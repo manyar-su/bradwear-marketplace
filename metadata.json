@@ -1,0 +1,7 @@
+{
+  "name": "Bradermock UI/UX Design",
+  "description": "A high-fidelity mobile UI/UX prototype for Bradermock, a print-on-demand shirt and uniform manufacturing application. Features product selection, design editor, and order summary.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
