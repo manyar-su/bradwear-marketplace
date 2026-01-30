@@ -23,11 +23,11 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   const filteredProducts = products.filter(p => p.category === activeTab && !p.isHidden);
 
   const promoSlides = [
-    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=600", tag: "PRESIISI" },
+    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=600", tag: "PRESISI" },
     { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: "https://images.unsplash.com/photo-1598501479155-02b03362691b?auto=format&fit=crop&q=80&w=600", tag: "FAVORIT" },
     { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=600", tag: "KUALITAS" },
     { title: "DESAIN BEBAS", desc: "Kustomisasi penuh warna & atribut unit.", img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600", tag: "KREATIF" },
-    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat.", img: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600", tag: "MURAH" }
+    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat.", img: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600", tag: "EKONOMIS" }
   ];
 
   useEffect(() => {
@@ -111,7 +111,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent flex flex-col justify-center px-10">
             <h4 className="text-white text-2xl font-black leading-tight uppercase tracking-tighter">STANDAR<br/><span className="neon-text">INDUSTRI</span></h4>
             <div className="mt-3 flex items-center gap-2">
-              <span className="bg-red-600 text-white text-[9px] font-black px-3 py-1 rounded-lg uppercase shadow-lg">Toko Resmi</span>
+              <span className="bg-red-600 text-white text-[9px] font-black px-3 py-1 rounded-lg uppercase shadow-lg">Bradwear Officials</span>
             </div>
           </div>
         </div>
