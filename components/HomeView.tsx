@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Product, Category, WorkflowStage, CustomerService, ProductionOrder } from '../types';
-import { CLIENT_LOGOS, CS_TEAM, TESTIMONIALS, FAQS, RANDOM_ORDERS } from '../constants';
+import { CS_TEAM, RANDOM_ORDERS, TESTIMONIALS, FAQS } from '../constants';
 import { ASSETS } from '../assets';
-
+import { useRef } from 'react';
 
 interface HomeViewProps {
   products: Product[];
@@ -21,6 +21,11 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   const [currentNotification, setCurrentNotification] = useState<typeof RANDOM_ORDERS[0] | null>(null);
   const [currentResi, setCurrentResi] = useState<string | null>(null);
   const [promoSlide, setPromoSlide] = useState(0);
+  const catalogRef = useRef<HTMLDivElement>(null);
+
+  const scrollToCatalog = () => {
+    catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Cek apakah ada order aktif di localStorage untuk user ini
   const hasActiveOrder = useMemo(() => {
@@ -33,11 +38,13 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   const filteredProducts = products.filter(p => p.category === activeTab && !p.isHidden);
 
   const promoSlides = [
-    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: "https://pin.it/1S3VNY2ps", tag: "PRESISI" },
-    { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: "https://images.unsplash.com/photo-1598501479155-02b03362691b?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
-    { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
-    { title: "DESAIN BEBAS", desc: "Kustomisasi penuh warna & atribut unit.", img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=800", tag: "KREATIF" },
-    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat.", img: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=800", tag: "EKONOMIS" }
+    { title: "PRODUKSI MASAL", desc: "Kapasitas ribuan pcs per bulan dengan QC ketat.", img: "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=800", tag: "KAPASITAS" },
+    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800", tag: "PRESISI" },
+    { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
+    { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
+    { title: "BANYAK INSTANSI", desc: "Dipercaya ratusan instansi di seluruh Indonesia.", img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800", tag: "KEPERCAYAAN" },
+    { title: "MANUFAKTUR MODERN", desc: "Proses produksi cepat dengan teknologi terkini.", img: "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=800", tag: "MODERN" },
+    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat biaya.", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800", tag: "EKONOMIS" }
   ];
 
   useEffect(() => {
@@ -45,7 +52,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       setPromoSlide((prev) => (prev + 1) % promoSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [promoSlides.length]);
 
   useEffect(() => {
     if (activeModal === 'tracking') {
@@ -104,18 +111,15 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
             <div className="w-10 h-10 rounded-full neon-bg flex items-center justify-center shrink-0 shadow-lg">
               <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             </div>
-            <div>
-              <p className="text-[10px] font-black uppercase neon-text tracking-widest">INFO TERBARU!</p>
-              <p className={`text-[9px] font-bold leading-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                <span className="neon-text font-black">{currentNotification.user}</span> baru saja memesan {currentNotification.qty}pcs {currentNotification.product}
-              </p>
-            </div>
+            <p className={`text-[9px] font-bold leading-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>
+              <span className="neon-text font-black">{currentNotification.user}</span> baru saja memesan {currentNotification.qty}pcs {currentNotification.product}
+            </p>
           </div>
         </div>
       )}
 
       {/* Hero Standar Industri */}
-      <div className="px-6 py-6">
+      <div className="px-6 py-6" id="home-top">
         <div className="w-full aspect-[16/7] rounded-[40px] overflow-hidden relative shadow-premium group border border-white/5 animate-breathe">
           <img src={ASSETS.BRAND.HERO} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[3000ms] opacity-80" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent flex flex-col justify-center px-10">
@@ -169,7 +173,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
           </div>
         ) : (
           <div
-            onClick={() => setActiveTab('Kemeja')}
+            onClick={scrollToCatalog}
             className={`p-6 rounded-[32px] border flex items-center gap-5 glass cursor-pointer transition-all hover:scale-[1.02] active:scale-95 ${theme === 'dark' ? 'border-white/10 bg-gradient-to-r from-zinc-900/50 to-transparent' : 'border-zinc-200 bg-white shadow-lg'}`}
           >
             <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center shrink-0 border border-white/5">
@@ -188,7 +192,10 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
 
       {/* NEW Slideshow Promosi Menarik (Di atas Katalog) */}
       <div className="px-6 py-4 overflow-hidden">
-        <div className="relative w-full aspect-[21/9] rounded-[48px] overflow-hidden shadow-2xl group border border-white/10">
+        <div
+          onClick={() => setPromoSlide((prev) => (prev + 1) % promoSlides.length)}
+          className="relative w-full aspect-[21/9] rounded-[48px] overflow-hidden shadow-2xl group border border-white/10 cursor-pointer"
+        >
           {promoSlides.map((slide, idx) => (
             <div
               key={idx}
@@ -211,22 +218,26 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       </div>
 
       {/* Catalog */}
-      <main className="px-6 space-y-8 mt-4">
+      <main ref={catalogRef} className="px-6 space-y-8 mt-4">
+        {/* Category Tabs */}
         <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
-          {(['Kemeja', 'Jaket', 'Celana', 'Rompi'] as Category[]).map(cat => (
-            <button key={cat} onClick={() => setActiveTab(cat)} className={`px-7 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${activeTab === cat ? 'neon-bg text-black neon-border shadow-lg scale-105' : theme === 'dark' ? 'bg-zinc-900/50 text-zinc-500 border-white/5' : 'bg-white text-zinc-400 border-zinc-200 shadow-sm'}`}>
+          {(['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Kids'] as Category[]).map(cat => (
+            <button key={cat} onClick={() => setActiveTab(cat)} className={`px-7 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${activeTab === cat ? 'neon-bg text-black neon-border shadow-lg scale-105' : theme === 'dark' ? 'bg-zinc-900/50 text-zinc-500 border-white/5' : 'bg-white text-zinc-500 border-zinc-200 shadow-sm'}`}>
               {cat}
             </button>
           ))}
         </div>
+
+
+        {/* Product Grid */}
         <div className="grid grid-cols-2 gap-5">
           {filteredProducts.map(product => (
-            <div key={product.id} className={`rounded-[40px] p-4 border shadow-md group transition-all relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5' : 'bg-white border-zinc-200'}`}>
+            <div key={product.id} id={`product-${product.id}`} className={`rounded-[40px] p-4 border shadow-md group transition-all relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5' : 'bg-white border-zinc-200'}`}>
               <div onClick={() => setSelectedCatalog(product)} className="aspect-[4/5] rounded-[32px] overflow-hidden bg-zinc-800/50 mb-4 cursor-zoom-in">
                 <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
               </div>
               <div className="px-1 space-y-1">
-                <h3 className="text-xs font-black uppercase line-clamp-1 adaptive-text">{product.name}</h3>
+                <h3 className={`text-xs font-black uppercase line-clamp-1 ${theme === 'dark' ? 'text-white' : 'text-zinc-700'}`}>{product.name}</h3>
                 <p className="text-[9px] font-bold adaptive-text-muted mb-3"><span className="neon-text">{product.soldCount.toLocaleString()}+</span> TERJUAL</p>
                 <button onClick={(e) => { e.stopPropagation(); onSelectProduct(product); }} className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-3xl bg-zinc-900 text-white hover:neon-bg hover:text-black transition-all shadow-lg active:scale-95">KUSTOM</button>
               </div>
@@ -235,7 +246,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       </main>
 
-      {/* 30 Days Log (Moved Below Catalog) */}
+      {/* 30 Days Log */}
       <div className="px-6 py-12 space-y-4">
         <div className="flex justify-between items-center px-1">
           <div className="flex items-center gap-2">
@@ -252,7 +263,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className={`text-[9px] font-black uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>{item.client}</p>
+                    <p className={`text-[9px] font-black uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>{item.client}</p>
                     <span className="text-[8px] font-black neon-text bg-emerald-500/10 px-1.5 py-0.5 rounded">ID: {item.code}</span>
                   </div>
                   <p className="text-[8px] font-bold adaptive-text-muted uppercase tracking-widest">TAHAP: <span className="neon-text">{item.stage}</span> • {item.cs}</p>
@@ -264,7 +275,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       </div>
 
-      {/* Testimonials (10 Items) */}
+      {/* Testimonials */}
       <section className="mt-8 px-6 space-y-6">
         <div className="text-center">
           <p className="text-[9px] font-black neon-text uppercase tracking-[0.4em]">CERITA PELANGGAN</p>
@@ -274,9 +285,13 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
           {TESTIMONIALS.map((testi, idx) => (
             <div key={idx} className="glass p-8 rounded-[40px] shrink-0 w-80 space-y-6 shadow-2xl border border-white/5 transition-all hover:scale-105 active:scale-95">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[11px] font-black uppercase bg-zinc-900 text-white border border-white/10 shadow-lg">{testi.agency.substring(0, 2)}</div>
+                <img
+                  src={testi.avatar}
+                  className="w-12 h-12 rounded-2xl object-cover border border-white/10 shadow-lg"
+                  alt={testi.name}
+                />
                 <div>
-                  <p className={`text-[11px] font-black uppercase ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>{testi.name}</p>
+                  <p className={`text-[11px] font-black uppercase ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>{testi.name}</p>
                   <p className="text-[8px] font-bold neon-text uppercase tracking-widest">{testi.agency}</p>
                 </div>
               </div>
@@ -291,7 +306,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       </section>
 
-      {/* CTA SECTION: Consultation */}
+      {/* CTA SECTION */}
       <section className="mt-12 px-6">
         <div className={`p-10 rounded-[48px] border glass relative overflow-hidden group shadow-2xl transition-all duration-700 hover:shadow-[0_40px_100px_rgba(191,255,0,0.25)] animate-breathe ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
           <div className="absolute -top-12 -right-12 w-64 h-64 neon-bg opacity-10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000"></div>
@@ -299,7 +314,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
           <div className="relative z-10 text-center space-y-8">
             <div className="space-y-3">
               <span className="text-[10px] font-black neon-text uppercase tracking-[0.5em] px-4 py-1.5 rounded-full border border-[#BFFF00]/20 bg-[#BFFF00]/5 inline-block animate-pulse">Konsultasi Prioritas</span>
-              <h2 className={`text-3xl font-black uppercase tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>Wujudkan Seragam<br /><span className="neon-text italic tracking-normal">Impian Unit Anda</span></h2>
+              <h2 className={`text-3xl font-black uppercase tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>Wujudkan Seragam<br /><span className="neon-text italic tracking-normal">Impian Unit Anda</span></h2>
               <p className="text-xs font-medium adaptive-text-muted leading-relaxed px-4 opacity-80">Hubungi tim ahli kami untuk mendapatkan penawaran harga terbaik dan bantuan kustomisasi desain instansi Anda.</p>
             </div>
             <button
@@ -308,32 +323,26 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
             >
               CHAT KONSULTAN SEKARANG
             </button>
-            <div className="flex items-center justify-center gap-2 opacity-50">
-              <div className="w-1.5 h-1.5 rounded-full neon-bg animate-ping"></div>
-              <p className="text-[8px] font-bold neon-text uppercase tracking-widest">Admin Online Siap Membantu</p>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Partners */}
+      {/* Partners Awareness */}
       <section className="mt-24 px-6 space-y-8 pb-10">
         <div className="text-center">
           <p className="text-[9px] font-black adaptive-text-muted uppercase tracking-[0.4em]">KEPERCAYAAN INSTANSI</p>
           <h4 className="text-xl font-black uppercase tracking-tighter adaptive-text">Our Strategic Partners</h4>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 opacity-30 grayscale hover:grayscale-0 transition-all duration-[2000ms] pb-10">
-          {CLIENT_LOGOS.map((client, idx) => (
-            <div key={idx} className="w-12 h-12 flex items-center justify-center filter drop-shadow-md">
-              <img src={client.logo} alt={client.name} className="max-w-full max-h-full object-contain" />
-            </div>
-          ))}
-        </div>
-        <div className="text-center pt-6 border-t border-white/5 opacity-40">
-          <p className="text-[8px] font-black adaptive-text-muted uppercase tracking-[0.5em] leading-relaxed italic">
-            CV. BRADWEAR INDONESIA GROUP<br />
-            © 2024 MANUFACTURE SOLUTIONS
-          </p>
+        <div className="relative overflow-hidden partner-logo-container">
+          <div className="flex animate-marquee gap-12 items-center">
+            {[...ASSETS.PARTNERS, ...ASSETS.PARTNERS].map((logo, idx) => (
+              <div key={idx} className="logo-item w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
+                <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain drop-shadow-2xl" />
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black via-black/40 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black via-black/40 to-transparent z-10 pointer-events-none"></div>
         </div>
       </section>
 
@@ -352,15 +361,11 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
             <div className="p-8 overflow-y-auto no-scrollbar space-y-6">
               {activeModal === 'cs-choice' && (
                 <div className="grid grid-cols-1 gap-4">
-                  <p className="text-[10px] font-black uppercase text-zinc-500 mb-2 tracking-widest px-2">TIM BRADWEAR SIAP MELAYANI:</p>
                   {CS_TEAM.map(cs => (
                     <button key={cs.id} onClick={() => handleCSChoice(cs)} className={`p-4 rounded-[32px] border-2 transition-all flex items-center gap-5 group hover:border-emerald-500/40 active:scale-95 ${theme === 'dark' ? 'bg-zinc-900/40 border-white/5' : 'bg-white border-zinc-100'}`}>
-                      <div className="relative shrink-0">
-                        <img src={cs.avatar} className="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/10" />
-                        {cs.isOnline && <div className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 neon-bg rounded-full border-4 border-black shadow-[0_0_10px_#BFFF00]" />}
-                      </div>
+                      <img src={cs.avatar} className="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/10" />
                       <div className="text-left">
-                        <p className="text-[13px] font-black uppercase adaptive-text group-hover:neon-text transition-colors">{cs.name}</p>
+                        <p className="text-[13px] font-black uppercase adaptive-text group-hover:neon-text transition-colors text-zinc-600 dark:text-white">{cs.name}</p>
                         <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Expert Consultant</p>
                       </div>
                     </button>
@@ -397,30 +402,16 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                       </div>
                     ))}
                   </div>
-                  {currentResi && (
-                    <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/20 text-center">
-                      <p className="text-[8px] font-black text-zinc-500 uppercase mb-1">NOMOR RESI KURIR</p>
-                      <p className="text-xs font-black neon-text uppercase">{currentResi}</p>
-                    </div>
-                  )}
                 </div>
               )}
               {activeModal === 'help' && (
                 <div className="space-y-8">
                   {FAQS.map((f, i) => (
-                    <div key={i} className="space-y-2 group">
-                      <p className="text-xs font-black neon-text uppercase tracking-tight group-hover:translate-x-1 transition-transform">Q: {f.q}</p>
+                    <div key={i} className="space-y-2 group text-left">
+                      <p className="text-xs font-black neon-text uppercase tracking-tight">Q: {f.q}</p>
                       <p className="text-[11px] font-medium adaptive-text-muted leading-relaxed opacity-80">A: {f.a}</p>
                     </div>
                   ))}
-                </div>
-              )}
-              {activeModal === 'voucher' && (
-                <div className="py-16 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-zinc-900 border border-white/5 mx-auto flex items-center justify-center">
-                    <svg className="w-8 h-8 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
-                  </div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Belum ada promo tersedia saat ini.</p>
                 </div>
               )}
             </div>
@@ -430,15 +421,15 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
 
       {/* Selected Catalog Detail Modal */}
       {selectedCatalog && (
-        <div className="fixed inset-0 z-[400] bg-black/98 backdrop-blur-3xl flex items-center justify-center p-6">
-          <div className="w-full max-w-screen-md h-full flex flex-col relative no-scrollbar">
+        <div className="fixed inset-0 z-[400] bg-black/98 backdrop-blur-3xl flex items-center justify-center p-6" onClick={() => setSelectedCatalog(null)}>
+          <div className="w-full max-w-screen-md h-full flex flex-col relative no-scrollbar" onClick={e => e.stopPropagation()}>
             <button onClick={() => setSelectedCatalog(null)} className="absolute top-0 right-0 z-50 w-14 h-14 rounded-3xl bg-white/5 backdrop-blur flex items-center justify-center text-white border border-white/10 shadow-2xl active:scale-90">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="flex-1 overflow-y-auto no-scrollbar py-20 px-4 space-y-16">
               <div className="text-center space-y-4">
                 <h3 className="text-5xl font-black text-white uppercase tracking-tighter pt-4 animate-fade-in">{selectedCatalog.name}</h3>
-                <p className="text-zinc-500 text-[11px] font-black uppercase tracking-[0.5em] opacity-60 animate-pulse tracking-widest">INDUSTRIAL WEAR SOLUTIONS</p>
+                <p className="text-zinc-500 text-[11px] font-black uppercase tracking-[0.5em] opacity-60 animate-pulse">INDUSTRIAL WEAR SOLUTIONS</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="rounded-[60px] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] bg-zinc-900">

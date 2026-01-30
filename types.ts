@@ -6,7 +6,7 @@ export enum View {
   ADMIN = 'ADMIN'
 }
 
-export type Category = 'Kemeja' | 'Celana' | 'Rompi' | 'Jaket';
+export type Category = 'Kemeja' | 'Celana' | 'Rompi' | 'Jaket' | 'Kids';
 
 export interface ProductImages {
   front: string;

@@ -11,15 +11,12 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(() => {
     return (localStorage.getItem('bradwear_view') as View) || View.HOME;
   });
-  
+
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('bradwear_theme') as 'light' | 'dark') || 'dark';
   });
-  
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('bradwear_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
 
   const [orderCode, setOrderCode] = useState(() => {
     return localStorage.getItem('bradwear_order_code') || Math.floor(Math.random() * 9000 + 1000).toString();
@@ -50,7 +47,7 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('bradwear_selected_product');
     return saved ? JSON.parse(saved) : null;
   });
-  
+
   const [designData, setDesignData] = useState<DesignData>(() => {
     const saved = localStorage.getItem('bradwear_design_data');
     return saved ? JSON.parse(saved) : {
@@ -110,42 +107,44 @@ const App: React.FC = () => {
   return (
     <div className={`h-screen w-screen overflow-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-[#050505]' : 'bg-zinc-200'} flex justify-center items-center`}>
       <div className={`h-full w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[1200px] shadow-premium relative overflow-hidden flex flex-col border-x ${theme === 'dark' ? 'bg-black text-white border-white/5' : 'bg-white text-zinc-900 border-zinc-200'}`}>
-        
-        <header className={`px-6 py-6 flex items-center justify-between border-b shrink-0 z-50 ${theme === 'dark' ? 'bg-black/80 border-white/5 backdrop-blur-xl' : 'bg-white/90 border-zinc-100 backdrop-blur-xl'}`}>
-          <div className="flex flex-col cursor-pointer" onClick={() => setCurrentView(View.HOME)}>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-black tracking-tighter italic neon-text`}>BRADWEAR</span>
-              <span className={`text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500`}>INDONESIA</span>
+
+        {currentView !== View.EDITOR && (
+          <header className={`px-6 py-6 flex items-center justify-between border-b shrink-0 z-50 ${theme === 'dark' ? 'bg-black/80 border-white/5 backdrop-blur-xl' : 'bg-white/90 border-zinc-100 backdrop-blur-xl'}`}>
+            <div className="flex flex-col cursor-pointer" onClick={() => setCurrentView(View.HOME)}>
+              <div className="flex items-baseline gap-2">
+                <span className={`text-2xl font-black tracking-tighter italic neon-text`}>BRADWEAR</span>
+                <span className={`text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500`}>INDONESIA</span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 neon-text border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
-              {theme === 'dark' ? <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>}
-            </button>
-            <button onClick={() => setCurrentView(View.ADMIN)} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 text-white border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </button>
-          </div>
-        </header>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 neon-text border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
+                {theme === 'dark' ? <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>}
+              </button>
+              <button onClick={() => setCurrentView(View.ADMIN)} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 text-white border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </button>
+            </div>
+          </header>
+        )}
 
         <div className="flex-1 h-full overflow-hidden flex flex-col relative no-scrollbar">
           {currentView === View.HOME && (
             <div className="h-full overflow-y-auto no-scrollbar scroll-smooth view-transition">
-              <HomeView 
+              <HomeView
                 products={products}
                 workflowStages={userWorkflowStages}
                 orderCode={orderCode}
                 branding={{ title: "Bradwear Manufacture", subtitle: "Industrial Quality Uniform & Shirt" }}
-                onSelectProduct={handleSelectProduct} 
-                theme={theme} 
+                onSelectProduct={handleSelectProduct}
+                theme={theme}
               />
             </div>
           )}
 
           {currentView === View.EDITOR && selectedProduct && (
             <div className="h-full overflow-hidden view-transition">
-              <DesignEditorView 
-                product={selectedProduct} 
+              <DesignEditorView
+                product={selectedProduct}
                 designData={designData}
                 onUpdate={handleUpdateDesign}
                 onBack={handleGoBack}
@@ -157,7 +156,7 @@ const App: React.FC = () => {
 
           {currentView === View.SUMMARY && selectedProduct && (
             <div className="h-full overflow-hidden view-transition">
-              <SummaryView 
+              <SummaryView
                 product={selectedProduct}
                 designData={designData}
                 orderItems={orderItems}
@@ -170,7 +169,7 @@ const App: React.FC = () => {
 
           {currentView === View.ADMIN && (
             <div className="h-full overflow-hidden view-transition">
-              <AdminView 
+              <AdminView
                 products={products}
                 setProducts={setProducts}
                 productionOrders={productionOrders}
@@ -178,7 +177,7 @@ const App: React.FC = () => {
                 orderCode={orderCode}
                 setOrderCode={setOrderCode}
                 branding={{ title: "Admin Panel", subtitle: "Real-time Production Control" }}
-                setBranding={() => {}}
+                setBranding={() => { }}
                 onBack={handleGoBack}
                 theme={theme}
               />
