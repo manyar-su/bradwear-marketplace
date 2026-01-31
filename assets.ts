@@ -31,6 +31,48 @@ import PARTNER_PUPR from './assets/Logo our partner/Logo Kementerian PUPR (PNG-2
 import PARTNER_HUB from './assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png';
 import PARTNER_PERINDUS from './assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png';
 
+// Import Warna Images
+import COLOR_BIRU_MUDA from './assets/warna/biru muda.jpeg';
+import COLOR_COKLAT_TUA from './assets/warna/coklat tua.jpeg';
+import COLOR_COKLAT from './assets/warna/coklat.jpeg';
+import COLOR_DENIM from './assets/warna/denim.jpeg';
+import COLOR_HIJAU_ARMY from './assets/warna/hijau army.jpeg';
+import COLOR_HIJAU_BUNGLON from './assets/warna/hijau bunglon.jpeg';
+import COLOR_HIJAU from './assets/warna/hijau.jpeg';
+import COLOR_HITAM from './assets/warna/hitam.jpeg';
+import COLOR_KHAKI from './assets/warna/khaki.jpeg';
+import COLOR_KUNING from './assets/warna/kuning.jpeg';
+import COLOR_MAROON from './assets/warna/maroon.jpeg';
+import COLOR_MERAH_CABE from './assets/warna/merah cabe.jpeg';
+import COLOR_MOCHA from './assets/warna/mocha.jpeg';
+import COLOR_NAVI from './assets/warna/navi.jpeg';
+import COLOR_OREN from './assets/warna/oren.jpeg';
+import COLOR_PUTIH from './assets/warna/putih.jpeg';
+import COLOR_SAGE from './assets/warna/sage.jpeg';
+import COLOR_UNGU_MUDA from './assets/warna/ungu muda.jpeg';
+import COLOR_UNGU_TUA from './assets/warna/ungu tua.jpeg';
+
+// Import Warna Images (BACK)
+import COLOR_BIRU_MUDA_BACK from './assets/warna/biru muda belakang.png';
+import COLOR_COKLAT_TUA_BACK from './assets/warna/coklat tua belakang.png';
+import COLOR_COKLAT_BACK from './assets/warna/coklat belakang.png';
+import COLOR_DENIM_BACK from './assets/warna/denim belakang.png';
+import COLOR_HIJAU_ARMY_BACK from './assets/warna/hijau army belakang.png';
+import COLOR_HIJAU_BUNGLON_BACK from './assets/warna/hijau bunglon belakang.png';
+import COLOR_HIJAU_BACK from './assets/warna/hijau belakang.png';
+import COLOR_HITAM_BACK from './assets/warna/hitam belakang.png';
+import COLOR_KHAKI_BACK from './assets/warna/khaki belakang.png';
+import COLOR_KUNING_BACK from './assets/warna/kuning belakang.png';
+import COLOR_MAROON_BACK from './assets/warna/maroon belakang.png';
+import COLOR_MERAH_CABE_BACK from './assets/warna/merah cabe belakang.png';
+import COLOR_MOCHA_BACK from './assets/warna/mocha belakang.png';
+import COLOR_NAVI_BACK from './assets/warna/navi belakang.png';
+import COLOR_OREN_BACK from './assets/warna/oren belakang.png';
+import COLOR_PUTIH_BACK from './assets/warna/putih belakang.png';
+import COLOR_SAGE_BACK from './assets/warna/sage belakang.png';
+import COLOR_UNGU_MUDA_BACK from './assets/warna/ungu muda belakang.png';
+import COLOR_UNGU_TUA_BACK from './assets/warna/ungu tua belakang.png';
+
 export const ASSETS = {
   // --- UI & BRANDING ---
   BRAND: {
@@ -85,6 +127,52 @@ export const ASSETS = {
   AVATARS: {
     DAFFA: 'https://i.pravatar.cc/150?u=daffa',
     SISKA: 'https://i.pravatar.cc/150?u=siska',
+  },
+
+  // --- WARNA ---
+  COLORS: {
+    BIRU_MUDA: COLOR_BIRU_MUDA,
+    COKLAT_TUA: COLOR_COKLAT_TUA,
+    COKLAT: COLOR_COKLAT,
+    DENIM: COLOR_DENIM,
+    HIJAU_ARMY: COLOR_HIJAU_ARMY,
+    HIJAU_BUNGLON: COLOR_HIJAU_BUNGLON,
+    HIJAU: COLOR_HIJAU,
+    HITAM: COLOR_HITAM,
+    KHAKI: COLOR_KHAKI,
+    KUNING: COLOR_KUNING,
+    MAROON: COLOR_MAROON,
+    MERAH_CABE: COLOR_MERAH_CABE,
+    MOCHA: COLOR_MOCHA,
+    NAVI: COLOR_NAVI,
+    OREN: COLOR_OREN,
+    PUTIH: COLOR_PUTIH,
+    SAGE: COLOR_SAGE,
+    UNGU_MUDA: COLOR_UNGU_MUDA,
+    UNGU_TUA: COLOR_UNGU_TUA,
+  },
+
+  // --- WARNA BELAKANG ---
+  COLORS_BACK: {
+    BIRU_MUDA: COLOR_BIRU_MUDA_BACK,
+    COKLAT_TUA: COLOR_COKLAT_TUA_BACK,
+    COKLAT: COLOR_COKLAT_BACK,
+    DENIM: COLOR_DENIM_BACK,
+    HIJAU_ARMY: COLOR_HIJAU_ARMY_BACK,
+    HIJAU_BUNGLON: COLOR_HIJAU_BUNGLON_BACK,
+    HIJAU: COLOR_HIJAU_BACK,
+    HITAM: COLOR_HITAM_BACK,
+    KHAKI: COLOR_KHAKI_BACK,
+    KUNING: COLOR_KUNING_BACK,
+    MAROON: COLOR_MAROON_BACK,
+    MERAH_CABE: COLOR_MERAH_CABE_BACK,
+    MOCHA: COLOR_MOCHA_BACK,
+    NAVI: COLOR_NAVI_BACK,
+    OREN: COLOR_OREN_BACK,
+    PUTIH: COLOR_PUTIH_BACK,
+    SAGE: COLOR_SAGE_BACK,
+    UNGU_MUDA: COLOR_UNGU_MUDA_BACK,
+    UNGU_TUA: COLOR_UNGU_TUA_BACK,
   }
 };
 
@@ -95,7 +183,9 @@ export const getAssetByName = (name: string): string => {
     ...ASSETS.JAKET,
     ...ASSETS.CELANA,
     ...ASSETS.ROMPI,
-    ...ASSETS.AVATARS
+    ...ASSETS.AVATARS,
+    ...ASSETS.COLORS,
+    ...ASSETS.COLORS_BACK
   };
   return flatAssets[name] || '';
 };

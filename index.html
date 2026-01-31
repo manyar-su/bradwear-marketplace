@@ -104,6 +104,18 @@
           to { transform: translateY(0); opacity: 1; }
         }
 
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+        @keyframes fadeInUp {
+          from { transform: translateY(10px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+
         /* Infinite Marquee Animation */
         @keyframes marquee {
           0% { transform: translateX(0); }

@@ -120,7 +120,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
 
       {/* Hero Standar Industri */}
       <div className="px-6 py-6" id="home-top">
-        <div className="w-full aspect-[16/7] rounded-[40px] overflow-hidden relative shadow-premium group border border-white/5 animate-breathe">
+        <div className="w-full aspect-[4/3] md:aspect-[21/9] lg:aspect-[16/7] rounded-[40px] overflow-hidden relative shadow-premium group border border-white/5 animate-breathe">
           <img src={ASSETS.BRAND.HERO} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[3000ms] opacity-80" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent flex flex-col justify-center px-10">
             <h4 className="text-white text-2xl font-black leading-tight uppercase tracking-tighter">STANDAR<br /><span className="neon-text">INDUSTRI</span></h4>

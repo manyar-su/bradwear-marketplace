@@ -356,20 +356,25 @@ export const MATERIAL_SPECS: Record<string, { title: string; desc: string; point
 };
 
 export const COLORS = [
-  { name: 'Hitam (Black)', hex: '#1A1A1B' },
-  { name: 'Putih (White)', hex: '#FFFFFF' },
-  { name: 'Navy (Dongker)', hex: '#1B263B' },
-  { name: 'Abu SMA (Grey)', hex: '#808080' },
-  { name: 'Hijau Army (TNI)', hex: '#4b5320' },
-  { name: 'Hijau Toska', hex: '#008080' },
-  { name: 'Burgundi', hex: '#800020' },
-  { name: 'Maroon', hex: '#5E1916' },
-  { name: 'Mocha', hex: '#6F4E37' },
-  { name: 'Khaki (Pemda)', hex: '#C3B091' },
-  { name: 'Cream', hex: '#FFFDD0' },
-  { name: 'Kuning Golkar', hex: '#FACC15' },
-  { name: 'Merah Cabe', hex: '#B91C1C' },
-  { name: 'Benhur (Royal Blue)', hex: '#1E40AF' }
+  { name: 'Putih', hex: '#FFFFFF', image: ASSETS.COLORS.PUTIH, backImage: ASSETS.COLORS_BACK.PUTIH },
+  { name: 'Khaki', hex: '#C5CAE9', image: ASSETS.COLORS.KHAKI, backImage: ASSETS.COLORS_BACK.KHAKI },
+  { name: 'Kuning', hex: '#FFEB3B', image: ASSETS.COLORS.KUNING, backImage: ASSETS.COLORS_BACK.KUNING },
+  { name: 'Oren', hex: '#FF9800', image: ASSETS.COLORS.OREN, backImage: ASSETS.COLORS_BACK.OREN },
+  { name: 'Merah Cabe', hex: '#D32F2F', image: ASSETS.COLORS.MERAH_CABE, backImage: ASSETS.COLORS_BACK.MERAH_CABE },
+  { name: 'Ungu Muda', hex: '#D1C4E9', image: ASSETS.COLORS.UNGU_MUDA, backImage: ASSETS.COLORS_BACK.UNGU_MUDA },
+  { name: 'Biru Muda', hex: '#87CEEB', image: ASSETS.COLORS.BIRU_MUDA, backImage: ASSETS.COLORS_BACK.BIRU_MUDA },
+  { name: 'Sage', hex: '#81C784', image: ASSETS.COLORS.SAGE, backImage: ASSETS.COLORS_BACK.SAGE },
+  { name: 'Hijau', hex: '#2E7D32', image: ASSETS.COLORS.HIJAU, backImage: ASSETS.COLORS_BACK.HIJAU },
+  { name: 'Hijau Bunglon', hex: '#006400', image: ASSETS.COLORS.HIJAU_BUNGLON, backImage: ASSETS.COLORS_BACK.HIJAU_BUNGLON },
+  { name: 'Mocha', hex: '#A1887F', image: ASSETS.COLORS.MOCHA, backImage: ASSETS.COLORS_BACK.MOCHA },
+  { name: 'Coklat', hex: '#795548', image: ASSETS.COLORS.COKLAT, backImage: ASSETS.COLORS_BACK.COKLAT },
+  { name: 'Maroon', hex: '#B71C1C', image: ASSETS.COLORS.MAROON, backImage: ASSETS.COLORS_BACK.MAROON },
+  { name: 'Ungu Tua', hex: '#4A148C', image: ASSETS.COLORS.UNGU_TUA, backImage: ASSETS.COLORS_BACK.UNGU_TUA },
+  { name: 'Denim', hex: '#1560BD', image: ASSETS.COLORS.DENIM, backImage: ASSETS.COLORS_BACK.DENIM },
+  { name: 'Navy', hex: '#1A237E', image: ASSETS.COLORS.NAVI, backImage: ASSETS.COLORS_BACK.NAVI },
+  { name: 'Hijau Army', hex: '#4B5320', image: ASSETS.COLORS.HIJAU_ARMY, backImage: ASSETS.COLORS_BACK.HIJAU_ARMY },
+  { name: 'Coklat Tua', hex: '#3E2723', image: ASSETS.COLORS.COKLAT_TUA, backImage: ASSETS.COLORS_BACK.COKLAT_TUA },
+  { name: 'Hitam', hex: '#212121', image: ASSETS.COLORS.HITAM, backImage: ASSETS.COLORS_BACK.HITAM }
 ];
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', 'Kustom'];
