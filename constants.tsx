@@ -375,12 +375,13 @@ export const COLORS = [
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', 'Kustom'];
 
 export const CS_TEAM: CustomerService[] = [
-  { id: 'cs1', name: 'Gilang', avatar: 'https://i.pravatar.cc/150?u=gilang', isOnline: true, phone: '6281234567801', loginKey: 'brad01' },
-  { id: 'cs2', name: 'Bayu', avatar: 'https://i.pravatar.cc/150?u=bayu', isOnline: true, phone: '6281234567802', loginKey: 'brad02' },
+  { id: 'cs1', name: 'Gilang', avatar: 'https://i.pravatar.cc/150?u=gilang', isOnline: true, phone: '6282232133926', loginKey: 'brad01' },
+  { id: 'cs2', name: 'Bayu', avatar: 'https://i.pravatar.cc/150?u=bayu', isOnline: true, phone: '6287736834454', loginKey: 'brad02' },
   { id: 'cs3', name: 'Fikri', avatar: 'https://i.pravatar.cc/150?u=fikri', isOnline: true, phone: '6281234567803', loginKey: 'brad03' },
   { id: 'cs4', name: 'Aris', avatar: 'https://i.pravatar.cc/150?u=aris', isOnline: true, phone: '6281234567804', loginKey: 'brad04' },
   { id: 'cs5', name: 'Ede', avatar: 'https://i.pravatar.cc/150?u=ede', isOnline: true, phone: '6281234567805', loginKey: 'brad05' },
-  { id: 'cs6', name: 'Elsa', avatar: 'https://i.pravatar.cc/150?u=elsa', isOnline: true, phone: '6281234567806', loginKey: 'brad06' },
-  { id: 'cs7', name: 'Nadhifa', avatar: 'https://i.pravatar.cc/150?u=nadhifa', isOnline: true, phone: '6281234567807', loginKey: 'brad07' },
-  { id: 'cs8', name: 'Eris', avatar: 'https://i.pravatar.cc/150?u=eris', isOnline: true, phone: '6281234567808', loginKey: 'brad08' },
+  { id: 'cs6', name: 'Elsa', avatar: 'https://i.pravatar.cc/150?u=elsa', isOnline: true, phone: '6285722733889', loginKey: 'brad06' },
+  { id: 'cs7', name: 'Nadhifa', avatar: 'https://i.pravatar.cc/150?u=nadhifa', isOnline: true, phone: '6282316067692', loginKey: 'brad07' },
+  { id: 'cs8', name: 'Eris', avatar: 'https://i.pravatar.cc/150?u=eris', isOnline: true, phone: '6285846989608', loginKey: 'brad08' },
+  { id: 'cs9', name: 'Risma', avatar: 'https://i.pravatar.cc/150?u=risma', isOnline: true, phone: '6282232133926', loginKey: 'brad09' },
 ];
