@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
-import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS } from '../constants';
+import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, CS_TEAM } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
 
 const DesignEditorView: React.FC<{
@@ -31,7 +31,77 @@ const DesignEditorView: React.FC<{
     setHistoryPointer(0);
   }, []); // [] artinya hanya jalan sekali saat mount
 
-  const [editorStep, setEditorStep] = useState<'materials' | 'details'>('materials');
+  const [editorStep, setEditorStep] = useState<'materials' | 'details' | 'finish'>('materials');
+
+  // --- STATE LIST PESANAN (CART SYSTEM) ---
+  interface OrderItem {
+    id: string;
+    model: Product;
+    color: string;
+    name: string;
+    size: string;
+    gender: 'Pria' | 'Wanita';
+    sleeve: 'Panjang' | 'Pendek';
+    qty: number;
+    customDetail?: string; // Menyimpan detail ukuran custom
+  }
+
+  const [cartItems, setCartItems] = useState<OrderItem[]>([]);
+
+  // State untuk Form "Tambah Item"
+  const [activeFormModel, setActiveFormModel] = useState<Product>(product);
+  const [activeFormColor, setActiveFormColor] = useState<string>(designData.color);
+
+  const [newItem, setNewItem] = useState({
+    name: '',
+    size: 'L',
+    gender: 'Pria' as 'Pria' | 'Wanita',
+    sleeve: 'Panjang' as 'Panjang' | 'Pendek',
+    qty: 1
+  });
+
+  const [showCustomSizeModal, setShowCustomSizeModal] = useState(false);
+  // Simpan detail custom sementara sebelum dimasukkan ke cart
+  const [customMeasures, setCustomMeasures] = useState({
+    tinggi: '', lebarDada: '', lebarBahu: '', panjangLengan: '', kerah: '', manset: ''
+  });
+
+  // State Ekspor WhatsApp
+  const [showExtraSizes, setShowExtraSizes] = useState(false);
+
+
+  // Tambahkan item ke cart
+  const handleAddToCart = () => {
+    let customDetailStr = '';
+    if (newItem.size === 'Custom') {
+      customDetailStr = `(T:${customMeasures.tinggi}, LD:${customMeasures.lebarDada}, LB:${customMeasures.lebarBahu}, PL:${customMeasures.panjangLengan})`;
+    }
+
+    const item: OrderItem = {
+      id: `item_${Date.now()}`,
+      model: activeFormModel,
+      color: activeFormColor,
+      name: newItem.name || '-',
+      size: newItem.size,
+      gender: newItem.gender,
+      sleeve: newItem.sleeve,
+      qty: newItem.qty,
+      customDetail: customDetailStr
+    };
+
+    setCartItems([...cartItems, item]);
+
+    // Reset form (keep model/color same for convenience or reset? User wants "add item", presumably diverse)
+    setNewItem({ ...newItem, name: '', qty: 1 }); // Keep size/gender specs as they might repeat
+    alert("✅ Item berhasil ditambahkan ke daftar!");
+  };
+
+  // Hapus item dari cart
+  const handleRemoveFromCart = (id: string) => {
+    setCartItems(cartItems.filter(i => i.id !== id));
+  };
+
+  // --- KONFIGURASI POSISI DEFAULT ELEMEN (EDIT DISINI) ---
 
   // --- KONFIGURASI POSISI DEFAULT ELEMEN (EDIT DISINI) ---
   // Panduan Koordinat:
@@ -154,28 +224,105 @@ const DesignEditorView: React.FC<{
     setActiveElementId(null);
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>, targetView?: 'Depan' | 'Belakang' | 'Kanan' | 'Kiri', targetPos?: { x: number, y: number }) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setIsProcessing(true);
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const originalSrc = event.target?.result as string;
-        const overrides: Partial<DesignElement> = {};
-        if (targetView) overrides.view = targetView;
-        if (targetPos) overrides.pos = targetPos;
+  /* --- LOGIKA UPLOAD LOGO (SUPPORT MULTIPLE FILES) --- */
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetView?: 'Depan' | 'Belakang' | 'Kanan' | 'Kiri', targetPos?: { x: number, y: number }) => {
+    const input = e.target; // Simpan referensi input
+    const files = input.files;
+    if (!files || files.length === 0) return;
 
+    setIsProcessing(true);
+
+    // Copy elements to avoid mutation issues during async process
+    let currentElements = JSON.parse(JSON.stringify(elements));
+    let hasChanges = false;
+
+    try {
+      // Proses setiap file secara berurutan
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         try {
-          await new Promise(r => setTimeout(r, 50));
-          const processedSrc = await removeBackground(originalSrc);
-          addElement('image', processedSrc, overrides);
-        } catch (e) {
-          addElement('image', originalSrc, overrides);
-        } finally {
-          setIsProcessing(false);
+          const originalSrc = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target?.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+
+          let finalSrc = originalSrc;
+
+          // RESIZE LOGIC (PREVENT MEMORY CRASH)
+          const resizedSrc = await new Promise<string>((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 800; // Limit 800px
+              let w = img.width; let h = img.height;
+              if (w > MAX || h > MAX) {
+                if (w > h) { h = Math.round((h * MAX) / w); w = MAX; }
+                else { w = Math.round((w * MAX) / h); h = MAX; }
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                const ctx = c.getContext('2d');
+                if (ctx) { ctx.drawImage(img, 0, 0, w, h); resolve(c.toDataURL()); return; }
+              }
+              resolve(originalSrc);
+            };
+            img.onerror = () => resolve(originalSrc);
+            img.src = originalSrc;
+          });
+
+          finalSrc = resizedSrc;
+          // Coba hapus background
+          try {
+            await new Promise(r => setTimeout(r, 50));
+            const noBgSrc = await removeBackground(resizedSrc);
+            if (noBgSrc && noBgSrc.length > 100) finalSrc = noBgSrc;
+          } catch (bgError) {
+            console.warn("Background removal failed", bgError);
+          }
+
+          // Generate ID unik
+          const newId = `img_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 6)}`;
+
+          const overrides: Partial<DesignElement> = {};
+          if (targetView) overrides.view = targetView;
+          if (targetPos) {
+            // Geser posisi agar tidak menumpuk (semakin banyak semakin ke kanan-bawah)
+            overrides.pos = {
+              x: targetPos.x + (i * 3),
+              y: targetPos.y + (i * 3)
+            };
+          }
+
+          const newElement: DesignElement = {
+            id: newId,
+            type: 'image',
+            content: finalSrc,
+            pos: { x: 50, y: 50 }, // Default
+            scale: 1,
+            view: designData.view,
+            ...overrides
+          };
+
+          currentElements.push(newElement);
+          hasChanges = true;
+
+        } catch (err) {
+          console.error(`Error processing file ${file.name}:`, err);
+          // Continue to next file
         }
-      };
-      reader.readAsDataURL(file);
+      }
+
+      if (hasChanges) {
+        onUpdate({ elements: currentElements });
+        pushToHistory(currentElements);
+      }
+    } catch (criticalErr) {
+      console.error("Critical upload error:", criticalErr);
+      alert("Terjadi kesalahan saat memproses upload.");
+    } finally {
+      // Reset input value
+      if (input) input.value = '';
+      setIsProcessing(false);
     }
   };
 
@@ -333,46 +480,102 @@ const DesignEditorView: React.FC<{
     }
   };
 
+  /* --- LOGIKA EKSPOR WHATSAPP (FRONT & BACK) --- */
   const handleExport = async () => {
     if (!canvasRef.current) return;
     setIsExporting(true);
+    const originalView = designData.view; // Simpan view saat ini
 
     try {
-      // Small delay to ensure UI is updated
-      await new Promise(r => setTimeout(r, 100));
+      // 1. CAPTURE TAMPAK DEPAN
+      onUpdate({ view: 'Depan' });
+      await new Promise(r => setTimeout(r, 800)); // Tunggu render ulang
 
-      // Capture Canvas
-      const canvas = await html2canvas(canvasRef.current, {
+      const canvasFront = await html2canvas(canvasRef.current, {
         useCORS: true,
-        scale: 2, // Befter quality
+        scale: 2,
         backgroundColor: null
       });
+      const imageFront = canvasFront.toDataURL("image/png");
 
-      // Download Image
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `BRADWEAR_${product.name}_${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Download Gambar Depan
+      const linkFront = document.createElement('a');
+      linkFront.href = imageFront;
+      linkFront.download = `BRADWEAR_${product.name}_DEPAN_${Date.now()}.png`;
+      document.body.appendChild(linkFront);
+      linkFront.click();
+      document.body.removeChild(linkFront);
 
-      // WhatsApp Message
-      const colorName = COLORS.find(c => c.hex === designData.color)?.name || designData.color;
+      // 2. CAPTURE TAMPAK BELAKANG
+      onUpdate({ view: 'Belakang' });
+      await new Promise(r => setTimeout(r, 800)); // Tunggu render ulang
+
+      const canvasBack = await html2canvas(canvasRef.current, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: null
+      });
+      const imageBack = canvasBack.toDataURL("image/png");
+
+      // Download Gambar Belakang
+      const linkBack = document.createElement('a');
+      linkBack.href = imageBack;
+      linkBack.download = `BRADWEAR_${product.name}_BELAKANG_${Date.now()}.png`;
+      document.body.appendChild(linkBack);
+      linkBack.click();
+      document.body.removeChild(linkBack);
+
+      // Kembalikan ke view awal
+      onUpdate({ view: originalView });
+
+      // 3. KIRIM PESAN WHATSAPP
       const materialName = designData.material || 'Standar';
-      const text = `Halo Admin Bradwear, saya ingin memesan kustom desain ini:%0a%0a` +
-        `*Produk*: ${product.name}%0a` +
-        `*Warna*: ${colorName}%0a` +
-        `*Bahan*: ${materialName}%0a` +
-        `*Catatan*: (Gambar Desain Terlampir)`;
 
-      const phone = '6282232133926'; // Default CS
-      window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+      // Validasi Cart - Jika kosong pakai data form saat ini
+      const finalItems = cartItems.length > 0 ? cartItems : [
+        {
+          id: 'temp',
+          model: activeFormModel,
+          color: activeFormColor,
+          name: newItem.name || '-',
+          size: newItem.size,
+          gender: newItem.gender,
+          sleeve: newItem.sleeve,
+          qty: newItem.qty,
+          customDetail: newItem.size === 'Custom' ? `(Custom: ${customMeasures.tinggi}/${customMeasures.lebarDada}...)` : ''
+        }
+      ];
 
-      onNext();
+      // Format List Pesanan Lengkap
+      let ordersText = '';
+      finalItems.forEach((item, idx) => {
+        const colorName = COLORS.find(c => c.hex === item.color)?.name || 'Custom';
+        ordersText += `\nItem #${idx + 1}:\n` +
+          `   - Model: ${item.model.name}\n` +
+          `   - Warna: ${colorName}\n` +
+          `   - Label/Nama: *${item.name}*\n` +
+          `   - Size: ${item.size} ${item.customDetail || ''}\n` +
+          `   - Spec: ${item.gender}, Lengan ${item.sleeve}\n` +
+          `   - Qty: ${item.qty} pcs\n`;
+      });
+
+      const text = `Halo, saya ingin *MEMPRODUKSI PESANAN* hasil desain dari aplikasi Bradwear:%0a%0a` +
+        `🧵 *MATERIAL INFO*%0a` +
+        `   - Bahan: ${materialName}%0a%0a` +
+        `📋 *DETAIL PESANAN (${finalItems.length} Item)*${encodeURIComponent(ordersText)}%0a` +
+        `🖼️ *DESAIN*: (Saya telah mengunduh gambar DEPAN & BELAKANG, dan akan mengirimkannya setelah pesan ini)%0a%0a` +
+        `Mohon info total harga dan invoice-nya. Terima kasih!`;
+
+      // Buka WA tanpa nomor tujuan spesifik (agar user bisa pilih kontak)
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+
+      alert("✅ Gambar TAMPAK DEPAN & BELAKANG berhasil diunduh.\n\nWhatsApp terbuka! Silakan PILIH KONTAK (CS/Admin) yang Anda tuju, lalu KIRIM pesan & LAMPIRKAN gambar yang baru saja diunduh.");
+
+      handleBackCustom();
     } catch (err) {
       console.error("Export failed", err);
-      alert("Gagal menyimpan gambar. Silakan coba lagi.");
+      alert("Gagal memproses gambar. Silakan coba lagi.");
+      onUpdate({ view: originalView });
     } finally {
       setIsExporting(false);
     }
@@ -509,9 +712,9 @@ const DesignEditorView: React.FC<{
         {/* Panel Header */}
         <div className={`px-8 py-6 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-zinc-100 bg-zinc-50'}`}>
           <h2 className="text-xl font-black uppercase tracking-widest neon-text mb-1">
-            {editorStep === 'materials' ? 'Desain Warna & Bahan' : 'Detail Atribut'}
+            {editorStep === 'materials' ? 'Desain Warna & Bahan' : editorStep === 'details' ? 'Detail Atribut' : 'Data Pesanan'}
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">Steps: {editorStep === 'materials' ? '1/2' : '2/2'}</p>
+          <p className="text-xs text-zinc-500 font-medium">Steps: {editorStep === 'materials' ? '1/3' : editorStep === 'details' ? '2/3' : '3/3'}</p>
         </div>
 
         {/* Scrollable Content */}
@@ -662,7 +865,7 @@ const DesignEditorView: React.FC<{
                   >
                     + Logo
                   </button>
-                  <input type="file" ref={fileInputRefNama} className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LOGO_NAMA)} />
+                  <input type="file" ref={fileInputRefNama} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LOGO_NAMA)} />
                 </div>
                 <input
                   type="text"
@@ -686,7 +889,7 @@ const DesignEditorView: React.FC<{
                   >
                     + Logo
                   </button>
-                  <input type="file" ref={fileInputRefJabatan} className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LOGO_JABATAN)} />
+                  <input type="file" ref={fileInputRefJabatan} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LOGO_JABATAN)} />
                 </div>
                 <input
                   type="text"
@@ -732,7 +935,7 @@ const DesignEditorView: React.FC<{
                   >
                     <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                     <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kanan</span>
-                    <input type="file" ref={fileInputRefLenganKanan} className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KANAN)} />
+                    <input type="file" ref={fileInputRefLenganKanan} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KANAN)} />
                   </button>
 
                   <button
@@ -744,7 +947,7 @@ const DesignEditorView: React.FC<{
                   >
                     <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                     <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kiri</span>
-                    <input type="file" ref={fileInputRefLenganKiri} className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KIRI)} />
+                    <input type="file" ref={fileInputRefLenganKiri} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KIRI)} />
                   </button>
 
                   <button
@@ -756,7 +959,7 @@ const DesignEditorView: React.FC<{
                   >
                     <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                     <span className="text-[9px] font-bold uppercase transition-colors">Upload Desain Belakang</span>
-                    <input type="file" ref={fileInputRefBelakang} className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e, 'Belakang', DEFAULT_POS.BELAKANG)} />
+                    <input type="file" ref={fileInputRefBelakang} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Belakang', DEFAULT_POS.BELAKANG)} />
                   </button>
                 </div>
               </div>
@@ -764,116 +967,377 @@ const DesignEditorView: React.FC<{
             </div>
           )}
 
-        </div>
+          {editorStep === 'finish' && (
+            <div className="space-y-6">
 
-        {/* Footer Actions */}
-        <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'}`}>
-          {editorStep === 'materials' ? (
-            <button
-              onClick={() => setEditorStep('details')}
-              className={`w-full py-4 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg animate-pulse hover:animate-none ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-xl'}`}
-            >
-              Lanjut &rarr;
-            </button>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleSaveImage}
-                className={`w-full py-3 font-bold uppercase tracking-widest rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10' : 'border-zinc-800 text-zinc-800 hover:bg-zinc-100'}`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                Simpan Gambar
-              </button>
-              <button
-                onClick={handleExport}
-                className="w-full py-3 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                Kirim Desain via WhatsApp
-              </button>
+              {/* --- HEADER & SUMMARY --- */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className={`text-xl font-black uppercase tracking-wider ${theme === 'dark' ? 'text-white' : 'text-zinc-800'}`}>Daftar Pesanan</h3>
+                  <p className="text-xs opacity-60">
+                    Menampilkan pesanan untuk {activeFormModel.name} - {COLORS.find(c => c.hex === activeFormColor)?.name}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-black text-emerald-500">{cartItems.length}</span>
+                  <span className="text-xs block opacity-60">Total Item</span>
+                </div>
+              </div>
+
+              {/* --- LIST ITEM DI KERANJANG (SEMUA ITEM) --- */}
+              <div className="space-y-3 mb-8">
+                {cartItems.length === 0 && (
+                  <div className="p-4 rounded-xl border border-dashed text-center opacity-50">
+                    <p className="text-xs">Belum ada pesanan.</p>
+                  </div>
+                )}
+                {cartItems.map((item) => (
+                  <div key={item.id} className={`p-4 rounded-xl border flex items-center justify-between group ${theme === 'dark' ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200 shadow-sm'}`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center p-1 relative overflow-hidden text-xs font-bold text-zinc-400">
+                        <img src={item.model.image} className="w-full h-full object-contain" />
+                        <div className="absolute inset-0 opacity-20" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{item.name}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-bold border border-emerald-500/20">{item.size}</span>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 flex gap-2">
+                          <span>{item.model.name}</span> •
+                          <span>{item.gender}</span> •
+                          <span>{item.sleeve}</span> •
+                          <span className="text-emerald-500 font-bold">{item.qty} Pcs</span>
+                        </p>
+                      </div>
+                    </div>
+                    <button onClick={() => handleRemoveFromCart(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+
+              {/* --- FORM TAMBAH ITEM BARU --- */}
+              <div className={`p-5 rounded-2xl border-2 ${theme === 'dark' ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50'}`}>
+                <h4 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                  Tambah Item Baru
+                </h4>
+
+                {/* 1. MODEL & WARNA SELECTOR */}
+                <div className="mb-6 space-y-4">
+                  {/* Model Horizontal Scroll */}
+                  <div>
+                    <label className="text-[10px] font-bold uppercase mb-2 flex justify-between items-center opacity-70">
+                      <span>Pilih Model</span>
+                      <span className="text-emerald-500 font-extrabold">{activeFormModel.name}</span>
+                    </label>
+                    <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                      {[product, ...similarProducts].map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => setActiveFormModel(p)}
+                          className={`flex-shrink-0 w-16 h-16 rounded-xl border-2 p-1 transition-all relative ${activeFormModel.id === p.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-transparent bg-black/5'}`}
+                        >
+                          <img src={p.image} className="w-full h-full object-contain" />
+                          {activeFormModel.id === p.id && <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border border-white"></div>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Color Selector */}
+                  <div>
+                    <label className="text-[10px] font-bold uppercase mb-2 block opacity-70">Pilih Warna (Preview)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {COLORS.map((c) => (
+                        <button
+                          key={c.name}
+                          onClick={() => {
+                            setActiveFormColor(c.hex);
+                            onUpdate({ color: c.hex });
+                          }}
+                          className={`w-8 h-8 rounded-full border-2 transition-all shadow-sm ${activeFormColor === c.hex ? 'border-emerald-500 scale-110 ring-2 ring-emerald-500/20' : 'border-white/10 hover:scale-105'}`}
+                          style={{ backgroundColor: c.hex }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. FORM INPUTS */}
+                <div className="grid gap-4">
+                  {/* Nama */}
+                  <div>
+                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Nama / Label</label>
+                    <input
+                      type="text"
+                      value={newItem.name}
+                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                      placeholder="Contoh: Budi (Ketua)"
+                      className={`w-full p-3 rounded-xl border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-white border-zinc-200 focus:border-emerald-500'}`}
+                    />
+                  </div>
+
+                  {/* Size */}
+                  <div>
+                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Ukuran</label>
+                    <div className="flex flex-wrap gap-2">
+                      {/* Standard Sizes */}
+                      {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                        <button
+                          key={size}
+                          onClick={() => setNewItem({ ...newItem, size })}
+                          className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === size ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+
+                      {/* Extra Sizes Toggle */}
+                      <button
+                        onClick={() => setShowExtraSizes(!showExtraSizes)}
+                        className={`px-3 py-2 rounded-lg text-xs font-bold border border-dashed transition-all ${showExtraSizes ? 'bg-black/10' : 'hover:bg-black/5'}`}
+                      >
+                        {showExtraSizes ? 'Sembunyikan' : 'Size Besar +'}
+                      </button>
+
+                      {/* Extra Sizes List */}
+                      {showExtraSizes && (
+                        <>
+                          {['3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL'].map(size => (
+                            <button
+                              key={size}
+                              onClick={() => setNewItem({ ...newItem, size })}
+                              className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === size ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </>
+                      )}
+
+                      {/* Custom Button */}
+                      <button
+                        onClick={() => {
+                          setNewItem({ ...newItem, size: 'Custom' });
+                          setShowCustomSizeModal(true);
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === 'Custom' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
+                      >
+                        Custom
+                      </button>
+
+                    </div>
+                  </div>
+
+                  {/* Gender & Sleeve */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Gender</label>
+                      <div className="flex rounded-lg border overflow-hidden p-1 gap-1">
+                        {['Pria', 'Wanita'].map(g => (
+                          <button
+                            key={g}
+                            onClick={() => setNewItem({ ...newItem, gender: g as any })}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded ${newItem.gender === g ? 'bg-emerald-500 text-white' : 'hover:bg-black/5'}`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Lengan</label>
+                      <div className="flex rounded-lg border overflow-hidden p-1 gap-1">
+                        {['Panjang', 'Pendek'].map(s => (
+                          <button
+                            key={s}
+                            onClick={() => setNewItem({ ...newItem, sleeve: s as any })}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded ${newItem.sleeve === s ? 'bg-emerald-500 text-white' : 'hover:bg-black/5'}`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Qty & Add Button */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setNewItem({ ...newItem, qty: Math.max(1, newItem.qty - 1) })} className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-black/5">-</button>
+                      <span className="font-black w-8 text-center">{newItem.qty}</span>
+                      <button onClick={() => setNewItem({ ...newItem, qty: newItem.qty + 1 })} className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-black/5">+</button>
+                    </div>
+                    <button
+                      onClick={handleAddToCart}
+                      className="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                    >
+                      + Tambah
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
-        </div>
 
-      </div>
-
-      {/* POPUP: MATERIAL DETAILS */}
-      {expandedMaterial && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setExpandedMaterial(null)}>
-          <div className={`w-full max-w-md p-6 rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl transform scale-100 transition-all`} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setExpandedMaterial(null)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-
-            <h3 className="text-2xl font-black uppercase tracking-wider mb-2 text-emerald-500">{MATERIAL_SPECS[expandedMaterial]?.title}</h3>
-            <p className={`text-sm leading-relaxed mb-6 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>{MATERIAL_SPECS[expandedMaterial]?.desc}</p>
-
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-widest opacity-70">Keunggulan Utama:</h4>
-              {MATERIAL_SPECS[expandedMaterial]?.points?.map((point, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></div>
-                  <span className={`text-sm ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{point}</span>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => setExpandedMaterial(null)} className="w-full mt-8 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">
-              Mengerti
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* POPUP: MODEL CATALOG */}
-      {viewingModel && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in" onClick={() => setViewingModel(null)}>
-          <div className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar p-6 rounded-3xl relative ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`} onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h3 className="text-2xl font-black uppercase tracking-wider mb-1 text-white/90">{viewingModel.name}</h3>
-                <p className="text-sm text-zinc-500">Katalog Tampilan Produk</p>
-              </div>
-              <button onClick={() => setViewingModel(null)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Tampilan Utama */}
-              <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5">
-                <img src={viewingModel.images?.front || viewingModel.image} className="w-full h-full object-contain" />
-                <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Depan</span>
-              </div>
-
-              <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                <img src={viewingModel.images?.back || viewingModel.image} className="w-full h-full object-contain" />
-                <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Belakang</span>
-              </div>
-
-              <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                <img src={viewingModel.images?.rightSleeve || viewingModel.image} className="w-full h-full object-contain" />
-                <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kanan</span>
-              </div>
-
-              <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                <img src={viewingModel.images?.leftSleeve || viewingModel.image} className="w-full h-full object-contain" />
-                <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kiri</span>
-              </div>
-            </div>
-
-            <div className="mt-8 flex justify-end">
+          {/* Footer Actions */}
+          <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'}`}>
+            {editorStep !== 'finish' ? (
               <button
-                onClick={() => { onSelectProduct(viewingModel); setViewingModel(null); }}
-                className="px-8 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+                onClick={() => setEditorStep(editorStep === 'materials' ? 'details' : 'finish')}
+                className={`w-full py-4 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg animate-pulse hover:animate-none ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-xl'}`}
               >
-                Gunakan Model Ini
+                Lanjut &rarr;
               </button>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleSaveImage}
+                  className={`w-full py-3 font-bold uppercase tracking-widest rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10' : 'border-zinc-800 text-zinc-800 hover:bg-zinc-100'}`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  Simpan Gambar
+                </button>
+                <button
+                  onClick={handleExport}
+                  className="w-full py-3 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                  Kirim Desain via WhatsApp
+                </button>
+              </div>
+            )}
           </div>
-        </div>
-      )}
 
+
+
+
+          {/* POPUP: MATERIAL DETAILS */}
+          {expandedMaterial && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setExpandedMaterial(null)}>
+              <div className={`w-full max-w-md p-6 rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl transform scale-100 transition-all`} onClick={e => e.stopPropagation()}>
+                <button onClick={() => setExpandedMaterial(null)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+
+                <h3 className="text-2xl font-black uppercase tracking-wider mb-2 text-emerald-500">{MATERIAL_SPECS[expandedMaterial]?.title}</h3>
+                <p className={`text-sm leading-relaxed mb-6 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>{MATERIAL_SPECS[expandedMaterial]?.desc}</p>
+
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-widest opacity-70">Keunggulan Utama:</h4>
+                  {MATERIAL_SPECS[expandedMaterial]?.points?.map((point, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></div>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{point}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={() => setExpandedMaterial(null)} className="w-full mt-8 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">
+                  Mengerti
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* POPUP: MODEL CATALOG */}
+          {viewingModel && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in" onClick={() => setViewingModel(null)}>
+              <div className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar p-6 rounded-3xl relative ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`} onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-2xl font-black uppercase tracking-wider mb-1 text-white/90">{viewingModel.name}</h3>
+                    <p className="text-sm text-zinc-500">Katalog Tampilan Produk</p>
+                  </div>
+                  <button onClick={() => setViewingModel(null)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tampilan Utama */}
+                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5">
+                    <img src={viewingModel.images?.front || viewingModel.image} className="w-full h-full object-contain" />
+                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Depan</span>
+                  </div>
+
+                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                    <img src={viewingModel.images?.back || viewingModel.image} className="w-full h-full object-contain" />
+                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Belakang</span>
+                  </div>
+
+                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                    <img src={viewingModel.images?.rightSleeve || viewingModel.image} className="w-full h-full object-contain" />
+                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kanan</span>
+                  </div>
+
+                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                    <img src={viewingModel.images?.leftSleeve || viewingModel.image} className="w-full h-full object-contain" />
+                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kiri</span>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={() => { onSelectProduct(viewingModel); setViewingModel(null); }}
+                    className="px-8 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+                  >
+                    Gunakan Model Ini
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* POPUP: CUSTOM SIZE FORM */}
+          {showCustomSizeModal && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+              <div className={`w-full max-w-md p-6 rounded-3xl ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`}>
+                <h3 className="text-xl font-black uppercase tracking-wider mb-6 text-emerald-500">Ukuran Kustom</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {['Tinggi Badan', 'Lebar Dada', 'Lebar Bahu', 'Panjang Lengan', 'Lingkar Kerah', 'Lingkar Manset'].map((label, idx) => {
+                    const key = ['tinggi', 'lebarDada', 'lebarBahu', 'panjangLengan', 'kerah', 'manset'][idx] as keyof typeof customMeasures;
+                    return (
+                      <div key={key}>
+                        <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 block">{label} (cm)</label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={customMeasures[key]}
+                          onChange={(e) => setCustomMeasures({ ...customMeasures, [key]: e.target.value })}
+                          className={`w-full p-2.5 rounded-lg border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setShowCustomSizeModal(false)}
+                    className="flex-1 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800 font-bold uppercase tracking-widest hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-all"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={() => setShowCustomSizeModal(false)}
+                    className="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                  >
+                    Simpan
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
     </div>
   );
 };
