@@ -25,6 +25,7 @@ export interface Product {
   images?: ProductImages;
   description: string;
   isHidden?: boolean;
+  gallery?: string[];
 }
 
 export interface DesignElement {

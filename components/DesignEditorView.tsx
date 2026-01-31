@@ -15,6 +15,15 @@ const DesignEditorView: React.FC<{
 }> = ({ product, designData, onUpdate, onBack, onNext, onSelectProduct, theme }) => {
 
   const handleBackCustom = () => {
+    if (editorStep === 'finish') {
+      setEditorStep('details');
+      return;
+    }
+    if (editorStep === 'details') {
+      setEditorStep('materials');
+      return;
+    }
+
     // Menghapus semua elemen (teks/logo) saat kembali ke menu utama
     onUpdate({ elements: [] });
     // Reset history
@@ -71,7 +80,7 @@ const DesignEditorView: React.FC<{
 
 
   // Tambahkan item ke cart
-  const handleAddToCart = () => {
+  const handleAddToCart = (silent = false) => {
     let customDetailStr = '';
     if (newItem.size === 'Custom') {
       customDetailStr = `(T:${customMeasures.tinggi}, LD:${customMeasures.lebarDada}, LB:${customMeasures.lebarBahu}, PL:${customMeasures.panjangLengan})`;
@@ -91,9 +100,18 @@ const DesignEditorView: React.FC<{
 
     setCartItems([...cartItems, item]);
 
-    // Reset form (keep model/color same for convenience or reset? User wants "add item", presumably diverse)
-    setNewItem({ ...newItem, name: '', qty: 1 }); // Keep size/gender specs as they might repeat
-    alert("✅ Item berhasil ditambahkan ke daftar!");
+    // Reset form
+    setNewItem({ ...newItem, name: '', qty: 1 });
+    if (!silent) alert("✅ Item berhasil ditambahkan ke daftar!");
+  };
+
+  const handleNextStep = () => {
+    if (editorStep === 'materials') {
+      setEditorStep('details');
+    } else if (editorStep === 'details') {
+      handleAddToCart(true);
+      setEditorStep('finish');
+    }
   };
 
   // Hapus item dari cart
@@ -148,6 +166,21 @@ const DesignEditorView: React.FC<{
 
   const fileInputRefNama = useRef<HTMLInputElement>(null);
   const fileInputRefJabatan = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Hardware Back Button Handler
+  useEffect(() => {
+    const handleHardwareBack = (e: PopStateEvent) => {
+      e.preventDefault();
+      // Push state back to maintain our position in history
+      window.history.pushState(null, '', window.location.pathname);
+      handleBackCustom();
+    };
+
+    window.history.pushState(null, '', window.location.pathname);
+    window.addEventListener('popstate', handleHardwareBack);
+    return () => window.removeEventListener('popstate', handleHardwareBack);
+  }, [editorStep]); // Re-bind when step changes so handleBackCustom has right context
   const fileInputRefLenganKanan = useRef<HTMLInputElement>(null);
   const fileInputRefLenganKiri = useRef<HTMLInputElement>(null);
   const fileInputRefBelakang = useRef<HTMLInputElement>(null);
@@ -597,21 +630,22 @@ const DesignEditorView: React.FC<{
       {/* LEFT PANEL: PREVIEW */}
       <div className={`w-full aspect-square md:w-[60%] lg:w-[65%] md:h-full relative flex flex-col items-center justify-center p-4 border-b md:border-b-0 md:border-r shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'bg-[#0a0a0a] border-white/5' : 'bg-zinc-200 border-zinc-300'}`}>
 
-        {/* Undo/Redo/Back Header */}
-        <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
-          {/* Tombol Kembali (Menggunakan HandleBackCustom untuk reset) */}
-          <button onClick={handleBackCustom} className={`p-2 rounded-full hover:bg-white/10 ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-white/60 text-zinc-800 shadow-sm'}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-          </button>
-          <div className={`flex gap-1 rounded-lg p-1 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60 shadow-sm'}`}>
-            <button onClick={undo} disabled={historyPointer === 0} className={`p-2 rounded transition-all ${historyPointer === 0 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
-            </button>
-            <button onClick={redo} disabled={historyPointer === history.length - 1} className={`p-2 rounded transition-all ${historyPointer === history.length - 1 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
-            </button>
+        {/* Undo/Redo/Back Header - Hidden when any popup is active */}
+        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && (
+          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
+            {/* Tombol Kembali (Menggunakan HandleBackCustom untuk reset) */}
+            {/* Space Placeholder where Back Button was */}
+            <div className="w-9 h-9"></div>
+            <div className={`flex gap-1 rounded-lg p-1 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60 shadow-sm'}`}>
+              <button onClick={undo} disabled={historyPointer === 0} className={`p-2 rounded transition-all ${historyPointer === 0 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+              </button>
+              <button onClick={redo} disabled={historyPointer === history.length - 1} className={`p-2 rounded transition-all ${historyPointer === history.length - 1 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Canvas */}
         <div id="design-canvas" className="relative w-full h-full flex items-center justify-center overflow-hidden">
@@ -698,11 +732,37 @@ const DesignEditorView: React.FC<{
           </div>
         </div>
 
-        {/* View Controls (Depan/Belakang) */}
-        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 p-2 rounded-2xl border backdrop-blur-md z-30 ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
-          <button onClick={() => onUpdate({ view: 'Depan' })} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${designData.view === 'Depan' ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white') : (theme === 'dark' ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black')}`}>Depan</button>
-          <button onClick={() => onUpdate({ view: 'Belakang' })} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${designData.view === 'Belakang' ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white') : (theme === 'dark' ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black')}`}>Belakang</button>
-        </div>
+        {/* View Controls (Navigation & Side Toggle) - Hidden when modals are active */}
+        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30 w-full max-w-[90%] md:max-w-max justify-center">
+
+            {/* Tombol Kembali Cepat */}
+            <button
+              onClick={handleBackCustom}
+              className={`flex items-center justify-center w-12 h-12 rounded-2xl border backdrop-blur-md transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10 text-white' : 'bg-white/90 border-zinc-200 text-zinc-800 shadow-xl'}`}
+              title="Kembali"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+
+            {/* View Toggle */}
+            <div className={`flex gap-2 p-1.5 rounded-2xl border backdrop-blur-md ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
+              <button onClick={() => onUpdate({ view: 'Depan' })} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === 'Depan' ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}>Depan</button>
+              <button onClick={() => onUpdate({ view: 'Belakang' })} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === 'Belakang' ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}>Belakang</button>
+            </div>
+
+            {/* Tombol Lanjut Cepat */}
+            {editorStep !== 'finish' && (
+              <button
+                onClick={handleNextStep}
+                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95 transition-all animate-pulse hover:animate-none"
+              >
+                <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Lanjut</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            )}
+          </div>
+        )}
 
       </div>
 
@@ -721,80 +781,20 @@ const DesignEditorView: React.FC<{
         <div className={`flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8 pb-32 ${theme === 'dark' ? 'bg-zinc-950' : 'bg-white'}`}>
 
           {editorStep === 'materials' && (
-            <div className="space-y-10 animate-fade-in">
+            <div className="flex flex-col gap-6 animate-fade-in pb-10">
 
-              {/* Model Switcher (Vertical List) */}
-              <div className="h-[350px] flex flex-col">
-                <label className={`text-xs font-bold uppercase tracking-widest mb-4 block ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Ganti Model ({product.category})</label>
-                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
-                  {/* Current Active Model */}
-                  <div className={`p-3 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 flex items-center gap-4 relative`}>
-                    <img src={product.image} className="w-16 h-16 object-contain bg-white/5 rounded-lg" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="text-xs font-black uppercase truncate text-emerald-500">{product.name}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500 text-white">AKTIF</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-                        <span className="flex items-center text-amber-500"><svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg> 4.9</span>
-                        <span>|</span>
-                        <span>{product.soldCount || '2.5k'} Terjual</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setViewingModel(product)}
-                      className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-500 hover:text-emerald-500 transition-colors"
-                      title="Lihat Katalog"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    </button>
-                  </div>
-
-                  {/* List Other Models */}
-                  {similarProducts.map(p => (
-                    <div
-                      key={p.id}
-                      className={`p-3 rounded-xl border flex items-center gap-4 transition-all group ${theme === 'dark' ? 'border-white/5 hover:border-white/20 bg-white/5' : 'border-zinc-200 hover:border-zinc-300 bg-white'}`}
-                    >
-                      <img src={p.image} className="w-16 h-16 object-contain bg-black/5 rounded-lg opacity-80 group-hover:opacity-100 transition-opacity" />
-                      <div className="flex-1 min-w-0">
-                        <h4 className={`text-xs font-bold uppercase truncate mb-1 ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{p.name}</h4>
-                        <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-                          <span className="flex items-center text-amber-500"><svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg> {((Math.random() * 0.5) + 4.5).toFixed(1)}</span>
-                          <span>|</span>
-                          <span>{p.soldCount || '1k+'} Terjual</span>
-                        </div>
-                        <button
-                          onClick={() => onSelectProduct(p)}
-                          className="mt-2 text-[10px] font-bold text-emerald-500 hover:underline"
-                        >
-                          Gunakan Model Ini
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => setViewingModel(p)}
-                        className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-zinc-400' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-500'}`}
-                        title="Lihat Katalog"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Color Selection */}
+              {/* 1. Color Selection (Horizontal) */}
               <div>
-                <label className={`text-xs font-bold uppercase tracking-widest mb-4 flex justify-between items-center ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                <label className={`text-xs font-bold uppercase tracking-widest mb-3 flex justify-between items-center ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
                   <span>Pilih Warna</span>
                   <span className="text-[10px] text-emerald-500 neon-text">{COLORS.find(c => c.hex === designData.color)?.name}</span>
                 </label>
-                <div className="grid grid-cols-5 md:grid-cols-6 gap-3">
+                <div className="flex overflow-x-auto no-scrollbar gap-3 py-3 -mx-2 px-2">
                   {COLORS.map(c => (
                     <button
                       key={c.hex}
                       onClick={() => onUpdate({ color: c.hex })}
-                      className={`aspect-square rounded-xl border-2 transition-all duration-300 relative group overflow-hidden ${designData.color === c.hex ? 'border-white scale-110 z-10 shadow-lg' : 'border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600'}`}
+                      className={`flex-shrink-0 w-11 h-11 rounded-full border-2 transition-all duration-300 relative group overflow-hidden shadow-sm ${designData.color === c.hex ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 z-10' : 'border-white/10 hover:border-emerald-500/50'}`}
                       style={{ backgroundColor: c.hex }}
                       title={c.name}
                     >
@@ -808,17 +808,71 @@ const DesignEditorView: React.FC<{
                 </div>
               </div>
 
-              {/* Material Selection */}
+              <div className={`h-px w-full ${theme === 'dark' ? 'bg-white/10' : 'bg-zinc-200'}`}></div>
+
+              {/* 2. Model Switcher (Horizontal Card List) */}
               <div>
-                <label className={`text-xs font-bold uppercase tracking-widest mb-4 block flex justify-between items-center ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                <label className={`text-xs font-bold uppercase tracking-widest mb-3 block ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Ganti Model ({product.category})</label>
+                <div className="flex overflow-x-auto no-scrollbar gap-4 pb-2 -mx-2 px-2">
+                  {/* Join Current Active + Similar Products for a unified list */}
+                  {[product, ...similarProducts].map(p => {
+                    const isActive = p.id === product.id;
+                    return (
+                      <div
+                        key={p.id}
+                        className={`flex-shrink-0 w-60 p-3 rounded-2xl border transition-all relative group flex items-center gap-3 ${isActive
+                          ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500/20'
+                          : theme === 'dark'
+                            ? 'border-white/5 bg-zinc-900/50 hover:bg-zinc-800 hover:border-white/10'
+                            : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                          }`}
+                      >
+                        <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-black/20 shrink-0 overflow-hidden relative">
+                          <img src={p.image} className="w-full h-full object-contain p-1" />
+                          {isActive && <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay"></div>}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h4 className={`text-[10px] font-black uppercase truncate leading-tight ${isActive ? 'text-emerald-500' : theme === 'dark' ? 'text-white' : 'text-black'}`}>{p.name}</h4>
+                          <p className="text-[9px] text-zinc-500 mb-2 truncate">{p.category}</p>
+
+                          {isActive ? (
+                            <span className="text-[8px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded-md">Dipilih</span>
+                          ) : (
+                            <button
+                              onClick={() => onSelectProduct(p)}
+                              className="text-[9px] font-bold text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-md hover:bg-emerald-500 hover:text-white transition-colors"
+                            >
+                              Gunakan
+                            </button>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setViewingModel(p); }}
+                          className="absolute top-2 right-2 p-1.5 rounded-full text-zinc-400 hover:text-emerald-500 hover:bg-white/10 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className={`h-px w-full ${theme === 'dark' ? 'bg-white/10' : 'bg-zinc-200'}`}></div>
+
+              {/* 3. Material Selection (Vertical List) */}
+              <div className="flex-1 min-h-0 flex flex-col">
+                <label className={`text-xs font-bold uppercase tracking-widest mb-4 flex justify-between items-center ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
                   <span>Pilih Bahan</span>
-                  <span className="text-[10px] text-emerald-500 neon-text animate-pulse">Scroll untuk melihat</span>
+                  <span className="text-[10px] text-emerald-500 neon-text animate-pulse">Scroll info</span>
                 </label>
-                <div className="space-y-3 h-[240px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 -mr-2 pb-2">
                   {MATERIALS.map(m => (
                     <div
                       key={m}
-                      className={`w-full p-4 rounded-2xl border-2 text-left transition-all relative group ${designData.material === m
+                      className={`w-full p-4 rounded-2xl border-2 text-left transition-all relative group shrink-0 ${designData.material === m
                         ? 'border-emerald-500 bg-emerald-500/10'
                         : theme === 'dark'
                           ? 'border-zinc-900 bg-zinc-900/30 hover:border-zinc-700'
@@ -835,8 +889,6 @@ const DesignEditorView: React.FC<{
                         </div>
                         <p className={`text-[10px] line-clamp-2 leading-relaxed pr-8 ${theme === 'dark' ? 'text-zinc-600' : 'text-zinc-500'}`}>{MATERIAL_SPECS[m]?.desc}</p>
                       </button>
-
-                      {/* Detail Info Button */}
                       <button
                         onClick={(e) => { e.stopPropagation(); setExpandedMaterial(m); }}
                         className="absolute right-4 bottom-4 p-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-emerald-500 transition-colors z-10"
@@ -1005,6 +1057,10 @@ const DesignEditorView: React.FC<{
                         </div>
                         <p className="text-[10px] text-zinc-500 flex gap-2">
                           <span>{item.model.name}</span> •
+                          <span className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: item.color }}></div>
+                            {COLORS.find(c => c.hex === item.color)?.name || 'Custom'}
+                          </span> •
                           <span>{item.gender}</span> •
                           <span>{item.sleeve}</span> •
                           <span className="text-emerald-500 font-bold">{item.qty} Pcs</span>
@@ -1074,6 +1130,7 @@ const DesignEditorView: React.FC<{
                   <div>
                     <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Nama / Label</label>
                     <input
+                      ref={nameInputRef}
                       type="text"
                       value={newItem.name}
                       onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
@@ -1174,7 +1231,7 @@ const DesignEditorView: React.FC<{
                       <button onClick={() => setNewItem({ ...newItem, qty: newItem.qty + 1 })} className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-black/5">+</button>
                     </div>
                     <button
-                      onClick={handleAddToCart}
+                      onClick={() => handleAddToCart()}
                       className="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
                     >
                       + Tambah
@@ -1190,7 +1247,7 @@ const DesignEditorView: React.FC<{
           <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'}`}>
             {editorStep !== 'finish' ? (
               <button
-                onClick={() => setEditorStep(editorStep === 'materials' ? 'details' : 'finish')}
+                onClick={handleNextStep}
                 className={`w-full py-4 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg animate-pulse hover:animate-none ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-xl'}`}
               >
                 Lanjut &rarr;
@@ -1206,10 +1263,10 @@ const DesignEditorView: React.FC<{
                 </button>
                 <button
                   onClick={handleExport}
-                  className="w-full py-3 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"
+                  className="w-full py-4 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                  Kirim Desain via WhatsApp
+                  <svg className="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                  KIRIM DESAIN
                 </button>
               </div>
             )}
@@ -1222,7 +1279,7 @@ const DesignEditorView: React.FC<{
           {expandedMaterial && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setExpandedMaterial(null)}>
               <div className={`w-full max-w-md p-6 rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl transform scale-100 transition-all`} onClick={e => e.stopPropagation()}>
-                <button onClick={() => setExpandedMaterial(null)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition-colors">
+                <button onClick={() => setExpandedMaterial(null)} className={`absolute top-4 right-4 p-2 rounded-full transition-colors z-10 ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
 
@@ -1255,32 +1312,49 @@ const DesignEditorView: React.FC<{
                     <h3 className="text-2xl font-black uppercase tracking-wider mb-1 text-white/90">{viewingModel.name}</h3>
                     <p className="text-sm text-zinc-500">Katalog Tampilan Produk</p>
                   </div>
-                  <button onClick={() => setViewingModel(null)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
+                  <button onClick={() => setViewingModel(null)} className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Tampilan Utama */}
-                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5">
-                    <img src={viewingModel.images?.front || viewingModel.image} className="w-full h-full object-contain" />
-                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Depan</span>
-                  </div>
+                  {/* Priority: Gallery -> Images -> Single Image */}
+                  {viewingModel.gallery && viewingModel.gallery.length > 0 ? (
+                    <>
+                      {/* Main Front Image */}
+                      <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative group">
+                        <img src={viewingModel.images?.front || viewingModel.image} className="w-full h-full object-cover rounded-xl" />
+                        <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Depan</span>
+                      </div>
 
-                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                    <img src={viewingModel.images?.back || viewingModel.image} className="w-full h-full object-contain" />
-                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Belakang</span>
-                  </div>
+                      {/* Gallery Images */}
+                      {viewingModel.gallery.map((img, idx) => (
+                        <div key={idx} className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-2 border border-white/5 relative group overflow-hidden">
+                          <img src={img} className="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-110" />
+                          <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Detail #{idx + 1}</span>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                        <img src={viewingModel.images?.front || viewingModel.image} className="w-full h-full object-contain" />
+                        <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Depan</span>
+                      </div>
 
-                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                    <img src={viewingModel.images?.rightSleeve || viewingModel.image} className="w-full h-full object-contain" />
-                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kanan</span>
-                  </div>
+                      <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                        <img src={viewingModel.images?.back || viewingModel.image} className="w-full h-full object-contain" />
+                        <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Tampak Belakang</span>
+                      </div>
 
-                  <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
-                    <img src={viewingModel.images?.leftSleeve || viewingModel.image} className="w-full h-full object-contain" />
-                    <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Lengan Kiri</span>
-                  </div>
+                      {(viewingModel.images?.rightSleeve || viewingModel.images?.leftSleeve) && (
+                        <div className="aspect-square rounded-2xl bg-zinc-800/50 flex items-center justify-center p-8 border border-white/5 relative">
+                          <img src={viewingModel.images?.rightSleeve || viewingModel.image} className="w-full h-full object-contain" />
+                          <span className="absolute bottom-4 left-6 text-xs font-bold uppercase tracking-widest px-3 py-1 bg-black/50 backdrop-blur rounded-lg text-white">Samping</span>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-8 flex justify-end">
@@ -1298,7 +1372,10 @@ const DesignEditorView: React.FC<{
           {/* POPUP: CUSTOM SIZE FORM */}
           {showCustomSizeModal && (
             <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-              <div className={`w-full max-w-md p-6 rounded-3xl ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`}>
+              <div className={`w-full max-w-md p-6 rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`}>
+                <button onClick={() => setShowCustomSizeModal(false)} className={`absolute top-4 right-4 p-2 rounded-full transition-colors z-10 ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
                 <h3 className="text-xl font-black uppercase tracking-wider mb-6 text-emerald-500">Ukuran Kustom</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {['Tinggi Badan', 'Lebar Dada', 'Lebar Bahu', 'Panjang Lengan', 'Lingkar Kerah', 'Lingkar Manset'].map((label, idx) => {
@@ -1338,7 +1415,7 @@ const DesignEditorView: React.FC<{
 
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

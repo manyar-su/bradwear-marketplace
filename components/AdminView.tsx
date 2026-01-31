@@ -22,13 +22,13 @@ interface OrderHistoryItem {
   resi: string;
 }
 
-const AdminView: React.FC<AdminViewProps> = ({ 
-  products, 
-  setProducts, 
-  productionOrders, 
-  setProductionOrders, 
-  onBack, 
-  theme 
+const AdminView: React.FC<AdminViewProps> = ({
+  products,
+  setProducts,
+  productionOrders,
+  setProductionOrders,
+  onBack,
+  theme
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<CustomerService | null>(null);
@@ -110,7 +110,7 @@ const AdminView: React.FC<AdminViewProps> = ({
       completedAt: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }),
       resi: resiInput
     };
-    
+
     setOrderHistory([newHistory, ...orderHistory]);
     setProductionOrders(productionOrders.filter(o => o.orderCode !== showResiModal));
     setResiInput('');
@@ -120,9 +120,10 @@ const AdminView: React.FC<AdminViewProps> = ({
 
   const handleAddManualOrder = (e: React.FormEvent) => {
     e.preventDefault();
+
     const newCode = Math.floor(Math.random() * 9000 + 1000).toString();
     const totalQty = manualForm.items.reduce((acc, curr) => acc + curr.quantity, 0);
-    
+
     const newOrder: ProductionOrder = {
       orderCode: newCode,
       productCode: manualForm.productCode,
@@ -136,12 +137,12 @@ const AdminView: React.FC<AdminViewProps> = ({
     };
     setProductionOrders([newOrder, ...productionOrders]);
     setShowAddOrderForm(false);
-    setManualForm({ 
-      customerName: '', 
-      productCode: '', 
-      productName: products[0]?.name || '', 
-      category: products[0]?.category || 'Kemeja', 
-      items: [{ size: 'M', quantity: 1, gender: 'L' }] 
+    setManualForm({
+      customerName: '',
+      productCode: '',
+      productName: products[0]?.name || '',
+      category: products[0]?.category || 'Kemeja',
+      items: [{ size: 'M', quantity: 1, gender: 'L' }]
     });
   };
 
@@ -154,10 +155,10 @@ const AdminView: React.FC<AdminViewProps> = ({
         setProducts(products.map(p => {
           if (p.id === uploadTarget.productId) {
             const newImages = { ...(p.images || { front: p.image }), [uploadTarget.view]: url };
-            return { 
-              ...p, 
+            return {
+              ...p,
               image: uploadTarget.view === 'front' ? url : p.image,
-              images: newImages 
+              images: newImages
             };
           }
           return p;
@@ -190,7 +191,7 @@ const AdminView: React.FC<AdminViewProps> = ({
           <form onSubmit={handleLogin} className="space-y-6">
             <input required type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="ID LOGIN" />
             <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="PASSWORD" />
-            
+
             <div className="flex justify-center">
               <button type="button" onClick={() => setShowSudoPrompt(true)} className="text-[9px] font-black neon-text uppercase tracking-widest underline decoration-emerald-500/30 underline-offset-4">Lihat Daftar Kunci</button>
             </div>
@@ -213,7 +214,7 @@ const AdminView: React.FC<AdminViewProps> = ({
             )}
 
             {error && <p className="text-red-500 text-[10px] text-center font-black uppercase tracking-widest bg-red-500/10 py-2 rounded-xl">{error}</p>}
-            
+
             <button type="submit" className="w-full py-6 neon-bg text-black font-black uppercase tracking-widest rounded-3xl shadow-lg active:scale-95 transition-all">MASUK SISTEM</button>
             <button type="button" onClick={onBack} className="w-full adaptive-text-muted text-[10px] font-black uppercase tracking-widest py-2">KEMBALI</button>
           </form>
@@ -230,8 +231,8 @@ const AdminView: React.FC<AdminViewProps> = ({
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" /></svg>
           </button>
           <div className="flex flex-col">
-             <p className="text-[8px] font-black neon-text uppercase tracking-widest">USER:</p>
-             <p className="text-[10px] font-black uppercase">{currentUser?.name}</p>
+            <p className="text-[8px] font-black neon-text uppercase tracking-widest">USER:</p>
+            <p className="text-[10px] font-black uppercase">{currentUser?.name}</p>
           </div>
         </div>
         <h1 className="text-[11px] font-black uppercase tracking-[0.3em] neon-text">ADMIN CONTROL</h1>
@@ -256,15 +257,15 @@ const AdminView: React.FC<AdminViewProps> = ({
             {productionOrders.map((order) => (
               <section key={order.orderCode} className={`p-6 rounded-[40px] border glass transition-all ${theme === 'dark' ? 'border-white/5' : 'border-zinc-200 shadow-xl'}`}>
                 <div className="flex flex-wrap justify-between items-start gap-4 mb-6 border-b border-white/5 pb-6">
-                   <div className="space-y-1">
-                      <p className="text-[8px] font-black neon-text uppercase tracking-widest">KONSUMEN:</p>
-                      <h4 className="text-[13px] font-black uppercase tracking-tight">{order.productCode || 'BRD-...'}: {order.customerName}</h4>
-                      <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{order.productName} • {order.totalQty} PCS</p>
-                   </div>
-                   <div className="text-right">
-                      <p className="text-[8px] font-black neon-text uppercase tracking-widest">ID:</p>
-                      <h4 className="text-lg font-black uppercase tracking-tight">#{order.orderCode}</h4>
-                   </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] font-black neon-text uppercase tracking-widest">KONSUMEN:</p>
+                    <h4 className="text-[13px] font-black uppercase tracking-tight">{order.productCode || 'BRD-...'}: {order.customerName}</h4>
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{order.productName} • {order.totalQty} PCS</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[8px] font-black neon-text uppercase tracking-widest">ID:</p>
+                    <h4 className="text-lg font-black uppercase tracking-tight">#{order.orderCode}</h4>
+                  </div>
                 </div>
 
                 <div className="space-y-6 relative mb-8">
@@ -304,7 +305,7 @@ const AdminView: React.FC<AdminViewProps> = ({
                   <div className="aspect-[16/10] rounded-[48px] overflow-hidden bg-black/80 border border-white/5 relative group">
                     <img src={p.image} className={`w-full h-full object-cover transition-all duration-700 ${p.isHidden ? 'opacity-20 grayscale' : 'opacity-60 group-hover:opacity-100'}`} />
                     <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
-                       <button onClick={() => setShowViewEditor(p.id)} className="neon-bg text-black text-[10px] font-black px-12 py-4 rounded-3xl uppercase tracking-widest shadow-premium">UBAH FOTO 4 SISI</button>
+                      <button onClick={() => setShowViewEditor(p.id)} className="neon-bg text-black text-[10px] font-black px-12 py-4 rounded-3xl uppercase tracking-widest shadow-premium">UBAH FOTO 4 SISI</button>
                     </div>
                   </div>
                 </div>
@@ -314,21 +315,21 @@ const AdminView: React.FC<AdminViewProps> = ({
         )}
 
         {activeTab === 'riwayat' && (
-           <div className="space-y-6">
-             <h3 className="text-[11px] font-black uppercase neon-text">ARSIP PRODUKSI</h3>
-             {orderHistory.map((item, idx) => (
-               <div key={idx} className="p-8 rounded-[40px] border glass flex justify-between items-center transition-all hover:bg-white/5">
-                 <div className="space-y-1">
-                   <p className="text-[12px] font-black uppercase adaptive-text">{item.code} - {item.productName}</p>
-                   <p className="text-[10px] font-black neon-text uppercase tracking-widest">RESI: {item.resi}</p>
-                   <p className="text-[8px] font-bold text-zinc-500 uppercase">SELESAI: {item.completedAt}</p>
-                 </div>
-                 <div className="w-12 h-12 rounded-2xl neon-bg flex items-center justify-center text-black shadow-2xl">
-                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>
-                 </div>
-               </div>
-             ))}
-           </div>
+          <div className="space-y-6">
+            <h3 className="text-[11px] font-black uppercase neon-text">ARSIP PRODUKSI</h3>
+            {orderHistory.map((item, idx) => (
+              <div key={idx} className="p-8 rounded-[40px] border glass flex justify-between items-center transition-all hover:bg-white/5">
+                <div className="space-y-1">
+                  <p className="text-[12px] font-black uppercase adaptive-text">{item.code} - {item.productName}</p>
+                  <p className="text-[10px] font-black neon-text uppercase tracking-widest">RESI: {item.resi}</p>
+                  <p className="text-[8px] font-bold text-zinc-500 uppercase">SELESAI: {item.completedAt}</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl neon-bg flex items-center justify-center text-black shadow-2xl">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </main>
 
@@ -340,48 +341,48 @@ const AdminView: React.FC<AdminViewProps> = ({
               <h3 className="text-2xl font-black uppercase tracking-tighter neon-text">TAMBAH KERJA MANUAL</h3>
             </div>
             <form onSubmit={handleAddManualOrder} className="space-y-6">
-               <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500 px-3">KODE BARANG:</label>
-                  <input required type="text" value={manualForm.productCode} onChange={(e) => setManualForm({...manualForm, productCode: e.target.value})} className={`w-full p-5 rounded-3xl border-2 font-black uppercase text-[11px] outline-none ${theme === 'dark' ? 'bg-black border-white/10' : 'bg-zinc-50 border-zinc-200'}`} placeholder="EX: BRD-KT-01" />
-               </div>
-               <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500 px-3">KONSUMEN:</label>
-                  <input required type="text" value={manualForm.customerName} onChange={(e) => setManualForm({...manualForm, customerName: e.target.value})} className={`w-full p-5 rounded-3xl border-2 font-black uppercase text-[11px] outline-none ${theme === 'dark' ? 'bg-black border-white/10' : 'bg-zinc-50 border-zinc-200'}`} placeholder="EX: POLDA JABAR" />
-               </div>
-               <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[9px] font-black uppercase text-zinc-500">DAFTAR UKURAN:</label>
-                    <button type="button" onClick={() => setManualForm({...manualForm, items: [...manualForm.items, { size: 'M', quantity: 1, gender: 'L' }]})} className="text-[9px] font-black neon-text uppercase">+ TAMBAH</button>
-                  </div>
-                  <div className="space-y-3 max-h-[150px] overflow-y-auto pr-1">
-                    {manualForm.items.map((item, idx) => (
-                      <div key={idx} className="flex gap-2 items-center bg-black/20 p-2 rounded-2xl">
-                        <select value={item.size} onChange={(e) => {
-                          const newItems = [...manualForm.items];
-                          newItems[idx].size = e.target.value;
-                          setManualForm({...manualForm, items: newItems});
-                        }} className="flex-1 p-2 rounded-xl text-[10px] font-black uppercase bg-black border border-white/10 text-white">
-                          {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <select value={item.gender} onChange={(e) => {
-                          const newItems = [...manualForm.items];
-                          newItems[idx].gender = e.target.value as 'L'|'P';
-                          setManualForm({...manualForm, items: newItems});
-                        }} className="p-2 rounded-xl text-[10px] font-black uppercase bg-black border border-white/10 text-white">
-                          <option value="L">L</option>
-                          <option value="P">P</option>
-                        </select>
-                        <input type="number" min="1" value={item.quantity} onChange={(e) => {
-                          const newItems = [...manualForm.items];
-                          newItems[idx].quantity = parseInt(e.target.value);
-                          setManualForm({...manualForm, items: newItems});
-                        }} className="w-12 p-2 rounded-xl text-[10px] font-black bg-black border border-white/10 text-center text-white" />
-                        <button type="button" onClick={() => setManualForm({...manualForm, items: manualForm.items.filter((_, i) => i !== idx)})} className="text-red-500 p-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-                      </div>
-                    ))}
-                  </div>
-               </div>
-               <button type="submit" className="w-full py-6 neon-bg text-black font-black uppercase tracking-widest rounded-[32px] shadow-2xl active:scale-95 transition-all">SINKRONISASI DATA</button>
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500 px-3">KODE BARANG:</label>
+                <input required type="text" value={manualForm.productCode} onChange={(e) => setManualForm({ ...manualForm, productCode: e.target.value })} className={`w-full p-5 rounded-3xl border-2 font-black uppercase text-[11px] outline-none ${theme === 'dark' ? 'bg-black border-white/10' : 'bg-zinc-50 border-zinc-200'}`} placeholder="EX: BRD-KT-01" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500 px-3">KONSUMEN:</label>
+                <input required type="text" value={manualForm.customerName} onChange={(e) => setManualForm({ ...manualForm, customerName: e.target.value })} className={`w-full p-5 rounded-3xl border-2 font-black uppercase text-[11px] outline-none ${theme === 'dark' ? 'bg-black border-white/10' : 'bg-zinc-50 border-zinc-200'}`} placeholder="EX: POLDA JABAR" />
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[9px] font-black uppercase text-zinc-500">DAFTAR UKURAN:</label>
+                  <button type="button" onClick={() => setManualForm({ ...manualForm, items: [...manualForm.items, { size: 'M', quantity: 1, gender: 'L' }] })} className="text-[9px] font-black neon-text uppercase">+ TAMBAH</button>
+                </div>
+                <div className="space-y-3 max-h-[150px] overflow-y-auto pr-1">
+                  {manualForm.items.map((item, idx) => (
+                    <div key={idx} className="flex gap-2 items-center bg-black/20 p-2 rounded-2xl">
+                      <select value={item.size} onChange={(e) => {
+                        const newItems = [...manualForm.items];
+                        newItems[idx].size = e.target.value;
+                        setManualForm({ ...manualForm, items: newItems });
+                      }} className="flex-1 p-2 rounded-xl text-[10px] font-black uppercase bg-black border border-white/10 text-white">
+                        {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                      <select value={item.gender} onChange={(e) => {
+                        const newItems = [...manualForm.items];
+                        newItems[idx].gender = e.target.value as 'L' | 'P';
+                        setManualForm({ ...manualForm, items: newItems });
+                      }} className="p-2 rounded-xl text-[10px] font-black uppercase bg-black border border-white/10 text-white">
+                        <option value="L">L</option>
+                        <option value="P">P</option>
+                      </select>
+                      <input type="number" min="1" value={item.quantity} onChange={(e) => {
+                        const newItems = [...manualForm.items];
+                        newItems[idx].quantity = parseInt(e.target.value);
+                        setManualForm({ ...manualForm, items: newItems });
+                      }} className="w-12 p-2 rounded-xl text-[10px] font-black bg-black border border-white/10 text-center text-white" />
+                      <button type="button" onClick={() => setManualForm({ ...manualForm, items: manualForm.items.filter((_, i) => i !== idx) })} className="text-red-500 p-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button type="submit" className="w-full py-6 neon-bg text-black font-black uppercase tracking-widest rounded-[32px] shadow-2xl active:scale-95 transition-all">SINKRONISASI DATA</button>
             </form>
           </div>
         </div>
@@ -392,8 +393,8 @@ const AdminView: React.FC<AdminViewProps> = ({
         <div className="fixed inset-0 z-[600] bg-black/98 backdrop-blur-3xl flex items-center justify-center p-6" onClick={() => setShowViewEditor(null)}>
           <div className="w-full max-w-screen-md glass rounded-[60px] overflow-hidden flex flex-col max-h-[90vh] shadow-premium border border-white/10" onClick={e => e.stopPropagation()}>
             <div className="p-10 border-b border-white/5 flex justify-between items-center bg-black/60 backdrop-blur-xl">
-               <h3 className="text-2xl font-black uppercase neon-text">UBAH FOTO CATALOG</h3>
-               <button onClick={() => setShowViewEditor(null)} className="p-4 bg-white/5 rounded-3xl text-white"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg></button>
+              <h3 className="text-2xl font-black uppercase neon-text">UBAH FOTO CATALOG</h3>
+              <button onClick={() => setShowViewEditor(null)} className="p-4 bg-white/5 rounded-3xl text-white"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg></button>
             </div>
             <div className="p-10 overflow-y-auto no-scrollbar grid grid-cols-2 gap-10">
               {(['front', 'back', 'leftSleeve', 'rightSleeve'] as const).map(v => {
@@ -402,15 +403,15 @@ const AdminView: React.FC<AdminViewProps> = ({
                 const labels: Record<string, string> = { front: 'DEPAN', back: 'BELAKANG', leftSleeve: 'KIRI', rightSleeve: 'KANAN' };
                 return (
                   <div key={v} className="space-y-4">
-                     <label className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400">SISI {labels[v]}</label>
-                     <div className="aspect-[4/5] rounded-[40px] overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center relative group cursor-pointer shadow-xl" 
-                          onClick={() => { setUploadTarget({ productId: showViewEditor!, view: v }); fileInputRef.current?.click(); }}>
-                        {currentUrl ? <img src={currentUrl} className="w-full h-full object-contain filter drop-shadow-2xl" /> : <span className="text-[10px] font-black uppercase opacity-20 tracking-widest">UPLOAD FOTO</span>}
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center text-white space-y-3">
-                           <svg className="w-10 h-10 neon-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                           <span className="font-black text-[10px] uppercase tracking-widest">GANTI FOTO</span>
-                        </div>
-                     </div>
+                    <label className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400">SISI {labels[v]}</label>
+                    <div className="aspect-[4/5] rounded-[40px] overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center relative group cursor-pointer shadow-xl"
+                      onClick={() => { setUploadTarget({ productId: showViewEditor!, view: v }); fileInputRef.current?.click(); }}>
+                      {currentUrl ? <img src={currentUrl} className="w-full h-full object-contain filter drop-shadow-2xl" /> : <span className="text-[10px] font-black uppercase opacity-20 tracking-widest">UPLOAD FOTO</span>}
+                      <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center text-white space-y-3">
+                        <svg className="w-10 h-10 neon-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        <span className="font-black text-[10px] uppercase tracking-widest">GANTI FOTO</span>
+                      </div>
+                    </div>
                   </div>
                 );
               })}

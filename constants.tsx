@@ -11,13 +11,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 185000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM_FRONT,
+    image: ASSETS.KEMEJA.GATAM.FRONT,
     images: {
-      front: ASSETS.KEMEJA.GATAM_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.GATAM_FRONT,
-      rightSleeve: ASSETS.KEMEJA.GATAM_FRONT
+      front: ASSETS.KEMEJA.GATAM.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.GATAM.FRONT,
+      rightSleeve: ASSETS.KEMEJA.GATAM.FRONT
     },
+    gallery: ASSETS.KEMEJA.GATAM.GALLERY,
     description: 'Seri Gatam dengan material Ripstop Tornado premium dan ventilasi udara punggung.'
   },
   {
@@ -26,13 +27,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 165000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.MTAC_FRONT,
+    image: ASSETS.KEMEJA.BRAD_V1.FRONT,
     images: {
-      front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.MTAC_FRONT,
-      rightSleeve: ASSETS.KEMEJA.MTAC_FRONT
+      front: ASSETS.KEMEJA.BRAD_V1.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT
     },
+    gallery: ASSETS.KEMEJA.BRAD_V1.GALLERY,
     description: 'Seri Brad-V1: Keseimbangan sempurna antara gaya kantor dan fungsionalitas taktis.'
   },
   {
@@ -41,13 +43,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 175000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.YOROI_FRONT,
+    image: ASSETS.KEMEJA.BRAD_V2.FRONT,
     images: {
-      front: ASSETS.KEMEJA.YOROI_FRONT,
-      back: ASSETS.KEMEJA.YOROI_BACK,
-      leftSleeve: ASSETS.KEMEJA.YOROI_FRONT,
-      rightSleeve: ASSETS.KEMEJA.YOROI_FRONT
+      front: ASSETS.KEMEJA.BRAD_V2.FRONT,
+      back: ASSETS.KEMEJA.YOROI.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V2.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V2.FRONT
     },
+    gallery: ASSETS.KEMEJA.BRAD_V2.GALLERY,
     description: 'Seri Brad-V2 dengan potongan modern dan material premium.'
   },
   {
@@ -56,13 +59,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 175000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.MTAC_FRONT,
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
     images: {
-      front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.MTAC_FRONT,
-      rightSleeve: ASSETS.KEMEJA.MTAC_FRONT
+      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
     },
+    gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
     description: 'Seri Brad-V3 untuk durabilitas maksimal di lapangan.'
   },
   {
@@ -71,12 +75,12 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 175000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM_FRONT,
+    image: ASSETS.KEMEJA.GATAM.FRONT, // Fallback for V4
     images: {
-      front: ASSETS.KEMEJA.GATAM_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.GATAM_FRONT,
-      rightSleeve: ASSETS.KEMEJA.GATAM_FRONT
+      front: ASSETS.KEMEJA.GATAM.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.GATAM.FRONT,
+      rightSleeve: ASSETS.KEMEJA.GATAM.FRONT
     },
     description: 'Seri Brad-V4: Standar baru untuk seragam tangguh.'
   },
@@ -86,13 +90,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 195000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.VENTURA,
+    image: ASSETS.KEMEJA.VENTURA.FRONT,
     images: {
-      front: ASSETS.KEMEJA.VENTURA,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.VENTURA,
-      rightSleeve: ASSETS.KEMEJA.VENTURA
+      front: ASSETS.KEMEJA.VENTURA.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.VENTURA.FRONT,
+      rightSleeve: ASSETS.KEMEJA.VENTURA.FRONT
     },
+    gallery: ASSETS.KEMEJA.VENTURA.GALLERY,
     description: 'Seri Ventura dengan desain sleek dan minimalis.'
   },
   {
@@ -101,13 +106,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 205000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.MTAC_FRONT,
+    image: ASSETS.KEMEJA.ROBOTIC.FRONT,
     images: {
-      front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK,
-      leftSleeve: ASSETS.KEMEJA.MTAC_FRONT,
-      rightSleeve: ASSETS.KEMEJA.MTAC_FRONT
+      front: ASSETS.KEMEJA.ROBOTIC.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK,
+      leftSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT,
+      rightSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT
     },
+    gallery: ASSETS.KEMEJA.ROBOTIC.GALLERY,
     description: 'Seri Robotic dengan saku multifungsi modular.'
   },
   {
@@ -116,13 +122,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 155000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.PDH,
+    image: ASSETS.KEMEJA.PDH.FRONT,
     images: {
-      front: ASSETS.KEMEJA.PDH,
+      front: ASSETS.KEMEJA.PDH.FRONT,
       back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/PDH-White-2.jpg',
-      leftSleeve: ASSETS.KEMEJA.PDH,
-      rightSleeve: ASSETS.KEMEJA.PDH
+      leftSleeve: ASSETS.KEMEJA.PDH.FRONT,
+      rightSleeve: ASSETS.KEMEJA.PDH.FRONT
     },
+    gallery: ASSETS.KEMEJA.PDH.GALLERY,
     description: 'Pakaian Dinas Harian (PDH) klasik dengan kenyamanan katun drill.'
   },
   {
@@ -131,13 +138,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 155000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.PDH,
+    image: ASSETS.KEMEJA.PDH_BARU.FRONT,
     images: {
-      front: ASSETS.KEMEJA.PDH,
+      front: ASSETS.KEMEJA.PDH_BARU.FRONT,
       back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/PDH-White-2.jpg',
-      leftSleeve: ASSETS.KEMEJA.PDH,
-      rightSleeve: ASSETS.KEMEJA.PDH
+      leftSleeve: ASSETS.KEMEJA.PDH_BARU.FRONT,
+      rightSleeve: ASSETS.KEMEJA.PDH_BARU.FRONT
     },
+    gallery: ASSETS.KEMEJA.PDH_BARU.GALLERY,
     description: 'Evolusi terbaru PDH dengan material lebih lembut dan sejuk.'
   },
   {
@@ -146,13 +154,14 @@ export const PRODUCTS: Product[] = [
     category: 'Kemeja',
     price: 225000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.YOROI_FRONT,
+    image: ASSETS.KEMEJA.STRAZAR.FRONT,
     images: {
-      front: ASSETS.KEMEJA.YOROI_FRONT,
-      back: ASSETS.KEMEJA.YOROI_BACK,
-      leftSleeve: ASSETS.KEMEJA.YOROI_FRONT,
-      rightSleeve: ASSETS.KEMEJA.YOROI_FRONT
+      front: ASSETS.KEMEJA.STRAZAR.FRONT,
+      back: ASSETS.KEMEJA.YOROI.BACK,
+      leftSleeve: ASSETS.KEMEJA.STRAZAR.FRONT,
+      rightSleeve: ASSETS.KEMEJA.STRAZAR.FRONT
     },
+    gallery: ASSETS.KEMEJA.STRAZAR.GALLERY,
     description: 'Strazar: Kemeja premium dengan standar kualitas ekspor.'
   },
   {
@@ -230,10 +239,10 @@ export const PRODUCTS: Product[] = [
     category: 'Kids',
     price: 95000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM_FRONT,
+    image: ASSETS.KEMEJA.GATAM.FRONT,
     images: {
-      front: ASSETS.KEMEJA.GATAM_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK
+      front: ASSETS.KEMEJA.GATAM.FRONT,
+      back: ASSETS.KEMEJA.GATAM.BACK
     },
     description: 'Kemeja anak untuk seragam TK/PAUD.'
   },
@@ -246,7 +255,7 @@ export const PRODUCTS: Product[] = [
     image: ASSETS.KEMEJA.MTAC_FRONT,
     images: {
       front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.GATAM_BACK
+      back: ASSETS.KEMEJA.GATAM.BACK
     },
     description: 'Kemeja anak untuk seragam SD.'
   }

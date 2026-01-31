@@ -10,12 +10,70 @@ import LOGO_BRADWEAR from './assets/logo_bradwear.png';
 import HERO_BG from './assets/factory_hero.jpg';
 
 // Import Produk
-import GATAM_FRONT from './assets/gatam_front.png';
-import GATAM_BACK from './assets/gatam_back.png';
+// Import Produk - KEMEJA MAIN & GALLERY
+// Dynamic Front Image Detection (supports jpeg, jpg, png, webp)
+const frontImagesGlob = import.meta.glob('./assets/Model Kemeja/*/depan.{jpeg,jpg,png,webp}', { eager: true, as: 'url' });
+
+const getFrontImage = (folder: string) => {
+  const extensions = ['jpeg', 'jpg', 'webp', 'png'];
+  for (const ext of extensions) {
+    const key = `./assets/Model Kemeja/${folder}/depan.${ext}`;
+    if (frontImagesGlob[key]) return frontImagesGlob[key];
+  }
+  console.warn(`Front image not found for folder: ${folder}`);
+  return '';
+};
+
+const GATAM_FRONT = getFrontImage('gatam');
+import GATAM_BACK from './assets/Model Kemeja/gatam/gatam_back.png';
+import GATAM_GAL_1 from './assets/Model Kemeja/gatam/Gatam depan.png';
+import GATAM_GAL_2 from './assets/Model Kemeja/gatam/depanw.jpeg';
+import GATAM_GAL_3 from './assets/Model Kemeja/gatam/dreamina-2026-02-01-6484-buatkan menjadi menghadap depan dengan p....jpeg';
+
+const BRAD_V1_FRONT = getFrontImage('Brad-v1');
+import BRAD_V1_GAL_1 from './assets/Model Kemeja/Brad-v1/Gatam depan.png';
+import BRAD_V1_GAL_2 from './assets/Model Kemeja/Brad-v1/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
+
+const BRAD_V2_FRONT = getFrontImage('Brad-v2');
+import BRAD_V2_GAL_1 from './assets/Model Kemeja/Brad-v2/series-brad-v2-1.webp';
+import BRAD_V2_GAL_2 from './assets/Model Kemeja/Brad-v2/series-brad-v2-2.webp';
+import BRAD_V2_GAL_3 from './assets/Model Kemeja/Brad-v2/series-brad-v2-3.webp';
+
+const BRAD_V3_FRONT = getFrontImage('Brad-V3');
+import BRAD_V3_GAL_1 from './assets/Model Kemeja/Brad-V3/empty-1.webp';
+import BRAD_V3_GAL_2 from './assets/Model Kemeja/Brad-V3/empty-2.webp';
+
+const PDH_FRONT = getFrontImage('Pdh');
+import PDH_GAL_1 from './assets/Model Kemeja/Pdh/pdh-1.webp';
+import PDH_GAL_2 from './assets/Model Kemeja/Pdh/pdh-2.webp';
+import PDH_GAL_3 from './assets/Model Kemeja/Pdh/pdh-3.webp';
+
+const PDH_BARU_FRONT = getFrontImage('Pdh-baru');
+import PDH_BARU_GAL_1 from './assets/Model Kemeja/Pdh-baru/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
+import PDH_BARU_GAL_2 from './assets/Model Kemeja/Pdh-baru/dreamina-2026-02-01-7762-buatkan menjadi menghadap depan dengan p....jpeg';
+
+const ROBOTIC_FRONT = getFrontImage('robotik');
+import ROBOTIC_GAL_1 from './assets/Model Kemeja/robotik/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
+import ROBOTIC_GAL_2 from './assets/Model Kemeja/robotik/dreamina-2026-02-01-7762-buatkan menjadi menghadap depan dengan p....jpeg';
+
+const STRAZAR_FRONT = getFrontImage('Strazard');
+import STRAZAR_GAL_1 from './assets/Model Kemeja/Strazard/series-strazard-1.webp';
+import STRAZAR_GAL_2 from './assets/Model Kemeja/Strazard/series-strazard-2.webp';
+import STRAZAR_GAL_3 from './assets/Model Kemeja/Strazard/series-strazard-3.webp';
+
+const VENTURA_FRONT = getFrontImage('Ventura');
+import VENTURA_GAL_1 from './assets/Model Kemeja/Ventura/series-ventura-1.webp';
+import VENTURA_GAL_2 from './assets/Model Kemeja/Ventura/series-ventura-2.webp';
+import VENTURA_GAL_3 from './assets/Model Kemeja/Ventura/series-ventura-3.webp';
+
 import MTAC_FRONT from './assets/mtac_front.png';
-import BOMBER_FRONT from './assets/bomber_front.png';
-import YOROI_FRONT from './assets/yoroidpn.jpeg';
+import BOMBER_FRONT from './assets/Jacket/bomber_front.png';
+
+const YOROI_FRONT = getFrontImage('Yoroi');
 import YOROI_BACK from './assets/yoroiblkg.jpeg';
+import YOROI_GAL_1 from './assets/Model Kemeja/Yoroi/series-yoroi-1.webp';
+import YOROI_GAL_2 from './assets/Model Kemeja/Yoroi/series-yoroi-2.webp';
+import YOROI_GAL_3 from './assets/Model Kemeja/Yoroi/series-yoroi-3.webp';
 
 // Import Our Partners Logos
 import PARTNER_KEMENDAGRI_1 from './assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png';
@@ -98,13 +156,51 @@ export const ASSETS = {
 
   // --- KATEGORI KEMEJA ---
   KEMEJA: {
-    GATAM_FRONT: GATAM_FRONT,
-    GATAM_BACK: GATAM_BACK,
-    MTAC_FRONT: MTAC_FRONT,
-    YOROI_FRONT: YOROI_FRONT,
-    YOROI_BACK: YOROI_BACK,
-    VENTURA: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=600',
-    PDH: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&q=80&w=600',
+    GATAM: {
+      FRONT: GATAM_FRONT,
+      BACK: GATAM_BACK,
+      GALLERY: [GATAM_GAL_1, GATAM_GAL_2, GATAM_GAL_3]
+    },
+    BRAD_V1: {
+      FRONT: BRAD_V1_FRONT,
+      GALLERY: [BRAD_V1_GAL_1, BRAD_V1_GAL_2]
+    },
+    BRAD_V2: {
+      FRONT: BRAD_V2_FRONT,
+      GALLERY: [BRAD_V2_GAL_1, BRAD_V2_GAL_2, BRAD_V2_GAL_3]
+    },
+    BRAD_V3: {
+      FRONT: BRAD_V3_FRONT,
+      GALLERY: [BRAD_V3_GAL_1, BRAD_V3_GAL_2]
+    },
+    PDH: {
+      FRONT: PDH_FRONT,
+      GALLERY: [PDH_GAL_1, PDH_GAL_2, PDH_GAL_3]
+    },
+    PDH_BARU: {
+      FRONT: PDH_BARU_FRONT,
+      GALLERY: [PDH_BARU_GAL_1, PDH_BARU_GAL_2]
+    },
+    ROBOTIC: {
+      FRONT: ROBOTIC_FRONT,
+      GALLERY: [ROBOTIC_GAL_1, ROBOTIC_GAL_2]
+    },
+    STRAZAR: {
+      FRONT: STRAZAR_FRONT,
+      GALLERY: [STRAZAR_GAL_1, STRAZAR_GAL_2, STRAZAR_GAL_3]
+    },
+    VENTURA: {
+      FRONT: VENTURA_FRONT,
+      GALLERY: [VENTURA_GAL_1, VENTURA_GAL_2, VENTURA_GAL_3]
+    },
+    YOROI: {
+      FRONT: YOROI_FRONT,
+      BACK: YOROI_BACK,
+      GALLERY: [YOROI_GAL_1, YOROI_GAL_2, YOROI_GAL_3]
+    },
+
+    // Legacy / Fallback
+    MTAC_FRONT,
   },
 
   // --- KATEGORI JAKET ---
@@ -176,8 +272,9 @@ export const ASSETS = {
   }
 };
 
+// Helper untuk mendapatkan asset berdasarkan nama string (jika diperlukan)
 export const getAssetByName = (name: string): string => {
-  const flatAssets: Record<string, string> = {
+  const flatAssets: Record<string, any> = {
     ...ASSETS.BRAND,
     ...ASSETS.KEMEJA,
     ...ASSETS.JAKET,
@@ -187,5 +284,6 @@ export const getAssetByName = (name: string): string => {
     ...ASSETS.COLORS,
     ...ASSETS.COLORS_BACK
   };
-  return flatAssets[name] || '';
+  const result = flatAssets[name];
+  return typeof result === 'string' ? result : '';
 };

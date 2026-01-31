@@ -354,7 +354,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
               <h3 className="text-xl font-black uppercase tracking-tighter neon-text">
                 {activeModal === 'cs-choice' ? 'PILIH KONSULTAN' : activeModal.toUpperCase().replace('-', ' ')}
               </h3>
-              <button onClick={() => setActiveModal('none')} className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-zinc-100 text-zinc-900'}`}>
+              <button onClick={() => setActiveModal('none')} className={`p-3 rounded-2xl transition-all ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -423,7 +423,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       {selectedCatalog && (
         <div className="fixed inset-0 z-[400] bg-black/98 backdrop-blur-3xl flex items-center justify-center p-6" onClick={() => setSelectedCatalog(null)}>
           <div className="w-full max-w-screen-md h-full flex flex-col relative no-scrollbar" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setSelectedCatalog(null)} className="absolute top-0 right-0 z-50 w-14 h-14 rounded-3xl bg-white/5 backdrop-blur flex items-center justify-center text-white border border-white/10 shadow-2xl active:scale-90">
+            <button onClick={() => setSelectedCatalog(null)} className={`absolute top-0 right-0 z-50 w-14 h-14 rounded-3xl backdrop-blur flex items-center justify-center shadow-2xl active:scale-90 transition-all ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="flex-1 overflow-y-auto no-scrollbar py-20 px-4 space-y-16">
