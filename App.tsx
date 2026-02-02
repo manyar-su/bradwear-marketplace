@@ -8,9 +8,7 @@ import AdminView from './components/AdminView';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from './constants';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<View>(() => {
-    return (localStorage.getItem('bradwear_view') as View) || View.HOME;
-  });
+  const [currentView, setCurrentView] = useState<View>(View.HOME);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('bradwear_theme') as 'light' | 'dark') || 'dark';
@@ -52,8 +50,8 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('bradwear_design_data');
     return saved ? JSON.parse(saved) : {
       productId: '',
-      color: '#1A1A1A',
-      material: 'Katun Drill',
+      color: '#212121',
+      material: 'TROPICAL',
       view: 'Depan',
       elements: [],
       namePos: { x: 50, y: 35 },
@@ -77,7 +75,7 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('bradwear_products', JSON.stringify(products));
     localStorage.setItem('bradwear_production_orders', JSON.stringify(productionOrders));
-    localStorage.setItem('bradwear_view', currentView);
+
     localStorage.setItem('bradwear_theme', theme);
     localStorage.setItem('bradwear_order_code', orderCode);
     localStorage.setItem('bradwear_design_data', JSON.stringify(designData));
@@ -132,7 +130,7 @@ const App: React.FC = () => {
                 products={products}
                 workflowStages={userWorkflowStages}
                 orderCode={orderCode}
-                branding={{ title: "Bradwear Manufacture", subtitle: "Industrial Quality Uniform & Shirt" }}
+                branding={{ title: "Bradwear Manufacture", subtitle: "KATALOG BRADWEAR" }}
                 onSelectProduct={handleSelectProduct}
                 theme={theme}
               />

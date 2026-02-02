@@ -7,30 +7,28 @@ const getRandomSold = () => Math.floor(Math.random() * (4500 - 2000 + 1)) + 2000
 export const PRODUCTS: Product[] = [
   {
     id: 'k1',
-    name: 'Gatam',
+    name: 'Brad-V3',
     category: 'Kemeja',
-    price: 185000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM.FRONT,
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
     images: {
-      front: ASSETS.KEMEJA.GATAM.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
-      leftSleeve: ASSETS.KEMEJA.GATAM.FRONT,
-      rightSleeve: ASSETS.KEMEJA.GATAM.FRONT
+      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
     },
-    gallery: ASSETS.KEMEJA.GATAM.GALLERY,
-    description: 'Seri Gatam dengan material Ripstop Tornado premium dan ventilasi udara punggung.'
+    gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
+    description: 'Seri Brad-V3 dengan material Ripstop Tornado premium dan ventilasi udara punggung.'
   },
   {
     id: 'k2',
     name: 'Brad-V1',
     category: 'Kemeja',
-    price: 165000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.BRAD_V1.FRONT,
     images: {
       front: ASSETS.KEMEJA.BRAD_V1.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
       leftSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT,
       rightSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT
     },
@@ -41,7 +39,6 @@ export const PRODUCTS: Product[] = [
     id: 'k3',
     name: 'Brad-V2',
     category: 'Kemeja',
-    price: 175000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.BRAD_V2.FRONT,
     images: {
@@ -55,32 +52,30 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'k4',
-    name: 'Brad-V3',
+    name: 'Brad-V3 PRO',
     category: 'Kemeja',
-    price: 175000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.BRAD_V3.FRONT,
     images: {
       front: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
       leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
       rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
     },
     gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
-    description: 'Seri Brad-V3 untuk durabilitas maksimal di lapangan.'
+    description: 'Seri Brad-V3 PRO untuk durabilitas maksimal di lapangan.'
   },
   {
     id: 'k5',
     name: 'Brad-V4',
     category: 'Kemeja',
-    price: 175000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM.FRONT, // Fallback for V4
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT, // Fallback for V4
     images: {
-      front: ASSETS.KEMEJA.GATAM.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
-      leftSleeve: ASSETS.KEMEJA.GATAM.FRONT,
-      rightSleeve: ASSETS.KEMEJA.GATAM.FRONT
+      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
     },
     description: 'Seri Brad-V4: Standar baru untuk seragam tangguh.'
   },
@@ -88,12 +83,11 @@ export const PRODUCTS: Product[] = [
     id: 'k6',
     name: 'Ventura',
     category: 'Kemeja',
-    price: 195000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.VENTURA.FRONT,
     images: {
       front: ASSETS.KEMEJA.VENTURA.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
       leftSleeve: ASSETS.KEMEJA.VENTURA.FRONT,
       rightSleeve: ASSETS.KEMEJA.VENTURA.FRONT
     },
@@ -104,12 +98,11 @@ export const PRODUCTS: Product[] = [
     id: 'k7',
     name: 'Robotic',
     category: 'Kemeja',
-    price: 205000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.ROBOTIC.FRONT,
     images: {
       front: ASSETS.KEMEJA.ROBOTIC.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
       leftSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT,
       rightSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT
     },
@@ -120,7 +113,6 @@ export const PRODUCTS: Product[] = [
     id: 'k8',
     name: 'PDH',
     category: 'Kemeja',
-    price: 155000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.PDH.FRONT,
     images: {
@@ -136,7 +128,6 @@ export const PRODUCTS: Product[] = [
     id: 'k9',
     name: 'PDH baru',
     category: 'Kemeja',
-    price: 155000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.PDH_BARU.FRONT,
     images: {
@@ -152,7 +143,6 @@ export const PRODUCTS: Product[] = [
     id: 'k10',
     name: 'Strazar',
     category: 'Kemeja',
-    price: 225000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.STRAZAR.FRONT,
     images: {
@@ -168,7 +158,6 @@ export const PRODUCTS: Product[] = [
     id: 'j1',
     name: 'Bomber Brad',
     category: 'Jaket',
-    price: 285000,
     soldCount: getRandomSold(),
     image: ASSETS.JAKET.BOMBER,
     images: {
@@ -183,7 +172,6 @@ export const PRODUCTS: Product[] = [
     id: 'r1',
     name: 'Tactical Bupati',
     category: 'Rompi',
-    price: 195000,
     soldCount: getRandomSold(),
     image: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-1.jpg',
     images: {
@@ -198,7 +186,6 @@ export const PRODUCTS: Product[] = [
     id: 'r2',
     name: 'Rompi Lapangan',
     category: 'Rompi',
-    price: 175000,
     soldCount: getRandomSold(),
     image: ASSETS.ROMPI.BUPATI,
     images: {
@@ -211,7 +198,6 @@ export const PRODUCTS: Product[] = [
     id: 'c1',
     name: 'Cargo Tactical',
     category: 'Celana',
-    price: 185000,
     soldCount: getRandomSold(),
     image: ASSETS.CELANA.WARRIOR,
     images: {
@@ -224,7 +210,6 @@ export const PRODUCTS: Product[] = [
     id: 'c2',
     name: 'PDL Formal',
     category: 'Celana',
-    price: 155000,
     soldCount: getRandomSold(),
     image: ASSETS.CELANA.FORMAL,
     images: {
@@ -237,12 +222,11 @@ export const PRODUCTS: Product[] = [
     id: 'kid1',
     name: 'Kemeja Anak TK',
     category: 'Kids',
-    price: 95000,
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.GATAM.FRONT,
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
     images: {
-      front: ASSETS.KEMEJA.GATAM.FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK
+      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK
     },
     description: 'Kemeja anak untuk seragam TK/PAUD.'
   },
@@ -250,12 +234,11 @@ export const PRODUCTS: Product[] = [
     id: 'kid2',
     name: 'Kemeja Anak SD',
     category: 'Kids',
-    price: 105000,
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.MTAC_FRONT,
     images: {
       front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.GATAM.BACK
+      back: ASSETS.KEMEJA.BRAD_V3.BACK
     },
     description: 'Kemeja anak untuk seragam SD.'
   }

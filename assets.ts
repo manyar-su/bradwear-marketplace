@@ -9,62 +9,105 @@
 import LOGO_BRADWEAR from './assets/logo_bradwear.png';
 import HERO_BG from './assets/factory_hero.jpg';
 
+// Supabase Integration Toggle
+// Set 'true' untuk menggunakan asset dari Supabase Storage
+export const USE_SUPABASE_STORAGE = true;
+export const SUPABASE_BASE_URL = 'https://kppsavzarjxtwsljwzzi.supabase.co/storage/v1/object/public/assets';
+
+// Helper untuk mendapatkan path asset (lokal atau remote)
+const getAssetPath = (localPath: string, remotePath: string): string => {
+  return USE_SUPABASE_STORAGE ? `${SUPABASE_BASE_URL}/${remotePath}` : localPath;
+};
+
 // Import Produk
 // Import Produk - KEMEJA MAIN & GALLERY
 // Dynamic Front Image Detection (supports jpeg, jpg, png, webp)
-const frontImagesGlob = import.meta.glob('./assets/Model Kemeja/*/depan.{jpeg,jpg,png,webp}', { eager: true, as: 'url' });
+// Universal Image Detection (supports jpeg, jpg, png, webp, and generic naming)
+const allImagesGlob = import.meta.glob('./assets/Model Kemeja/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
 
-const getFrontImage = (folder: string) => {
-  const extensions = ['jpeg', 'jpg', 'webp', 'png'];
-  for (const ext of extensions) {
-    const key = `./assets/Model Kemeja/${folder}/depan.${ext}`;
-    if (frontImagesGlob[key]) return frontImagesGlob[key];
+const getModelAsset = (folder: string, fileName: string) => {
+  const extensions = ['png', 'jpg', 'jpeg', 'webp'];
+  const possibleNames = [fileName, `${folder}_${fileName}`, `series-${folder}-${fileName}`];
+
+  for (const name of possibleNames) {
+    for (const ext of extensions) {
+      const key = `./assets/Model Kemeja/${folder}/${name}.${ext}`;
+      if (allImagesGlob[key]) return allImagesGlob[key] as string;
+    }
   }
-  console.warn(`Front image not found for folder: ${folder}`);
   return '';
 };
 
-const GATAM_FRONT = getFrontImage('gatam');
-import GATAM_BACK from './assets/Model Kemeja/gatam/gatam_back.png';
-import GATAM_GAL_1 from './assets/Model Kemeja/gatam/Gatam depan.png';
-import GATAM_GAL_2 from './assets/Model Kemeja/gatam/depanw.jpeg';
-import GATAM_GAL_3 from './assets/Model Kemeja/gatam/dreamina-2026-02-01-6484-buatkan menjadi menghadap depan dengan p....jpeg';
+const getFrontImage = (folder: string) => getModelAsset(folder, 'depan');
+const getBackImage = (folder: string) => getModelAsset(folder, 'belakang');
+
+// --- DYNAMIC COLOR LOADING (Robust format detection & Supabase Support) ---
+const allWarnaGlob = import.meta.glob('./assets/warna/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
+
+const getColorAsset = (name: string): string => {
+  const extensions = ['jpeg', 'jpg', 'png', 'webp'];
+  let detectedExt = 'jpeg'; // Default fallback
+  let localUrl = '';
+
+  // 1. Local File Check (Multiple Formats)
+  for (const ext of extensions) {
+    const key = `./assets/warna/${name}.${ext}`;
+    if (allWarnaGlob[key]) {
+      localUrl = allWarnaGlob[key] as string;
+      detectedExt = ext;
+      break;
+    }
+  }
+
+  // 2. Return Local URL if found (as requested: restore to load from assets warna)
+  if (localUrl) return localUrl;
+
+  // 3. Fallback to Supabase URL if enabled
+  if (USE_SUPABASE_STORAGE) {
+    return `${SUPABASE_BASE_URL}/warna/${encodeURIComponent(name)}.${detectedExt}`;
+  }
+
+  return '';
+};
+
+const BRAD_V3_FRONT = getFrontImage('Brad-V3') || getFrontImage('gatam');
+const BRAD_V3_BACK = getBackImage('Brad-V3') || getBackImage('gatam');
+const BRAD_V3_GAL_1 = getModelAsset('Brad-V3', '1') || getModelAsset('gatam', '1');
+const BRAD_V3_GAL_2 = getModelAsset('Brad-V3', '2') || getModelAsset('gatam', '2');
+const BRAD_V3_GAL_3 = getModelAsset('Brad-V3', '3') || getModelAsset('gatam', '3');
 
 const BRAD_V1_FRONT = getFrontImage('Brad-v1');
-import BRAD_V1_GAL_1 from './assets/Model Kemeja/Brad-v1/Gatam depan.png';
-import BRAD_V1_GAL_2 from './assets/Model Kemeja/Brad-v1/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
+const BRAD_V1_GAL_1 = getModelAsset('Brad-v1', '1');
+const BRAD_V1_GAL_2 = getModelAsset('Brad-v1', '2');
 
 const BRAD_V2_FRONT = getFrontImage('Brad-v2');
-import BRAD_V2_GAL_1 from './assets/Model Kemeja/Brad-v2/series-brad-v2-1.webp';
-import BRAD_V2_GAL_2 from './assets/Model Kemeja/Brad-v2/series-brad-v2-2.webp';
-import BRAD_V2_GAL_3 from './assets/Model Kemeja/Brad-v2/series-brad-v2-3.webp';
+const BRAD_V2_GAL_1 = getModelAsset('Brad-v2', '1');
+const BRAD_V2_GAL_2 = getModelAsset('Brad-v2', '2');
+const BRAD_V2_GAL_3 = getModelAsset('Brad-v2', '3');
 
-const BRAD_V3_FRONT = getFrontImage('Brad-V3');
-import BRAD_V3_GAL_1 from './assets/Model Kemeja/Brad-V3/empty-1.webp';
-import BRAD_V3_GAL_2 from './assets/Model Kemeja/Brad-V3/empty-2.webp';
 
 const PDH_FRONT = getFrontImage('Pdh');
-import PDH_GAL_1 from './assets/Model Kemeja/Pdh/pdh-1.webp';
-import PDH_GAL_2 from './assets/Model Kemeja/Pdh/pdh-2.webp';
-import PDH_GAL_3 from './assets/Model Kemeja/Pdh/pdh-3.webp';
+const PDH_GAL_1 = getModelAsset('Pdh', '1');
+const PDH_GAL_2 = getModelAsset('Pdh', '2');
+const PDH_GAL_3 = getModelAsset('Pdh', '3');
 
 const PDH_BARU_FRONT = getFrontImage('Pdh-baru');
-import PDH_BARU_GAL_1 from './assets/Model Kemeja/Pdh-baru/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
-import PDH_BARU_GAL_2 from './assets/Model Kemeja/Pdh-baru/dreamina-2026-02-01-7762-buatkan menjadi menghadap depan dengan p....jpeg';
+const PDH_BARU_GAL_1 = getModelAsset('Pdh-baru', '1');
+const PDH_BARU_GAL_2 = getModelAsset('Pdh-baru', '2');
 
 const ROBOTIC_FRONT = getFrontImage('robotik');
-import ROBOTIC_GAL_1 from './assets/Model Kemeja/robotik/dreamina-2026-02-01-1495-Show only the shirt, facing directly for....jpeg';
-import ROBOTIC_GAL_2 from './assets/Model Kemeja/robotik/dreamina-2026-02-01-7762-buatkan menjadi menghadap depan dengan p....jpeg';
+const ROBOTIC_GAL_1 = getModelAsset('robotik', '1');
+const ROBOTIC_GAL_2 = getModelAsset('robotik', '2');
 
 const STRAZAR_FRONT = getFrontImage('Strazard');
-import STRAZAR_GAL_1 from './assets/Model Kemeja/Strazard/series-strazard-1.webp';
-import STRAZAR_GAL_2 from './assets/Model Kemeja/Strazard/series-strazard-2.webp';
-import STRAZAR_GAL_3 from './assets/Model Kemeja/Strazard/series-strazard-3.webp';
+const STRAZAR_GAL_1 = getModelAsset('Strazard', '1');
+const STRAZAR_GAL_2 = getModelAsset('Strazard', '2');
+const STRAZAR_GAL_3 = getModelAsset('Strazard', '3');
 
 const VENTURA_FRONT = getFrontImage('Ventura');
-import VENTURA_GAL_1 from './assets/Model Kemeja/Ventura/series-ventura-1.webp';
-import VENTURA_GAL_2 from './assets/Model Kemeja/Ventura/series-ventura-2.webp';
-import VENTURA_GAL_3 from './assets/Model Kemeja/Ventura/series-ventura-3.webp';
+const VENTURA_GAL_1 = getModelAsset('Ventura', '1');
+const VENTURA_GAL_2 = getModelAsset('Ventura', '2');
+const VENTURA_GAL_3 = getModelAsset('Ventura', '3');
 
 import MTAC_FRONT from './assets/mtac_front.png';
 import BOMBER_FRONT from './assets/Jacket/bomber_front.png';
@@ -89,47 +132,7 @@ import PARTNER_PUPR from './assets/Logo our partner/Logo Kementerian PUPR (PNG-2
 import PARTNER_HUB from './assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png';
 import PARTNER_PERINDUS from './assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png';
 
-// Import Warna Images
-import COLOR_BIRU_MUDA from './assets/warna/biru muda.jpeg';
-import COLOR_COKLAT_TUA from './assets/warna/coklat tua.jpeg';
-import COLOR_COKLAT from './assets/warna/coklat.jpeg';
-import COLOR_DENIM from './assets/warna/denim.jpeg';
-import COLOR_HIJAU_ARMY from './assets/warna/hijau army.jpeg';
-import COLOR_HIJAU_BUNGLON from './assets/warna/hijau bunglon.jpeg';
-import COLOR_HIJAU from './assets/warna/hijau.jpeg';
-import COLOR_HITAM from './assets/warna/hitam.jpeg';
-import COLOR_KHAKI from './assets/warna/khaki.jpeg';
-import COLOR_KUNING from './assets/warna/kuning.jpeg';
-import COLOR_MAROON from './assets/warna/maroon.jpeg';
-import COLOR_MERAH_CABE from './assets/warna/merah cabe.jpeg';
-import COLOR_MOCHA from './assets/warna/mocha.jpeg';
-import COLOR_NAVI from './assets/warna/navi.jpeg';
-import COLOR_OREN from './assets/warna/oren.jpeg';
-import COLOR_PUTIH from './assets/warna/putih.jpeg';
-import COLOR_SAGE from './assets/warna/sage.jpeg';
-import COLOR_UNGU_MUDA from './assets/warna/ungu muda.jpeg';
-import COLOR_UNGU_TUA from './assets/warna/ungu tua.jpeg';
-
-// Import Warna Images (BACK)
-import COLOR_BIRU_MUDA_BACK from './assets/warna/biru muda belakang.png';
-import COLOR_COKLAT_TUA_BACK from './assets/warna/coklat tua belakang.png';
-import COLOR_COKLAT_BACK from './assets/warna/coklat belakang.png';
-import COLOR_DENIM_BACK from './assets/warna/denim belakang.png';
-import COLOR_HIJAU_ARMY_BACK from './assets/warna/hijau army belakang.png';
-import COLOR_HIJAU_BUNGLON_BACK from './assets/warna/hijau bunglon belakang.png';
-import COLOR_HIJAU_BACK from './assets/warna/hijau belakang.png';
-import COLOR_HITAM_BACK from './assets/warna/hitam belakang.png';
-import COLOR_KHAKI_BACK from './assets/warna/khaki belakang.png';
-import COLOR_KUNING_BACK from './assets/warna/kuning belakang.png';
-import COLOR_MAROON_BACK from './assets/warna/maroon belakang.png';
-import COLOR_MERAH_CABE_BACK from './assets/warna/merah cabe belakang.png';
-import COLOR_MOCHA_BACK from './assets/warna/mocha belakang.png';
-import COLOR_NAVI_BACK from './assets/warna/navi belakang.png';
-import COLOR_OREN_BACK from './assets/warna/oren belakang.png';
-import COLOR_PUTIH_BACK from './assets/warna/putih belakang.png';
-import COLOR_SAGE_BACK from './assets/warna/sage belakang.png';
-import COLOR_UNGU_MUDA_BACK from './assets/warna/ungu muda belakang.png';
-import COLOR_UNGU_TUA_BACK from './assets/warna/ungu tua belakang.png';
+// --- COLORS ARE NOW LOADED DYNAMICALLY BELOW ---
 
 export const ASSETS = {
   // --- UI & BRANDING ---
@@ -156,47 +159,50 @@ export const ASSETS = {
 
   // --- KATEGORI KEMEJA ---
   KEMEJA: {
-    GATAM: {
-      FRONT: GATAM_FRONT,
-      BACK: GATAM_BACK,
-      GALLERY: [GATAM_GAL_1, GATAM_GAL_2, GATAM_GAL_3]
+    BRAD_V3: {
+      FRONT: BRAD_V3_FRONT,
+      BACK: BRAD_V3_BACK,
+      GALLERY: [BRAD_V3_GAL_1, BRAD_V3_GAL_2, BRAD_V3_GAL_3].filter(Boolean)
     },
     BRAD_V1: {
       FRONT: BRAD_V1_FRONT,
-      GALLERY: [BRAD_V1_GAL_1, BRAD_V1_GAL_2]
+      BACK: getBackImage('Brad-v1'),
+      GALLERY: [BRAD_V1_GAL_1, BRAD_V1_GAL_2].filter(Boolean)
     },
     BRAD_V2: {
       FRONT: BRAD_V2_FRONT,
-      GALLERY: [BRAD_V2_GAL_1, BRAD_V2_GAL_2, BRAD_V2_GAL_3]
-    },
-    BRAD_V3: {
-      FRONT: BRAD_V3_FRONT,
-      GALLERY: [BRAD_V3_GAL_1, BRAD_V3_GAL_2]
+      BACK: getBackImage('Brad-v2'),
+      GALLERY: [BRAD_V2_GAL_1, BRAD_V2_GAL_2, BRAD_V2_GAL_3].filter(Boolean)
     },
     PDH: {
       FRONT: PDH_FRONT,
-      GALLERY: [PDH_GAL_1, PDH_GAL_2, PDH_GAL_3]
+      BACK: getBackImage('Pdh'),
+      GALLERY: [PDH_GAL_1, PDH_GAL_2, PDH_GAL_3].filter(Boolean)
     },
     PDH_BARU: {
       FRONT: PDH_BARU_FRONT,
-      GALLERY: [PDH_BARU_GAL_1, PDH_BARU_GAL_2]
+      BACK: getBackImage('Pdh-baru'),
+      GALLERY: [PDH_BARU_GAL_1, PDH_BARU_GAL_2].filter(Boolean)
     },
     ROBOTIC: {
       FRONT: ROBOTIC_FRONT,
-      GALLERY: [ROBOTIC_GAL_1, ROBOTIC_GAL_2]
+      BACK: getBackImage('robotik'),
+      GALLERY: [ROBOTIC_GAL_1, ROBOTIC_GAL_2].filter(Boolean)
     },
     STRAZAR: {
       FRONT: STRAZAR_FRONT,
-      GALLERY: [STRAZAR_GAL_1, STRAZAR_GAL_2, STRAZAR_GAL_3]
+      BACK: getBackImage('Strazard'),
+      GALLERY: [STRAZAR_GAL_1, STRAZAR_GAL_2, STRAZAR_GAL_3].filter(Boolean)
     },
     VENTURA: {
       FRONT: VENTURA_FRONT,
-      GALLERY: [VENTURA_GAL_1, VENTURA_GAL_2, VENTURA_GAL_3]
+      BACK: getBackImage('Ventura'),
+      GALLERY: [VENTURA_GAL_1, VENTURA_GAL_2, VENTURA_GAL_3].filter(Boolean)
     },
     YOROI: {
       FRONT: YOROI_FRONT,
-      BACK: YOROI_BACK,
-      GALLERY: [YOROI_GAL_1, YOROI_GAL_2, YOROI_GAL_3]
+      BACK: YOROI_BACK || getBackImage('Yoroi'),
+      GALLERY: [YOROI_GAL_1, YOROI_GAL_2, YOROI_GAL_3].filter(Boolean)
     },
 
     // Legacy / Fallback
@@ -210,8 +216,8 @@ export const ASSETS = {
 
   // --- KATEGORI CELANA ---
   CELANA: {
-    WARRIOR: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600',
-    FORMAL: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&q=80&w=600',
+    WARRIOR: getAssetPath('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600', 'Celana/warrior.jpg'),
+    FORMAL: getAssetPath('https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&q=80&w=600', 'Celana/formal.jpg'),
   },
 
   // --- KATEGORI ROMPI ---
@@ -227,48 +233,48 @@ export const ASSETS = {
 
   // --- WARNA ---
   COLORS: {
-    BIRU_MUDA: COLOR_BIRU_MUDA,
-    COKLAT_TUA: COLOR_COKLAT_TUA,
-    COKLAT: COLOR_COKLAT,
-    DENIM: COLOR_DENIM,
-    HIJAU_ARMY: COLOR_HIJAU_ARMY,
-    HIJAU_BUNGLON: COLOR_HIJAU_BUNGLON,
-    HIJAU: COLOR_HIJAU,
-    HITAM: COLOR_HITAM,
-    KHAKI: COLOR_KHAKI,
-    KUNING: COLOR_KUNING,
-    MAROON: COLOR_MAROON,
-    MERAH_CABE: COLOR_MERAH_CABE,
-    MOCHA: COLOR_MOCHA,
-    NAVI: COLOR_NAVI,
-    OREN: COLOR_OREN,
-    PUTIH: COLOR_PUTIH,
-    SAGE: COLOR_SAGE,
-    UNGU_MUDA: COLOR_UNGU_MUDA,
-    UNGU_TUA: COLOR_UNGU_TUA,
+    BIRU_MUDA: getColorAsset('biru muda'),
+    COKLAT_TUA: getColorAsset('coklat tua'),
+    COKLAT: getColorAsset('coklat'),
+    DENIM: getColorAsset('denim'),
+    HIJAU_ARMY: getColorAsset('hijau army'),
+    HIJAU_BUNGLON: getColorAsset('hijau bunglon'),
+    HIJAU: getColorAsset('hijau'),
+    HITAM: getColorAsset('hitam'),
+    KHAKI: getColorAsset('khaki'),
+    KUNING: getColorAsset('kuning'),
+    MAROON: getColorAsset('maroon'),
+    MERAH_CABE: getColorAsset('merah cabe'),
+    MOCHA: getColorAsset('mocha'),
+    NAVI: getColorAsset('navi'),
+    OREN: getColorAsset('oren'),
+    PUTIH: getColorAsset('putih'),
+    SAGE: getColorAsset('sage'),
+    UNGU_MUDA: getColorAsset('ungu muda'),
+    UNGU_TUA: getColorAsset('ungu tua'),
   },
 
   // --- WARNA BELAKANG ---
   COLORS_BACK: {
-    BIRU_MUDA: COLOR_BIRU_MUDA_BACK,
-    COKLAT_TUA: COLOR_COKLAT_TUA_BACK,
-    COKLAT: COLOR_COKLAT_BACK,
-    DENIM: COLOR_DENIM_BACK,
-    HIJAU_ARMY: COLOR_HIJAU_ARMY_BACK,
-    HIJAU_BUNGLON: COLOR_HIJAU_BUNGLON_BACK,
-    HIJAU: COLOR_HIJAU_BACK,
-    HITAM: COLOR_HITAM_BACK,
-    KHAKI: COLOR_KHAKI_BACK,
-    KUNING: COLOR_KUNING_BACK,
-    MAROON: COLOR_MAROON_BACK,
-    MERAH_CABE: COLOR_MERAH_CABE_BACK,
-    MOCHA: COLOR_MOCHA_BACK,
-    NAVI: COLOR_NAVI_BACK,
-    OREN: COLOR_OREN_BACK,
-    PUTIH: COLOR_PUTIH_BACK,
-    SAGE: COLOR_SAGE_BACK,
-    UNGU_MUDA: COLOR_UNGU_MUDA_BACK,
-    UNGU_TUA: COLOR_UNGU_TUA_BACK,
+    BIRU_MUDA: getColorAsset('biru muda belakang'),
+    COKLAT_TUA: getColorAsset('coklat tua belakang'),
+    COKLAT: getColorAsset('coklat belakang'),
+    DENIM: getColorAsset('denim belakang'),
+    HIJAU_ARMY: getColorAsset('hijau army belakang'),
+    HIJAU_BUNGLON: getColorAsset('hijau bunglon belakang'),
+    HIJAU: getColorAsset('hijau belakang'),
+    HITAM: getColorAsset('hitam belakang'),
+    KHAKI: getColorAsset('khaki belakang'),
+    KUNING: getColorAsset('kuning belakang'),
+    MAROON: getColorAsset('maroon belakang'),
+    MERAH_CABE: getColorAsset('merah cabe belakang'),
+    MOCHA: getColorAsset('mocha belakang'),
+    NAVI: getColorAsset('navi belakang'),
+    OREN: getColorAsset('oren belakang'),
+    PUTIH: getColorAsset('putih belakang'),
+    SAGE: getColorAsset('sage belakang'),
+    UNGU_MUDA: getColorAsset('ungu muda belakang'),
+    UNGU_TUA: getColorAsset('ungu tua belakang'),
   }
 };
 

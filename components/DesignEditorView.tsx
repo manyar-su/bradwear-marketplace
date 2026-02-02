@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, CS_TEAM } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
+import { uploadImageToSupabase } from '../utils/supabaseService';
 
 const DesignEditorView: React.FC<{
   product: Product;
@@ -311,6 +312,17 @@ const DesignEditorView: React.FC<{
             if (noBgSrc && noBgSrc.length > 100) finalSrc = noBgSrc;
           } catch (bgError) {
             console.warn("Background removal failed", bgError);
+          }
+
+          // UPLOAD KE SUPABASE
+          const supabasePath = `user_uploads/${Date.now()}_${i}.png`;
+          const uploadedUrl = await uploadImageToSupabase(finalSrc, supabasePath);
+
+          if (uploadedUrl) {
+            finalSrc = uploadedUrl;
+          } else {
+            console.warn("Supabase upload failed, falling back to base64");
+            // Biarkan finalSrc sebagai base64 jika gagal upload
           }
 
           // Generate ID unik
@@ -795,7 +807,11 @@ const DesignEditorView: React.FC<{
                       key={c.hex}
                       onClick={() => onUpdate({ color: c.hex })}
                       className={`flex-shrink-0 w-11 h-11 rounded-full border-2 transition-all duration-300 relative group overflow-hidden shadow-sm ${designData.color === c.hex ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 z-10' : 'border-white/10 hover:border-emerald-500/50'}`}
-                      style={{ backgroundColor: c.hex }}
+                      style={{
+                        backgroundColor: c.hex,
+                        backgroundImage: `url("${c.image}")`,
+                        backgroundSize: 'cover'
+                      }}
                       title={c.name}
                     >
                       {designData.color === c.hex && (
@@ -1044,32 +1060,37 @@ const DesignEditorView: React.FC<{
                   </div>
                 )}
                 {cartItems.map((item) => (
-                  <div key={item.id} className={`p-4 rounded-xl border flex items-center justify-between group ${theme === 'dark' ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200 shadow-sm'}`}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center p-1 relative overflow-hidden text-xs font-bold text-zinc-400">
-                        <img src={item.model.image} className="w-full h-full object-contain" />
-                        <div className="absolute inset-0 opacity-20" style={{ backgroundColor: item.color }}></div>
+                  <div key={item.id} className={`p-4 rounded-xl border flex items-center justify-between gap-4 group transition-all ${theme === 'dark' ? 'bg-zinc-900 border-zinc-800 hover:border-emerald-500/30' : 'bg-white border-zinc-200 shadow-sm hover:border-emerald-500/30'}`}>
+                    <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-1.5 shrink-0 relative overflow-hidden group-hover:scale-105 transition-transform">
+                        <img src={item.model.image} className="w-full h-full object-contain relative z-10" />
+                        <div className="absolute inset-0 opacity-10 z-0" style={{ backgroundColor: item.color }}></div>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{item.name}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-bold border border-emerald-500/20">{item.size}</span>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="flex items-center flex-wrap gap-2 mb-1.5">
+                          <span className={`text-sm font-black tracking-tight truncate ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{item.name}</span>
+                          <span className="text-[9px] px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-500 font-black border border-emerald-500/20">{item.size}</span>
                         </div>
-                        <p className="text-[10px] text-zinc-500 flex gap-2">
-                          <span>{item.model.name}</span> •
-                          <span className="flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: item.color }}></div>
+                        <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                          <span className="uppercase tracking-wider">{item.model.name}</span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                          <span className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: item.color }}></div>
                             {COLORS.find(c => c.hex === item.color)?.name || 'Custom'}
-                          </span> •
-                          <span>{item.gender}</span> •
-                          <span>{item.sleeve}</span> •
-                          <span className="text-emerald-500 font-bold">{item.qty} Pcs</span>
-                        </p>
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                          <span>{item.gender}</span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                          <span>{item.sleeve}</span>
+                        </div>
                       </div>
                     </div>
-                    <button onClick={() => handleRemoveFromCart(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <button onClick={() => handleRemoveFromCart(item.id)} className="p-2 text-red-500/60 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                      <span className="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">{item.qty} Pcs</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1116,7 +1137,11 @@ const DesignEditorView: React.FC<{
                             onUpdate({ color: c.hex });
                           }}
                           className={`w-8 h-8 rounded-full border-2 transition-all shadow-sm ${activeFormColor === c.hex ? 'border-emerald-500 scale-110 ring-2 ring-emerald-500/20' : 'border-white/10 hover:scale-105'}`}
-                          style={{ backgroundColor: c.hex }}
+                          style={{
+                            backgroundColor: c.hex,
+                            backgroundImage: `url("${c.image}")`,
+                            backgroundSize: 'cover'
+                          }}
                           title={c.name}
                         />
                       ))}

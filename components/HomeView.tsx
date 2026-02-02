@@ -4,6 +4,8 @@ import { Product, Category, WorkflowStage, CustomerService, ProductionOrder } fr
 import { CS_TEAM, RANDOM_ORDERS, TESTIMONIALS, FAQS } from '../constants';
 import { ASSETS } from '../assets';
 import { useRef } from 'react';
+import OptimizedImage from './OptimizedImage';
+import DynamicFolderGallery from './DynamicFolderGallery';
 
 interface HomeViewProps {
   products: Product[];
@@ -17,10 +19,32 @@ interface HomeViewProps {
 const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode, branding, onSelectProduct, theme }) => {
   const [activeTab, setActiveTab] = useState<Category>('Kemeja');
   const [selectedCatalog, setSelectedCatalog] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (selectedCatalog) {
+      const fetchImages = async () => {
+        const paths = [
+          `catalog/${selectedCatalog.id}`,
+          `catalog/${selectedCatalog.name}`,
+          `Model Kemeja/${selectedCatalog.name}`
+        ];
+        let found: string[] = [];
+        for (const p of paths) {
+          const list = await import('../utils/supabaseService').then(m => m.listImagesInFolder(p));
+          if (list.length > 0) found = [...found, ...list];
+        }
+        setCatalogImages(Array.from(new Set(found)));
+      };
+      fetchImages();
+    } else {
+      setCatalogImages([]);
+    }
+  }, [selectedCatalog]);
   const [activeModal, setActiveModal] = useState<'none' | 'voucher' | 'guide' | 'tracking' | 'help' | 'cs-choice'>('none');
   const [currentNotification, setCurrentNotification] = useState<typeof RANDOM_ORDERS[0] | null>(null);
   const [currentResi, setCurrentResi] = useState<string | null>(null);
   const [promoSlide, setPromoSlide] = useState(0);
+  const [catalogImages, setCatalogImages] = useState<string[]>([]);
   const catalogRef = useRef<HTMLDivElement>(null);
 
   const scrollToCatalog = () => {
@@ -37,14 +61,23 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
 
   const filteredProducts = products.filter(p => p.category === activeTab && !p.isHidden);
 
+  // Dynamic video from assets/video folder
+  const videoGlob = import.meta.glob('../assets/video/*.(mp4|webm|mov)', { eager: true, as: 'url' });
+  const videoFiles = Object.values(videoGlob) as string[];
+  const heroVideo = videoFiles[0]; // Use first video found
+
+  // Dynamic slideshow images from assets/slideshow folder
+  const slideshowGlob = import.meta.glob('../assets/slideshow/*.(jpg|jpeg|png|webp)', { eager: true, as: 'url' });
+  const slideshowImages = Object.values(slideshowGlob) as string[];
+
   const promoSlides = [
-    { title: "PRODUKSI MASAL", desc: "Kapasitas ribuan pcs per bulan dengan QC ketat.", img: "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=800", tag: "KAPASITAS" },
-    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800", tag: "PRESISI" },
-    { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
-    { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
-    { title: "BANYAK INSTANSI", desc: "Dipercaya ratusan instansi di seluruh Indonesia.", img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800", tag: "KEPERCAYAAN" },
-    { title: "MANUFAKTUR MODERN", desc: "Proses produksi cepat dengan teknologi terkini.", img: "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=800", tag: "MODERN" },
-    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat biaya.", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800", tag: "EKONOMIS" }
+    { title: "PRODUKSI MASAL", desc: "Kapasitas ribuan pcs per bulan dengan QC ketat.", img: slideshowImages[0] || "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=800", tag: "KAPASITAS" },
+    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: slideshowImages[1] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800", tag: "PRESISI" },
+    { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: slideshowImages[2] || "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
+    { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: slideshowImages[3] || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
+    { title: "BANYAK INSTANSI", desc: "Dipercaya ratusan instansi di seluruh Indonesia.", img: slideshowImages[4] || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800", tag: "KEPERCAYAAN" },
+    { title: "MANUFAKTUR MODERN", desc: "Proses produksi cepat dengan teknologi terkini.", img: slideshowImages[5] || "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=800", tag: "MODERN" },
+    { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat biaya.", img: slideshowImages[6] || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800", tag: "EKONOMIS" }
   ];
 
   useEffect(() => {
@@ -233,8 +266,15 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         <div className="grid grid-cols-2 gap-5">
           {filteredProducts.map(product => (
             <div key={product.id} id={`product-${product.id}`} className={`rounded-[40px] p-4 border shadow-md group transition-all relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5' : 'bg-white border-zinc-200'}`}>
-              <div onClick={() => setSelectedCatalog(product)} className="aspect-[4/5] rounded-[32px] overflow-hidden bg-zinc-800/50 mb-4 cursor-zoom-in">
-                <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+              <div className="aspect-[4/5] rounded-[32px] overflow-hidden bg-zinc-800/50 mb-4 cursor-zoom-in">
+                <DynamicFolderGallery
+                  productId={product.id}
+                  folderName={product.name}
+                  fallbackImage={product.image}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  theme={theme}
+                  onImageClick={() => setSelectedCatalog(product)}
+                />
               </div>
               <div className="px-1 space-y-1">
                 <h3 className={`text-xs font-black uppercase line-clamp-1 ${theme === 'dark' ? 'text-white' : 'text-zinc-700'}`}>{product.name}</h3>
@@ -429,24 +469,285 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
             <div className="flex-1 overflow-y-auto no-scrollbar py-20 px-4 space-y-16">
               <div className="text-center space-y-4">
                 <h3 className="text-5xl font-black text-white uppercase tracking-tighter pt-4 animate-fade-in">{selectedCatalog.name}</h3>
-                <p className="text-zinc-500 text-[11px] font-black uppercase tracking-[0.5em] opacity-60 animate-pulse">INDUSTRIAL WEAR SOLUTIONS</p>
+                <p className="text-zinc-500 text-[11px] font-black uppercase tracking-[0.5em] opacity-60 animate-pulse">KATALOG BRADWEAR</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="rounded-[60px] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] bg-zinc-900">
-                  <img src={selectedCatalog.images?.front || selectedCatalog.image} className="w-full h-full object-cover" />
-                </div>
-                <div className="rounded-[60px] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] bg-zinc-900">
-                  <img src={selectedCatalog.images?.back || selectedCatalog.image} className="w-full h-full object-cover" />
-                </div>
+                {(() => {
+                  // FILTER LOGIC FOR POPUP
+                  const frontImgs = catalogImages.filter(i => i.toLowerCase().includes('depan'));
+                  const backImgs = catalogImages.filter(i => i.toLowerCase().includes('belakang'));
+                  const sideImgs = catalogImages.filter(i => i.toLowerCase().includes('kiri') || i.toLowerCase().includes('kanan'));
+                  const otherImgs = catalogImages.filter(i =>
+                    !i.toLowerCase().includes('depan') &&
+                    !i.toLowerCase().includes('belakang') &&
+                    !i.toLowerCase().includes('kiri') &&
+                    !i.toLowerCase().includes('kanan')
+                  );
+
+                  // Prioritize: Front (Hero) -> Back -> Sides -> Others
+                  const mainImage = frontImgs[0] || catalogImages[0] || selectedCatalog.image;
+                  const secondaryImages = [
+                    ...backImgs,
+                    ...sideImgs,
+                    ...otherImgs,
+                    ...frontImgs.slice(1) // Extra front images go to gallery
+                  ].slice(0, 5); // Limit to 5 extra images to make total 6
+
+                  // Get other images for thumbnails (excluding main)
+                  const thumbnailImages = [
+                    ...backImgs,
+                    ...sideImgs,
+                    ...otherImgs,
+                    ...frontImgs.slice(1)
+                  ].slice(0, 6);
+
+                  return (
+                    <div className="col-span-1 md:col-span-2">
+                      {/* HERO IMAGE WITH ROUNDED */}
+                      <div className="aspect-[3/4] md:aspect-[16/9] rounded-[48px] overflow-hidden border border-white/10 shadow-2xl bg-zinc-900 group relative mb-6">
+                        <img src={mainImage} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex items-end p-8">
+                          <div className="space-y-2">
+                            <span className="inline-block bg-emerald-500/20 backdrop-blur-md px-4 py-2 rounded-xl border border-emerald-500/30">
+                              <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest">PREMIUM QUALITY</span>
+                            </span>
+                            <h4 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg">{selectedCatalog.name}</h4>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* THUMBNAIL GRID 100x100px */}
+                      {thumbnailImages.length > 0 && (
+                        <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                          {thumbnailImages.map((img, idx) => {
+                            let label = 'KATALOG';
+                            if (img.toLowerCase().includes('belakang')) label = 'BELAKANG';
+                            else if (img.toLowerCase().includes('kiri')) label = 'KIRI';
+                            else if (img.toLowerCase().includes('kanan')) label = 'KANAN';
+                            else if (img.toLowerCase().includes('depan')) label = 'DEPAN';
+
+                            return (
+                              <div
+                                key={idx}
+                                className="shrink-0 w-[100px] h-[100px] rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 group relative cursor-pointer hover:scale-110 transition-transform duration-300"
+                              >
+                                <img src={img} className="w-full h-full object-cover" alt={label} />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                                  <span className="text-[8px] font-black text-white uppercase tracking-wide text-center px-1">{label}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
-              <div className="p-12 glass rounded-[60px] space-y-12 border border-white/10 shadow-premium text-center">
-                <p className="text-zinc-400 text-lg font-medium italic leading-relaxed">"{selectedCatalog.description}"</p>
-                <button onClick={() => { onSelectProduct(selectedCatalog); setSelectedCatalog(null); }} className="w-full py-8 neon-bg text-black font-black uppercase tracking-[0.5em] rounded-[40px] shadow-2xl active:scale-95 transition-all hover:scale-[1.02] hover:brightness-110">LANJUT KE DESAIN</button>
+
+              {/* KONTEN MARKETING & DESKRIPSI */}
+              <div className="space-y-8 max-w-4xl mx-auto">
+                {/* Keunggulan Material */}
+                <div className={`glass p-8 rounded-[48px] border space-y-6 ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
+                  <h5 className={`text-xl font-black uppercase tracking-tight flex items-center gap-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                    <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    KEUNGGULAN MATERIAL
+                  </h5>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      { icon: '🌟', title: 'Bahan Premium', desc: 'Material pilihan dengan standar kualitas ekspor, nyaman dan tahan lama.' },
+                      { icon: '💧', title: 'Anti-Luntur', desc: 'Pewarnaan profesional yang tahan terhadap pencucian berulang.' },
+                      { icon: '🌬️', title: 'Breathable', desc: 'Sirkulasi udara optimal, cocok untuk iklim tropis Indonesia.' },
+                      { icon: '✨', title: 'Jahitan Presisi', desc: 'Dikerjakan dengan mesin industri modern, hasil rapi dan kuat.' }
+                    ].map((feat, i) => (
+                      <div key={i} className={`flex gap-4 p-4 rounded-2xl border transition-all ${theme === 'dark' ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-zinc-100 border-zinc-200 hover:bg-zinc-200'}`}>
+                        <span className="text-3xl">{feat.icon}</span>
+                        <div>
+                          <p className={`text-sm font-black uppercase ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>{feat.title}</p>
+                          <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>{feat.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimoni Singkat */}
+                <div className={`glass p-8 rounded-[48px] border ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
+                  <div className="flex items-start gap-4">
+                    <svg className="w-10 h-10 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+                    <div>
+                      <p className={`text-base italic leading-relaxed mb-4 ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        "{selectedCatalog.description || 'Material premium dengan detail sempurna. Cocok untuk kebutuhan seragam instansi dengan standar tinggi.'}"
+                      </p>
+                      <p className="text-emerald-500 text-sm font-black uppercase tracking-widest">— Testimoni Client Bradwear</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Daftar Client / Instansi */}
+                <div className={`glass p-8 rounded-[48px] border space-y-6 ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
+                  <h5 className={`text-xl font-black uppercase tracking-tight flex items-center gap-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                    <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    DIPERCAYA RATUSAN INSTANSI
+                  </h5>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['POLRI', 'TNI AD', 'DISHUB', 'DAMKAR', 'SATPOL PP', 'BASARNAS', 'BPBD', 'KEMENHUB'].map((inst, i) => (
+                      <div key={i} className={`backdrop-blur-sm px-4 py-3 rounded-xl border text-center ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-zinc-100 border-zinc-200'}`}>
+                        <p className="text-xs font-black text-emerald-500 uppercase tracking-wider">{inst}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className={`text-xs text-center italic ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-600'}`}>Dan masih banyak lagi instansi pemerintah & swasta lainnya.</p>
+                </div>
+
+                {/* CTA Button */}
+                <button
+                  onClick={() => { onSelectProduct(selectedCatalog); setSelectedCatalog(null); }}
+                  className="w-full py-8 neon-bg text-black font-black uppercase tracking-[0.5em] rounded-[40px] shadow-2xl active:scale-95 transition-all hover:scale-[1.02] hover:brightness-110 text-lg"
+                >
+                  🚀 MULAI DESAIN SEKARANG
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* VIDEO SECTION */}
+      {heroVideo && (
+        <div className="px-6 py-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-8">
+              <h3 className={`text-3xl md:text-4xl font-black uppercase tracking-tighter mb-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                LIHAT KAMI BEKERJA
+              </h3>
+              <p className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Proses produksi profesional dengan standar industri modern
+              </p>
+            </div>
+            <div className="rounded-[48px] overflow-hidden shadow-2xl border border-white/10 bg-zinc-900 group relative">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto"
+              >
+                <source src={heroVideo} type="video/mp4" />
+                Browser Anda tidak mendukung video.
+              </video>
+              <div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
+                <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest flex items-center gap-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                  LIVE PRODUCTION
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TENTANG KAMI SECTION */}
+      <div className="px-6 py-16 bg-gradient-to-b from-transparent to-emerald-950/10">
+        <div className="max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className={`text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+              TENTANG KAMI
+            </h2>
+            <div className="w-24 h-1 neon-bg mx-auto rounded-full"></div>
+          </div>
+
+          {/* Company Info */}
+          <div className={`glass p-8 md:p-12 rounded-[48px] border space-y-8 mb-8 ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
+            <div>
+              <h3 className={`text-2xl md:text-3xl font-black uppercase tracking-tight mb-4 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                CV. ASTHAJAYA BRADERINDO
+              </h3>
+              <p className={`text-base leading-relaxed ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                <strong className="text-emerald-500">CV. ASTHAJAYA BRADERINDO</strong> adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek <strong className="text-emerald-500">Bradwear</strong> yang terdaftar di <strong>DJKI KEMENKUMHAM</strong>. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.
+              </p>
+            </div>
+
+            {/* Vision */}
+            <div>
+              <h4 className={`text-xl font-black uppercase tracking-tight mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                VISI
+              </h4>
+              <p className={`text-base leading-relaxed italic ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Menjadi perusahaan konveksi seragam dinas terdepan di Indonesia dengan prioritas pada kualitas, inovasi, ketepatan waktu, dan kepuasan pelanggan.
+              </p>
+            </div>
+
+            {/* Mission */}
+            <div>
+              <h4 className={`text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                MISI
+              </h4>
+              <ul className="space-y-3">
+                {[
+                  'Menyediakan seragam dinas dengan standar kualitas tinggi',
+                  'Menggunakan bahan nyaman dan tahan lama',
+                  'Memberikan pelayanan profesional dan tepat waktu',
+                  'Terus berinovasi dalam desain dan teknologi produksi',
+                  'Menjalin hubungan jangka panjang berdasarkan kepercayaan dan kepuasan klien'
+                ].map((mission, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2 shrink-0"></span>
+                    <span className={`text-base ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{mission}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Social Media */}
+          <div className="text-center">
+            <h4 className={`text-xl font-black uppercase tracking-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+              IKUTI KAMI
+            </h4>
+            <div className="flex justify-center gap-4">
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
+              >
+                <svg className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
+              >
+                <svg className="w-8 h-8 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </a>
+
+              {/* TikTok */}
+              <a
+                href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-14 h-14 rounded-full bg-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
+              >
+                <svg className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
