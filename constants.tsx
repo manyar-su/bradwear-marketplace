@@ -6,21 +6,6 @@ const getRandomSold = () => Math.floor(Math.random() * (4500 - 2000 + 1)) + 2000
 
 export const PRODUCTS: Product[] = [
   {
-    id: 'k1',
-    name: 'Brad-V3',
-    category: 'Kemeja',
-    soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
-    images: {
-      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
-      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
-    },
-    gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
-    description: 'Seri Brad-V3 dengan material Ripstop Tornado premium dan ventilasi udara punggung.'
-  },
-  {
     id: 'k2',
     name: 'Brad-V1',
     category: 'Kemeja',
@@ -51,6 +36,54 @@ export const PRODUCTS: Product[] = [
     description: 'Seri Brad-V2 dengan potongan modern dan material premium.'
   },
   {
+    id: 'k1',
+    name: 'Brad-V3',
+    category: 'Kemeja',
+    soldCount: getRandomSold(),
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
+    images: {
+      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
+    },
+    gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
+    description: 'Seri Brad-V3 dengan material Ripstop Tornado premium dan ventilasi udara punggung.'
+  },
+  {
+    id: 'k11',
+    name: 'Yoroi',
+    category: 'Kemeja',
+    soldCount: getRandomSold(),
+    image: ASSETS.KEMEJA.YOROI.FRONT,
+    images: {
+      front: ASSETS.KEMEJA.YOROI.FRONT,
+      back: ASSETS.KEMEJA.YOROI.BACK,
+      leftSleeve: ASSETS.KEMEJA.YOROI.FRONT,
+      rightSleeve: ASSETS.KEMEJA.YOROI.FRONT
+    },
+    gallery: ASSETS.KEMEJA.YOROI.GALLERY,
+    description: 'Seri Yoroi: Desain tactical tangguh dengan pilihan berbagai variasi warna.'
+  },
+  {
+    id: 'k7',
+    name: 'Robotic',
+    category: 'Kemeja',
+    soldCount: getRandomSold(),
+    image: ASSETS.KEMEJA.ROBOTIC.FRONT,
+    images: {
+      front: ASSETS.KEMEJA.ROBOTIC.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      leftSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT,
+      rightSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT
+    },
+    gallery: ASSETS.KEMEJA.ROBOTIC.GALLERY,
+    description: 'Seri Robotic dengan saku multifungsi modular.'
+  },
+  /* 
+  // MODEL DISEMBUNYIKAN (V3 PRO & V4)
+  // Lokasi Script: constants.tsx (dalam array PRODUCTS)
+  {
     id: 'k4',
     name: 'Brad-V3 PRO',
     category: 'Kemeja',
@@ -70,7 +103,7 @@ export const PRODUCTS: Product[] = [
     name: 'Brad-V4',
     category: 'Kemeja',
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.BRAD_V3.FRONT, // Fallback for V4
+    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
     images: {
       front: ASSETS.KEMEJA.BRAD_V3.FRONT,
       back: ASSETS.KEMEJA.BRAD_V3.BACK,
@@ -79,6 +112,7 @@ export const PRODUCTS: Product[] = [
     },
     description: 'Seri Brad-V4: Standar baru untuk seragam tangguh.'
   },
+  */
   {
     id: 'k6',
     name: 'Ventura',
@@ -93,21 +127,6 @@ export const PRODUCTS: Product[] = [
     },
     gallery: ASSETS.KEMEJA.VENTURA.GALLERY,
     description: 'Seri Ventura dengan desain sleek dan minimalis.'
-  },
-  {
-    id: 'k7',
-    name: 'Robotic',
-    category: 'Kemeja',
-    soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.ROBOTIC.FRONT,
-    images: {
-      front: ASSETS.KEMEJA.ROBOTIC.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
-      leftSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT,
-      rightSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT
-    },
-    gallery: ASSETS.KEMEJA.ROBOTIC.GALLERY,
-    description: 'Seri Robotic dengan saku multifungsi modular.'
   },
   {
     id: 'k8',

@@ -5,9 +5,12 @@
  * Mendukung pemanggilan file lokal dari folder ./assets
  */
 
-// Import logo dan UI assets
-import LOGO_BRADWEAR from './assets/logo_bradwear.png';
-import HERO_BG from './assets/factory_hero.jpg';
+// Universal Image Detection (supports all product categories + root assets + logos)
+const allImagesGlob = import.meta.glob('./assets/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
+
+// Import logo dan UI assets dynamically
+const LOGO_BRADWEAR = allImagesGlob['./assets/logo_bradwear.png'] as string || '';
+const HERO_BG = allImagesGlob['./assets/factory_hero.jpg'] as string || '';
 
 // Supabase Integration Toggle
 // Set 'true' untuk menggunakan asset dari Supabase Storage
@@ -20,26 +23,128 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
 };
 
 // Import Produk
-// Import Produk - KEMEJA MAIN & GALLERY
-// Dynamic Front Image Detection (supports jpeg, jpg, png, webp)
-// Universal Image Detection (supports jpeg, jpg, png, webp, and generic naming)
-const allImagesGlob = import.meta.glob('./assets/Model Kemeja/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
+// Map untuk menyimpan folder -> path lengkap
+// Juga menyimpan file langsung -> path untuk kategori datar
+const folderToPathMap = new Map<string, { parent: string, actual: string }>();
+const flatFilesMap = new Map<string, string>();
+
+Object.keys(allImagesGlob).forEach(key => {
+  const parts = key.split('/');
+  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
+
+  if (parts.length > 3) {
+    const parent = parts[2];
+    const folderOrFile = parts[3];
+
+    // Jika parts.length > 4, berarti ini di dalam subfolder (Model Kemeja/Yoroi/...)
+    if (parts.length > 4) {
+      folderToPathMap.set(normalize(folderOrFile), { parent, actual: folderOrFile });
+    } else {
+      // Jika parts.length == 4, ini file langsung di kategori (Jacket/bomber.png)
+      // Kita masukkan ke flatFilesMap untuk dicari jika folder tdk ditemukan
+      flatFilesMap.set(normalize(folderOrFile), allImagesGlob[key] as string);
+    }
+  } else if (parts.length === 3) {
+    // File di root ./assets/
+    flatFilesMap.set(normalize(parts[2]), allImagesGlob[key] as string);
+  }
+});
+
+// Helper untuk mencari folder secara case-insensitive & robust matching di semua kategori
+const findFolderInfo = (folder: string) => {
+  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
+  return folderToPathMap.get(normalize(folder));
+};
 
 const getModelAsset = (folder: string, fileName: string) => {
+  const info = findFolderInfo(folder);
   const extensions = ['png', 'jpg', 'jpeg', 'webp'];
-  const possibleNames = [fileName, `${folder}_${fileName}`, `series-${folder}-${fileName}`];
+  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
 
-  for (const name of possibleNames) {
-    for (const ext of extensions) {
-      const key = `./assets/Model Kemeja/${folder}/${name}.${ext}`;
-      if (allImagesGlob[key]) return allImagesGlob[key] as string;
+  if (info) {
+    // Jalur 1: Cari di subfolder model
+    const possibleNames = [fileName, `${folder}_${fileName}`, `series-${folder}-${fileName}`];
+
+    for (const name of possibleNames) {
+      for (const ext of extensions) {
+        const key = `./assets/${info.parent}/${info.actual}/${name}.${ext}`;
+        if (allImagesGlob[key]) return allImagesGlob[key] as string;
+      }
+    }
+
+    if (fileName === 'depan') {
+      const prefix = `./assets/${info.parent}/${info.actual}/`;
+      const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
+      if (folderFiles.length > 0) return allImagesGlob[folderFiles[0]] as string;
     }
   }
+
+  // Jalur 2: Cari di flat files (Jacket/bomber_front.png)
+  const searchName = normalize(`${folder}${fileName === 'depan' ? '' : fileName}`);
+  for (const [key, value] of flatFilesMap.entries()) {
+    if (key.includes(normalize(folder))) {
+      if (fileName === 'depan' && (key.includes('depan') || key.includes('front') || !key.includes('back'))) return value;
+      if (fileName === 'belakang' && (key.includes('belakang') || key.includes('back'))) return value;
+      if (key.includes(normalize(fileName))) return value;
+    }
+  }
+
   return '';
 };
 
 const getFrontImage = (folder: string) => getModelAsset(folder, 'depan');
 const getBackImage = (folder: string) => getModelAsset(folder, 'belakang');
+
+/**
+ * Mendapatkan gambar model spesifik berdasarkan warna dan view
+ * Digunakan di DesignEditorView untuk menampilkan versi berwarna jika tersedia di folder model
+ */
+export const getModelColorImage = (modelName: string, colorName: string, view: string): string => {
+  const info = findFolderInfo(modelName);
+  if (!info) return '';
+
+  const extensions = ['jpeg', 'jpg', 'png', 'webp'];
+  const isBack = view.toLowerCase().includes('belakang');
+  const suffix = isBack ? ' belakang' : '';
+  const searchName = colorName.toLowerCase();
+
+  for (const ext of extensions) {
+    const key = `./assets/${info.parent}/${info.actual}/${searchName}${suffix}.${ext}`;
+    if (allImagesGlob[key]) return allImagesGlob[key] as string;
+  }
+
+  const prefix = `./assets/${info.parent}/${info.actual}/`;
+  const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
+
+  for (const key of folderFiles) {
+    const fileName = key.split('/').pop()?.toLowerCase() || '';
+    if (fileName.includes(searchName)) {
+      if (isBack && fileName.includes('belakang')) return allImagesGlob[key] as string;
+      if (!isBack && !fileName.includes('belakang')) return allImagesGlob[key] as string;
+    }
+  }
+
+  return '';
+};
+
+/**
+ * Mendapatkan semua gambar lokal dalam folder model tertentu
+ */
+export const getLocalImagesInFolder = (folderName: string): string[] => {
+  const info = findFolderInfo(folderName);
+  if (!info) return [];
+
+  const prefix = `./assets/${info.parent}/${info.actual}/`;
+  // Optimized: Only filter keys that we know are in this parent/folder
+  return Object.keys(allImagesGlob)
+    .filter(key => key.startsWith(prefix))
+    .map(key => allImagesGlob[key] as string);
+};
+
+/**
+ * Mendapatkan daftar semua model yang memiliki folder aset lokal
+ */
+export const getAvailableLocalModels = () => Array.from(folderToPathMap.keys());
 
 // --- DYNAMIC COLOR LOADING (Robust format detection & Supabase Support) ---
 const allWarnaGlob = import.meta.glob('./assets/warna/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
@@ -109,28 +214,44 @@ const VENTURA_GAL_1 = getModelAsset('Ventura', '1');
 const VENTURA_GAL_2 = getModelAsset('Ventura', '2');
 const VENTURA_GAL_3 = getModelAsset('Ventura', '3');
 
-import MTAC_FRONT from './assets/mtac_front.png';
-import BOMBER_FRONT from './assets/Jacket/bomber_front.png';
+// --- ASSETS JAKET DARI FOLDER JACKET ---
+const BOMBER_BRAD_FRONT = getFrontImage('Bomber Brad');
+const BOMBER_BRAD_BACK = getBackImage('Bomber Brad');
+const BOMBER_BRAD_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Bomber Brad', n.toString())).filter(Boolean);
 
-const YOROI_FRONT = getFrontImage('Yoroi');
-import YOROI_BACK from './assets/yoroiblkg.jpeg';
-import YOROI_GAL_1 from './assets/Model Kemeja/Yoroi/series-yoroi-1.webp';
-import YOROI_GAL_2 from './assets/Model Kemeja/Yoroi/series-yoroi-2.webp';
-import YOROI_GAL_3 from './assets/Model Kemeja/Yoroi/series-yoroi-3.webp';
+// --- ASSETS ROMPI DARI FOLDER ROMPI ---
+const TACTICAL_BUPATI_FRONT = getFrontImage('Tactical Bupati');
+const TACTICAL_BUPATI_BACK = getBackImage('Tactical Bupati');
 
-// Import Our Partners Logos
-import PARTNER_KEMENDAGRI_1 from './assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png';
-import PARTNER_KEMENDAGRI from './assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com.png';
-import PARTNER_TUTWURI from './assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.png';
-import PARTNER_HAM from './assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.png';
-import PARTNER_DPR from './assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.png';
-import PARTNER_BMKG from './assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.png';
-import PARTNER_BAPPENAS from './assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).png';
-import PARTNER_KPI from './assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.png';
-import PARTNER_BUMN from './assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.png';
-import PARTNER_PUPR from './assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.png';
-import PARTNER_HUB from './assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png';
-import PARTNER_PERINDUS from './assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png';
+// --- ASSETS CELANA DARI FOLDER CELANA ---
+const CARGO_TACTICAL_FRONT = getFrontImage('Cargo Tactical');
+const CARGO_TACTICAL_BACK = getBackImage('Cargo Tactical');
+const CARGO_TACTICAL_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Cargo Tactical', n.toString())).filter(Boolean);
+
+const MTAC_FRONT = allImagesGlob['./assets/mtac_front.png'] as string || '';
+const BOMBER_FRONT = allImagesGlob['./assets/Jacket/bomber_front.png.webp'] as string || '';
+
+const YOROI_FRONT_ROOT = allImagesGlob['./assets/yoroidpn.jpeg'] as string || '';
+const YOROI_BACK_ROOT = allImagesGlob['./assets/yoroiblkg.jpeg'] as string || '';
+const YOROI_GAL_1 = allImagesGlob['./assets/yoroidpn2.png'] as string || '';
+const YOROI_GAL_2 = allImagesGlob['./assets/yoroidpn3.jpeg'] as string || '';
+
+const YOROI_FRONT = getFrontImage('Yoroi') || YOROI_FRONT_ROOT;
+const YOROI_BACK = getBackImage('Yoroi') || YOROI_BACK_ROOT;
+
+// Partner Logos lookups
+const PARTNER_KEMENDAGRI_1 = allImagesGlob['./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png'] as string || '';
+const PARTNER_KEMENDAGRI = allImagesGlob['./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com.png'] as string || '';
+const PARTNER_TUTWURI = allImagesGlob['./assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.png'] as string || '';
+const PARTNER_HAM = allImagesGlob['./assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.png'] as string || '';
+const PARTNER_DPR = allImagesGlob['./assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.png'] as string || '';
+const PARTNER_BMKG = allImagesGlob['./assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.png'] as string || '';
+const PARTNER_BAPPENAS = allImagesGlob['./assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).png'] as string || '';
+const PARTNER_KPI = allImagesGlob['./assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.png'] as string || '';
+const PARTNER_BUMN = allImagesGlob['./assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.png'] as string || '';
+const PARTNER_PUPR = allImagesGlob['./assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.png'] as string || '';
+const PARTNER_HUB = allImagesGlob['./assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png'] as string || '';
+const PARTNER_PERINDUS = allImagesGlob['./assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png'] as string || '';
 
 // --- COLORS ARE NOW LOADED DYNAMICALLY BELOW ---
 
@@ -202,7 +323,7 @@ export const ASSETS = {
     YOROI: {
       FRONT: YOROI_FRONT,
       BACK: YOROI_BACK || getBackImage('Yoroi'),
-      GALLERY: [YOROI_GAL_1, YOROI_GAL_2, YOROI_GAL_3].filter(Boolean)
+      GALLERY: [YOROI_GAL_1, YOROI_GAL_2].filter(Boolean)
     },
 
     // Legacy / Fallback
@@ -211,18 +332,23 @@ export const ASSETS = {
 
   // --- KATEGORI JAKET ---
   JAKET: {
-    BOMBER: BOMBER_FRONT,
+    BOMBER: BOMBER_BRAD_FRONT || BOMBER_FRONT,
+    BACK: BOMBER_BRAD_BACK,
+    GALLERY: BOMBER_BRAD_GAL
   },
 
   // --- KATEGORI CELANA ---
   CELANA: {
-    WARRIOR: getAssetPath('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600', 'Celana/warrior.jpg'),
+    WARRIOR: CARGO_TACTICAL_FRONT || getAssetPath('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600', 'Celana/warrior.jpg'),
+    BACK: CARGO_TACTICAL_BACK,
+    GALLERY: CARGO_TACTICAL_GAL,
     FORMAL: getAssetPath('https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&q=80&w=600', 'Celana/formal.jpg'),
   },
 
   // --- KATEGORI ROMPI ---
   ROMPI: {
-    BUPATI: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
+    BUPATI: TACTICAL_BUPATI_FRONT || 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
+    BACK: TACTICAL_BUPATI_BACK
   },
 
   // --- UI ASSETS (Avatars, etc) ---

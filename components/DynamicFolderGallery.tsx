@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { listImagesInFolder } from '../utils/supabaseService';
+import { getLocalImagesInFolder } from '../assets';
 
 interface DynamicFolderGalleryProps {
     productId?: string;
@@ -25,44 +26,60 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
     useEffect(() => {
         let isMounted = true;
         const fetchImages = async () => {
-            setLoading(true);
+            // STEP 1: PRIORITAS LOKAL (Instant)
+            // Kita ambil dari aset lokal dulu agar UI langsung muncul tanpa nunggu network
+            const locals = getLocalImagesInFolder(folderName);
+            let allFoundImages: string[] = [...locals];
 
-            // Try multiple possible paths to be robust
+            // Tampilkan aset lokal dulu jika ada
+            if (isMounted && allFoundImages.length > 0) {
+                const depanLocals = allFoundImages.filter(img => img.toLowerCase().includes('depan'));
+                const initialImages = depanLocals.length > 0 ? depanLocals : allFoundImages;
+                setImages(initialImages.slice(0, 10));
+                setLoading(false);
+            }
+
+            // STEP 2: SUPABASE (Background/Parallel)
+            // Jalankan request Supabase secara paralel untuk kecepatan maksimal
             const paths = [
                 `catalog/${productId}`,
                 `catalog/${folderName}`,
                 `Model Kemeja/${folderName}`,
-                `Model Kemeja/${folderName.toLowerCase()}`,
-                `Model Kemeja/${folderName.replace(/\s+/g, '-')}`
+                `Jacket/${folderName}`,
+                `Celana/${folderName}`,
+                `Rompi/${folderName}`,
+                `Kids Series/${folderName}`
             ];
 
-            let allFoundImages: string[] = [];
+            try {
+                // Gunakan Promise.all agar fetch tidak antre satu per satu
+                const results = await Promise.all(paths.map(path => listImagesInFolder(path)));
+                results.forEach(fetched => {
+                    if (fetched && fetched.length > 0) {
+                        allFoundImages = [...allFoundImages, ...fetched];
+                    }
+                });
 
-            for (const path of paths) {
-                const fetched = await listImagesInFolder(path);
-                if (fetched && fetched.length > 0) {
-                    allFoundImages = [...allFoundImages, ...fetched];
+                // Hapus duplikat dan limit maksimal 10 gambar untuk performa
+                const uniqueImages = Array.from(new Set(allFoundImages)).slice(0, 10);
+
+                // Filter 'depan' tetap menjadi prioritas tampilan utama
+                const depanImages = uniqueImages.filter(img => img.toLowerCase().includes('depan'));
+                const finalImages = depanImages.length > 0 ? depanImages : uniqueImages;
+
+                if (isMounted) {
+                    setImages(finalImages);
+                    setLoading(false);
                 }
-            }
-
-            // Remove duplicates if any
-            const uniqueImages = Array.from(new Set(allFoundImages));
-
-            // NEW RULE: Main Display (DynamicFolderGallery) must ONLY show 'depan' images
-            // If multiple 'depan' exist (e.g. variations), show them.
-            // If no 'depan' exists, show everything (fallback).
-            const depanImages = uniqueImages.filter(img => img.toLowerCase().includes('depan'));
-            const finalImages = depanImages.length > 0 ? depanImages : uniqueImages;
-
-            if (isMounted) {
-                setImages(finalImages);
-                setLoading(false);
+            } catch (error) {
+                console.warn("Fast fetch failed, using fallback/locals:", error);
+                if (isMounted) setLoading(false);
             }
         };
 
         fetchImages();
         return () => { isMounted = false; };
-    }, [folderName]);
+    }, [folderName, productId]);
 
     // Slideshow effect if multiple images
     useEffect(() => {

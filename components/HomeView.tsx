@@ -357,12 +357,26 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
               <h2 className={`text-3xl font-black uppercase tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>Wujudkan Seragam<br /><span className="neon-text italic tracking-normal">Impian Unit Anda</span></h2>
               <p className="text-xs font-medium adaptive-text-muted leading-relaxed px-4 opacity-80">Hubungi tim ahli kami untuk mendapatkan penawaran harga terbaik dan bantuan kustomisasi desain instansi Anda.</p>
             </div>
-            <button
-              onClick={() => setActiveModal('cs-choice')}
-              className="w-full py-6 neon-bg text-black font-black uppercase tracking-[0.3em] rounded-[32px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:scale-[1.05] active:scale-95 transition-all duration-500 group-hover:brightness-110"
-            >
-              CHAT KONSULTAN SEKARANG
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a
+                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-6 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-xl hover:scale-[1.05] active:scale-95 transition-all duration-300 text-center flex items-center justify-center gap-3"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                INSTAGRAM
+              </a>
+              <a
+                href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-6 bg-black text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-xl hover:scale-[1.05] active:scale-95 transition-all duration-300 text-center flex items-center justify-center gap-3 border border-white/10"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                TIKTOK
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -410,6 +424,39 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                       </div>
                     </button>
                   ))}
+                </div>
+              )}
+              {activeModal === 'voucher' && (
+                <div className="space-y-6 text-center py-4">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-inner">
+                    <svg className="w-10 h-10 neon-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className={`text-lg font-black uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-800'}`}>Dapatkan Voucher Diskon</h4>
+                    <p className="text-xs adaptive-text-muted leading-relaxed px-4">
+                      Ikuti media sosial kami untuk mendapatkan update voucher diskon dan penawaran menarik lainnya.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <a
+                      href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-3 rounded-2xl bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 text-white font-black text-[10px] uppercase tracking-wider shadow-lg flex flex-col items-center gap-1.5 transition-all active:scale-95"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                      INSTAGRAM
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-3 rounded-2xl bg-black text-white font-black text-[10px] uppercase tracking-wider shadow-lg flex flex-col items-center gap-1.5 transition-all active:scale-95 border border-white/10"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                      TIKTOK
+                    </a>
+                  </div>
                 </div>
               )}
               {activeModal === 'guide' && (
@@ -648,7 +695,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       )}
 
       {/* TENTANG KAMI SECTION */}
-      <div className="px-6 py-16 bg-gradient-to-b from-transparent to-emerald-950/10">
+      <div className="px-6 py-16">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -745,6 +792,16 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                 </svg>
               </a>
             </div>
+          </div>
+
+          {/* Footer Copyright */}
+          <div className="mt-12 pt-8 border-t border-white/10 text-center">
+            <p className={`text-sm ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-600'}`}>
+              © 2026 <strong className="text-emerald-500">Bradwear</strong> by CV. ASTHAJAYA BRADERINDO. All rights reserved.
+            </p>
+            <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-zinc-600' : 'text-zinc-500'}`}>
+              Terdaftar di DJKI KEMENKUMHAM
+            </p>
           </div>
         </div>
       </div>

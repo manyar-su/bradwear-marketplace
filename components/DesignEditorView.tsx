@@ -4,6 +4,7 @@ import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, CS_TEAM } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
 import { uploadImageToSupabase } from '../utils/supabaseService';
+import { getModelColorImage } from '../assets';
 
 const DesignEditorView: React.FC<{
   product: Product;
@@ -78,6 +79,12 @@ const DesignEditorView: React.FC<{
 
   // State Ekspor WhatsApp
   const [showExtraSizes, setShowExtraSizes] = useState(false);
+  const [showOrdererForm, setShowOrdererForm] = useState(false);
+  const [ordererInfo, setOrdererInfo] = useState({
+    name: '',
+    agency: '',
+    location: ''
+  });
 
 
   // Tambahkan item ke cart
@@ -474,7 +481,14 @@ const DesignEditorView: React.FC<{
   /* --- LOGIKA PEMANGGILAN GAMBAR UTAMA --- */
   // Menentukan gambar produk yang ditampilkan berdasarkan View (Depan/Belakang) dan Warna yang dipilih
   const currentDisplayImage = useMemo(() => {
-    // 1. Cek apakah ada gambar khusus untuk warna tertentu (misal: Baju Merah Tampak Depan sudah ada fotonya sendiri)
+    // 0. PRIORITAS: Cek apakah ada gambar model-spesifik untuk warna ini (misal di folder Yoroi)
+    const colorName = selectedColorObj?.name;
+    if (colorName) {
+      const modelSpecificColorImg = getModelColorImage(product.name, colorName, designData.view);
+      if (modelSpecificColorImg) return modelSpecificColorImg;
+    }
+
+    // 1. Cek apakah ada gambar khusus untuk warna tertentu (global fallback)
     if (isSpecificColorImage && selectedColorObj) {
       if (designData.view === 'Depan' && selectedColorObj.image) return selectedColorObj.image;
       if (designData.view === 'Belakang' && selectedColorObj.backImage) return selectedColorObj.backImage;
@@ -525,16 +539,22 @@ const DesignEditorView: React.FC<{
     }
   };
 
-  /* --- LOGIKA EKSPOR WHATSAPP (FRONT & BACK) --- */
-  const handleExport = async () => {
+  /* --- LOGIKA EKSPOR WHATSAPP (MODAL FORM TERLEBIH DAHULU) --- */
+  const handleExport = () => {
+    setShowOrdererForm(true);
+  };
+
+  const executeWhatsAppExport = async () => {
     if (!canvasRef.current) return;
     setIsExporting(true);
-    const originalView = designData.view; // Simpan view saat ini
+    setShowOrdererForm(false);
+
+    const originalView = designData.view;
 
     try {
       // 1. CAPTURE TAMPAK DEPAN
       onUpdate({ view: 'Depan' });
-      await new Promise(r => setTimeout(r, 800)); // Tunggu render ulang
+      await new Promise(r => setTimeout(r, 800));
 
       const canvasFront = await html2canvas(canvasRef.current, {
         useCORS: true,
@@ -543,17 +563,16 @@ const DesignEditorView: React.FC<{
       });
       const imageFront = canvasFront.toDataURL("image/png");
 
-      // Download Gambar Depan
       const linkFront = document.createElement('a');
       linkFront.href = imageFront;
-      linkFront.download = `BRADWEAR_${product.name}_DEPAN_${Date.now()}.png`;
+      linkFront.download = `BRAD_DEPAN_${ordererInfo.name || 'ORDER'}_${Date.now()}.png`;
       document.body.appendChild(linkFront);
       linkFront.click();
       document.body.removeChild(linkFront);
 
       // 2. CAPTURE TAMPAK BELAKANG
       onUpdate({ view: 'Belakang' });
-      await new Promise(r => setTimeout(r, 800)); // Tunggu render ulang
+      await new Promise(r => setTimeout(r, 800));
 
       const canvasBack = await html2canvas(canvasRef.current, {
         useCORS: true,
@@ -562,21 +581,18 @@ const DesignEditorView: React.FC<{
       });
       const imageBack = canvasBack.toDataURL("image/png");
 
-      // Download Gambar Belakang
       const linkBack = document.createElement('a');
       linkBack.href = imageBack;
-      linkBack.download = `BRADWEAR_${product.name}_BELAKANG_${Date.now()}.png`;
+      linkBack.download = `BRAD_BELAKANG_${ordererInfo.name || 'ORDER'}_${Date.now()}.png`;
       document.body.appendChild(linkBack);
       linkBack.click();
       document.body.removeChild(linkBack);
 
-      // Kembalikan ke view awal
       onUpdate({ view: originalView });
 
-      // 3. KIRIM PESAN WHATSAPP
+      // 3. KIRIM PESAN WHATSAPP DENGAN GROUPING
       const materialName = designData.material || 'Standar';
 
-      // Validasi Cart - Jika kosong pakai data form saat ini
       const finalItems = cartItems.length > 0 ? cartItems : [
         {
           id: 'temp',
@@ -591,35 +607,41 @@ const DesignEditorView: React.FC<{
         }
       ];
 
-      // Format List Pesanan Lengkap
-      let ordersText = '';
-      finalItems.forEach((item, idx) => {
+      // GROUPING LOGIC: Berdasarkan Model & Warna
+      const groupedItems: Record<string, OrderItem[]> = {};
+      finalItems.forEach(item => {
         const colorName = COLORS.find(c => c.hex === item.color)?.name || 'Custom';
-        ordersText += `\nItem #${idx + 1}:\n` +
-          `   - Model: ${item.model.name}\n` +
-          `   - Warna: ${colorName}\n` +
-          `   - Label/Nama: *${item.name}*\n` +
-          `   - Size: ${item.size} ${item.customDetail || ''}\n` +
-          `   - Spec: ${item.gender}, Lengan ${item.sleeve}\n` +
-          `   - Qty: ${item.qty} pcs\n`;
+        const key = `*MODEL: ${item.model.name} (${colorName})*`;
+        if (!groupedItems[key]) groupedItems[key] = [];
+        groupedItems[key].push(item);
       });
 
-      const text = `Halo, saya ingin *MEMPRODUKSI PESANAN* hasil desain dari aplikasi Bradwear:%0a%0a` +
+      let ordersText = '';
+      Object.entries(groupedItems).forEach(([modelKey, items]) => {
+        ordersText += `\n${modelKey}\n`;
+        items.forEach((item, i) => {
+          ordersText += `   ${i + 1}. *${item.name}* | Size: ${item.size} | Lengan: ${item.sleeve} | ${item.qty} Pcs\n`;
+        });
+      });
+
+      const text = `Halo Admin Bradwear, saya ingin *ORDER PRODUKSI*:%0a%0a` +
+        `👤 *DATA PEMESAN*%0a` +
+        `   - Nama: ${ordererInfo.name || '-'}%0a` +
+        `   - Instansi: ${ordererInfo.agency || '-'}%0a` +
+        `   - Lokasi: ${ordererInfo.location || '-'}%0a%0a` +
         `🧵 *MATERIAL INFO*%0a` +
         `   - Bahan: ${materialName}%0a%0a` +
-        `📋 *DETAIL PESANAN (${finalItems.length} Item)*${encodeURIComponent(ordersText)}%0a` +
-        `🖼️ *DESAIN*: (Saya telah mengunduh gambar DEPAN & BELAKANG, dan akan mengirimkannya setelah pesan ini)%0a%0a` +
-        `Mohon info total harga dan invoice-nya. Terima kasih!`;
+        `📋 *DETAIL DAFTAR PESANAN*${encodeURIComponent(ordersText)}%0a` +
+        `🖼️ *DESAIN*: (Gambar DEPAN & BELAKANG sudah saya download, akan saya lampirkan)%0a%0a` +
+        `Mohon info total harga dan invoice resminya. Terima kasih!`;
 
-      // Buka WA tanpa nomor tujuan spesifik (agar user bisa pilih kontak)
       window.open(`https://wa.me/?text=${text}`, '_blank');
 
-      alert("✅ Gambar TAMPAK DEPAN & BELAKANG berhasil diunduh.\n\nWhatsApp terbuka! Silakan PILIH KONTAK (CS/Admin) yang Anda tuju, lalu KIRIM pesan & LAMPIRKAN gambar yang baru saja diunduh.");
-
+      alert(`✅ Berhasil! Gambar desain sudah terunduh.\n\nSilakan pilih kontak CS/Admin di WhatsApp untuk mengirim list pesanan.`);
       handleBackCustom();
     } catch (err) {
       console.error("Export failed", err);
-      alert("Gagal memproses gambar. Silakan coba lagi.");
+      alert("Gagal memproses. Silakan coba lagi.");
       onUpdate({ view: originalView });
     } finally {
       setIsExporting(false);
@@ -923,6 +945,25 @@ const DesignEditorView: React.FC<{
           {editorStep === 'details' && (
             <div className="space-y-8 animate-fade-in-up">
 
+              {/* --- KONTROL UKURAN (SCALE) --- */}
+              {activeElementId && (
+                <div className={`p-5 rounded-2xl border transition-colors animate-fade-in ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5 hover:border-white/10' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}>
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3 flex justify-between">
+                    <span>Ukuran Logo / Teks</span>
+                    <span className="text-emerald-500">{Math.round((elements.find(el => el.id === activeElementId)?.scale || 1) * 100)}%</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.2"
+                    max="3"
+                    step="0.1"
+                    value={elements.find(el => el.id === activeElementId)?.scale || 1}
+                    onChange={(e) => updateElement(activeElementId, { scale: parseFloat(e.target.value) })}
+                    className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  />
+                </div>
+              )}
+
               {/* Nama (Dada Kanan) */}
               <div className={`p-5 rounded-2xl border transition-colors ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5 hover:border-white/10' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}>
                 <div className="flex justify-between items-center mb-3">
@@ -970,25 +1011,6 @@ const DesignEditorView: React.FC<{
                     }`}
                 />
               </div>
-
-              {/* --- KONTROL UKURAN (SCALE) --- */
-                activeElementId && (
-                  <div className={`p-5 rounded-2xl border transition-colors animate-fade-in ${theme === 'dark' ? 'bg-zinc-900/30 border-white/5 hover:border-white/10' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}>
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3 flex justify-between">
-                      <span>Ukuran Logo / Teks</span>
-                      <span className="text-emerald-500">{Math.round((elements.find(el => el.id === activeElementId)?.scale || 1) * 100)}%</span>
-                    </label>
-                    <input
-                      type="range"
-                      min="0.2"
-                      max="3"
-                      step="0.1"
-                      value={elements.find(el => el.id === activeElementId)?.scale || 1}
-                      onChange={(e) => updateElement(activeElementId, { scale: parseFloat(e.target.value) })}
-                      className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                    />
-                  </div>
-                )}
 
               {/* Atribut Lain (Lengan & Belakang) */}
               <div>
@@ -1388,6 +1410,67 @@ const DesignEditorView: React.FC<{
                     className="px-8 py-3 rounded-xl bg-emerald-500 text-white font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
                   >
                     Gunakan Model Ini
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* POPUP: FORM DATA PEMESAN (WHATSAPP) */}
+          {showOrdererForm && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+              <div className={`w-full max-w-md p-7 rounded-[32px] relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl`}>
+                <div className="mb-6">
+                  <h3 className="text-xl font-black uppercase tracking-wider text-emerald-500 mb-1">Data Pemesan</h3>
+                  <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Lengkapi data untuk invoice & pengiriman</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1.5 block">Nama Lengkap</label>
+                    <input
+                      type="text"
+                      placeholder="Masukkan nama Anda"
+                      value={ordererInfo.name}
+                      onChange={(e) => setOrdererInfo({ ...ordererInfo, name: e.target.value })}
+                      className={`w-full p-3.5 rounded-2xl border outline-none font-bold text-sm transition-all ${theme === 'dark' ? 'bg-black/40 border-white/10 focus:border-emerald-500 focus:bg-black/60' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500 focus:bg-white'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1.5 block">Instansi / Perusahaan</label>
+                    <input
+                      type="text"
+                      placeholder="Nama Kantor/Organisasi"
+                      value={ordererInfo.agency}
+                      onChange={(e) => setOrdererInfo({ ...ordererInfo, agency: e.target.value })}
+                      className={`w-full p-3.5 rounded-2xl border outline-none font-bold text-sm transition-all ${theme === 'dark' ? 'bg-black/40 border-white/10 focus:border-emerald-500 focus:bg-black/60' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500 focus:bg-white'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1.5 block">Lokasi / Kota</label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: Jakarta Selatan"
+                      value={ordererInfo.location}
+                      onChange={(e) => setOrdererInfo({ ...ordererInfo, location: e.target.value })}
+                      className={`w-full p-3.5 rounded-2xl border outline-none font-bold text-sm transition-all ${theme === 'dark' ? 'bg-black/40 border-white/10 focus:border-emerald-500 focus:bg-black/60' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500 focus:bg-white'}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-8">
+                  <button
+                    onClick={() => setShowOrdererForm(false)}
+                    className={`flex-1 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all ${theme === 'dark' ? 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'}`}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={executeWhatsAppExport}
+                    disabled={!ordererInfo.name}
+                    className="flex-1 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:grayscale"
+                  >
+                    Selesai & Kirim
                   </button>
                 </div>
               </div>
