@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
@@ -123,9 +124,9 @@ const DesignEditorView: React.FC<{
 
   // Tambahkan item ke cart
   const handleAddToCart = (silent = false) => {
-    // Validasi: Wajib isi nama dan kode warna
-    if (!newItem.name.trim() || !newItem.colorCode.trim()) {
-      setShowValidationNotify("Mohon di isi nama dan keterangan lain agar tidak ada kesalahan produksi");
+    // Validasi: Wanya kode warna yang wajib diisi untuk menghindari kesalahan produksi
+    if (!newItem.colorCode.trim()) {
+      setShowValidationNotify("Mohon isi kode warna atau scan katalog agar tidak ada kesalahan produksi");
       setTimeout(() => setShowValidationNotify(null), 4000);
       return;
     }
@@ -150,13 +151,14 @@ const DesignEditorView: React.FC<{
 
     setCartItems([...cartItems, item]);
 
-    // Reset form: KEEPS COLOR CODE/IMAGE to allow bulk add of different names
-    setNewItem(prev => ({
-      ...prev,
+    // Reset form: Clear ALL fields including color code as requested
+    setNewItem({
+      ...newItem,
       name: '',
       qty: 1,
-      // colorCode & colorCodeImage are PERSISTED for better UX
-    }));
+      colorCode: '',
+      colorCodeImage: null
+    });
 
     // Show success feedback
     const audioSuccess = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
@@ -251,7 +253,54 @@ const DesignEditorView: React.FC<{
   const fileInputRefLenganKiri = useRef<HTMLInputElement>(null);
   const fileInputRefBelakang = useRef<HTMLInputElement>(null);
 
+
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // --- TOUCH HANDLING FOR CATALOG ---
+  const [catalogScale, setCatalogScale] = useState(1);
+  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
+
+  // --- HARDWARE BACK BUTTON ---
+  useEffect(() => {
+    const backListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      // 1. Priority: Close Zoom/Catalog Image
+      if (isZoomed) {
+        setIsZoomed(false);
+        setIsPanningCatalog(false);
+        setCatalogScale(1);
+        setCatalogPan({ x: 0, y: 0 });
+        return;
+      }
+
+      // 2. Priority: Close Modals
+      if (showCatalogModal) {
+        setShowCatalogModal(false);
+        return;
+      }
+      if (showCustomSizeModal) {
+        setShowCustomSizeModal(false);
+        return;
+      }
+      if (expandedMaterial) {
+        setExpandedMaterial(null);
+        return;
+      }
+
+      // 3. Priority: Editor Steps
+      if (editorStep === 'finish') {
+        setEditorStep(product.category === 'Polo' ? 'materials' : 'details');
+      } else if (editorStep === 'details') {
+        setEditorStep('materials');
+      } else {
+        // 4. Priority: Exit Editor to Home
+        onBack();
+      }
+    });
+
+    return () => {
+      backListener.then(f => f.remove());
+    };
+  }, [isZoomed, showCatalogModal, showCustomSizeModal, expandedMaterial, editorStep, product.category, onBack]);
 
   const elements = useMemo(() => designData.elements || [], [designData.elements]);
   const similarProducts = useMemo(() => PRODUCTS.filter(p => p.category === product.category && p.id !== product.id), [product]);
@@ -1809,7 +1858,7 @@ const DesignEditorView: React.FC<{
                   ) : (
                     <div
                       ref={zoomContainerRef}
-                      className={`w-full h-full relative transition-all duration-300 ${isZoomed ? 'cursor-grab active:cursor-grabbing' : 'overflow-y-auto custom-scrollbar p-4'}`}
+                      className={`w-full h-full relative transition-all duration-300 ${isZoomed ? 'cursor-grab active:cursor-grabbing touch-none' : 'overflow-y-auto custom-scrollbar p-4'}`}
                       onMouseDown={(e) => {
                         if (isZoomed) {
                           setIsPanningCatalog(true);
@@ -1826,16 +1875,61 @@ const DesignEditorView: React.FC<{
                       }}
                       onMouseUp={() => setIsPanningCatalog(false)}
                       onMouseLeave={() => setIsPanningCatalog(false)}
+
+                      // TOUCH EVENTS
+                      onTouchStart={(e) => {
+                        if (!isZoomed) return;
+                        if (e.touches.length === 1) {
+                          setIsPanningCatalog(true);
+                          setLastCatalogMouse({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+                        } else if (e.touches.length === 2) {
+                          // Pinch Zoom Start
+                          const dist = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                          );
+                          setLastTouchDistance(dist);
+                        }
+                      }}
+                      onTouchMove={(e) => {
+                        if (!isZoomed) return;
+
+                        if (e.touches.length === 1 && isPanningCatalog) {
+                          // Pan
+                          const dx = e.touches[0].clientX - lastCatalogMouse.x;
+                          const dy = e.touches[0].clientY - lastCatalogMouse.y;
+                          setCatalogPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+                          setLastCatalogMouse({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+                        } else if (e.touches.length === 2 && lastTouchDistance) {
+                          // Pinch Zoom
+                          const dist = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                          );
+                          const delta = dist - lastTouchDistance;
+
+                          // Sensitivity limiter
+                          if (Math.abs(delta) > 5) {
+                            const newScale = Math.max(1, Math.min(4, catalogScale + (delta * 0.005)));
+                            setCatalogScale(newScale);
+                            setLastTouchDistance(dist);
+                          }
+                        }
+                      }}
+                      onTouchEnd={() => {
+                        setIsPanningCatalog(false);
+                        setLastTouchDistance(null);
+                      }}
                     >
                       {isZoomed ? (
                         <div className="w-full h-full flex items-center justify-center pointer-events-none">
                           <img
                             src={activeCatalogImage || ''}
                             draggable={false}
-                            className="max-w-none w-[300%] h-auto pointer-events-auto"
+                            className={`max-w-none w-[300%] h-auto origin-top-left pointer-events-auto`}
                             style={{
-                              transform: `translate(${catalogPan.x}px, ${catalogPan.y}px)`,
-                              transition: isPanningCatalog ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                              transform: `translate(${catalogPan.x}px, ${catalogPan.y}px) scale(${catalogScale})`,
+                              transition: isPanningCatalog ? 'none' : 'transform 0.1s linear'
                             }}
                           />
 
@@ -1906,7 +2000,142 @@ const DesignEditorView: React.FC<{
                   {isZoomed ? (
                     <div className="flex gap-3">
                       <button
-                        onClick={() => { setIsZoomed(false); setIsPanningCatalog(false); setCatalogPan({ x: 0, y: 0 }); }}
+                        onClick={() => {
+                          setIsZoomed(false);
+                          setIsPanningCatalog(false);
+                          setCatalogScale(1);
+                          setCatalogPan({ x: 0, y: 0 });
+                        }}
+                        className="p-4 rounded-2xl bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all border border-white/5"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setIsScanning(true);
+                          setDetectedCode(null);
+
+                          // Flickering text fragments effect
+                          const fragmentInterval = setInterval(() => {
+                            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ';
+                            let f = '';
+                            for (let i = 0; i < 8; i++) f += chars[Math.floor(Math.random() * chars.length)];
+                            setScanningFragments(f);
+                          }, 100);
+
+                          const audioScan = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+                          audioScan.volume = 0.2;
+                          audioScan.play().catch(() => { });
+
+                          // REAL AI OCR INTEGRATION
+                          let capturedText = "";
+                          let capturedImage = "";
+                          try {
+                            if (zoomContainerRef.current && roiRef.current) {
+                              // 1. Capture the entire container (which includes the transformed image)
+                              const fullCanvas = await html2canvas(zoomContainerRef.current, {
+                                useCORS: true,
+                                backgroundColor: null,
+                                scale: 2 // High res
+                              });
+
+                              // 2. Calculate crop coordinates relative to the container
+                              const containerRect = zoomContainerRef.current.getBoundingClientRect();
+                              const roiRect = roiRef.current.getBoundingClientRect();
+
+                              // Coordinate logic: (ROI_Left - Container_Left) * Scale.
+                              const cropX = (roiRect.left - containerRect.left) * 2;
+                              const cropY = (roiRect.top - containerRect.top) * 2;
+                              const cropWidth = roiRect.width * 2;
+                              const cropHeight = roiRect.height * 2;
+
+                              // 3. Create cropped canvas
+                              const croppedCanvas = document.createElement('canvas');
+                              croppedCanvas.width = cropWidth;
+                              croppedCanvas.height = cropHeight;
+                              const ctx = croppedCanvas.getContext('2d');
+
+                              if (ctx) {
+                                ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                                capturedImage = croppedCanvas.toDataURL('image/png');
+
+                                // Trigger Automatic Download of the CROPPED image
+                                const link = document.createElement('a');
+                                link.href = capturedImage;
+                                link.download = `scan_color_${Date.now()}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+
+                                capturedText = await analyzeImageWithGemini(capturedImage);
+                              }
+                            }
+                          } catch (err) {
+                            console.error("Capture Error:", err);
+                          }
+
+                          await new Promise(r => setTimeout(r, 1800));
+
+                          const finalCode = capturedText && capturedText !== "No text detected" && capturedText !== "Error scanning"
+                            ? capturedText.toUpperCase().replace(/\n/g, ' ')
+                            : "ISI KODE WARNA";
+
+                          setDetectedCode(finalCode);
+                          clearInterval(fragmentInterval);
+
+                          await new Promise(r => setTimeout(r, 600));
+
+                          setShowFlash(true);
+                          const audioClick = new Audio('https://assets.mixkit.co/active_storage/sfx/611/611-preview.mp3');
+                          audioClick.volume = 0.3;
+                          audioClick.play().catch(() => { });
+
+                          await new Promise(r => setTimeout(r, 800));
+                          setShowFlash(false);
+
+                          // Update data and close modal as requested
+                          setNewItem(prev => ({ ...prev, colorCode: finalCode, colorCodeImage: capturedImage }));
+                          setIsScanning(false);
+
+                          setDetectedCode(null);
+                          setShowCatalogModal(false);
+                          setIsZoomed(false);
+                        }}
+                        disabled={isScanning}
+                        className="flex-1 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isScanning ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <span>Analyzing Capture...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span>Pindai Kode Warna</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 py-2 px-4 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Pilih bahan, zoom area kode, lalu klik pindai untuk deteksi otomatis.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Area */}
+                <div className="p-6 bg-zinc-950/50 border-t border-white/5 space-y-4 shrink-0">
+                  {isZoomed ? (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setIsZoomed(false);
+                          setIsPanningCatalog(false);
+                          setCatalogScale(1);
+                          setCatalogPan({ x: 0, y: 0 });
+                        }}
                         className="p-4 rounded-2xl bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all border border-white/5"
                       >
                         Batal
@@ -2034,17 +2263,20 @@ const DesignEditorView: React.FC<{
         {/* NOTIFICATION TOAST: VALIDATION */}
         {/* NOTIFICATION TOAST: VALIDATION */}
         {showValidationNotify && (
-          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-sm">
-            <div className="bg-red-600 text-white p-5 rounded-2xl shadow-[0_20px_60px_rgba(220,38,38,0.5)] border-2 border-white/20 animate-bounce-in flex items-center gap-4">
-              <div className="shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center animate-pulse">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] w-[85%] max-w-xs">
+            <div className="bg-zinc-900/95 backdrop-blur-xl text-white p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 animate-bounce-in flex flex-col items-center gap-4 text-center ring-1 ring-white/20">
+              <div className="shrink-0 w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse">
+                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
               </div>
               <div className="flex-1">
-                <p className="text-xs font-black uppercase tracking-widest mb-1 text-red-200">Perhatian!</p>
-                <p className="text-xs font-bold leading-relaxed">{showValidationNotify}</p>
+                <p className="text-sm font-black uppercase tracking-widest mb-2 text-red-400">Data Belum Lengkap</p>
+                <p className="text-sm font-medium leading-relaxed text-zinc-300">{showValidationNotify}</p>
               </div>
-              <button onClick={() => setShowValidationNotify(null)} className="p-2 hover:bg-black/20 rounded-lg transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              <button
+                onClick={() => setShowValidationNotify(null)}
+                className="w-full py-3 bg-white text-black font-bold rounded-xl active:scale-95 transition-all mt-2"
+              >
+                OKE, SAYA ISI
               </button>
             </div>
           </div>

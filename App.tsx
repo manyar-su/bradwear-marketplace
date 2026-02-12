@@ -1,13 +1,29 @@
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Restored React import
+import { Filesystem } from '@capacitor/filesystem';
 import { View, Product, DesignData, OrderItem, WorkflowStage, ProductionOrder } from './types';
 import HomeView from './components/HomeView';
 import DesignEditorView from './components/DesignEditorView';
 import SummaryView from './components/SummaryView';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from './constants';
 
+import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
+
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<View>(View.HOME);
+  // Request Permissions on Mount
+  useEffect(() => {
+    const initPermissions = async () => {
+      try {
+        await Filesystem.requestPermissions();
+      } catch (e) {
+        console.error("Permission request failed", e);
+      }
+    };
+    initPermissions();
+  }, []);
+
+  const [currentView, setCurrentView] = useState<View>(() => {
+    return (localStorage.getItem('bradwear_current_view') as View) || View.HOME;
+  });
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('bradwear_theme') as 'light' | 'dark') || 'dark';
@@ -75,11 +91,37 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
+  // --- DOUBLE TAP TO EXIT LOGIC ---
+  useEffect(() => {
+    let lastBackPressed = 0;
+    const backListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (currentView === View.HOME) {
+        const now = Date.now();
+        if (now - lastBackPressed < 2000) {
+          CapacitorApp.exitApp();
+        } else {
+          lastBackPressed = now;
+          // Simple Toast for "Press back again to exit"
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold z-[9999] animate-fade-in-up';
+          toast.innerText = 'Tekan sekali lagi untuk keluar';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2000);
+        }
+      }
+    });
+
+    return () => {
+      backListener.then(f => f.remove());
+    };
+  }, [currentView]);
+
   useEffect(() => {
     localStorage.setItem('bradwear_products', JSON.stringify(products));
     localStorage.setItem('bradwear_production_orders', JSON.stringify(productionOrders));
 
     localStorage.setItem('bradwear_theme', theme);
+    localStorage.setItem('bradwear_current_view', currentView); // Persist Current View
     localStorage.setItem('bradwear_order_code', orderCode);
     localStorage.setItem('bradwear_design_data', JSON.stringify(designData));
     localStorage.setItem('bradwear_order_items', JSON.stringify(orderItems));
@@ -108,6 +150,7 @@ const App: React.FC = () => {
   return (
     <div className={`h-screen w-screen overflow-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-[#050505]' : 'bg-zinc-200'} flex justify-center items-center`}>
       <div className={`h-full w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[1200px] shadow-premium relative overflow-hidden flex flex-col border-x ${theme === 'dark' ? 'bg-black text-white border-white/5' : 'bg-white text-zinc-900 border-zinc-200'}`}>
+
 
         <header className={`px-6 py-6 flex items-center justify-between border-b shrink-0 z-50 ${theme === 'dark' ? 'bg-black/80 border-white/5 backdrop-blur-xl' : 'bg-white/90 border-zinc-100 backdrop-blur-xl'}`}>
           <div className="flex flex-col cursor-pointer" onClick={() => setCurrentView(View.HOME)}>
