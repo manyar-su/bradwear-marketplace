@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Product, Category, WorkflowStage, ProductionOrder, CustomerService, OrderItem } from '../types';
-import { CS_TEAM, INITIAL_WORKFLOW_STAGES, SIZES } from '../constants';
+import { Product, Category, WorkflowStage, ProductionOrder, OrderItem } from '../types';
+import { INITIAL_WORKFLOW_STAGES, SIZES } from '../constants';
 import { uploadImageToSupabase } from '../utils/supabaseService';
 import OptimizedImage from './OptimizedImage';
 

@@ -2,11 +2,10 @@
 export enum View {
   HOME = 'HOME',
   EDITOR = 'EDITOR',
-  SUMMARY = 'SUMMARY',
-  ADMIN = 'ADMIN'
+  SUMMARY = 'SUMMARY'
 }
 
-export type Category = 'Kemeja' | 'Celana' | 'Rompi' | 'Jaket' | 'Kids';
+export type Category = 'Kemeja' | 'Celana' | 'Rompi' | 'Jaket' | 'Kids' | 'Polo';
 
 export interface ProductImages {
   front: string;
@@ -60,17 +59,11 @@ export interface CustomMeasurements {
 export interface OrderItem {
   size: string;
   quantity: number;
-  gender: 'L' | 'P';
+  gender: 'L' | 'P' | 'Pria' | 'Wanita';
+  sleeve?: 'Panjang' | 'Pendek';
 }
 
-export interface CustomerService {
-  id: string;
-  name: string;
-  avatar: string;
-  isOnline: boolean;
-  phone: string;
-  loginKey?: string;
-}
+
 
 export interface WorkflowStage {
   id: string;

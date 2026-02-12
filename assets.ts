@@ -50,10 +50,40 @@ Object.keys(allImagesGlob).forEach(key => {
   }
 });
 
+// Catalog Images
+export const COLOR_CATALOGS = {
+  Nagata: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Nagata/')).map(k => allImagesGlob[k] as string),
+  Oxford: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Oxford/')).map(k => allImagesGlob[k] as string),
+  Polo: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Polo/')).map(k => allImagesGlob[k] as string),
+  Tropical: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Tropical/')).map(k => allImagesGlob[k] as string),
+};
+
 // Helper untuk mencari folder secara case-insensitive & robust matching di semua kategori
-const findFolderInfo = (folder: string) => {
+export const findFolderInfo = (folder: string, category?: string) => {
   const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
-  return folderToPathMap.get(normalize(folder));
+  const found = folderToPathMap.get(normalize(folder));
+  if (found) return found;
+
+  // Fallback 1: If not found as a subfolder, check if manyar-style direct category folder exists
+  // We check all parent folders in the glob
+  const allParentFolders = Array.from(new Set(Object.keys(allImagesGlob).map(k => k.split('/')[2])));
+
+  if (category) {
+    const catNorm = normalize(category);
+    const matchedParent = allParentFolders.find(p => normalize(p) === catNorm || normalize(p) === normalize('Kaos ' + category));
+    if (matchedParent) {
+      return { parent: matchedParent, actual: '' };
+    }
+  }
+
+  // Fallback 2: Check if the folder name itself matches any parent folder
+  const folderNorm = normalize(folder);
+  const matchedParentByFolder = allParentFolders.find(p => normalize(p) === folderNorm);
+  if (matchedParentByFolder) {
+    return { parent: matchedParentByFolder, actual: '' };
+  }
+
+  return undefined;
 };
 
 const getModelAsset = (folder: string, fileName: string) => {
@@ -99,8 +129,8 @@ const getBackImage = (folder: string) => getModelAsset(folder, 'belakang');
  * Mendapatkan gambar model spesifik berdasarkan warna dan view
  * Digunakan di DesignEditorView untuk menampilkan versi berwarna jika tersedia di folder model
  */
-export const getModelColorImage = (modelName: string, colorName: string, view: string): string => {
-  const info = findFolderInfo(modelName);
+const getModelColorImageInternal = (modelName: string, colorName: string, view: string, category?: string): string => {
+  const info = findFolderInfo(modelName, category);
   if (!info) return '';
 
   const extensions = ['jpeg', 'jpg', 'png', 'webp'];
@@ -108,12 +138,14 @@ export const getModelColorImage = (modelName: string, colorName: string, view: s
   const suffix = isBack ? ' belakang' : '';
   const searchName = colorName.toLowerCase();
 
+  const folderPath = `${info.parent}${info.actual ? '/' + info.actual : ''}`;
+
   for (const ext of extensions) {
-    const key = `./assets/${info.parent}/${info.actual}/${searchName}${suffix}.${ext}`;
+    const key = `./assets/${folderPath}/${searchName}${suffix}.${ext}`;
     if (allImagesGlob[key]) return allImagesGlob[key] as string;
   }
 
-  const prefix = `./assets/${info.parent}/${info.actual}/`;
+  const prefix = `./assets/${folderPath}/`;
   const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
 
   for (const key of folderFiles) {
@@ -121,6 +153,29 @@ export const getModelColorImage = (modelName: string, colorName: string, view: s
     if (fileName.includes(searchName)) {
       if (isBack && fileName.includes('belakang')) return allImagesGlob[key] as string;
       if (!isBack && !fileName.includes('belakang')) return allImagesGlob[key] as string;
+    }
+  }
+
+  return '';
+};
+
+export const getModelColorImage = (modelName: string, colorName: string, view: string, category?: string): string => {
+  // 1. Try to get from the specific model folder first
+  const specific = getModelColorImageInternal(modelName, colorName, view, category);
+  if (specific) return specific;
+
+  // 2. If it's a Back view and not found, search globally in other folders for the same color & view
+  if (view.toLowerCase().includes('belakang')) {
+    const searchName = colorName.toLowerCase();
+
+    // Search all images in all folders
+    for (const key of Object.keys(allImagesGlob)) {
+      const fileName = key.split('/').pop()?.toLowerCase() || '';
+      if (fileName.includes(searchName) && fileName.includes('belakang')) {
+        // Exclude specific gallery/series files that aren't product mockups
+        if (fileName.includes('series') || fileName.includes('gallery')) continue;
+        return allImagesGlob[key] as string;
+      }
     }
   }
 
@@ -145,6 +200,76 @@ export const getLocalImagesInFolder = (folderName: string): string[] => {
  * Mendapatkan daftar semua model yang memiliki folder aset lokal
  */
 export const getAvailableLocalModels = () => Array.from(folderToPathMap.keys());
+
+/**
+ * Mendapatkan warna spesifik yang tersedia di folder produk tersebut
+ * Mengekstrak warna dari nama file (misal: "Vest-hitam.jpeg" -> "hitam")
+ */
+export const getItemSpecificColors = (productName: string, category: string) => {
+  const info = findFolderInfo(productName, category);
+  if (!info) return [];
+
+  const folderPath = `${info.parent}${info.actual ? '/' + info.actual : ''}`;
+  const prefix = `./assets/${folderPath}/`;
+  const namePrefix = productName.split(' ')[0].toLowerCase() + '-';
+  const colorMap = new Map<string, { name: string, image: string, backImage?: string }>();
+
+  Object.keys(allImagesGlob).forEach(key => {
+    if (key.startsWith(prefix)) {
+      const fileName = key.split('/').pop()?.toLowerCase() || '';
+      if (fileName.includes('series') || fileName.includes('gallery')) return;
+
+      // Deteksi model prefix (misal 'vest-')
+      let colorPart = fileName;
+
+      // Remove any content inside parentheses (e.g., "(brad v-1)biru muda.png" -> "biru muda.png")
+      colorPart = colorPart.replace(/\(.*?\)/g, '').trim();
+
+      const normalizedName = productName.toLowerCase().replace(/\s+/g, '');
+      const nameParts = productName.toLowerCase().split(/\s+/);
+      const possiblePrefixes = [
+        namePrefix,
+        normalizedName,
+        normalizedName + '-',
+        (info.actual ? info.actual.toLowerCase() + '-' : ''),
+        ...nameParts.map(p => p + '-'),
+        'kaospolo-',
+        'kaospolos-'
+      ];
+
+      let matchFound = false;
+      for (const p of possiblePrefixes) {
+        if (p && colorPart.startsWith(p)) {
+          colorPart = colorPart.replace(p, '');
+          matchFound = true;
+          break;
+        }
+      }
+
+      // If still has leading non-alphabetic chars (like hyphens or spaces), clean them
+      colorPart = colorPart.replace(/^[^a-z0-9]+/i, '');
+
+      const isBack = colorPart.includes('belakang') || colorPart.includes('back');
+      // Bersihkan nama warna dari extension dan suffix
+      const colorName = colorPart.split('.')[0]
+        .replace(' belakang', '').replace('-belakang', '')
+        .replace(' back', '').replace('-back', '')
+        .trim();
+
+      if (!colorName || /^\d+$/.test(colorName) || colorName === 'front' || colorName === 'depan') return;
+
+      const existing = colorMap.get(colorName) || { name: colorName, image: '' };
+      if (isBack) {
+        existing.backImage = allImagesGlob[key] as string;
+      } else {
+        existing.image = allImagesGlob[key] as string;
+      }
+      colorMap.set(colorName, existing);
+    }
+  });
+
+  return Array.from(colorMap.values()).filter(c => c.image);
+};
 
 // --- DYNAMIC COLOR LOADING (Robust format detection & Supabase Support) ---
 const allWarnaGlob = import.meta.glob('./assets/warna/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
@@ -220,8 +345,26 @@ const BOMBER_BRAD_BACK = getBackImage('Bomber Brad');
 const BOMBER_BRAD_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Bomber Brad', n.toString())).filter(Boolean);
 
 // --- ASSETS ROMPI DARI FOLDER ROMPI ---
-const TACTICAL_BUPATI_FRONT = getFrontImage('Tactical Bupati');
-const TACTICAL_BUPATI_BACK = getBackImage('Tactical Bupati');
+// --- ASSETS ROMPI DARI FOLDER ROMPI ---
+const VEST_BUPATI_FRONT = allImagesGlob['./assets/Rompi/Vest-hitam.jpeg'] as string || '';
+const VEST_BUPATI_BACK = allImagesGlob['./assets/Rompi/Vest-hitam.jpeg'] as string || '';
+const VEST_BUPATI_GAL = [
+  allImagesGlob['./assets/Rompi/Vest-abu muda.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-abu tua.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-biru tua.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-coklat.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-hijau.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-khaki.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-pink muda.jpeg'] as string,
+  allImagesGlob['./assets/Rompi/Vest-pink tua.jpeg'] as string
+].filter(Boolean);
+
+const VEST_PARASUTE_FRONT = allImagesGlob['./assets/Rompi/Parasute/Vest-parasute-1.jpeg'] as string || '';
+const VEST_PARASUTE_BACK = allImagesGlob['./assets/Rompi/Parasute/Vest-parasute-2.jpeg'] as string || '';
+const VEST_PARASUTE_GAL = [3].map(n => allImagesGlob[`./assets/Rompi/Parasute/Vest-parasute-${n}.jpeg`] as string).filter(Boolean);
+
+// --- ASSETS POLO DARI FOLDER KAOS POLO ---
+const KAOS_POLO_FRONT = allImagesGlob['./assets/Kaos polo/Kaospolo-hitam.png'] as string || '';
 
 // --- ASSETS CELANA DARI FOLDER CELANA ---
 const CARGO_TACTICAL_FRONT = getFrontImage('Cargo Tactical');
@@ -347,8 +490,17 @@ export const ASSETS = {
 
   // --- KATEGORI ROMPI ---
   ROMPI: {
-    BUPATI: TACTICAL_BUPATI_FRONT || 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-    BACK: TACTICAL_BUPATI_BACK
+    BUPATI: VEST_BUPATI_FRONT || 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
+    BACK: VEST_BUPATI_BACK,
+    GALLERY: VEST_BUPATI_GAL,
+    PARASUTE: VEST_PARASUTE_FRONT,
+    PARASUTE_BACK: VEST_PARASUTE_BACK,
+    PARASUTE_GALLERY: VEST_PARASUTE_GAL
+  },
+
+  // --- KATEGORI POLO ---
+  POLO: {
+    BASIC: KAOS_POLO_FRONT
   },
 
   // --- UI ASSETS (Avatars, etc) ---

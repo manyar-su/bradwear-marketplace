@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { Product, DesignData, OrderItem, CustomerService, CustomMeasurements } from '../types';
-import { CS_TEAM, SIZES, COLORS } from '../constants';
+import { Product, DesignData, OrderItem, CustomMeasurements } from '../types';
+import { SIZES, COLORS } from '../constants';
 
 interface SummaryViewProps {
   product: Product;
@@ -20,7 +20,6 @@ const SummaryView: React.FC<SummaryViewProps> = ({
   onBack,
   theme
 }) => {
-  const [selectedCS, setSelectedCS] = useState<CustomerService>(CS_TEAM[0]);
   const [isSending, setIsSending] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [showSizePicker, setShowSizePicker] = useState<number | null>(null);
@@ -54,13 +53,24 @@ const SummaryView: React.FC<SummaryViewProps> = ({
   const handleSendToCS = () => {
     setIsSending(true);
     setTimeout(() => {
-      const detailOrder = orderItems.map(i => `${i.size} (${i.gender}): ${i.quantity}pcs`).join(', ');
+      const detailOrder = orderItems.map(i => {
+        const sleevePart = product.category === 'Rompi' ? '' : ` | Lengan: ${i.sleeve || 'Pendek'}`;
+        return `${i.size} (${i.gender})${sleevePart}: ${i.quantity}pcs`;
+      }).join('\n   - ');
       const kustomInfo = orderItems.some(i => i.size === 'Kustom')
-        ? `\n\nDetail Kustom:\n- Tinggi: ${localMeasurements.tinggi}\n- Lebar Dada: ${localMeasurements.lebarDada}\n- Lengan: ${localMeasurements.panjangLengan}`
+        ? `\n\n📐 *DETAIL KUSTOM*:\n   📍 Tinggi: ${localMeasurements.tinggi}cm\n   📍 Lebar Dada: ${localMeasurements.lebarDada}cm\n   📍 Lengan: ${localMeasurements.panjangLengan}cm`
         : '';
 
-      const message = `Halo ${selectedCS.name}, saya ingin memesan ${product.name} kustom.\n\nDetail:\n- Bahan: ${designData.material}\n- Warna: ${designData.color}\n- Personalisasi: ${displayCustomName || '-'}\n- Detail Ukuran: ${detailOrder}${kustomInfo}\n- Total Qty: ${totalQty} pcs\n\n(Mohon bantuannya untuk proses produksi)`;
-      window.open(`https://wa.me/${selectedCS.phone}?text=${encodeURIComponent(message)}`, '_blank');
+      const message = `Halo Admin Bradwear ✨, saya ingin memesan *${product.name}* kustom 🚀.\n\n` +
+        `🧵 *DETAIL PESANAN*:\n` +
+        `   👕 Bahan: ${designData.material}\n` +
+        `   🎨 Warna: ${designData.color}\n` +
+        `   🏷️ Personalisasi: ${displayCustomName || '-'}\n\n` +
+        `📋 *DAFTAR UKURAN*:\n   - ${detailOrder}${kustomInfo}\n\n` +
+        `📦 *TOTAL*: ${totalQty} pcs\n` +
+        `🖼️ *DESAIN*:\n\n` +
+        `(Mohon bantuannya untuk proses produksi 🙏)`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
       setIsSending(false);
     }, 2000);
   };
@@ -137,25 +147,7 @@ const SummaryView: React.FC<SummaryViewProps> = ({
           </div>
         </section>
 
-        <section className="pb-10">
-          <h4 className="text-[10px] font-black adaptive-text-muted uppercase tracking-widest mb-6">SPESIALIS LAYANAN</h4>
-          <div className="space-y-4">
-            {CS_TEAM.map(cs => (
-              <div key={cs.id} onClick={() => setSelectedCS(cs)} className={`p-4 rounded-3xl border-2 transition-all flex items-center justify-between cursor-pointer ${selectedCS.id === cs.id ? 'neon-border bg-black/5 shadow-lg' : `${theme === 'dark' ? 'bg-zinc-900 border-white/5' : 'bg-white border-zinc-100 shadow-sm'}`}`}>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <img src={cs.avatar} className="w-12 h-12 rounded-2xl object-cover shadow-md" />
-                    {cs.isOnline && <div className="absolute -top-1 -right-1 w-4 h-4 neon-bg border-4 border-black rounded-full" />}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase adaptive-text">{cs.name}</p>
-                    <p className={`text-[8px] font-bold ${cs.isOnline ? 'text-green-500' : 'text-zinc-500'}`}>{cs.isOnline ? 'ONLINE' : 'OFFLINE'}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+
       </main>
 
       {/* Modal Pemilih Ukuran */}

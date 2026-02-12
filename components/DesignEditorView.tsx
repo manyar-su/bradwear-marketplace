@@ -1,10 +1,11 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
-import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, CS_TEAM } from '../constants';
+import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
 import { uploadImageToSupabase } from '../utils/supabaseService';
-import { getModelColorImage } from '../assets';
+import { getModelColorImage, getItemSpecificColors, COLOR_CATALOGS } from '../assets';
+import { analyzeImageWithGemini } from '../utils/geminiService';
 
 const DesignEditorView: React.FC<{
   product: Product;
@@ -18,7 +19,11 @@ const DesignEditorView: React.FC<{
 
   const handleBackCustom = () => {
     if (editorStep === 'finish') {
-      setEditorStep('details');
+      if (product.category === 'Polo') {
+        setEditorStep('materials');
+      } else {
+        setEditorStep('details');
+      }
       return;
     }
     if (editorStep === 'details') {
@@ -49,12 +54,14 @@ const DesignEditorView: React.FC<{
     id: string;
     model: Product;
     color: string;
+    colorCode: string;
     name: string;
     size: string;
     gender: 'Pria' | 'Wanita';
     sleeve: 'Panjang' | 'Pendek';
     qty: number;
     customDetail?: string; // Menyimpan detail ukuran custom
+    colorCodeImage?: string; // Menyimpan gambar hasil scan
   }
 
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
@@ -65,11 +72,27 @@ const DesignEditorView: React.FC<{
 
   const [newItem, setNewItem] = useState({
     name: '',
+    colorCode: '',
     size: 'L',
     gender: 'Pria' as 'Pria' | 'Wanita',
     sleeve: 'Panjang' as 'Panjang' | 'Pendek',
     qty: 1
   });
+
+  const [activeCatalogType, setActiveCatalogType] = useState<string | null>(null);
+  const [showCatalogModal, setShowCatalogModal] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [activeCatalogImage, setActiveCatalogImage] = useState<string | null>(null);
+  const [catalogPan, setCatalogPan] = useState({ x: 0, y: 0 });
+  const [isPanningCatalog, setIsPanningCatalog] = useState(false);
+  const [lastCatalogMouse, setLastCatalogMouse] = useState({ x: 0, y: 0 });
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannedImage, setScannedImage] = useState<string | null>(null);
+  const [showFlash, setShowFlash] = useState(false);
+  const [showValidationNotify, setShowValidationNotify] = useState<string | null>(null);
+  const [scanningFragments, setScanningFragments] = useState<string>('');
+  const [detectedCode, setDetectedCode] = useState<string | null>(null);
 
   const [showCustomSizeModal, setShowCustomSizeModal] = useState(false);
   // Simpan detail custom sementara sebelum dimasukkan ke cart
@@ -86,9 +109,27 @@ const DesignEditorView: React.FC<{
     location: ''
   });
 
+  const zoomContainerRef = useRef<HTMLDivElement>(null);
+  const roiRef = useRef<HTMLDivElement>(null);
+
+
+  // Efek untuk sinkronisasi model & warna dari desain ke form isian pesanan
+  useEffect(() => {
+    if (editorStep === 'finish') {
+      setActiveFormModel(product);
+      setActiveFormColor(designData.color);
+    }
+  }, [editorStep, product, designData.color]);
 
   // Tambahkan item ke cart
   const handleAddToCart = (silent = false) => {
+    // Validasi: Wajib isi nama dan kode warna
+    if (!newItem.name.trim() || !newItem.colorCode.trim()) {
+      setShowValidationNotify("Mohon di isi nama dan keterangan lain agar tidak ada kesalahan produksi");
+      setTimeout(() => setShowValidationNotify(null), 4000);
+      return;
+    }
+
     let customDetailStr = '';
     if (newItem.size === 'Custom') {
       customDetailStr = `(T:${customMeasures.tinggi}, LD:${customMeasures.lebarDada}, LB:${customMeasures.lebarBahu}, PL:${customMeasures.panjangLengan})`;
@@ -98,6 +139,7 @@ const DesignEditorView: React.FC<{
       id: `item_${Date.now()}`,
       model: activeFormModel,
       color: activeFormColor,
+      colorCode: newItem.colorCode || '-',
       name: newItem.name || '-',
       size: newItem.size,
       gender: newItem.gender,
@@ -108,16 +150,33 @@ const DesignEditorView: React.FC<{
 
     setCartItems([...cartItems, item]);
 
-    // Reset form
-    setNewItem({ ...newItem, name: '', qty: 1 });
-    if (!silent) alert("✅ Item berhasil ditambahkan ke daftar!");
+    // Reset form: KEEPS COLOR CODE/IMAGE to allow bulk add of different names
+    setNewItem(prev => ({
+      ...prev,
+      name: '',
+      qty: 1,
+      // colorCode & colorCodeImage are PERSISTED for better UX
+    }));
+
+    // Show success feedback
+    const audioSuccess = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    audioSuccess.volume = 0.5;
+    audioSuccess.play().catch(() => { });
+
+    if (!silent) {
+      // Optional: non-blocking toast instead of alert if desired, for now we keep behavior simple
+      // alert("✅ Item berhasil ditambahkan!"); 
+    }
   };
 
   const handleNextStep = () => {
     if (editorStep === 'materials') {
-      setEditorStep('details');
+      if (product.category === 'Polo') {
+        setEditorStep('finish');
+      } else {
+        setEditorStep('details');
+      }
     } else if (editorStep === 'details') {
-      handleAddToCart(true);
       setEditorStep('finish');
     }
   };
@@ -129,22 +188,21 @@ const DesignEditorView: React.FC<{
 
   // --- KONFIGURASI POSISI DEFAULT ELEMEN (EDIT DISINI) ---
 
-  // --- KONFIGURASI POSISI DEFAULT ELEMEN (EDIT DISINI) ---
   // Panduan Koordinat:
   // X (Horizontal): 0 = Paling Kiri, 50 = Tengah, 100 = Paling Kanan
   // Y (Vertikal):   0 = Paling Atas, 100 = Paling Bawah
   const DEFAULT_POS = {
     // Posisi Teks Nama (Dada Kanan)
-    NAMA_TEKS: { x: 27, y: 24 },
+    NAMA_TEKS: { x: 36, y: 22 },
 
     // Posisi Teks Jabatan (Dada Kiri)
-    JABATAN_TEKS: { x: 73, y: 24 },
+    JABATAN_TEKS: { x: 64, y: 22 },
 
     // Posisi Logo diatas Nama (Dada Kanan)
-    LOGO_NAMA: { x: 35, y: 28 },
+    LOGO_NAMA: { x: 36, y: 14 },
 
     // Posisi Logo diatas Jabatan (Dada Kiri)
-    LOGO_JABATAN: { x: 55, y: 28 },
+    LOGO_JABATAN: { x: 64, y: 14 },
 
     // Posisi Logo Lengan Kanan
     LENGAN_KANAN: { x: 20, y: 30 },
@@ -204,7 +262,46 @@ const DesignEditorView: React.FC<{
     if (activeBtn) {
       activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
-  }, [product.id]);
+  }, [product.id, product.category]);
+
+  const specificColors = useMemo(() => getItemSpecificColors(product.name, product.category), [product.name, product.category]);
+
+  const availableViews = useMemo(() => {
+    const views = ['Depan', 'Belakang'];
+    if (product.category !== 'Kemeja') {
+      if (product.images?.rightSleeve) views.push('Kanan');
+      if (product.images?.leftSleeve) views.push('Kiri');
+    }
+    return views;
+  }, [product]);
+
+  /* Auto-select first specific color and check view availability */
+  useEffect(() => {
+    // 1. Check if current view is still available
+    if (!availableViews.includes(designData.view)) {
+      onUpdate({ view: 'Depan' });
+    }
+
+    // 2. Auto-select color for Shirts
+    if (product.category === 'Kemeja' && specificColors.length > 0) {
+      // If current color is not in specific colors, pick the first one
+      const isCurrentInSpecific = specificColors.some(sc => {
+        const matchingGlobal = COLORS.find(gc => gc.name.toLowerCase() === sc.name.toLowerCase());
+        return matchingGlobal ? designData.color === matchingGlobal.hex : designData.color === sc.name;
+      });
+
+      if (!isCurrentInSpecific) {
+        const firstColor = specificColors[0];
+        const matchingGlobal = COLORS.find(gc => gc.name.toLowerCase() === firstColor.name.toLowerCase());
+        const colorVal = matchingGlobal?.hex || firstColor.name;
+        setActiveFormColor(colorVal);
+        onUpdate({ color: colorVal, view: 'Depan' });
+      }
+    }
+  }, [product.id, specificColors, availableViews, designData.view]);
+
+  const activeMaterials = useMemo(() => product.category === 'Polo' ? POLO_MATERIALS : MATERIALS, [product.category]);
+  const activeMaterialSpecs = useMemo(() => product.category === 'Polo' ? POLO_MATERIAL_SPECS : MATERIAL_SPECS, [product.category]);
 
   const pushToHistory = (newElements: DesignElement[]) => {
     const newHistory = history.slice(0, historyPointer + 1);
@@ -388,19 +485,20 @@ const DesignEditorView: React.FC<{
     if (existing) {
       updateElement(existing.id, { content: text });
     } else {
-      // Menggunakan konfigurasi posisi default dari DEFAULT_POS
+      // Buat elemen baru jika belum ada
       const isRightChest = idPrefix.includes('dada_kanan'); // Dada Kanan = Nama
       const pos = isRightChest ? DEFAULT_POS.NAMA_TEKS : DEFAULT_POS.JABATAN_TEKS;
 
-      const newId = `${idPrefix}_${Math.random().toString(36).substr(2, 5)}`;
+      const newId = `${idPrefix}_${Date.now()}`; // Gunakan timestamp agar unik tapi awalan konsisten
       const newElement: DesignElement = {
         id: newId,
         type: 'text',
         content: text,
-        pos,
+        pos: { ...pos },
         scale: 0.8,
         view: 'Depan'
       };
+
       const newElements = [...elements, newElement];
       onUpdate({ elements: newElements });
       pushToHistory(newElements);
@@ -481,11 +579,24 @@ const DesignEditorView: React.FC<{
   /* --- LOGIKA PEMANGGILAN GAMBAR UTAMA --- */
   // Menentukan gambar produk yang ditampilkan berdasarkan View (Depan/Belakang) dan Warna yang dipilih
   const currentDisplayImage = useMemo(() => {
-    // 0. PRIORITAS: Cek apakah ada gambar model-spesifik untuk warna ini (misal di folder Yoroi)
-    const colorName = selectedColorObj?.name;
+    // 0. PRIORITAS: Cek apakah ada gambar model-spesifik untuk warna ini (misal di folder Yoroi atau Rompi)
+    const colorName = selectedColorObj?.name || (designData.color.startsWith('#') ? '' : designData.color);
+
     if (colorName) {
-      const modelSpecificColorImg = getModelColorImage(product.name, colorName, designData.view);
+      // 0. PRIORITAS 1: Cek folder model sendiri (depan/belakang)
+      const modelSpecificColorImg = getModelColorImage(product.name, colorName, designData.view, product.category);
       if (modelSpecificColorImg) return modelSpecificColorImg;
+
+      // 0. PRIORITAS 2: Cek specificColors yang sudah ter-scan di folder (ini redundan dengan yang diatas tapi kita pastikan)
+      const foundSpecific = specificColors.find(sc => sc.name.toLowerCase() === colorName.toLowerCase());
+      if (foundSpecific) {
+        if (designData.view === 'Belakang') {
+          if (foundSpecific.backImage) return foundSpecific.backImage;
+          // Jika tidak ada backImage di folder ini, biarkan lanjut ke fallback global di getModelColorImage
+        } else {
+          return foundSpecific.image;
+        }
+      }
     }
 
     // 1. Cek apakah ada gambar khusus untuk warna tertentu (global fallback)
@@ -552,17 +663,14 @@ const DesignEditorView: React.FC<{
     const originalView = designData.view;
 
     try {
-      // 1. CAPTURE TAMPAK DEPAN
+      // 1. CAPTURE & UPLOAD DEPAN
       onUpdate({ view: 'Depan' });
       await new Promise(r => setTimeout(r, 800));
 
-      const canvasFront = await html2canvas(canvasRef.current, {
-        useCORS: true,
-        scale: 2,
-        backgroundColor: null
-      });
+      const canvasFront = await html2canvas(canvasRef.current, { useCORS: true, scale: 2, backgroundColor: null });
       const imageFront = canvasFront.toDataURL("image/png");
 
+      // Auto Download
       const linkFront = document.createElement('a');
       linkFront.href = imageFront;
       linkFront.download = `BRAD_DEPAN_${ordererInfo.name || 'ORDER'}_${Date.now()}.png`;
@@ -570,17 +678,17 @@ const DesignEditorView: React.FC<{
       linkFront.click();
       document.body.removeChild(linkFront);
 
-      // 2. CAPTURE TAMPAK BELAKANG
+      // Upload
+      const frontUrl = await uploadImageToSupabase(imageFront, `orders/front_${Date.now()}.png`);
+
+      // 2. CAPTURE & UPLOAD BELAKANG
       onUpdate({ view: 'Belakang' });
       await new Promise(r => setTimeout(r, 800));
 
-      const canvasBack = await html2canvas(canvasRef.current, {
-        useCORS: true,
-        scale: 2,
-        backgroundColor: null
-      });
+      const canvasBack = await html2canvas(canvasRef.current, { useCORS: true, scale: 2, backgroundColor: null });
       const imageBack = canvasBack.toDataURL("image/png");
 
+      // Auto Download
       const linkBack = document.createElement('a');
       linkBack.href = imageBack;
       linkBack.download = `BRAD_BELAKANG_${ordererInfo.name || 'ORDER'}_${Date.now()}.png`;
@@ -588,12 +696,15 @@ const DesignEditorView: React.FC<{
       linkBack.click();
       document.body.removeChild(linkBack);
 
+      // Upload
+      const backUrl = await uploadImageToSupabase(imageBack, `orders/back_${Date.now()}.png`);
+
       onUpdate({ view: originalView });
 
-      // 3. KIRIM PESAN WHATSAPP DENGAN GROUPING
+      // 3. PROCESS ITEMS & UPLOAD SCANS
       const materialName = designData.material || 'Standar';
 
-      const finalItems = cartItems.length > 0 ? cartItems : [
+      const rawItems = cartItems.length > 0 ? cartItems : [
         {
           id: 'temp',
           model: activeFormModel,
@@ -603,45 +714,63 @@ const DesignEditorView: React.FC<{
           gender: newItem.gender,
           sleeve: newItem.sleeve,
           qty: newItem.qty,
-          customDetail: newItem.size === 'Custom' ? `(Custom: ${customMeasures.tinggi}/${customMeasures.lebarDada}...)` : ''
+          customDetail: newItem.size === 'Custom' ? `(Custom: ${customMeasures.tinggi}...)` : '',
+          colorCode: newItem.colorCode,
+          colorCodeImage: newItem.colorCodeImage
         }
       ];
 
-      // GROUPING LOGIC: Berdasarkan Model & Warna
-      const groupedItems: Record<string, OrderItem[]> = {};
-      finalItems.forEach(item => {
-        const colorName = COLORS.find(c => c.hex === item.color)?.name || 'Custom';
-        const key = `*MODEL: ${item.model.name} (${colorName})*`;
+      // Upload Scans Loop
+      const processedItems = await Promise.all(rawItems.map(async (item, idx) => {
+        let scanUrl = null;
+        if (item.colorCodeImage && item.colorCodeImage.startsWith('data:image')) {
+          scanUrl = await uploadImageToSupabase(item.colorCodeImage, `orders/scan_${Date.now()}_${idx}.png`);
+        }
+        return { ...item, scanUrl };
+      }));
+
+      // 4. GROUPING & TEXT
+      const groupedItems: Record<string, typeof processedItems> = {};
+      processedItems.forEach(item => {
+        // Modified: Use Color Code exclusively for grouping key if available
+        const colorName = item.colorCode && item.colorCode !== '-' ? item.colorCode : (COLORS.find(c => c.hex === item.color)?.name || 'Custom');
+        const key = `*MODEL: ${item.model.name} - KODE: ${colorName}*`;
         if (!groupedItems[key]) groupedItems[key] = [];
         groupedItems[key].push(item);
       });
 
       let ordersText = '';
       Object.entries(groupedItems).forEach(([modelKey, items]) => {
-        ordersText += `\n${modelKey}\n`;
+        ordersText += `\n📦 ${modelKey}\n──────────────────\n`;
         items.forEach((item, i) => {
-          ordersText += `   ${i + 1}. *${item.name}* | Size: ${item.size} | Lengan: ${item.sleeve} | ${item.qty} Pcs\n`;
+          const sleeveInfo = item.model.category === 'Rompi' ? '' : `\n      ✂️ Lengan: ${item.sleeve}`;
+          ordersText += `   ${i + 1}. 👤 Nama: *${item.name}*\n      📐 Size: ${item.size}${sleeveInfo}\n      🎨 Kode/Warna: ${item.colorCode}\n      🔢 Qty: ${item.qty} Pcs`;
+          if (item.scanUrl) ordersText += `\n      📷 Scan Warna: ${item.scanUrl}`;
+          ordersText += `\n\n`;
         });
       });
 
-      const text = `Halo Admin Bradwear, saya ingin *ORDER PRODUKSI*:%0a%0a` +
-        `👤 *DATA PEMESAN*%0a` +
-        `   - Nama: ${ordererInfo.name || '-'}%0a` +
-        `   - Instansi: ${ordererInfo.agency || '-'}%0a` +
-        `   - Lokasi: ${ordererInfo.location || '-'}%0a%0a` +
-        `🧵 *MATERIAL INFO*%0a` +
-        `   - Bahan: ${materialName}%0a%0a` +
-        `📋 *DETAIL DAFTAR PESANAN*${encodeURIComponent(ordersText)}%0a` +
-        `🖼️ *DESAIN*: (Gambar DEPAN & BELAKANG sudah saya download, akan saya lampirkan)%0a%0a` +
-        `Mohon info total harga dan invoice resminya. Terima kasih!`;
+      const text = `Halo Admin Bradwear! 👋%0aSaya ingin *ORDER PRODUKSI ${product.category.toUpperCase()}* 🚀:%0a%0a` +
+        `📋 *DATA PEMESAN*%0a` +
+        `   👤 Nama: ${ordererInfo.name || '-'}%0a` +
+        `   🏢 Instansi: ${ordererInfo.agency || '-'}%0a` +
+        `   📍 Lokasi: ${ordererInfo.location || '-'}%0a%0a` +
+        `👕 *MATERIAL INFO*%0a` +
+        `   👕 Model: ${product.name}%0a` +
+        `   ✨ Bahan: ${materialName}%0a%0a` +
+        `📝 *DETAIL PESANAN*${encodeURIComponent(ordersText)}%0a` +
+        `📎 *PREVIEW DESAIN*%0a` +
+        `   Front: ${frontUrl || '(Lihat Lampiran)'}%0a` +
+        `   Back: ${backUrl || '(Lihat Lampiran)'}%0a%0a` +
+        `Mohon info total harga dan invoice resminya. Terima kasih! 🙏`;
 
       window.open(`https://wa.me/?text=${text}`, '_blank');
-
-      alert(`✅ Berhasil! Gambar desain sudah terunduh.\n\nSilakan pilih kontak CS/Admin di WhatsApp untuk mengirim list pesanan.`);
+      alert(`✅ Berhasil! Link gambar telah disematkan di WhatsApp.`);
       handleBackCustom();
+
     } catch (err) {
       console.error("Export failed", err);
-      alert("Gagal memproses. Silakan coba lagi.");
+      alert("Gagal memproses upload gambar. Pastikan internet lancar.");
       onUpdate({ view: originalView });
     } finally {
       setIsExporting(false);
@@ -767,8 +896,8 @@ const DesignEditorView: React.FC<{
         </div>
 
         {/* View Controls (Navigation & Side Toggle) - Hidden when modals are active */}
-        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30 w-full max-w-[90%] md:max-w-max justify-center">
+        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 w-full max-w-[95%] md:max-w-max justify-center px-2">
 
             {/* Tombol Kembali Cepat */}
             <button
@@ -781,8 +910,15 @@ const DesignEditorView: React.FC<{
 
             {/* View Toggle */}
             <div className={`flex gap-2 p-1.5 rounded-2xl border backdrop-blur-md ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
-              <button onClick={() => onUpdate({ view: 'Depan' })} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === 'Depan' ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}>Depan</button>
-              <button onClick={() => onUpdate({ view: 'Belakang' })} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === 'Belakang' ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}>Belakang</button>
+              {availableViews.map(v => (
+                <button
+                  key={v}
+                  onClick={() => onUpdate({ view: v as any })}
+                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
+                >
+                  {v}
+                </button>
+              ))}
             </div>
 
             {/* Tombol Lanjut Cepat */}
@@ -804,7 +940,7 @@ const DesignEditorView: React.FC<{
       <div className={`w-full md:w-[40%] lg:w-[35%] flex-1 md:h-full flex flex-col border-t md:border-t-0 md:border-l relative z-10 shadow-2xl transition-colors duration-500 ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`}>
 
         {/* Panel Header */}
-        <div className={`px-8 py-6 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-zinc-100 bg-zinc-50'}`}>
+        <div className={`px-5 py-5 md:px-8 md:py-6 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-zinc-100 bg-zinc-50'}`}>
           <h2 className="text-xl font-black uppercase tracking-widest neon-text mb-1">
             {editorStep === 'materials' ? 'Desain Warna & Bahan' : editorStep === 'details' ? 'Detail Atribut' : 'Data Pesanan'}
           </h2>
@@ -812,7 +948,7 @@ const DesignEditorView: React.FC<{
         </div>
 
         {/* Scrollable Content */}
-        <div className={`flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8 pb-32 ${theme === 'dark' ? 'bg-zinc-950' : 'bg-white'}`}>
+        <div className={`flex-1 overflow-y-auto custom-scrollbar p-5 md:p-8 space-y-6 md:space-y-8 pb-32 ${theme === 'dark' ? 'bg-zinc-950' : 'bg-white'}`}>
 
           {editorStep === 'materials' && (
             <div className="flex flex-col gap-6 animate-fade-in pb-10">
@@ -821,82 +957,125 @@ const DesignEditorView: React.FC<{
               <div>
                 <label className={`text-xs font-bold uppercase tracking-widest mb-3 flex justify-between items-center ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
                   <span>Pilih Warna</span>
-                  <span className="text-[10px] text-emerald-500 neon-text">{COLORS.find(c => c.hex === designData.color)?.name}</span>
+                  <span className="text-[10px] text-emerald-500 neon-text">
+                    {specificColors.find(sc => sc.name.toLowerCase() === designData.color.toLowerCase())?.name || COLORS.find(c => c.hex === designData.color)?.name || (designData.color.startsWith('#') ? 'Custom' : designData.color)}
+                  </span>
                 </label>
-                <div className="flex overflow-x-auto no-scrollbar gap-3 py-3 -mx-2 px-2">
-                  {COLORS.map(c => (
-                    <button
-                      key={c.hex}
-                      onClick={() => onUpdate({ color: c.hex })}
-                      className={`flex-shrink-0 w-11 h-11 rounded-full border-2 transition-all duration-300 relative group overflow-hidden shadow-sm ${designData.color === c.hex ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 z-10' : 'border-white/10 hover:border-emerald-500/50'}`}
-                      style={{
-                        backgroundColor: c.hex,
-                        backgroundImage: `url("${c.image}")`,
-                        backgroundSize: 'cover'
-                      }}
-                      title={c.name}
-                    >
-                      {designData.color === c.hex && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                          <svg className="w-5 h-5 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
-              <div className={`h-px w-full ${theme === 'dark' ? 'bg-white/10' : 'bg-zinc-200'}`}></div>
+                {/* Model Specific Colors (Warna dari Folder) */}
+                {specificColors.length > 0 && (
+                  <div className="mb-6 animate-fade-in">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                      {specificColors.map(sc => {
+                        const matchingGlobal = COLORS.find(gc => gc.name.toLowerCase() === sc.name.toLowerCase());
+                        const isSelected = matchingGlobal ? designData.color === matchingGlobal.hex : designData.color.toLowerCase() === sc.name.toLowerCase();
 
-              {/* 2. Model Switcher (Horizontal Card List) */}
-              <div>
-                <label className={`text-xs font-bold uppercase tracking-widest mb-3 block ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Ganti Model ({product.category})</label>
-                <div className="flex overflow-x-auto no-scrollbar gap-4 pb-2 -mx-2 px-2">
-                  {/* Join Current Active + Similar Products for a unified list */}
-                  {[product, ...similarProducts].map(p => {
-                    const isActive = p.id === product.id;
-                    return (
-                      <div
-                        key={p.id}
-                        className={`flex-shrink-0 w-60 p-3 rounded-2xl border transition-all relative group flex items-center gap-3 ${isActive
-                          ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500/20'
-                          : theme === 'dark'
-                            ? 'border-white/5 bg-zinc-900/50 hover:bg-zinc-800 hover:border-white/10'
-                            : 'border-zinc-200 bg-white hover:bg-zinc-50'
-                          }`}
+                        return (
+                          <button
+                            key={sc.name}
+                            onClick={() => onUpdate({ color: matchingGlobal?.hex || sc.name })}
+                            className={`group relative aspect-square rounded-xl border-2 transition-all p-0.5 ${isSelected ? 'border-emerald-500 scale-105 shadow-lg shadow-emerald-500/20' : 'border-white/5 opacity-70 hover:opacity-100 hover:border-emerald-500/30'}`}
+                            title={sc.name}
+                          >
+                            <img src={sc.image} className="w-full h-full object-cover rounded-lg" />
+                            {isSelected && (
+                              <div className="absolute top-0 right-0 p-0.5 bg-emerald-500 rounded-bl-lg z-10">
+                                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {(product.category !== 'Rompi' && product.category !== 'Polo' && product.category !== 'Kemeja') && (
+                  <div className="flex overflow-x-auto no-scrollbar gap-3 py-3 -mx-2 px-2">
+                    {COLORS.map(c => (
+                      <button
+                        key={c.hex}
+                        onClick={() => onUpdate({ color: c.hex })}
+                        className={`flex-shrink-0 w-11 h-11 rounded-full border-2 transition-all duration-300 relative group overflow-hidden shadow-sm ${designData.color === c.hex ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 z-10' : 'border-white/10 hover:border-emerald-500/50'}`}
+                        style={{
+                          backgroundColor: c.hex,
+                          backgroundImage: `url("${c.image}")`,
+                          backgroundSize: 'cover'
+                        }}
+                        title={c.name}
                       >
-                        <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-black/20 shrink-0 overflow-hidden relative">
-                          <img src={p.image} className="w-full h-full object-contain p-1" />
-                          {isActive && <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay"></div>}
-                        </div>
+                        {designData.color === c.hex && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                            <svg className="w-5 h-5 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
-                        <div className="flex-1 min-w-0">
-                          <h4 className={`text-[10px] font-black uppercase truncate leading-tight ${isActive ? 'text-emerald-500' : theme === 'dark' ? 'text-white' : 'text-black'}`}>{p.name}</h4>
-                          <p className="text-[9px] text-zinc-500 mb-2 truncate">{p.category}</p>
-
-                          {isActive ? (
-                            <span className="text-[8px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded-md">Dipilih</span>
-                          ) : (
-                            <button
-                              onClick={() => onSelectProduct(p)}
-                              className="text-[9px] font-bold text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-md hover:bg-emerald-500 hover:text-white transition-colors"
-                            >
-                              Gunakan
-                            </button>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setViewingModel(p); }}
-                          className="absolute top-2 right-2 p-1.5 rounded-full text-zinc-400 hover:text-emerald-500 hover:bg-white/10 transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                        </button>
-                      </div>
-                    );
-                  })}
+                {/* Color Reference Notice */}
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 mt-4 animate-fade-in">
+                  <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <p className="text-[10px] font-bold text-emerald-500 leading-tight uppercase tracking-widest">
+                    Pemberitahuan: Warna pada layar hanya sebagai referensi warna untuk mempermudah visualisasi desain Anda.
+                  </p>
                 </div>
               </div>
+
+              {/* 2. Model Switcher (Hidden for Kemeja) */}
+              {product.category !== 'Kemeja' && (
+                <>
+                  <div className={`h-px w-full ${theme === 'dark' ? 'bg-white/10' : 'bg-zinc-200'}`}></div>
+                  <div>
+                    <label className={`text-xs font-bold uppercase tracking-widest mb-3 block ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Ganti Model ({product.category})</label>
+                    <div className="flex overflow-x-auto no-scrollbar gap-4 pb-2 -mx-2 px-2">
+                      {[product, ...similarProducts].map(p => {
+                        const isActive = p.id === product.id;
+                        return (
+                          <div
+                            key={p.id}
+                            className={`flex-shrink-0 w-60 p-3 rounded-2xl border transition-all relative group flex items-center gap-3 ${isActive
+                              ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500/20'
+                              : theme === 'dark'
+                                ? 'border-white/5 bg-zinc-900/50 hover:bg-zinc-800 hover:border-white/10'
+                                : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                              }`}
+                          >
+                            <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-black/20 shrink-0 overflow-hidden relative">
+                              <img src={p.image} className="w-full h-full object-contain p-1" />
+                              {isActive && <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay"></div>}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <h4 className={`text-[10px] font-black uppercase truncate leading-tight ${isActive ? 'text-emerald-500' : theme === 'dark' ? 'text-white' : 'text-black'}`}>{p.name}</h4>
+                              <p className="text-[9px] text-zinc-500 mb-2 truncate">{p.category}</p>
+
+                              {isActive ? (
+                                <span className="text-[8px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded-md">Dipilih</span>
+                              ) : (
+                                <button
+                                  onClick={() => onSelectProduct(p)}
+                                  className="text-[9px] font-bold text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-md hover:bg-emerald-500 hover:text-white transition-colors"
+                                >
+                                  Gunakan
+                                </button>
+                              )}
+                            </div>
+
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setViewingModel(p); }}
+                              className="absolute top-2 right-2 p-1.5 rounded-full text-zinc-400 hover:text-emerald-500 hover:bg-white/10 transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className={`h-px w-full ${theme === 'dark' ? 'bg-white/10' : 'bg-zinc-200'}`}></div>
 
@@ -907,7 +1086,7 @@ const DesignEditorView: React.FC<{
                   <span className="text-[10px] text-emerald-500 neon-text animate-pulse">Scroll info</span>
                 </label>
                 <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 -mr-2 pb-2">
-                  {MATERIALS.map(m => (
+                  {activeMaterials.map(m => (
                     <div
                       key={m}
                       className={`w-full p-4 rounded-2xl border-2 text-left transition-all relative group shrink-0 ${designData.material === m
@@ -922,17 +1101,16 @@ const DesignEditorView: React.FC<{
                           <span className={`text-sm font-bold uppercase ${designData.material === m
                             ? (theme === 'dark' ? 'text-white' : 'text-black')
                             : (theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600')
-                            }`}>{m}</span>
+                            }`}>{activeMaterialSpecs[m]?.title || m}</span>
                           {designData.material === m && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div>}
                         </div>
-                        <p className={`text-[10px] line-clamp-2 leading-relaxed pr-8 ${theme === 'dark' ? 'text-zinc-600' : 'text-zinc-500'}`}>{MATERIAL_SPECS[m]?.desc}</p>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setExpandedMaterial(m); }}
-                        className="absolute right-4 bottom-4 p-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-emerald-500 transition-colors z-10"
+                        className="absolute right-4 bottom-4 w-6 h-6 flex items-center justify-center text-zinc-400 hover:text-emerald-500 transition-colors z-10"
                         title="Lihat Detail Bahan"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span className="font-serif italic font-bold text-lg">i</span>
                       </button>
                     </div>
                   ))}
@@ -943,7 +1121,18 @@ const DesignEditorView: React.FC<{
           )}
 
           {editorStep === 'details' && (
-            <div className="space-y-8 animate-fade-in-up">
+            <div className="space-y-6 animate-fade-in-up pb-10">
+
+              {/* Position Simulation Notice */}
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-orange-500/5 border border-orange-500/10 animate-fade-in mb-4">
+                <svg className="w-4 h-4 text-orange-500 mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Pemberitahuan Simulasi</p>
+                  <p className="text-[9px] font-bold text-orange-500/80 leading-tight uppercase tracking-wide">
+                    Posisi nama atau logo pada layar hanya sebagai simulasi acuan. Penempatan aslinya akan menyesuaikan standar produksi.
+                  </p>
+                </div>
+              </div>
 
               {/* --- KONTROL UKURAN (SCALE) --- */}
               {activeElementId && (
@@ -1085,8 +1274,16 @@ const DesignEditorView: React.FC<{
                   <div key={item.id} className={`p-4 rounded-xl border flex items-center justify-between gap-4 group transition-all ${theme === 'dark' ? 'bg-zinc-900 border-zinc-800 hover:border-emerald-500/30' : 'bg-white border-zinc-200 shadow-sm hover:border-emerald-500/30'}`}>
                     <div className="flex items-start gap-4 flex-1 min-w-0">
                       <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-1.5 shrink-0 relative overflow-hidden group-hover:scale-105 transition-transform">
-                        <img src={item.model.image} className="w-full h-full object-contain relative z-10" />
-                        <div className="absolute inset-0 opacity-10 z-0" style={{ backgroundColor: item.color }}></div>
+                        {/* Dynamic Image based on color */}
+                        {(() => {
+                          const specColor = specificColors.find(sc => sc.name.toLowerCase() === item.color.toLowerCase());
+                          return specColor ? (
+                            <img src={specColor.image} className="w-full h-full object-cover relative z-10 rounded-lg" />
+                          ) : (
+                            <img src={item.model.image} className="w-full h-full object-contain relative z-10" />
+                          );
+                        })()}
+                        <div className="absolute inset-0 opacity-10 z-0" style={{ backgroundColor: COLORS.find(c => c.hex === item.color)?.hex || (item.color.startsWith('#') ? item.color : 'transparent') }}></div>
                       </div>
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
                         <div className="flex items-center flex-wrap gap-2 mb-1.5">
@@ -1097,13 +1294,26 @@ const DesignEditorView: React.FC<{
                           <span className="uppercase tracking-wider">{item.model.name}</span>
                           <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
                           <span className="flex items-center gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: item.color }}></div>
-                            {COLORS.find(c => c.hex === item.color)?.name || 'Custom'}
+                            {(() => {
+                              const colorObj = COLORS.find(c => c.hex === item.color) || COLORS.find(c => c.name.toLowerCase() === item.color.toLowerCase());
+                              const displayHex = colorObj?.hex || (item.color.startsWith('#') ? item.color : '#888');
+                              // Modified: Show Color Code as primary name
+                              return (
+                                <>
+                                  <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: displayHex }}></div>
+                                  <span className="font-bold text-emerald-500">{item.colorCode !== '-' ? item.colorCode : (colorObj?.name || item.color)}</span>
+                                </>
+                              );
+                            })()}
                           </span>
                           <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
                           <span>{item.gender}</span>
-                          <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
-                          <span>{item.sleeve}</span>
+                          {item.model.category !== 'Rompi' && (
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                              <span>{item.sleeve}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1127,55 +1337,92 @@ const DesignEditorView: React.FC<{
 
                 {/* 1. MODEL & WARNA SELECTOR */}
                 <div className="mb-6 space-y-4">
-                  {/* Model Horizontal Scroll */}
-                  <div>
-                    <label className="text-[10px] font-bold uppercase mb-2 flex justify-between items-center opacity-70">
-                      <span>Pilih Model</span>
-                      <span className="text-emerald-500 font-extrabold">{activeFormModel.name}</span>
-                    </label>
-                    <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                      {[product, ...similarProducts].map(p => (
-                        <button
-                          key={p.id}
-                          onClick={() => setActiveFormModel(p)}
-                          className={`flex-shrink-0 w-16 h-16 rounded-xl border-2 p-1 transition-all relative ${activeFormModel.id === p.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-transparent bg-black/5'}`}
-                        >
-                          <img src={p.image} className="w-full h-full object-contain" />
-                          {activeFormModel.id === p.id && <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border border-white"></div>}
-                        </button>
-                      ))}
+                  {/* Model Horizontal Scroll (Hidden for Kemeja) */}
+                  {product.category !== 'Kemeja' && (
+                    <div>
+                      <label className="text-[10px] font-bold uppercase mb-2 flex justify-between items-center opacity-70">
+                        <span>Pilih Model</span>
+                        <span className="text-emerald-500 font-extrabold">{activeFormModel.name}</span>
+                      </label>
+                      <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                        {[product, ...similarProducts].map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => setActiveFormModel(p)}
+                            className={`flex-shrink-0 w-16 h-16 rounded-xl border-2 p-1 transition-all relative ${activeFormModel.id === p.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-transparent bg-black/5'}`}
+                          >
+                            <img src={p.image} className="w-full h-full object-contain" />
+                            {activeFormModel.id === p.id && <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border border-white"></div>}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Color Selector */}
-                  <div>
-                    <label className="text-[10px] font-bold uppercase mb-2 block opacity-70">Pilih Warna (Preview)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {COLORS.map((c) => (
-                        <button
-                          key={c.name}
-                          onClick={() => {
-                            setActiveFormColor(c.hex);
-                            onUpdate({ color: c.hex });
-                          }}
-                          className={`w-8 h-8 rounded-full border-2 transition-all shadow-sm ${activeFormColor === c.hex ? 'border-emerald-500 scale-110 ring-2 ring-emerald-500/20' : 'border-white/10 hover:scale-105'}`}
-                          style={{
-                            backgroundColor: c.hex,
-                            backgroundImage: `url("${c.image}")`,
-                            backgroundSize: 'cover'
-                          }}
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  {/* Color Selector Removed - User relies on Code */}
+                  {/* Grid removed as per request to focus on Color Code input */}
                 </div>
 
                 {/* 2. FORM INPUTS */}
                 <div className="grid gap-4">
+                  {/* Kode Warna & Katalog Button */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-[10px] font-bold uppercase block opacity-70">Kode Warna</label>
+                      <button
+                        onClick={() => setShowCatalogModal(true)}
+                        className="text-[9px] font-black text-emerald-500 uppercase tracking-widest hover:underline"
+                      >
+                        Lihat Katalog
+                      </button>
+                    </div>
+                    {newItem.colorCodeImage ? (
+                      <div className="flex items-center gap-3 bg-black/5 p-3 rounded-xl border border-dashed border-emerald-500/50">
+                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-white border border-emerald-200 shrink-0 shadow-sm relative group">
+                          <img src={newItem.colorCodeImage} className="w-full h-full object-cover" alt="Scan" />
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[9px] uppercase font-black text-emerald-500/70 tracking-widest mb-0.5">Terpilih</p>
+                          <input
+                            type="text"
+                            value={newItem.colorCode}
+                            onChange={(e) => setNewItem({ ...newItem, colorCode: e.target.value })}
+                            className="font-bold text-sm text-zinc-800 bg-transparent outline-none w-full border-b border-transparent focus:border-emerald-500/50 transition-colors"
+                          />
+                        </div>
+                        <button
+                          onClick={() => setShowCatalogModal(true)}
+                          className="px-3 py-1.5 bg-white text-emerald-600 font-bold text-xs rounded-lg shadow-sm border hover:bg-emerald-50 active:scale-95 transition-all"
+                        >
+                          Ubah
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newItem.colorCode}
+                          onChange={(e) => setNewItem({ ...newItem, colorCode: e.target.value })}
+                          placeholder="Scan Katalog / Kode Warna..."
+                          className={`w-full p-3 pr-12 rounded-xl border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-white border-zinc-200 focus:border-emerald-500'}`}
+                        />
+                        <button
+                          onClick={() => setShowCatalogModal(true)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.172-1.172a4 4 0 015.656 5.656l-1.172 1.172" /></svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Nama */}
                   <div>
-                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Nama / Label</label>
+                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Nama</label>
                     <input
                       ref={nameInputRef}
                       type="text"
@@ -1254,20 +1501,22 @@ const DesignEditorView: React.FC<{
                         ))}
                       </div>
                     </div>
-                    <div>
-                      <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Lengan</label>
-                      <div className="flex rounded-lg border overflow-hidden p-1 gap-1">
-                        {['Panjang', 'Pendek'].map(s => (
-                          <button
-                            key={s}
-                            onClick={() => setNewItem({ ...newItem, sleeve: s as any })}
-                            className={`flex-1 py-1.5 text-xs font-bold rounded ${newItem.sleeve === s ? 'bg-emerald-500 text-white' : 'hover:bg-black/5'}`}
-                          >
-                            {s}
-                          </button>
-                        ))}
+                    {product.category !== 'Rompi' && (
+                      <div>
+                        <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Lengan</label>
+                        <div className="flex rounded-lg border overflow-hidden p-1 gap-1">
+                          {['Panjang', 'Pendek'].map(s => (
+                            <button
+                              key={s}
+                              onClick={() => setNewItem({ ...newItem, sleeve: s as any })}
+                              className={`flex-1 py-1.5 text-xs font-bold rounded ${newItem.sleeve === s ? 'bg-emerald-500 text-white' : 'hover:bg-black/5'}`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Qty & Add Button */}
@@ -1326,19 +1575,19 @@ const DesignEditorView: React.FC<{
           {expandedMaterial && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setExpandedMaterial(null)}>
               <div className={`w-full max-w-md p-6 rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-900 border border-white/10' : 'bg-white'} shadow-2xl transform scale-100 transition-all`} onClick={e => e.stopPropagation()}>
-                <button onClick={() => setExpandedMaterial(null)} className={`absolute top-4 right-4 p-2 rounded-full transition-colors z-10 ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                <h3 className="text-2xl font-black uppercase tracking-wider mb-2 text-emerald-500">{activeMaterialSpecs[expandedMaterial]?.title}</h3>
+                <p className={`text-sm leading-relaxed mb-6 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>{activeMaterialSpecs[expandedMaterial]?.desc}</p>
 
-                <h3 className="text-2xl font-black uppercase tracking-wider mb-2 text-emerald-500">{MATERIAL_SPECS[expandedMaterial]?.title}</h3>
-                <p className={`text-sm leading-relaxed mb-6 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>{MATERIAL_SPECS[expandedMaterial]?.desc}</p>
-
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest opacity-70">Keunggulan Utama:</h4>
-                  {MATERIAL_SPECS[expandedMaterial]?.points?.map((point, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></div>
-                      <span className={`text-sm ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{point}</span>
+                <div className="space-y-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Keunggulan Utama:</h4>
+                  {activeMaterialSpecs[expandedMaterial]?.points?.map((point, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-4 animate-stagger-fade-in opacity-0"
+                      style={{ animationDelay: `${idx * 150}ms` }}
+                    >
+                      <div className="mt-1.5 w-2 h-2 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                      <span className={`text-sm font-medium leading-tight ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{point}</span>
                     </div>
                   ))}
                 </div>
@@ -1521,7 +1770,286 @@ const DesignEditorView: React.FC<{
             </div>
           )}
 
+          {/* POPUP: COLOR CATALOG */}
+          {showCatalogModal && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-fade-in">
+              <div className={`w-full max-w-lg h-[90vh] flex flex-col rounded-3xl relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border border-white/5' : 'bg-white'} shadow-2xl`}>
+
+                {/* Header */}
+                <div className="p-6 border-b border-white/5 shrink-0 flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-black uppercase tracking-wider text-emerald-500">Katalog Warna</h3>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Pilih Kain & Zoom Unt Ambil Kode</p>
+                  </div>
+                  <button onClick={() => { setShowCatalogModal(false); setIsZoomed(false); }} className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-black/5 text-black'}`}>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+
+                {/* Category Tabs */}
+                <div className="flex gap-2 p-4 overflow-x-auto no-scrollbar shrink-0">
+                  {Object.keys(COLOR_CATALOGS).map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => { setActiveCatalogType(cat); setIsZoomed(false); }}
+                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeCatalogType === cat ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-zinc-500'}`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Catalog View */}
+                <div className="flex-1 overflow-hidden p-0 relative bg-black/20">
+                  {!activeCatalogType ? (
+                    <div className="h-full flex flex-col items-center justify-center opacity-30 text-center space-y-4">
+                      <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <p className="text-xs font-bold uppercase tracking-widest">Silakan pilih jenis kain</p>
+                    </div>
+                  ) : (
+                    <div
+                      ref={zoomContainerRef}
+                      className={`w-full h-full relative transition-all duration-300 ${isZoomed ? 'cursor-grab active:cursor-grabbing' : 'overflow-y-auto custom-scrollbar p-4'}`}
+                      onMouseDown={(e) => {
+                        if (isZoomed) {
+                          setIsPanningCatalog(true);
+                          setLastCatalogMouse({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (isPanningCatalog && isZoomed) {
+                          const dx = e.clientX - lastCatalogMouse.x;
+                          const dy = e.clientY - lastCatalogMouse.y;
+                          setCatalogPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+                          setLastCatalogMouse({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseUp={() => setIsPanningCatalog(false)}
+                      onMouseLeave={() => setIsPanningCatalog(false)}
+                    >
+                      {isZoomed ? (
+                        <div className="w-full h-full flex items-center justify-center pointer-events-none">
+                          <img
+                            src={activeCatalogImage || ''}
+                            draggable={false}
+                            className="max-w-none w-[300%] h-auto pointer-events-auto"
+                            style={{
+                              transform: `translate(${catalogPan.x}px, ${catalogPan.y}px)`,
+                              transition: isPanningCatalog ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                            }}
+                          />
+
+                          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                            <div
+                              ref={roiRef}
+                              className="w-80 h-56 border-2 border-emerald-500 rounded-3xl shadow-[0_0_80px_rgba(16,185,129,0.3)] bg-emerald-500/10 relative overflow-hidden ring-1 ring-white/20"
+                            >
+                              {/* Scanning Laser Line */}
+                              {isScanning && (
+                                <div className="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_20px_#10b981] animate-scan-line z-10"></div>
+                              )}
+
+                              {/* ROI Corners */}
+                              <div className="absolute inset-4 flex flex-col justify-between">
+                                <div className="flex justify-between border-t-2 border-white/20 h-2 px-2"></div>
+                                <div className="flex justify-between border-b-2 border-white/20 h-2 px-2"></div>
+                              </div>
+
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                {isScanning ? (
+                                  <div className="flex flex-col items-center gap-3">
+                                    <div className="bg-emerald-500/20 backdrop-blur-md px-5 py-3 rounded-2xl border border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.4)] animate-pulse">
+                                      <p className="text-sm font-black text-emerald-400 tracking-widest">{detectedCode || scanningFragments}</p>
+                                    </div>
+                                    <p className="text-[9px] font-bold text-emerald-500/60 uppercase tracking-[0.3em]">{detectedCode ? 'AUTO-SAVED' : 'ANALYZING...'}</p>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center gap-1">
+                                    <div className="text-[8px] font-black text-white/60 uppercase tracking-[0.2em] animate-pulse">Scanning Zone</div>
+                                    <div className="w-4 h-4 text-emerald-500">
+                                      <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.523 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              {/* Flash Overlay */}
+                              {showFlash && <div className="absolute inset-0 bg-white animate-flash z-20"></div>}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {COLOR_CATALOGS[activeCatalogType as keyof typeof COLOR_CATALOGS].map((img, idx) => (
+                            <div
+                              key={idx}
+                              className="relative group rounded-2xl overflow-hidden border border-white/5 cursor-zoom-in"
+                              onClick={() => {
+                                setActiveCatalogImage(img);
+                                setIsZoomed(true);
+                                setCatalogPan({ x: 0, y: 0 });
+                              }}
+                            >
+                              <img src={img} className="w-full transition-transform duration-500 group-hover:scale-105" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                <div className="bg-emerald-500 text-white px-5 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-xl">Klik Untuk Zoom & Pindai</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Area */}
+                <div className="p-6 bg-zinc-950/50 border-t border-white/5 space-y-4 shrink-0">
+                  {isZoomed ? (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => { setIsZoomed(false); setIsPanningCatalog(false); setCatalogPan({ x: 0, y: 0 }); }}
+                        className="p-4 rounded-2xl bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all border border-white/5"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setIsScanning(true);
+                          setDetectedCode(null);
+
+                          // Flickering text fragments effect
+                          const fragmentInterval = setInterval(() => {
+                            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ';
+                            let f = '';
+                            for (let i = 0; i < 8; i++) f += chars[Math.floor(Math.random() * chars.length)];
+                            setScanningFragments(f);
+                          }, 100);
+
+                          const audioScan = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+                          audioScan.volume = 0.2;
+                          audioScan.play().catch(() => { });
+
+                          // REAL AI OCR INTEGRATION
+                          let capturedText = "";
+                          let capturedImage = "";
+                          try {
+                            if (zoomContainerRef.current && roiRef.current) {
+                              // 1. Capture the entire container (which includes the transformed image)
+                              const fullCanvas = await html2canvas(zoomContainerRef.current, {
+                                useCORS: true,
+                                backgroundColor: null,
+                                scale: 2 // High res
+                              });
+
+                              // 2. Calculate crop coordinates relative to the container
+                              const containerRect = zoomContainerRef.current.getBoundingClientRect();
+                              const roiRect = roiRef.current.getBoundingClientRect();
+
+                              // Coordinate logic: (ROI_Left - Container_Left) * Scale.
+                              const cropX = (roiRect.left - containerRect.left) * 2;
+                              const cropY = (roiRect.top - containerRect.top) * 2;
+                              const cropWidth = roiRect.width * 2;
+                              const cropHeight = roiRect.height * 2;
+
+                              // 3. Create cropped canvas
+                              const croppedCanvas = document.createElement('canvas');
+                              croppedCanvas.width = cropWidth;
+                              croppedCanvas.height = cropHeight;
+                              const ctx = croppedCanvas.getContext('2d');
+
+                              if (ctx) {
+                                ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                                capturedImage = croppedCanvas.toDataURL('image/png');
+
+                                // Trigger Automatic Download of the CROPPED image
+                                const link = document.createElement('a');
+                                link.href = capturedImage;
+                                link.download = `scan_color_${Date.now()}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+
+                                capturedText = await analyzeImageWithGemini(capturedImage);
+                              }
+                            }
+                          } catch (err) {
+                            console.error("Capture Error:", err);
+                          }
+
+                          await new Promise(r => setTimeout(r, 1800));
+
+                          const finalCode = capturedText && capturedText !== "No text detected" && capturedText !== "Error scanning"
+                            ? capturedText.toUpperCase().replace(/\n/g, ' ')
+                            : "ISI KODE WARNA";
+
+                          setDetectedCode(finalCode);
+                          clearInterval(fragmentInterval);
+
+                          await new Promise(r => setTimeout(r, 600));
+
+                          setShowFlash(true);
+                          const audioClick = new Audio('https://assets.mixkit.co/active_storage/sfx/611/611-preview.mp3');
+                          audioClick.volume = 0.3;
+                          audioClick.play().catch(() => { });
+
+                          await new Promise(r => setTimeout(r, 800));
+                          setShowFlash(false);
+
+                          // Update data and close modal as requested
+                          setNewItem(prev => ({ ...prev, colorCode: finalCode, colorCodeImage: capturedImage }));
+                          setIsScanning(false);
+
+                          setDetectedCode(null);
+                          setShowCatalogModal(false);
+                          setIsZoomed(false);
+                        }}
+                        disabled={isScanning}
+                        className="flex-1 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isScanning ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <span>Analyzing Capture...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span>Pindai Kode Warna</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 py-2 px-4 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Pilih bahan, zoom area kode, lalu klik pindai untuk deteksi otomatis.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
+
+        {/* NOTIFICATION TOAST: VALIDATION */}
+        {/* NOTIFICATION TOAST: VALIDATION */}
+        {showValidationNotify && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-sm">
+            <div className="bg-red-600 text-white p-5 rounded-2xl shadow-[0_20px_60px_rgba(220,38,38,0.5)] border-2 border-white/20 animate-bounce-in flex items-center gap-4">
+              <div className="shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center animate-pulse">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-black uppercase tracking-widest mb-1 text-red-200">Perhatian!</p>
+                <p className="text-xs font-bold leading-relaxed">{showValidationNotify}</p>
+              </div>
+              <button onClick={() => setShowValidationNotify(null)} className="p-2 hover:bg-black/20 rounded-lg transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div >
   );

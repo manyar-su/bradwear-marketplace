@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Product, Category, WorkflowStage, CustomerService, ProductionOrder } from '../types';
-import { CS_TEAM, RANDOM_ORDERS, TESTIMONIALS, FAQS } from '../constants';
+import { Product, Category, WorkflowStage, ProductionOrder } from '../types';
+import { RANDOM_ORDERS, TESTIMONIALS, FAQS } from '../constants';
 import { ASSETS } from '../assets';
 import { useRef } from 'react';
 import OptimizedImage from './OptimizedImage';
@@ -40,7 +40,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       setCatalogImages([]);
     }
   }, [selectedCatalog]);
-  const [activeModal, setActiveModal] = useState<'none' | 'voucher' | 'guide' | 'tracking' | 'help' | 'cs-choice'>('none');
+  const [activeModal, setActiveModal] = useState<'none' | 'voucher' | 'guide' | 'tracking' | 'help'>('none');
   const [currentNotification, setCurrentNotification] = useState<typeof RANDOM_ORDERS[0] | null>(null);
   const [currentResi, setCurrentResi] = useState<string | null>(null);
   const [promoSlide, setPromoSlide] = useState(0);
@@ -117,7 +117,6 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       return {
         client: agencies[Math.floor(Math.random() * agencies.length)] + ' ' + (['JABAR', 'METRO', 'DKI', 'PUSAT', 'PROV', 'UNIT'][Math.floor(Math.random() * 6)]),
         stage: stages[Math.floor(Math.random() * stages.length)],
-        cs: CS_TEAM[Math.floor(Math.random() * CS_TEAM.length)]?.name || 'Admin',
         time: formattedDate,
         code: randomCode
       };
@@ -130,10 +129,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       workflowStages[0];
   }, [workflowStages]);
 
-  const handleCSChoice = (cs: CustomerService) => {
-    window.open(`https://wa.me/${cs.phone}?text=Halo%20${cs.name},%20saya%20tertarik%20konsultasi%20pemesanan%20kustom%20Bradwear.`, '_blank');
-    setActiveModal('none');
-  };
+
 
   return (
     <div className={`flex flex-col flex-shrink-0 no-scrollbar pb-40 ${theme === 'dark' ? 'bg-black' : 'bg-zinc-50'}`}>
@@ -254,7 +250,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       <main ref={catalogRef} className="px-6 space-y-8 mt-4">
         {/* Category Tabs */}
         <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
-          {(['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Kids'] as Category[]).map(cat => (
+          {(['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo', 'Kids'] as Category[]).map(cat => (
             <button key={cat} onClick={() => setActiveTab(cat)} className={`px-7 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${activeTab === cat ? 'neon-bg text-black neon-border shadow-lg scale-105' : theme === 'dark' ? 'bg-zinc-900/50 text-zinc-500 border-white/5' : 'bg-white text-zinc-500 border-zinc-200 shadow-sm'}`}>
               {cat}
             </button>
@@ -306,7 +302,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                     <p className={`text-[9px] font-black uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>{item.client}</p>
                     <span className="text-[8px] font-black neon-text bg-emerald-500/10 px-1.5 py-0.5 rounded">ID: {item.code}</span>
                   </div>
-                  <p className="text-[8px] font-bold adaptive-text-muted uppercase tracking-widest">TAHAP: <span className="neon-text">{item.stage}</span> • {item.cs}</p>
+                  <p className="text-[8px] font-bold adaptive-text-muted uppercase tracking-widest">TAHAP: <span className="neon-text">{item.stage}</span></p>
                 </div>
               </div>
               <span className="text-[7px] font-black adaptive-text-muted uppercase text-right">{item.time}</span>
@@ -406,26 +402,14 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
           <div className="w-full max-w-sm glass rounded-[48px] flex flex-col max-h-[85vh] view-transition shadow-premium border border-white/10" onClick={e => e.stopPropagation()}>
             <div className={`flex justify-between items-center p-8 border-b ${theme === 'dark' ? 'border-white/5' : 'border-zinc-100'}`}>
               <h3 className="text-xl font-black uppercase tracking-tighter neon-text">
-                {activeModal === 'cs-choice' ? 'PILIH KONSULTAN' : activeModal.toUpperCase().replace('-', ' ')}
+                {activeModal.toUpperCase().replace('-', ' ')}
               </h3>
               <button onClick={() => setActiveModal('none')} className={`p-3 rounded-2xl transition-all ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="p-8 overflow-y-auto no-scrollbar space-y-6">
-              {activeModal === 'cs-choice' && (
-                <div className="grid grid-cols-1 gap-4">
-                  {CS_TEAM.map(cs => (
-                    <button key={cs.id} onClick={() => handleCSChoice(cs)} className={`p-4 rounded-[32px] border-2 transition-all flex items-center gap-5 group hover:border-emerald-500/40 active:scale-95 ${theme === 'dark' ? 'bg-zinc-900/40 border-white/5' : 'bg-white border-zinc-100'}`}>
-                      <img src={cs.avatar} className="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/10" />
-                      <div className="text-left">
-                        <p className="text-[13px] font-black uppercase adaptive-text group-hover:neon-text transition-colors text-zinc-600 dark:text-white">{cs.name}</p>
-                        <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Expert Consultant</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+
               {activeModal === 'voucher' && (
                 <div className="space-y-6 text-center py-4">
                   <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-inner">

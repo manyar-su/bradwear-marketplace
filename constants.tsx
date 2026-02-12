@@ -1,5 +1,5 @@
 
-import { Product, CustomerService, WorkflowStage } from './types';
+import { Product, WorkflowStage } from './types';
 import { ASSETS } from './assets';
 
 const getRandomSold = () => Math.floor(Math.random() * (4500 - 2000 + 1)) + 2000;
@@ -189,29 +189,33 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'r1',
-    name: 'Tactical Bupati',
-    category: 'Rompi',
-    soldCount: getRandomSold(),
-    image: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-1.jpg',
-    images: {
-      front: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-1.jpg',
-      back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-2.jpg',
-      leftSleeve: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-1.jpg',
-      rightSleeve: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Rompi-Bupati-Tan-1.jpg'
-    },
-    description: 'Rompi tactical untuk instansi pemerintah.'
-  },
-  {
-    id: 'r2',
-    name: 'Rompi Lapangan',
+    name: 'Vest Bupati',
     category: 'Rompi',
     soldCount: getRandomSold(),
     image: ASSETS.ROMPI.BUPATI,
     images: {
       front: ASSETS.ROMPI.BUPATI,
-      back: ASSETS.ROMPI.BUPATI
+      back: ASSETS.ROMPI.BACK,
+      leftSleeve: ASSETS.ROMPI.BUPATI,
+      rightSleeve: ASSETS.ROMPI.BUPATI
     },
-    description: 'Rompi lapangan multifungsi.'
+    gallery: ASSETS.ROMPI.GALLERY,
+    description: 'Vest tactical untuk instansi pemerintah.'
+  },
+  {
+    id: 'r2',
+    name: 'Vest Parasute',
+    category: 'Rompi',
+    soldCount: getRandomSold(),
+    image: ASSETS.ROMPI.PARASUTE,
+    images: {
+      front: ASSETS.ROMPI.PARASUTE,
+      back: ASSETS.ROMPI.PARASUTE_BACK,
+      leftSleeve: ASSETS.ROMPI.PARASUTE,
+      rightSleeve: ASSETS.ROMPI.PARASUTE
+    },
+    gallery: ASSETS.ROMPI.PARASUTE_GALLERY,
+    description: 'Vest parasut ringan dengan desain modern.'
   },
   {
     id: 'c1',
@@ -260,6 +264,18 @@ export const PRODUCTS: Product[] = [
       back: ASSETS.KEMEJA.BRAD_V3.BACK
     },
     description: 'Kemeja anak untuk seragam SD.'
+  },
+  {
+    id: 'p1',
+    name: 'Kaos Polo',
+    category: 'Polo',
+    soldCount: getRandomSold(),
+    image: ASSETS.POLO.BASIC,
+    images: {
+      front: ASSETS.POLO.BASIC,
+      back: ASSETS.POLO.BASIC
+    },
+    description: 'Kaos polo premium untuk seragam santai namun tetap profesional.'
   }
 ];
 
@@ -323,6 +339,15 @@ export const MATERIALS = [
   'AMERICAN DRILL'
 ];
 
+export const POLO_MATERIALS = [
+  'PIQUE COTTON',
+  'LACOSTE CVC',
+  'PIQUE PE',
+  'DRI-FIT',
+  'WAFFLE KNIT',
+  'VISCOSE'
+];
+
 export const MATERIAL_SPECS: Record<string, { title: string; desc: string; points?: string[] }> = {
   'TROPICAL': {
     title: 'TROPICAL',
@@ -366,6 +391,39 @@ export const MATERIAL_SPECS: Record<string, { title: string; desc: string; point
   }
 };
 
+export const POLO_MATERIAL_SPECS: Record<string, { title: string; desc: string; points?: string[] }> = {
+  'PIQUE COTTON': {
+    title: 'Pique Cotton (Katun Pique)',
+    desc: 'Terbuat dari 100% katun, bertekstur berpori seperti sarang lebah (pique), sangat adem, lembut, dan menyerap keringat dengan baik, cocok untuk polo premium.',
+    points: ['100% Katun Murni', 'Tekstur Pique Sarang Lebah', 'Sangat Adem & Lembut', 'Daya Serap Keringat Tinggi']
+  },
+  'LACOSTE CVC': {
+    title: 'Lacoste CVC (Chief Value Cotton)',
+    desc: 'Campuran katun dan polyester (biasanya 60:40 atau 50:50). Bahan ini lebih kokoh, tahan lama, dan tidak mudah menyusut dibandingkan katun murni, namun tetap nyaman.',
+    points: ['Campuran Katun & Polyester', 'Lebih Kokoh & Tahan Lama', 'Minimal Menyusut', 'Tetap Nyaman Digunakan']
+  },
+  'PIQUE PE': {
+    title: 'Pique PE (Polyester)',
+    desc: 'Terbuat dari 100% polyester. Bahannya cenderung kaku, lebih tipis, dan kurang menyerap keringat, namun tahan lama, cepat kering, dan harganya ekonomis.',
+    points: ['100% Polyester', 'Cepat Kering', 'Tahan Lama', 'Harga Ekonomis']
+  },
+  'DRI-FIT': {
+    title: 'Dri-fit (Performance)',
+    desc: 'Bahan sintetis yang sangat ringan, cepat menyerap keringat, dan melepaskan panas. Sangat cocok untuk polo olahraga karena memberikan sirkulasi udara yang baik, namun cenderung lebih lemas.',
+    points: ['Sangat Ringan', 'Sirkulasi Udara Maksimal', 'Melepaskan Panas', 'Cocok untuk Olahraga']
+  },
+  'WAFFLE KNIT': {
+    title: 'Waffle Knit',
+    desc: 'Memiliki tekstur lebih menonjol daripada pique, memberikan kesan unik, kuat, dan tetap nyaman untuk digunakan sehari-hari.',
+    points: ['Tekstur Unik Menonjol', 'Kuat & Kokoh', 'Tampilan Modern', 'Nyaman Harian']
+  },
+  'VISCOSE': {
+    title: 'Viscose',
+    desc: 'Bahan yang lembut, berkilau, dan memberikan kesan elegan, sering digunakan untuk polo premium.',
+    points: ['Lembut & Berkilau', 'Kesan Mewah/Elegan', 'Jatuh dengan Indah (Drape)', 'Kualitas Premium']
+  }
+};
+
 export const COLORS = [
   { name: 'Putih', hex: '#FFFFFF', image: ASSETS.COLORS.PUTIH, backImage: ASSETS.COLORS_BACK.PUTIH },
   { name: 'Khaki', hex: '#C5CAE9', image: ASSETS.COLORS.KHAKI, backImage: ASSETS.COLORS_BACK.KHAKI },
@@ -390,14 +448,4 @@ export const COLORS = [
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', 'Kustom'];
 
-export const CS_TEAM: CustomerService[] = [
-  { id: 'cs1', name: 'Gilang', avatar: 'https://i.pravatar.cc/150?u=gilang', isOnline: true, phone: '6282232133926', loginKey: 'brad01' },
-  { id: 'cs2', name: 'Bayu', avatar: 'https://i.pravatar.cc/150?u=bayu', isOnline: true, phone: '6287736834454', loginKey: 'brad02' },
-  { id: 'cs3', name: 'Fikri', avatar: 'https://i.pravatar.cc/150?u=fikri', isOnline: true, phone: '6281234567803', loginKey: 'brad03' },
-  { id: 'cs4', name: 'Aris', avatar: 'https://i.pravatar.cc/150?u=aris', isOnline: true, phone: '6281234567804', loginKey: 'brad04' },
-  { id: 'cs5', name: 'Ede', avatar: 'https://i.pravatar.cc/150?u=ede', isOnline: true, phone: '6281234567805', loginKey: 'brad05' },
-  { id: 'cs6', name: 'Elsa', avatar: 'https://i.pravatar.cc/150?u=elsa', isOnline: true, phone: '6285722733889', loginKey: 'brad06' },
-  { id: 'cs7', name: 'Nadhifa', avatar: 'https://i.pravatar.cc/150?u=nadhifa', isOnline: true, phone: '6282316067692', loginKey: 'brad07' },
-  { id: 'cs8', name: 'Eris', avatar: 'https://i.pravatar.cc/150?u=eris', isOnline: true, phone: '6285846989608', loginKey: 'brad08' },
-  { id: 'cs9', name: 'Risma', avatar: 'https://i.pravatar.cc/150?u=risma', isOnline: true, phone: '6282232133926', loginKey: 'brad09' },
-];
+

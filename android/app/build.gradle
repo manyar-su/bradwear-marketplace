@@ -1,10 +1,9 @@
-import groovy.json.JsonSlurper
 apply plugin: 'com.android.application'
 
 def packageJson = new groovy.json.JsonSlurper().parseText(file('../../package.json').text)
 
 android {
-    namespace = "com.bradwear.app"
+    namespace "com.bradwear.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.bradwear.app"
@@ -21,6 +20,7 @@ android {
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

@@ -4,7 +4,6 @@ import { View, Product, DesignData, OrderItem, WorkflowStage, ProductionOrder } 
 import HomeView from './components/HomeView';
 import DesignEditorView from './components/DesignEditorView';
 import SummaryView from './components/SummaryView';
-import AdminView from './components/AdminView';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from './constants';
 
 const App: React.FC = () => {
@@ -48,7 +47,11 @@ const App: React.FC = () => {
 
   const [designData, setDesignData] = useState<DesignData>(() => {
     const saved = localStorage.getItem('bradwear_design_data');
-    return saved ? JSON.parse(saved) : {
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...parsed, elements: [] }; // Reset elements on refresh/start
+    }
+    return {
       productId: '',
       color: '#212121',
       material: 'TROPICAL',
@@ -117,9 +120,6 @@ const App: React.FC = () => {
             <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 neon-text border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
               {theme === 'dark' ? <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>}
             </button>
-            <button onClick={() => setCurrentView(View.ADMIN)} className={`p-3 rounded-2xl transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 text-white border border-white/5' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </button>
           </div>
         </header>
 
@@ -159,23 +159,6 @@ const App: React.FC = () => {
                 orderItems={orderItems}
                 setOrderItems={setOrderItems}
                 onBack={() => setCurrentView(View.EDITOR)}
-                theme={theme}
-              />
-            </div>
-          )}
-
-          {currentView === View.ADMIN && (
-            <div className="h-full overflow-hidden view-transition">
-              <AdminView
-                products={products}
-                setProducts={setProducts}
-                productionOrders={productionOrders}
-                setProductionOrders={setProductionOrders}
-                orderCode={orderCode}
-                setOrderCode={setOrderCode}
-                branding={{ title: "Admin Panel", subtitle: "Real-time Production Control" }}
-                setBranding={() => { }}
-                onBack={handleGoBack}
                 theme={theme}
               />
             </div>

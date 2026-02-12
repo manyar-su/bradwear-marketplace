@@ -1,1 +1,5 @@
-// This file was a duplicate and has been cleared to resolve a build error.
+package com.bradwear.app;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}
