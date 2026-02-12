@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
+import { Filesystem } from '@capacitor/filesystem';
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
@@ -1995,7 +1996,7 @@ const DesignEditorView: React.FC<{
                   )}
                 </div>
 
-                {/* Footer Area */}
+                {/* Footer Area with Action Buttons */}
                 <div className="p-6 bg-zinc-950/50 border-t border-white/5 space-y-4 shrink-0">
                   {isZoomed ? (
                     <div className="flex gap-3">
@@ -2012,6 +2013,11 @@ const DesignEditorView: React.FC<{
                       </button>
                       <button
                         onClick={async () => {
+                          // PERMISSION CHECK FOR DOWNLOAD
+                          try {
+                            await Filesystem.requestPermissions();
+                          } catch (e) { console.error("Permission request error", e); }
+
                           setIsScanning(true);
                           setDetectedCode(null);
 
@@ -2032,24 +2038,19 @@ const DesignEditorView: React.FC<{
                           let capturedImage = "";
                           try {
                             if (zoomContainerRef.current && roiRef.current) {
-                              // 1. Capture the entire container (which includes the transformed image)
+                              // Canvas Logic...
                               const fullCanvas = await html2canvas(zoomContainerRef.current, {
                                 useCORS: true,
                                 backgroundColor: null,
-                                scale: 2 // High res
+                                scale: 2
                               });
-
-                              // 2. Calculate crop coordinates relative to the container
                               const containerRect = zoomContainerRef.current.getBoundingClientRect();
                               const roiRect = roiRef.current.getBoundingClientRect();
-
-                              // Coordinate logic: (ROI_Left - Container_Left) * Scale.
                               const cropX = (roiRect.left - containerRect.left) * 2;
                               const cropY = (roiRect.top - containerRect.top) * 2;
                               const cropWidth = roiRect.width * 2;
                               const cropHeight = roiRect.height * 2;
 
-                              // 3. Create cropped canvas
                               const croppedCanvas = document.createElement('canvas');
                               croppedCanvas.width = cropWidth;
                               croppedCanvas.height = cropHeight;
@@ -2059,7 +2060,7 @@ const DesignEditorView: React.FC<{
                                 ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
                                 capturedImage = croppedCanvas.toDataURL('image/png');
 
-                                // Trigger Automatic Download of the CROPPED image
+                                // AUTO DOWNLOAD
                                 const link = document.createElement('a');
                                 link.href = capturedImage;
                                 link.download = `scan_color_${Date.now()}.png`;
@@ -2083,20 +2084,14 @@ const DesignEditorView: React.FC<{
                           setDetectedCode(finalCode);
                           clearInterval(fragmentInterval);
 
+                          // ... Animation delays ...
                           await new Promise(r => setTimeout(r, 600));
-
                           setShowFlash(true);
-                          const audioClick = new Audio('https://assets.mixkit.co/active_storage/sfx/611/611-preview.mp3');
-                          audioClick.volume = 0.3;
-                          audioClick.play().catch(() => { });
-
                           await new Promise(r => setTimeout(r, 800));
                           setShowFlash(false);
 
-                          // Update data and close modal as requested
                           setNewItem(prev => ({ ...prev, colorCode: finalCode, colorCodeImage: capturedImage }));
                           setIsScanning(false);
-
                           setDetectedCode(null);
                           setShowCatalogModal(false);
                           setIsZoomed(false);
@@ -2125,135 +2120,26 @@ const DesignEditorView: React.FC<{
                   )}
                 </div>
 
-                {/* Footer Area */}
-                <div className="p-6 bg-zinc-950/50 border-t border-white/5 space-y-4 shrink-0">
-                  {isZoomed ? (
-                    <div className="flex gap-3">
+                {/* NOTIFICATION TOAST: VALIDATION */}
+                {showValidationNotify && (
+                  <div className="fixed top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[85%] max-w-xs transition-all duration-300 transform scale-100 opacity-100">
+                    <div className="bg-zinc-900/95 backdrop-blur-xl text-white p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 animate-fade-in-up flex flex-col items-center gap-4 text-center ring-1 ring-white/20">
+                      <div className="shrink-0 w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse">
+                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-black uppercase tracking-widest mb-2 text-red-400">Data Belum Lengkap</p>
+                        <p className="text-sm font-medium leading-relaxed text-zinc-300">{showValidationNotify}</p>
+                      </div>
                       <button
-                        onClick={() => {
-                          setIsZoomed(false);
-                          setIsPanningCatalog(false);
-                          setCatalogScale(1);
-                          setCatalogPan({ x: 0, y: 0 });
-                        }}
-                        className="p-4 rounded-2xl bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all border border-white/5"
+                        onClick={() => setShowValidationNotify(null)}
+                        className="w-full py-3 bg-white text-black font-bold rounded-xl active:scale-95 transition-all mt-2"
                       >
-                        Batal
-                      </button>
-                      <button
-                        onClick={async () => {
-                          setIsScanning(true);
-                          setDetectedCode(null);
-
-                          // Flickering text fragments effect
-                          const fragmentInterval = setInterval(() => {
-                            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ';
-                            let f = '';
-                            for (let i = 0; i < 8; i++) f += chars[Math.floor(Math.random() * chars.length)];
-                            setScanningFragments(f);
-                          }, 100);
-
-                          const audioScan = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-                          audioScan.volume = 0.2;
-                          audioScan.play().catch(() => { });
-
-                          // REAL AI OCR INTEGRATION
-                          let capturedText = "";
-                          let capturedImage = "";
-                          try {
-                            if (zoomContainerRef.current && roiRef.current) {
-                              // 1. Capture the entire container (which includes the transformed image)
-                              const fullCanvas = await html2canvas(zoomContainerRef.current, {
-                                useCORS: true,
-                                backgroundColor: null,
-                                scale: 2 // High res
-                              });
-
-                              // 2. Calculate crop coordinates relative to the container
-                              const containerRect = zoomContainerRef.current.getBoundingClientRect();
-                              const roiRect = roiRef.current.getBoundingClientRect();
-
-                              // Coordinate logic: (ROI_Left - Container_Left) * Scale.
-                              const cropX = (roiRect.left - containerRect.left) * 2;
-                              const cropY = (roiRect.top - containerRect.top) * 2;
-                              const cropWidth = roiRect.width * 2;
-                              const cropHeight = roiRect.height * 2;
-
-                              // 3. Create cropped canvas
-                              const croppedCanvas = document.createElement('canvas');
-                              croppedCanvas.width = cropWidth;
-                              croppedCanvas.height = cropHeight;
-                              const ctx = croppedCanvas.getContext('2d');
-
-                              if (ctx) {
-                                ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-                                capturedImage = croppedCanvas.toDataURL('image/png');
-
-                                // Trigger Automatic Download of the CROPPED image
-                                const link = document.createElement('a');
-                                link.href = capturedImage;
-                                link.download = `scan_color_${Date.now()}.png`;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-
-                                capturedText = await analyzeImageWithGemini(capturedImage);
-                              }
-                            }
-                          } catch (err) {
-                            console.error("Capture Error:", err);
-                          }
-
-                          await new Promise(r => setTimeout(r, 1800));
-
-                          const finalCode = capturedText && capturedText !== "No text detected" && capturedText !== "Error scanning"
-                            ? capturedText.toUpperCase().replace(/\n/g, ' ')
-                            : "ISI KODE WARNA";
-
-                          setDetectedCode(finalCode);
-                          clearInterval(fragmentInterval);
-
-                          await new Promise(r => setTimeout(r, 600));
-
-                          setShowFlash(true);
-                          const audioClick = new Audio('https://assets.mixkit.co/active_storage/sfx/611/611-preview.mp3');
-                          audioClick.volume = 0.3;
-                          audioClick.play().catch(() => { });
-
-                          await new Promise(r => setTimeout(r, 800));
-                          setShowFlash(false);
-
-                          // Update data and close modal as requested
-                          setNewItem(prev => ({ ...prev, colorCode: finalCode, colorCodeImage: capturedImage }));
-                          setIsScanning(false);
-
-                          setDetectedCode(null);
-                          setShowCatalogModal(false);
-                          setIsZoomed(false);
-                        }}
-                        disabled={isScanning}
-                        className="flex-1 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        {isScanning ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            <span>Analyzing Capture...</span>
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <span>Pindai Kode Warna</span>
-                          </>
-                        )}
+                        OKE, SAYA ISI
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-3 py-2 px-4 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                      <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Pilih bahan, zoom area kode, lalu klik pindai untuk deteksi otomatis.</p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
