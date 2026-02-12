@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
-import { Filesystem } from '@capacitor/filesystem';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Media } from '@capacitor-community/media';
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
@@ -21,6 +22,15 @@ const DesignEditorView: React.FC<{
 
   const handleBackCustom = () => {
     if (editorStep === 'finish') {
+      if (['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)) {
+        // Menghapus semua elemen (teks/logo) saat kembali ke menu utama
+        onUpdate({ elements: [] });
+        // Reset history
+        setHistory([[]]);
+        setHistoryPointer(0);
+        onBack();
+        return;
+      }
       if (product.category === 'Polo') {
         setEditorStep('materials');
       } else {
@@ -49,7 +59,9 @@ const DesignEditorView: React.FC<{
     setHistoryPointer(0);
   }, []); // [] artinya hanya jalan sekali saat mount
 
-  const [editorStep, setEditorStep] = useState<'materials' | 'details' | 'finish'>('materials');
+  const [editorStep, setEditorStep] = useState<'materials' | 'details' | 'finish'>(
+    (['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)) ? 'finish' : 'materials'
+  );
 
   // --- STATE LIST PESANAN (CART SYSTEM) ---
   interface OrderItem {
@@ -95,11 +107,13 @@ const DesignEditorView: React.FC<{
   const [showValidationNotify, setShowValidationNotify] = useState<string | null>(null);
   const [scanningFragments, setScanningFragments] = useState<string>('');
   const [detectedCode, setDetectedCode] = useState<string | null>(null);
+  const [colorCodeError, setColorCodeError] = useState<string | null>(null);
 
   const [showCustomSizeModal, setShowCustomSizeModal] = useState(false);
   // Simpan detail custom sementara sebelum dimasukkan ke cart
   const [customMeasures, setCustomMeasures] = useState({
-    tinggi: '', lebarDada: '', lebarBahu: '', panjangLengan: '', kerah: '', manset: ''
+    tinggi: '', lebarDada: '', lebarBahu: '', panjangLengan: '', kerah: '', manset: '',
+    pinggang: '', pinggul: '', paha: '', bawah: '' // Tambahan untuk Celana
   });
 
   // State Ekspor WhatsApp
@@ -113,6 +127,7 @@ const DesignEditorView: React.FC<{
 
   const zoomContainerRef = useRef<HTMLDivElement>(null);
   const roiRef = useRef<HTMLDivElement>(null);
+  const colorCodeRef = useRef<HTMLDivElement>(null);
 
 
   // Efek untuk sinkronisasi model & warna dari desain ke form isian pesanan
@@ -127,14 +142,19 @@ const DesignEditorView: React.FC<{
   const handleAddToCart = (silent = false) => {
     // Validasi: Wanya kode warna yang wajib diisi untuk menghindari kesalahan produksi
     if (!newItem.colorCode.trim()) {
-      setShowValidationNotify("Mohon isi kode warna atau scan katalog agar tidak ada kesalahan produksi");
-      setTimeout(() => setShowValidationNotify(null), 4000);
+      setColorCodeError("Mohon isi kode warna atau scan katalog agar tidak ada kesalahan produksi");
+      colorCodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+    setColorCodeError(null);
 
     let customDetailStr = '';
     if (newItem.size === 'Custom') {
-      customDetailStr = `(T:${customMeasures.tinggi}, LD:${customMeasures.lebarDada}, LB:${customMeasures.lebarBahu}, PL:${customMeasures.panjangLengan})`;
+      if (product.category === 'Celana') {
+        customDetailStr = `(T:${customMeasures.tinggi}, LPng:${customMeasures.pinggang}, LPngl:${customMeasures.pinggul}, LPh:${customMeasures.paha}, LBw:${customMeasures.bawah})`;
+      } else {
+        customDetailStr = `(T:${customMeasures.tinggi}, LD:${customMeasures.lebarDada}, LB:${customMeasures.lebarBahu}, PL:${customMeasures.panjangLengan})`;
+      }
     }
 
     const item: OrderItem = {
@@ -317,13 +337,8 @@ const DesignEditorView: React.FC<{
   const specificColors = useMemo(() => getItemSpecificColors(product.name, product.category), [product.name, product.category]);
 
   const availableViews = useMemo(() => {
-    const views = ['Depan', 'Belakang'];
-    if (product.category !== 'Kemeja') {
-      if (product.images?.rightSleeve) views.push('Kanan');
-      if (product.images?.leftSleeve) views.push('Kiri');
-    }
-    return views;
-  }, [product]);
+    return ['Depan', 'Belakang'];
+  }, []);
 
   /* Auto-select first specific color and check view availability */
   useEffect(() => {
@@ -650,7 +665,9 @@ const DesignEditorView: React.FC<{
     }
 
     // 1. Cek apakah ada gambar khusus untuk warna tertentu (global fallback)
-    if (isSpecificColorImage && selectedColorObj) {
+    // HANYA untuk Kemeja/Polo/Kids karena asset warna global mayoritas berbentuk Kemeja
+    const isKemejaLike = ['Kemeja', 'Kids', 'Polo'].includes(product.category);
+    if (isKemejaLike && isSpecificColorImage && selectedColorObj) {
       if (designData.view === 'Depan' && selectedColorObj.image) return selectedColorObj.image;
       if (designData.view === 'Belakang' && selectedColorObj.backImage) return selectedColorObj.backImage;
     }
@@ -682,16 +699,27 @@ const DesignEditorView: React.FC<{
         backgroundColor: null
       });
 
-      // Download gambar hasil capture
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `BRADWEAR_${product.name}_${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Ambil data base64
+      const base64Data = canvas.toDataURL("image/png");
 
-      alert("Desain berhasil disimpan ke perangkat!");
+      // Gunakan Media Plugin untuk simpan ke Galeri (Android 10+ MediaStore API)
+      try {
+        await Media.savePhoto({
+          path: base64Data,
+          albumIdentifier: 'Bradwear Designs'
+        });
+        alert("Desain berhasil disimpan ke Galeri!");
+      } catch (pluginErr) {
+        console.warn("Media plugin save failed, falling back to browser download", pluginErr);
+        // Fallback untuk browser/preview
+        const link = document.createElement('a');
+        link.href = base64Data;
+        link.download = `BRADWEAR_${product.name}_${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert("Desain diunduh ke perangkat.");
+      }
     } catch (err) {
       console.error("Save failed", err);
       alert("Gagal menyimpan gambar.");
@@ -994,7 +1022,12 @@ const DesignEditorView: React.FC<{
           <h2 className="text-xl font-black uppercase tracking-widest neon-text mb-1">
             {editorStep === 'materials' ? 'Desain Warna & Bahan' : editorStep === 'details' ? 'Detail Atribut' : 'Data Pesanan'}
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">Steps: {editorStep === 'materials' ? '1/3' : editorStep === 'details' ? '2/3' : '3/3'}</p>
+          <p className="text-xs text-zinc-500 font-medium">
+            {['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)
+              ? 'Lengkapi Data Pesanan Anda'
+              : `Steps: ${editorStep === 'materials' ? '1/3' : editorStep === 'details' ? '2/3' : '3/3'}`
+            }
+          </p>
         </div>
 
         {/* Scrollable Content */}
@@ -1251,37 +1284,13 @@ const DesignEditorView: React.FC<{
                 />
               </div>
 
-              {/* Atribut Lain (Lengan & Belakang) */}
+              {/* Atribut Lain (Belakang) */}
               <div>
                 <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 block">Posisi Atribut Lain</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => { onUpdate({ view: 'Depan' }); fileInputRefLenganKanan.current?.click(); }}
-                    className={`p-4 rounded-xl border flex flex-col items-center gap-2 group transition-all active:scale-95 ${theme === 'dark'
-                      ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
-                      }`}
-                  >
-                    <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                    <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kanan</span>
-                    <input type="file" ref={fileInputRefLenganKanan} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KANAN)} />
-                  </button>
-
-                  <button
-                    onClick={() => { onUpdate({ view: 'Depan' }); fileInputRefLenganKiri.current?.click(); }}
-                    className={`p-4 rounded-xl border flex flex-col items-center gap-2 group transition-all active:scale-95 ${theme === 'dark'
-                      ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
-                      }`}
-                  >
-                    <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                    <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kiri</span>
-                    <input type="file" ref={fileInputRefLenganKiri} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KIRI)} />
-                  </button>
-
+                <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={() => { onUpdate({ view: 'Belakang' }); fileInputRefBelakang.current?.click(); }}
-                    className={`col-span-2 p-4 rounded-xl border flex flex-row items-center justify-center gap-3 group transition-all active:scale-95 ${theme === 'dark'
+                    className={`p-4 rounded-xl border flex flex-row items-center justify-center gap-3 group transition-all active:scale-95 ${theme === 'dark'
                       ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
                       : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
                       }`}
@@ -1379,7 +1388,9 @@ const DesignEditorView: React.FC<{
 
 
               {/* --- FORM TAMBAH ITEM BARU --- */}
-              <div className={`p-5 rounded-2xl border-2 ${theme === 'dark' ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50'}`}>
+              <div className={`p-5 rounded-2xl border-2 relative ${theme === 'dark' ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50'}`}>
+
+
                 <h4 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
                   <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                   Tambah Item Baru
@@ -1398,10 +1409,17 @@ const DesignEditorView: React.FC<{
                         {[product, ...similarProducts].map(p => (
                           <button
                             key={p.id}
-                            onClick={() => setActiveFormModel(p)}
+                            id={`model-form-${p.id}`}
+                            onClick={() => {
+                              setActiveFormModel(p);
+                              // Khusus Celana, Rompi, Polo, Jaket: Sinkronkan visual utama dengan model yang dipilih di form
+                              if (['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)) {
+                                onSelectProduct(p);
+                              }
+                            }}
                             className={`flex-shrink-0 w-16 h-16 rounded-xl border-2 p-1 transition-all relative ${activeFormModel.id === p.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-transparent bg-black/5'}`}
                           >
-                            <img src={p.image} className="w-full h-full object-contain" />
+                            <img src={p.image} className="w-full h-full object-contain" alt={p.name} />
                             {activeFormModel.id === p.id && <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border border-white"></div>}
                           </button>
                         ))}
@@ -1417,36 +1435,35 @@ const DesignEditorView: React.FC<{
                 {/* 2. FORM INPUTS */}
                 <div className="grid gap-4">
                   {/* Kode Warna & Katalog Button */}
-                  <div>
+                  <div ref={colorCodeRef} className={`transition-all duration-300 ${colorCodeError ? 'animate-shake' : ''}`}>
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-[10px] font-bold uppercase block opacity-70">Kode Warna</label>
+                      <label className={`text-[10px] font-bold uppercase block ${colorCodeError ? 'text-red-500' : 'opacity-70'}`}>
+                        Kode Warna {colorCodeError && <span className="ml-1 animate-pulse italic">(Wajib Isi)</span>}
+                      </label>
                       <button
                         onClick={() => setShowCatalogModal(true)}
-                        className="text-[9px] font-black text-emerald-500 uppercase tracking-widest hover:underline"
+                        className={`text-[9px] font-black uppercase tracking-widest hover:underline ${colorCodeError ? 'text-red-400' : 'text-emerald-500'}`}
                       >
                         Lihat Katalog
                       </button>
                     </div>
                     {newItem.colorCodeImage ? (
-                      <div className="flex items-center gap-3 bg-black/5 p-3 rounded-xl border border-dashed border-emerald-500/50">
-                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-white border border-emerald-200 shrink-0 shadow-sm relative group">
+                      <div className={`flex items-center gap-3 p-3 rounded-xl border border-dashed transition-all ${colorCodeError ? 'bg-red-500/5 border-red-500/50' : 'bg-black/5 border-emerald-500/50'}`}>
+                        <div className={`w-16 h-12 rounded-lg overflow-hidden bg-white border shrink-0 shadow-sm relative group ${colorCodeError ? 'border-red-300' : 'border-emerald-200'}`}>
                           <img src={newItem.colorCodeImage} className="w-full h-full object-cover" alt="Scan" />
-                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                          </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[9px] uppercase font-black text-emerald-500/70 tracking-widest mb-0.5">Terpilih</p>
+                          <p className={`text-[9px] uppercase font-black tracking-widest mb-0.5 ${colorCodeError ? 'text-red-500' : 'text-emerald-500/70'}`}>Terpilih</p>
                           <input
                             type="text"
                             value={newItem.colorCode}
-                            onChange={(e) => setNewItem({ ...newItem, colorCode: e.target.value })}
-                            className="font-bold text-sm text-zinc-800 bg-transparent outline-none w-full border-b border-transparent focus:border-emerald-500/50 transition-colors"
+                            onChange={(e) => { setNewItem({ ...newItem, colorCode: e.target.value }); setColorCodeError(null); }}
+                            className={`font-bold text-sm bg-transparent outline-none w-full border-b border-transparent focus:border-emerald-500/50 transition-colors ${colorCodeError ? 'text-red-600' : 'text-zinc-800'}`}
                           />
                         </div>
                         <button
                           onClick={() => setShowCatalogModal(true)}
-                          className="px-3 py-1.5 bg-white text-emerald-600 font-bold text-xs rounded-lg shadow-sm border hover:bg-emerald-50 active:scale-95 transition-all"
+                          className={`px-3 py-1.5 font-bold text-xs rounded-lg shadow-sm border active:scale-95 transition-all ${colorCodeError ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-emerald-600 border-zinc-200 hover:bg-emerald-50'}`}
                         >
                           Ubah
                         </button>
@@ -1456,17 +1473,26 @@ const DesignEditorView: React.FC<{
                         <input
                           type="text"
                           value={newItem.colorCode}
-                          onChange={(e) => setNewItem({ ...newItem, colorCode: e.target.value })}
+                          onChange={(e) => { setNewItem({ ...newItem, colorCode: e.target.value }); setColorCodeError(null); }}
                           placeholder="Scan Katalog / Kode Warna..."
-                          className={`w-full p-3 pr-12 rounded-xl border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-white border-zinc-200 focus:border-emerald-500'}`}
+                          className={`w-full p-3 pr-12 rounded-xl border outline-none font-bold text-sm transition-all ${colorCodeError
+                            ? 'bg-red-50 border-red-500 focus:ring-2 focus:ring-red-200 placeholder:text-red-300 text-red-700'
+                            : (theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500 text-white' : 'bg-white border-zinc-200 focus:border-emerald-500 text-black')
+                            }`}
                         />
                         <button
                           onClick={() => setShowCatalogModal(true)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                          className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors ${colorCodeError ? 'text-red-500 hover:bg-red-500/10' : 'text-emerald-500 hover:bg-emerald-500/10'}`}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.172-1.172a4 4 0 015.656 5.656l-1.172 1.172" /></svg>
                         </button>
                       </div>
+                    )}
+                    {colorCodeError && (
+                      <p className="text-[10px] font-bold text-red-500 mt-1.5 flex items-center gap-1 animate-fadeIn">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                        {colorCodeError}
+                      </p>
                     )}
                   </div>
 
@@ -1488,26 +1514,42 @@ const DesignEditorView: React.FC<{
                     <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Ukuran</label>
                     <div className="flex flex-wrap gap-2">
                       {/* Standard Sizes */}
-                      {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
-                        <button
-                          key={size}
-                          onClick={() => setNewItem({ ...newItem, size })}
-                          className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === size ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
-                        >
-                          {size}
-                        </button>
-                      ))}
+                      {product.category === 'Celana' ? (
+                        // Ukuran Celana 28-40
+                        [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40].map(size => (
+                          <button
+                            key={size}
+                            onClick={() => setNewItem({ ...newItem, size: size.toString() })}
+                            className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === size.toString() ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
+                          >
+                            {size}
+                          </button>
+                        ))
+                      ) : (
+                        // Ukuran Kemeja/Lainnya S-XXL
+                        ['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                          <button
+                            key={size}
+                            onClick={() => setNewItem({ ...newItem, size })}
+                            className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${newItem.size === size ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-transparent hover:bg-black/5'}`}
+                          >
+                            {size}
+                          </button>
+                        ))
+                      )}
 
-                      {/* Extra Sizes Toggle */}
-                      <button
-                        onClick={() => setShowExtraSizes(!showExtraSizes)}
-                        className={`px-3 py-2 rounded-lg text-xs font-bold border border-dashed transition-all ${showExtraSizes ? 'bg-black/10' : 'hover:bg-black/5'}`}
-                      >
-                        {showExtraSizes ? 'Sembunyikan' : 'Size Besar +'}
-                      </button>
+                      {/* Extra Sizes Toggle (Hidden for Celana as it's already 28-40) */}
+                      {product.category !== 'Celana' && (
+                        <button
+                          onClick={() => setShowExtraSizes(!showExtraSizes)}
+                          className={`px-3 py-2 rounded-lg text-xs font-bold border border-dashed transition-all ${showExtraSizes ? 'bg-black/10' : 'hover:bg-black/5'}`}
+                        >
+                          {showExtraSizes ? 'Sembunyikan' : 'Size Besar +'}
+                        </button>
+                      )}
 
                       {/* Extra Sizes List */}
-                      {showExtraSizes && (
+                      {showExtraSizes && product.category !== 'Celana' && (
                         <>
                           {['3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL'].map(size => (
                             <button
@@ -1535,7 +1577,7 @@ const DesignEditorView: React.FC<{
                     </div>
                   </div>
 
-                  {/* Gender & Sleeve */}
+                  {/* Gender & Sleeve (Hidden some parts for Celana) */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Gender</label>
@@ -1551,7 +1593,7 @@ const DesignEditorView: React.FC<{
                         ))}
                       </div>
                     </div>
-                    {product.category !== 'Rompi' && (
+                    {(product.category !== 'Rompi' && product.category !== 'Celana') && (
                       <div>
                         <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Lengan</label>
                         <div className="flex rounded-lg border overflow-hidden p-1 gap-1">
@@ -1593,20 +1635,20 @@ const DesignEditorView: React.FC<{
           <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'}`}>
             {editorStep !== 'finish' ? (
               <button
-                onClick={handleNextStep}
+                onClick={() => {
+                  if (['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)) {
+                    setEditorStep('finish');
+                  } else {
+                    handleNextStep();
+                  }
+                }}
                 className={`w-full py-4 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg animate-pulse hover:animate-none ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-xl'}`}
               >
-                Lanjut &rarr;
+                {['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category) ? 'Pesan Sekarang →' : 'Lanjut →'}
               </button>
             ) : (
               <div className="flex flex-col gap-3">
-                <button
-                  onClick={handleSaveImage}
-                  className={`w-full py-3 font-bold uppercase tracking-widest rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10' : 'border-zinc-800 text-zinc-800 hover:bg-zinc-100'}`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                  Simpan Gambar
-                </button>
+
                 <button
                   onClick={handleExport}
                   className="w-full py-4 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3"
@@ -1785,21 +1827,46 @@ const DesignEditorView: React.FC<{
                 </button>
                 <h3 className="text-xl font-black uppercase tracking-wider mb-6 text-emerald-500">Ukuran Kustom</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {['Tinggi Badan', 'Lebar Dada', 'Lebar Bahu', 'Panjang Lengan', 'Lingkar Kerah', 'Lingkar Manset'].map((label, idx) => {
-                    const key = ['tinggi', 'lebarDada', 'lebarBahu', 'panjangLengan', 'kerah', 'manset'][idx] as keyof typeof customMeasures;
-                    return (
-                      <div key={key}>
-                        <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 block">{label} (cm)</label>
-                        <input
-                          type="number"
-                          placeholder="0"
-                          value={customMeasures[key]}
-                          onChange={(e) => setCustomMeasures({ ...customMeasures, [key]: e.target.value })}
-                          className={`w-full p-2.5 rounded-lg border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
-                        />
-                      </div>
-                    )
-                  })}
+                  {product.category === 'Celana' ? (
+                    // Fields kustom khusus Celana
+                    <>
+                      {[
+                        { label: 'Tinggi (cm)', key: 'tinggi' },
+                        { label: 'Lingkar Pinggang (cm)', key: 'pinggang' },
+                        { label: 'Lingkar Pinggul (cm)', key: 'pinggul' },
+                        { label: 'Lingkar Paha (cm)', key: 'paha' },
+                        { label: 'Lingkar Bawah (cm)', key: 'bawah' }
+                      ].map((field) => (
+                        <div key={field.key}>
+                          <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 block">{field.label}</label>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={customMeasures[field.key as keyof typeof customMeasures]}
+                            onChange={(e) => setCustomMeasures({ ...customMeasures, [field.key]: e.target.value })}
+                            className={`w-full p-2.5 rounded-lg border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                          />
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    // Fields kustom standar (Kemeja/Lainnya)
+                    ['Tinggi Badan', 'Lebar Dada', 'Lebar Bahu', 'Panjang Lengan', 'Lingkar Kerah', 'Lingkar Manset'].map((label, idx) => {
+                      const key = ['tinggi', 'lebarDada', 'lebarBahu', 'panjangLengan', 'kerah', 'manset'][idx] as keyof typeof customMeasures;
+                      return (
+                        <div key={key}>
+                          <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 block">{label} (cm)</label>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={customMeasures[key as keyof typeof customMeasures]}
+                            onChange={(e) => setCustomMeasures({ ...customMeasures, [key]: e.target.value })}
+                            className={`w-full p-2.5 rounded-lg border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                          />
+                        </div>
+                      )
+                    })
+                  )}
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
@@ -1934,41 +2001,56 @@ const DesignEditorView: React.FC<{
                             }}
                           />
 
-                          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                          <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center gap-6">
                             <div
                               ref={roiRef}
-                              className="w-80 h-56 border-2 border-emerald-500 rounded-3xl shadow-[0_0_80px_rgba(16,185,129,0.3)] bg-emerald-500/10 relative overflow-hidden ring-1 ring-white/20"
+                              className="w-[320px] h-[220px] border-2 border-emerald-500 rounded-[32px] shadow-[0_0_80px_rgba(16,185,129,0.3)] bg-transparent relative overflow-hidden ring-1 ring-white/10 flex flex-col"
                             >
-                              {/* Scanning Laser Line */}
-                              {isScanning && (
-                                <div className="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_20px_#10b981] animate-scan-line z-10"></div>
-                              )}
-
-                              {/* ROI Corners */}
-                              <div className="absolute inset-4 flex flex-col justify-between">
-                                <div className="flex justify-between border-t-2 border-white/20 h-2 px-2"></div>
-                                <div className="flex justify-between border-b-2 border-white/20 h-2 px-2"></div>
+                              {/* Header Area Drawing Style - Transparent */}
+                              <div className="bg-transparent py-2 px-4 flex items-center justify-center border-b-2 border-emerald-500/50">
+                                <span className="text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em] drop-shadow-md">Kode warna</span>
                               </div>
 
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                {isScanning ? (
-                                  <div className="flex flex-col items-center gap-3">
-                                    <div className="bg-emerald-500/20 backdrop-blur-md px-5 py-3 rounded-2xl border border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.4)] animate-pulse">
-                                      <p className="text-sm font-black text-emerald-400 tracking-widest">{detectedCode || scanningFragments}</p>
-                                    </div>
-                                    <p className="text-[9px] font-bold text-emerald-500/60 uppercase tracking-[0.3em]">{detectedCode ? 'AUTO-SAVED' : 'ANALYZING...'}</p>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-col items-center gap-1">
-                                    <div className="text-[8px] font-black text-white/60 uppercase tracking-[0.2em] animate-pulse">Scanning Zone</div>
-                                    <div className="w-4 h-4 text-emerald-500">
-                                      <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.523 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
-                                    </div>
-                                  </div>
+                              <div className="flex-1 relative overflow-hidden">
+                                {/* Scanning Laser Line */}
+                                {isScanning && (
+                                  <div className="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_20px_#10b981] animate-scan-line z-10"></div>
                                 )}
+
+                                {/* ROI Corners Style */}
+                                <div className="absolute inset-4 flex flex-col justify-between pointer-events-none opacity-40">
+                                  <div className="flex justify-between border-t-2 border-white/40 h-3 px-2"></div>
+                                  <div className="flex justify-between border-b-2 border-white/40 h-3 px-2"></div>
+                                </div>
+
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  {isScanning ? (
+                                    <div className="flex flex-col items-center gap-3">
+                                      <div className="bg-emerald-500/20 backdrop-blur-md px-5 py-3 rounded-2xl border border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.4)] animate-pulse">
+                                        <p className="text-sm font-black text-emerald-400 tracking-widest">{detectedCode || scanningFragments}</p>
+                                      </div>
+                                      <p className="text-[9px] font-bold text-emerald-500/60 uppercase tracking-[0.3em]">{detectedCode ? 'AUTO-SAVED' : 'ANALYZING...'}</p>
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center gap-1">
+                                      <div className="text-[8px] font-black text-white/60 uppercase tracking-[0.2em] animate-pulse">Scanning Zone</div>
+                                      <div className="w-4 h-4 text-emerald-500">
+                                        <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.523 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               {/* Flash Overlay */}
                               {showFlash && <div className="absolute inset-0 bg-white animate-flash z-20"></div>}
+                            </div>
+
+                            {/* Instruction Text */}
+                            <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 shadow-2xl">
+                              <p className="text-[10px] font-bold text-center text-white/90 uppercase tracking-[0.15em] leading-relaxed">
+                                Pas kan area scanning dengan <br />
+                                <span className="text-emerald-400">kode warna kain</span> di atas area scan
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -2058,15 +2140,24 @@ const DesignEditorView: React.FC<{
 
                               if (ctx) {
                                 ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-                                capturedImage = croppedCanvas.toDataURL('image/png');
+                                capturedImage = croppedCanvas.toDataURL('image/jpeg', 0.9);
 
-                                // AUTO DOWNLOAD
-                                const link = document.createElement('a');
-                                link.href = capturedImage;
-                                link.download = `scan_color_${Date.now()}.png`;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
+                                // AUTO SAVE TO GALLERY (Android 10+ MediaStore)
+                                try {
+                                  await Media.savePhoto({
+                                    path: capturedImage,
+                                    albumIdentifier: 'Bradwear Scans'
+                                  });
+                                } catch (mediaErr) {
+                                  console.warn("Auto save scan failed", mediaErr);
+                                  // Fallback download browser
+                                  const link = document.createElement('a');
+                                  link.href = capturedImage;
+                                  link.download = `scan_color_${Date.now()}.jpg`;
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                }
 
                                 capturedText = await analyzeImageWithGemini(capturedImage);
                               }
@@ -2120,53 +2211,14 @@ const DesignEditorView: React.FC<{
                   )}
                 </div>
 
-                {/* NOTIFICATION TOAST: VALIDATION */}
-                {showValidationNotify && (
-                  <div className="fixed top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[85%] max-w-xs transition-all duration-300 transform scale-100 opacity-100">
-                    <div className="bg-zinc-900/95 backdrop-blur-xl text-white p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 animate-fade-in-up flex flex-col items-center gap-4 text-center ring-1 ring-white/20">
-                      <div className="shrink-0 w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse">
-                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-black uppercase tracking-widest mb-2 text-red-400">Data Belum Lengkap</p>
-                        <p className="text-sm font-medium leading-relaxed text-zinc-300">{showValidationNotify}</p>
-                      </div>
-                      <button
-                        onClick={() => setShowValidationNotify(null)}
-                        className="w-full py-3 bg-white text-black font-bold rounded-xl active:scale-95 transition-all mt-2"
-                      >
-                        OKE, SAYA ISI
-                      </button>
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
           )}
 
         </div>
 
-        {/* NOTIFICATION TOAST: VALIDATION */}
-        {/* NOTIFICATION TOAST: VALIDATION */}
-        {showValidationNotify && (
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] w-[85%] max-w-xs">
-            <div className="bg-zinc-900/95 backdrop-blur-xl text-white p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 animate-bounce-in flex flex-col items-center gap-4 text-center ring-1 ring-white/20">
-              <div className="shrink-0 w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse">
-                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-black uppercase tracking-widest mb-2 text-red-400">Data Belum Lengkap</p>
-                <p className="text-sm font-medium leading-relaxed text-zinc-300">{showValidationNotify}</p>
-              </div>
-              <button
-                onClick={() => setShowValidationNotify(null)}
-                className="w-full py-3 bg-white text-black font-bold rounded-xl active:scale-95 transition-all mt-2"
-              >
-                OKE, SAYA ISI
-              </button>
-            </div>
-          </div>
-        )}
+
 
       </div>
     </div >

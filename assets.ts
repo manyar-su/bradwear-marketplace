@@ -52,10 +52,14 @@ Object.keys(allImagesGlob).forEach(key => {
 
 // Catalog Images
 export const COLOR_CATALOGS = {
-  Nagata: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Nagata/')).map(k => allImagesGlob[k] as string),
-  Oxford: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Oxford/')).map(k => allImagesGlob[k] as string),
-  Polo: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Polo/')).map(k => allImagesGlob[k] as string),
-  Tropical: Object.keys(allImagesGlob).filter(k => k.includes('Katalog warna/Tropical/')).map(k => allImagesGlob[k] as string),
+  'American Drill': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/american drill/')).map(k => allImagesGlob[k] as string),
+  'Nagata': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/nagata/')).map(k => allImagesGlob[k] as string),
+  'Oxford': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/oxford/')).map(k => allImagesGlob[k] as string),
+  'Polo': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/polo/')).map(k => allImagesGlob[k] as string),
+  'Tropical': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/tropical/')).map(k => allImagesGlob[k] as string),
+  'Baby Canvas': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/baby canvas/')).map(k => allImagesGlob[k] as string),
+  'Ripstop': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/ripstop/')).map(k => allImagesGlob[k] as string),
+  'Soft Denim': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/soft dennim/')).map(k => allImagesGlob[k] as string),
 };
 
 // Helper untuk mencari folder secara case-insensitive & robust matching di semua kategori
@@ -325,6 +329,10 @@ const PDH_BARU_FRONT = getFrontImage('Pdh-baru');
 const PDH_BARU_GAL_1 = getModelAsset('Pdh-baru', '1');
 const PDH_BARU_GAL_2 = getModelAsset('Pdh-baru', '2');
 
+const BRAD_V4_FRONT = getFrontImage('Brad-V4');
+const BRAD_V4_GAL_1 = getModelAsset('Brad-V4', '1');
+const BRAD_V4_GAL_2 = getModelAsset('Brad-V4', '2');
+
 const ROBOTIC_FRONT = getFrontImage('robotik');
 const ROBOTIC_GAL_1 = getModelAsset('robotik', '1');
 const ROBOTIC_GAL_2 = getModelAsset('robotik', '2');
@@ -367,9 +375,11 @@ const VEST_PARASUTE_GAL = [3].map(n => allImagesGlob[`./assets/Rompi/Parasute/Ve
 const KAOS_POLO_FRONT = allImagesGlob['./assets/Kaos polo/Kaospolo-hitam.png'] as string || '';
 
 // --- ASSETS CELANA DARI FOLDER CELANA ---
-const CARGO_TACTICAL_FRONT = getFrontImage('Cargo Tactical');
-const CARGO_TACTICAL_BACK = getBackImage('Cargo Tactical');
-const CARGO_TACTICAL_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Cargo Tactical', n.toString())).filter(Boolean);
+const CARGO_TACTICAL_FRONT = getFrontImage('Warrior') || getFrontImage('Cargo Tactical') || getFrontImage('Pant');
+const CARGO_TACTICAL_BACK = getBackImage('Warrior') || getBackImage('Cargo Tactical') || getBackImage('Pant');
+const ARMOUR_FRONT = getFrontImage('Armour') || getFrontImage('Armor');
+const ARMOUR_BACK = getBackImage('Armour') || getBackImage('Armor');
+const CARGO_TACTICAL_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Warrior', n.toString()) || getModelAsset('Cargo Tactical', n.toString())).filter(Boolean);
 
 const MTAC_FRONT = allImagesGlob['./assets/mtac_front.png'] as string || '';
 const BOMBER_FRONT = allImagesGlob['./assets/Jacket/bomber_front.png.webp'] as string || '';
@@ -448,6 +458,11 @@ export const ASSETS = {
       BACK: getBackImage('Pdh-baru'),
       GALLERY: [PDH_BARU_GAL_1, PDH_BARU_GAL_2].filter(Boolean)
     },
+    BRAD_V4: {
+      FRONT: BRAD_V4_FRONT,
+      BACK: getBackImage('Brad-V4') || BRAD_V3_BACK,
+      GALLERY: [BRAD_V4_GAL_1, BRAD_V4_GAL_2].filter(Boolean)
+    },
     ROBOTIC: {
       FRONT: ROBOTIC_FRONT,
       BACK: getBackImage('robotik'),
@@ -482,10 +497,12 @@ export const ASSETS = {
 
   // --- KATEGORI CELANA ---
   CELANA: {
-    WARRIOR: CARGO_TACTICAL_FRONT || getAssetPath('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600', 'Celana/warrior.jpg'),
+    WARRIOR: CARGO_TACTICAL_FRONT,
+    WARRIOR_BACK: CARGO_TACTICAL_BACK,
+    ARMOUR: ARMOUR_FRONT,
+    ARMOUR_BACK: ARMOUR_BACK,
     BACK: CARGO_TACTICAL_BACK,
-    GALLERY: CARGO_TACTICAL_GAL,
-    FORMAL: getAssetPath('https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&q=80&w=600', 'Celana/formal.jpg'),
+    GALLERY: CARGO_TACTICAL_GAL
   },
 
   // --- KATEGORI ROMPI ---

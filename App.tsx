@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'; // Restored React import
 import { Filesystem } from '@capacitor/filesystem';
 import { View, Product, DesignData, OrderItem, WorkflowStage, ProductionOrder } from './types';
-import HomeView from './components/HomeView';
-import DesignEditorView from './components/DesignEditorView';
-import SummaryView from './components/SummaryView';
+const HomeView = React.lazy(() => import('./components/HomeView'));
+const DesignEditorView = React.lazy(() => import('./components/DesignEditorView'));
+const SummaryView = React.lazy(() => import('./components/SummaryView'));
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from './constants';
 
 import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
@@ -14,6 +14,11 @@ const App: React.FC = () => {
     const initPermissions = async () => {
       try {
         await Filesystem.requestPermissions();
+        // Request Media permissions for saving to gallery
+        const { Media } = await import('@capacitor-community/media');
+        if ((Media as any).requestPermissions) {
+          await (Media as any).requestPermissions();
+        }
       } catch (e) {
         console.error("Permission request failed", e);
       }
@@ -153,10 +158,18 @@ const App: React.FC = () => {
 
 
         <header className={`px-6 py-6 flex items-center justify-between border-b shrink-0 z-50 ${theme === 'dark' ? 'bg-black/80 border-white/5 backdrop-blur-xl' : 'bg-white/90 border-zinc-100 backdrop-blur-xl'}`}>
-          <div className="flex flex-col cursor-pointer" onClick={() => setCurrentView(View.HOME)}>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-black tracking-tighter italic neon-text`}>BRADWEAR</span>
-              <span className={`text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500`}>INDONESIA</span>
+          <div className="flex flex-col cursor-pointer group" onClick={() => setCurrentView(View.HOME)}>
+            <div className="flex items-center">
+              <span className="text-3xl font-black tracking-tighter text-emerald-500 leading-none">BRAD</span>
+              <span className="text-3xl font-black tracking-tighter leading-none" style={{ WebkitTextStroke: '1.5px #10b981', color: 'transparent' }}>WEAR</span>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="h-3.5 bg-emerald-500 rounded-l-full rounded-r-md flex items-center justify-end px-2 w-20 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                <div className="flex gap-0.5 opacity-50">
+                  <span className="text-black font-black text-[10px] leading-none tracking-tighter"> {">>>"} </span>
+                </div>
+              </div>
+              <span className="text-[10px] font-black tracking-[0.3em] text-emerald-500 mt-0.5">INDONESIA</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -167,45 +180,52 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 h-full overflow-hidden flex flex-col relative no-scrollbar">
-          {currentView === View.HOME && (
-            <div className="h-full overflow-y-auto no-scrollbar scroll-smooth view-transition">
-              <HomeView
-                products={products}
-                workflowStages={userWorkflowStages}
-                orderCode={orderCode}
-                branding={{ title: "Bradwear Manufacture", subtitle: "KATALOG BRADWEAR" }}
-                onSelectProduct={handleSelectProduct}
-                theme={theme}
-              />
+          <React.Suspense fallback={
+            <div className="h-full w-full flex flex-col items-center justify-center bg-black">
+              <div className="w-16 h-16 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin mb-4"></div>
+              <p className="text-emerald-500 font-black text-xs uppercase tracking-[0.4em] animate-pulse">Memuat BRADWEAR...</p>
             </div>
-          )}
+          }>
+            {currentView === View.HOME && (
+              <div className="h-full overflow-y-auto no-scrollbar scroll-smooth view-transition">
+                <HomeView
+                  products={products}
+                  workflowStages={userWorkflowStages}
+                  orderCode={orderCode}
+                  branding={{ title: "Bradwear Manufacture", subtitle: "KATALOG BRADWEAR" }}
+                  onSelectProduct={handleSelectProduct}
+                  theme={theme}
+                />
+              </div>
+            )}
 
-          {currentView === View.EDITOR && selectedProduct && (
-            <div className="h-full overflow-hidden view-transition">
-              <DesignEditorView
-                product={selectedProduct}
-                designData={designData}
-                onUpdate={handleUpdateDesign}
-                onBack={handleGoBack}
-                onNext={() => setCurrentView(View.SUMMARY)}
-                onSelectProduct={handleSelectProduct}
-                theme={theme}
-              />
-            </div>
-          )}
+            {currentView === View.EDITOR && selectedProduct && (
+              <div className="h-full overflow-hidden view-transition">
+                <DesignEditorView
+                  product={selectedProduct}
+                  designData={designData}
+                  onUpdate={handleUpdateDesign}
+                  onBack={handleGoBack}
+                  onNext={() => setCurrentView(View.SUMMARY)}
+                  onSelectProduct={handleSelectProduct}
+                  theme={theme}
+                />
+              </div>
+            )}
 
-          {currentView === View.SUMMARY && selectedProduct && (
-            <div className="h-full overflow-hidden view-transition">
-              <SummaryView
-                product={selectedProduct}
-                designData={designData}
-                orderItems={orderItems}
-                setOrderItems={setOrderItems}
-                onBack={() => setCurrentView(View.EDITOR)}
-                theme={theme}
-              />
-            </div>
-          )}
+            {currentView === View.SUMMARY && selectedProduct && (
+              <div className="h-full overflow-hidden view-transition">
+                <SummaryView
+                  product={selectedProduct}
+                  designData={designData}
+                  orderItems={orderItems}
+                  setOrderItems={setOrderItems}
+                  onBack={() => setCurrentView(View.EDITOR)}
+                  theme={theme}
+                />
+              </div>
+            )}
+          </React.Suspense>
         </div>
       </div>
     </div>

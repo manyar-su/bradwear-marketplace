@@ -66,53 +66,20 @@ export const PRODUCTS: Product[] = [
     description: 'Seri Yoroi: Desain tactical tangguh dengan pilihan berbagai variasi warna.'
   },
   {
-    id: 'k7',
-    name: 'Robotic',
-    category: 'Kemeja',
-    soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.ROBOTIC.FRONT,
-    images: {
-      front: ASSETS.KEMEJA.ROBOTIC.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
-      leftSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT,
-      rightSleeve: ASSETS.KEMEJA.ROBOTIC.FRONT
-    },
-    gallery: ASSETS.KEMEJA.ROBOTIC.GALLERY,
-    description: 'Seri Robotic dengan saku multifungsi modular.'
-  },
-  /* 
-  // MODEL DISEMBUNYIKAN (V3 PRO & V4)
-  // Lokasi Script: constants.tsx (dalam array PRODUCTS)
-  {
-    id: 'k4',
-    name: 'Brad-V3 PRO',
-    category: 'Kemeja',
-    soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
-    images: {
-      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
-      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
-    },
-    gallery: ASSETS.KEMEJA.BRAD_V3.GALLERY,
-    description: 'Seri Brad-V3 PRO untuk durabilitas maksimal di lapangan.'
-  },
-  {
     id: 'k5',
     name: 'Brad-V4',
     category: 'Kemeja',
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
+    image: ASSETS.KEMEJA.BRAD_V4.FRONT,
     images: {
-      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
-      leftSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      rightSleeve: ASSETS.KEMEJA.BRAD_V3.FRONT
+      front: ASSETS.KEMEJA.BRAD_V4.FRONT,
+      back: ASSETS.KEMEJA.BRAD_V4.BACK,
+      leftSleeve: ASSETS.KEMEJA.BRAD_V4.FRONT,
+      rightSleeve: ASSETS.KEMEJA.BRAD_V4.FRONT
     },
-    description: 'Seri Brad-V4: Standar baru untuk seragam tangguh.'
+    gallery: ASSETS.KEMEJA.BRAD_V4.GALLERY,
+    description: 'Seri Brad-V4: Standar baru untuk seragam tangguh dengan desain kantong terbaru.'
   },
-  */
   {
     id: 'k6',
     name: 'Ventura',
@@ -142,21 +109,6 @@ export const PRODUCTS: Product[] = [
     },
     gallery: ASSETS.KEMEJA.PDH.GALLERY,
     description: 'Pakaian Dinas Harian (PDH) klasik dengan kenyamanan katun drill.'
-  },
-  {
-    id: 'k9',
-    name: 'PDH baru',
-    category: 'Kemeja',
-    soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.PDH_BARU.FRONT,
-    images: {
-      front: ASSETS.KEMEJA.PDH_BARU.FRONT,
-      back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/PDH-White-2.jpg',
-      leftSleeve: ASSETS.KEMEJA.PDH_BARU.FRONT,
-      rightSleeve: ASSETS.KEMEJA.PDH_BARU.FRONT
-    },
-    gallery: ASSETS.KEMEJA.PDH_BARU.GALLERY,
-    description: 'Evolusi terbaru PDH dengan material lebih lembut dan sejuk.'
   },
   {
     id: 'k10',
@@ -219,27 +171,28 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'c1',
-    name: 'Cargo Tactical',
+    name: 'Warrior',
     category: 'Celana',
     soldCount: getRandomSold(),
     image: ASSETS.CELANA.WARRIOR,
     images: {
       front: ASSETS.CELANA.WARRIOR,
-      back: ASSETS.CELANA.WARRIOR
+      back: ASSETS.CELANA.WARRIOR_BACK || ASSETS.CELANA.WARRIOR
     },
-    description: 'Celana cargo tactical dengan banyak saku.'
+    gallery: ASSETS.CELANA.GALLERY,
+    description: 'Celana Warrior: Desain tactical tangguh untuk aktivitas outdoor berat.'
   },
   {
     id: 'c2',
-    name: 'PDL Formal',
+    name: 'Armour',
     category: 'Celana',
     soldCount: getRandomSold(),
-    image: ASSETS.CELANA.FORMAL,
+    image: ASSETS.CELANA.ARMOUR,
     images: {
-      front: ASSETS.CELANA.FORMAL,
-      back: ASSETS.CELANA.FORMAL
+      front: ASSETS.CELANA.ARMOUR,
+      back: ASSETS.CELANA.ARMOUR_BACK || ASSETS.CELANA.ARMOUR
     },
-    description: 'Celana PDL formal untuk dinas harian.'
+    description: 'Celana Armour: Perlindungan maksimal dengan material durabilitas tinggi.'
   },
   {
     id: 'kid1',

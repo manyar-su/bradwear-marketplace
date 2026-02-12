@@ -45,6 +45,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   const [currentResi, setCurrentResi] = useState<string | null>(null);
   const [promoSlide, setPromoSlide] = useState(0);
   const [catalogImages, setCatalogImages] = useState<string[]>([]);
+  const [showAboutContent, setShowAboutContent] = useState(false);
   const catalogRef = useRef<HTMLDivElement>(null);
 
   const scrollToCatalog = () => {
@@ -377,24 +378,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       </section>
 
-      {/* Partners Awareness */}
-      <section className="mt-24 px-6 space-y-8 pb-10">
-        <div className="text-center">
-          <p className="text-[9px] font-black adaptive-text-muted uppercase tracking-[0.4em]">KEPERCAYAAN INSTANSI</p>
-          <h4 className="text-xl font-black uppercase tracking-tighter adaptive-text">Our Strategic Partners</h4>
-        </div>
-        <div className="relative overflow-hidden partner-logo-container">
-          <div className="flex animate-marquee gap-12 items-center">
-            {[...ASSETS.PARTNERS, ...ASSETS.PARTNERS].map((logo, idx) => (
-              <div key={idx} className="logo-item w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
-                <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain drop-shadow-2xl" />
-              </div>
-            ))}
-          </div>
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black via-black/40 to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black via-black/40 to-transparent z-10 pointer-events-none"></div>
-        </div>
-      </section>
+
 
       {/* Modals Container */}
       {activeModal !== 'none' && (
@@ -550,25 +534,25 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                       {/* THUMBNAIL GRID 100x100px */}
                       {thumbnailImages.length > 0 && (
                         <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                          {thumbnailImages.map((img, idx) => {
-                            let label = 'KATALOG';
-                            if (img.toLowerCase().includes('belakang')) label = 'BELAKANG';
-                            else if (img.toLowerCase().includes('kiri')) label = 'KIRI';
-                            else if (img.toLowerCase().includes('kanan')) label = 'KANAN';
-                            else if (img.toLowerCase().includes('depan')) label = 'DEPAN';
+                          {thumbnailImages
+                            .filter(img => !img.toLowerCase().includes('kiri') && !img.toLowerCase().includes('kanan'))
+                            .map((img, idx) => {
+                              let label = 'KATALOG';
+                              if (img.toLowerCase().includes('belakang')) label = 'BELAKANG';
+                              else if (img.toLowerCase().includes('depan')) label = 'DEPAN';
 
-                            return (
-                              <div
-                                key={idx}
-                                className="shrink-0 w-[100px] h-[100px] rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 group relative cursor-pointer hover:scale-110 transition-transform duration-300"
-                              >
-                                <img src={img} className="w-full h-full object-cover" alt={label} />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                                  <span className="text-[8px] font-black text-white uppercase tracking-wide text-center px-1">{label}</span>
+                              return (
+                                <div
+                                  key={idx}
+                                  className="shrink-0 w-[100px] h-[100px] rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 group relative cursor-pointer hover:scale-110 transition-transform duration-300"
+                                >
+                                  <img src={img} className="w-full h-full object-cover" alt={label} />
+                                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                                    <span className="text-[8px] font-black text-white uppercase tracking-wide text-center px-1">{label}</span>
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
                         </div>
                       )}
                     </div>
@@ -678,103 +662,117 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       )}
 
-      {/* TENTANG KAMI SECTION */}
+      {/* DIPERCAYA RATUSAN INSTANSI (Our Partners) - Moved up and improved animation */}
+      <div className="py-12 bg-emerald-500/5 border-y border-emerald-500/10 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 mb-8 text-center">
+          <h2 className={`text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+            DIPERCAYA RATUSAN INSTANSI
+          </h2>
+          <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em]">Official Government Partner</p>
+        </div>
+
+        {/* Marquee Animation */}
+        <div className="flex gap-8 whitespace-nowrap animate-marquee">
+          {[...Array(2)].map((_, groupIdx) => (
+            <div key={groupIdx} className="flex gap-12 items-center">
+              {['POLRI', 'TNI AD', 'DISHUB', 'DAMKAR', 'SATPOL PP', 'BASARNAS', 'BPBD', 'KEMENHUB', 'KEMENDAGRI', 'BUMN', 'DINKES'].map((inst, i) => (
+                <div key={i} className={`flex items-center gap-3 px-6 py-3 rounded-2xl border transition-all ${theme === 'dark' ? 'bg-zinc-900 border-white/5' : 'bg-white border-zinc-200'}`}>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <span className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{inst}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TENTANG KAMI SECTION - Interactive Accordion */}
       <div className="px-6 py-16">
         <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
+          {/* Header Toggle */}
+          <button
+            onClick={() => setShowAboutContent(!showAboutContent)}
+            className={`w-full text-left group transition-all p-8 md:p-12 rounded-[48px] border glass flex flex-col items-center text-center ${showAboutContent ? 'border-emerald-500/50 shadow-emerald-500/10' : theme === 'dark' ? 'border-white/10 hover:border-emerald-500/30' : 'border-zinc-200 hover:border-emerald-500/30 shadow-lg'}`}
+          >
             <h2 className={`text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
               TENTANG KAMI
             </h2>
-            <div className="w-24 h-1 neon-bg mx-auto rounded-full"></div>
-          </div>
+            <div className={`w-24 h-1 neon-bg rounded-full transition-all duration-500 ${showAboutContent ? 'w-48' : 'w-24'}`}></div>
 
-          {/* Company Info */}
-          <div className={`glass p-8 md:p-12 rounded-[48px] border space-y-8 mb-8 ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
-            <div>
-              <h3 className={`text-2xl md:text-3xl font-black uppercase tracking-tight mb-4 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                CV. ASTHAJAYA BRADERINDO
-              </h3>
-              <p className={`text-base leading-relaxed ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                <strong className="text-emerald-500">CV. ASTHAJAYA BRADERINDO</strong> adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek <strong className="text-emerald-500">Bradwear</strong> yang terdaftar di <strong>DJKI KEMENKUMHAM</strong>. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.
-              </p>
+            <div className="mt-8 flex items-center justify-center gap-2 text-emerald-500 font-black text-xs uppercase tracking-[0.3em]">
+              <span> {showAboutContent ? 'Tutup Konten' : 'Lihat Profil Kami'} </span>
+              <svg className={`w-4 h-4 transition-transform duration-500 ${showAboutContent ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
             </div>
+          </button>
 
-            {/* Vision */}
-            <div>
-              <h4 className={`text-xl font-black uppercase tracking-tight mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                VISI
-              </h4>
-              <p className={`text-base leading-relaxed italic ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                Menjadi perusahaan konveksi seragam dinas terdepan di Indonesia dengan prioritas pada kualitas, inovasi, ketepatan waktu, dan kepuasan pelanggan.
-              </p>
-            </div>
+          {/* Animated Content Wrapper */}
+          <div className={`transition-all duration-700 ease-in-out overflow-hidden ${showAboutContent ? 'max-h-[2000px] opacity-100 mt-8' : 'max-h-0 opacity-0'}`}>
+            <div className={`glass p-8 md:p-12 rounded-[48px] border space-y-12 ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200 shadow-2xl'}`}>
 
-            {/* Mission */}
-            <div>
-              <h4 className={`text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                MISI
-              </h4>
-              <ul className="space-y-3">
-                {[
-                  'Menyediakan seragam dinas dengan standar kualitas tinggi',
-                  'Menggunakan bahan nyaman dan tahan lama',
-                  'Memberikan pelayanan profesional dan tepat waktu',
-                  'Terus berinovasi dalam desain dan teknologi produksi',
-                  'Menjalin hubungan jangka panjang berdasarkan kepercayaan dan kepuasan klien'
-                ].map((mission, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2 shrink-0"></span>
-                    <span className={`text-base ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{mission}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+              {/* Company Info Box */}
+              <div className="relative">
+                <div className="absolute -left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-transparent hidden md:block"></div>
+                <h3 className={`text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                  CV. ASTHAJAYA BRADERINDO
+                </h3>
+                <p className={`text-lg leading-relaxed ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                  <strong className="text-emerald-500">CV. ASTHAJAYA BRADERINDO</strong> adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek <strong className="text-emerald-500">Bradwear</strong> yang terdaftar di <strong>DJKI KEMENKUMHAM</strong>. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.
+                </p>
+              </div>
 
-          {/* Social Media */}
-          <div className="text-center">
-            <h4 className={`text-xl font-black uppercase tracking-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-              IKUTI KAMI
-            </h4>
-            <div className="flex justify-center gap-4">
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
-              >
-                <svg className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </a>
+              {/* Stats/Grid Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Vision Box */}
+                <div className={`p-8 rounded-[32px] border ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+                  <h4 className={`text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                      <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    </div>
+                    VISI
+                  </h4>
+                  <p className={`text-base leading-relaxed italic ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                    Menjadi perusahaan konveksi seragam dinas terdepan di Indonesia dengan prioritas pada kualitas, inovasi, ketepatan waktu, dan kepuasan pelanggan.
+                  </p>
+                </div>
 
-              {/* Facebook */}
-              <a
-                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
-              >
-                <svg className="w-8 h-8 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </a>
+                {/* Mission Box */}
+                <div className={`p-8 rounded-[32px] border ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+                  <h4 className={`text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                      <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    MISI
+                  </h4>
+                  <ul className="space-y-4">
+                    {[
+                      'Menyediakan seragam dinas standar kualitas tinggi',
+                      'Menggunakan bahan nyaman dan tahan lama',
+                      'Memberikan pelayanan profesional & tepat waktu',
+                      'Terus berinovasi dalam desain & teknologi'
+                    ].map((mission, i) => (
+                      <li key={i} className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0"></div>
+                        <span className={`text-sm font-bold ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>{mission}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
 
-              {/* TikTok */}
-              <a
-                href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-14 h-14 rounded-full bg-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg group"
-              >
-                <svg className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                </svg>
-              </a>
+              {/* Social Media Linker */}
+              <div className="flex flex-col items-center pt-8 border-t border-white/5">
+                <h4 className={`text-sm font-black uppercase tracking-[0.5em] mb-8 ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                  Official Channels
+                </h4>
+                <div className="flex justify-center gap-8">
+                  <a href="https://www.instagram.com/reel/DTPxcXbk3hp/" target="_blank" rel="noopener noreferrer" className="w-16 h-16 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group">
+                    <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                  </a>
+                  <a href="https://www.tiktok.com/@bradwearindonesia" target="_blank" rel="noopener noreferrer" className="w-16 h-16 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group">
+                    <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
