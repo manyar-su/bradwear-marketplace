@@ -52,14 +52,15 @@ Object.keys(allImagesGlob).forEach(key => {
 
 // Catalog Images
 export const COLOR_CATALOGS = {
-  'American Drill': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/american drill/')).map(k => allImagesGlob[k] as string),
+  'Maryland': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/maryland/')).map(k => allImagesGlob[k] as string),
   'Nagata': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/nagata/')).map(k => allImagesGlob[k] as string),
+  'Soft Denim': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/soft dennim/')).map(k => allImagesGlob[k] as string),
+  'American Drill': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/american drill/')).map(k => allImagesGlob[k] as string),
   'Oxford': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/oxford/')).map(k => allImagesGlob[k] as string),
   'Polo': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/polo/')).map(k => allImagesGlob[k] as string),
   'Tropical': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/tropical/')).map(k => allImagesGlob[k] as string),
   'Baby Canvas': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/baby canvas/')).map(k => allImagesGlob[k] as string),
   'Ripstop': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/ripstop/')).map(k => allImagesGlob[k] as string),
-  'Soft Denim': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/soft dennim/')).map(k => allImagesGlob[k] as string),
 };
 
 // Helper untuk mencari folder secara case-insensitive & robust matching di semua kategori

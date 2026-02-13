@@ -76,6 +76,7 @@ const DesignEditorView: React.FC<{
     qty: number;
     customDetail?: string; // Menyimpan detail ukuran custom
     colorCodeImage?: string; // Menyimpan gambar hasil scan
+    catalogMaterial?: string; // Menyimpan jenis kain dari katalog
   }
 
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
@@ -93,7 +94,7 @@ const DesignEditorView: React.FC<{
     qty: 1
   });
 
-  const [activeCatalogType, setActiveCatalogType] = useState<string | null>(null);
+  const [activeCatalogType, setActiveCatalogType] = useState<string | null>('Maryland');
   const [showCatalogModal, setShowCatalogModal] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [isZoomed, setIsZoomed] = useState(false);
@@ -167,18 +168,19 @@ const DesignEditorView: React.FC<{
       gender: newItem.gender,
       sleeve: newItem.sleeve,
       qty: newItem.qty,
-      customDetail: customDetailStr
+      customDetail: customDetailStr,
+      catalogMaterial: activeCatalogType || 'Unspecified'
     };
 
     setCartItems([...cartItems, item]);
 
-    // Reset form: Clear ALL fields including color code as requested
+    // Reset form: Clear fields EXCEPT color code, so it applies to next item
     setNewItem({
       ...newItem,
       name: '',
       qty: 1,
-      colorCode: '',
-      colorCodeImage: null
+      // colorCode: newItem.colorCode, // Keep current
+      // colorCodeImage: newItem.colorCodeImage // Keep current
     });
 
     // Show success feedback
@@ -665,8 +667,9 @@ const DesignEditorView: React.FC<{
     }
 
     // 1. Cek apakah ada gambar khusus untuk warna tertentu (global fallback)
-    // HANYA untuk Kemeja/Polo/Kids karena asset warna global mayoritas berbentuk Kemeja
-    const isKemejaLike = ['Kemeja', 'Kids', 'Polo'].includes(product.category);
+    // HANYA untuk Kemeja/Kids karena asset warna global mayoritas berbentuk Kemeja
+    // Polo removed from here to prevent using Kemeja assets for Polo
+    const isKemejaLike = ['Kemeja', 'Kids'].includes(product.category);
     if (isKemejaLike && isSpecificColorImage && selectedColorObj) {
       if (designData.view === 'Depan' && selectedColorObj.image) return selectedColorObj.image;
       if (designData.view === 'Belakang' && selectedColorObj.backImage) return selectedColorObj.backImage;
@@ -822,7 +825,8 @@ const DesignEditorView: React.FC<{
         ordersText += `\n📦 ${modelKey}\n──────────────────\n`;
         items.forEach((item, i) => {
           const sleeveInfo = item.model.category === 'Rompi' ? '' : `\n      ✂️ Lengan: ${item.sleeve}`;
-          ordersText += `   ${i + 1}. 👤 Nama: *${item.name}*\n      📐 Size: ${item.size}${sleeveInfo}\n      🎨 Kode/Warna: ${item.colorCode}\n      🔢 Qty: ${item.qty} Pcs`;
+          const materialPrefix = item.catalogMaterial && item.catalogMaterial !== 'Unspecified' ? `${item.catalogMaterial} - ` : '';
+          ordersText += `   ${i + 1}. 👤 Nama: *${item.name}*\n      📐 Size: ${item.size}${sleeveInfo}\n      🎨 Kode/Warna: ${materialPrefix}${item.colorCode}\n      🔢 Qty: ${item.qty} Pcs`;
           if (item.scanUrl) ordersText += `\n      📷 Scan Warna: ${item.scanUrl}`;
           ordersText += `\n\n`;
         });
@@ -1360,7 +1364,10 @@ const DesignEditorView: React.FC<{
                               return (
                                 <>
                                   <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: displayHex }}></div>
-                                  <span className="font-bold text-emerald-500">{item.colorCode !== '-' ? item.colorCode : (colorObj?.name || item.color)}</span>
+                                  <span className="font-bold text-emerald-500">
+                                    {item.catalogMaterial && item.catalogMaterial !== 'Unspecified' ? `${item.catalogMaterial} - ` : ''}
+                                    {item.colorCode !== '-' ? item.colorCode : (colorObj?.name || item.color)}
+                                  </span>
                                 </>
                               );
                             })()}
@@ -1437,8 +1444,9 @@ const DesignEditorView: React.FC<{
                   {/* Kode Warna & Katalog Button */}
                   <div ref={colorCodeRef} className={`transition-all duration-300 ${colorCodeError ? 'animate-shake' : ''}`}>
                     <div className="flex justify-between items-center mb-1">
-                      <label className={`text-[10px] font-bold uppercase block ${colorCodeError ? 'text-red-500' : 'opacity-70'}`}>
-                        Kode Warna {colorCodeError && <span className="ml-1 animate-pulse italic">(Wajib Isi)</span>}
+                      <label className={`text-[10px] font-black uppercase block flex justify-between items-center ${colorCodeError ? 'text-red-500' : 'opacity-70'}`}>
+                        <span>Kode Warna <span className="text-red-500">*</span></span>
+                        {colorCodeError && <span className="text-[8px] animate-pulse italic bg-red-500 text-white px-1.5 py-0.5 rounded">Wajib Isi Kode Warna</span>}
                       </label>
                       <button
                         onClick={() => setShowCatalogModal(true)}
@@ -1474,12 +1482,15 @@ const DesignEditorView: React.FC<{
                           type="text"
                           value={newItem.colorCode}
                           onChange={(e) => { setNewItem({ ...newItem, colorCode: e.target.value }); setColorCodeError(null); }}
-                          placeholder="Scan Katalog / Kode Warna..."
-                          className={`w-full p-3 pr-12 rounded-xl border outline-none font-bold text-sm transition-all ${colorCodeError
-                            ? 'bg-red-50 border-red-500 focus:ring-2 focus:ring-red-200 placeholder:text-red-300 text-red-700'
-                            : (theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500 text-white' : 'bg-white border-zinc-200 focus:border-emerald-500 text-black')
+                          placeholder="(ISI KODE WARNA)"
+                          className={`w-full p-3 pr-12 rounded-xl border-2 outline-none font-bold text-sm transition-all ${colorCodeError
+                            ? 'bg-red-50 border-red-500 focus:ring-2 focus:ring-red-200 placeholder:text-red-300 text-red-700 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                            : (theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500 text-white placeholder:text-zinc-600' : 'bg-white border-zinc-200 focus:border-emerald-500 text-black placeholder:text-zinc-400 shadow-inner shadow-black/5')
                             }`}
                         />
+                        {newItem.colorCode && (
+                          <div className="absolute -top-2 left-3 px-1.5 bg-emerald-500 rounded text-[7px] font-black text-white uppercase tracking-tighter animate-fade-in">Tersimpan</div>
+                        )}
                         <button
                           onClick={() => setShowCatalogModal(true)}
                           className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors ${colorCodeError ? 'text-red-500 hover:bg-red-500/10' : 'text-emerald-500 hover:bg-emerald-500/10'}`}
@@ -1498,14 +1509,19 @@ const DesignEditorView: React.FC<{
 
                   {/* Nama */}
                   <div>
-                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70">Nama</label>
+                    <label className="text-[10px] font-bold uppercase mb-1 block opacity-70 flex justify-between">
+                      <span>Nama</span>
+                      <span className="text-red-500 text-[8px] animate-pulse">Wajib isi teks</span>
+                    </label>
                     <input
                       ref={nameInputRef}
                       type="text"
                       value={newItem.name}
                       onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                       placeholder="Contoh: Budi (Ketua)"
-                      className={`w-full p-3 rounded-xl border outline-none font-bold text-sm ${theme === 'dark' ? 'bg-black/30 border-zinc-700 focus:border-emerald-500' : 'bg-white border-zinc-200 focus:border-emerald-500'}`}
+                      className={`w-full p-3 rounded-xl border-2 outline-none font-bold text-sm transition-all ${theme === 'dark'
+                        ? 'bg-black/30 border-zinc-700 focus:border-emerald-500 text-white'
+                        : 'bg-white border-zinc-200 focus:border-emerald-500 text-black shadow-inner shadow-black/5'}`}
                     />
                   </div>
 
@@ -1904,15 +1920,22 @@ const DesignEditorView: React.FC<{
                 </div>
 
                 {/* Category Tabs */}
-                <div className="flex gap-2 p-4 overflow-x-auto no-scrollbar shrink-0">
+                <div className="flex gap-4 p-4 pt-8 overflow-x-auto no-scrollbar shrink-0 items-end">
                   {Object.keys(COLOR_CATALOGS).map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => { setActiveCatalogType(cat); setIsZoomed(false); }}
-                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeCatalogType === cat ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-zinc-500'}`}
-                    >
-                      {cat}
-                    </button>
+                    <div key={cat} className="relative shrink-0">
+                      {cat === 'Maryland' && (
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-gradient-to-r from-orange-400 to-yellow-500 px-2.5 py-1 rounded-full shadow-xl shadow-orange-500/30 animate-bounce z-10 whitespace-nowrap border border-white/20">
+                          <svg className="w-2 h-2 text-white fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                          <span className="text-[7px] font-black text-white uppercase tracking-tighter">Best Seller</span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => { setActiveCatalogType(cat); setIsZoomed(false); }}
+                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeCatalogType === cat ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-zinc-500'}`}
+                      >
+                        {cat}
+                      </button>
+                    </div>
                   ))}
                 </div>
 
@@ -2170,7 +2193,7 @@ const DesignEditorView: React.FC<{
 
                           const finalCode = capturedText && capturedText !== "No text detected" && capturedText !== "Error scanning"
                             ? capturedText.toUpperCase().replace(/\n/g, ' ')
-                            : "ISI KODE WARNA";
+                            : ""; // Set to empty to trigger validation and show placeholder
 
                           setDetectedCode(finalCode);
                           clearInterval(fragmentInterval);
