@@ -127,17 +127,18 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'j1',
-    name: 'Bomber Brad',
+    name: 'Jacket',
     category: 'Jaket',
     soldCount: getRandomSold(),
     image: ASSETS.JAKET.BOMBER,
     images: {
       front: ASSETS.JAKET.BOMBER,
-      back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/Bomber-Navy-2.jpg',
+      back: ASSETS.JAKET.BACK,
       leftSleeve: ASSETS.JAKET.BOMBER,
       rightSleeve: ASSETS.JAKET.BOMBER
     },
-    description: 'Jaket Bomber premium industri.'
+    gallery: ASSETS.JAKET.GALLERY,
+    description: 'Jaket Bomber premium industri dengan pilihan warna lengkap.'
   },
   {
     id: 'r1',

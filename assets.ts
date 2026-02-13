@@ -349,9 +349,16 @@ const VENTURA_GAL_2 = getModelAsset('Ventura', '2');
 const VENTURA_GAL_3 = getModelAsset('Ventura', '3');
 
 // --- ASSETS JAKET DARI FOLDER JACKET ---
-const BOMBER_BRAD_FRONT = getFrontImage('Bomber Brad');
-const BOMBER_BRAD_BACK = getBackImage('Bomber Brad');
-const BOMBER_BRAD_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Bomber Brad', n.toString())).filter(Boolean);
+const BOMBER_BRAD_FRONT = getFrontImage('Jacket') || getFrontImage('Bomber Brad');
+const BOMBER_BRAD_BACK = getBackImage('Jacket') || getBackImage('Bomber Brad');
+const BOMBER_BRAD_GAL = [
+  allImagesGlob['./assets/Jacket/jaket-hitam.jpeg'] as string,
+  allImagesGlob['./assets/Jacket/jaket-navi.jpeg'] as string,
+  allImagesGlob['./assets/Jacket/jaket-maroon.jpeg'] as string,
+  allImagesGlob['./assets/Jacket/jaket-hijau.jpeg'] as string,
+  allImagesGlob['./assets/Jacket/jaket-coklat.jpeg'] as string,
+  allImagesGlob['./assets/Jacket/jaket-cream.jpeg'] as string,
+].filter(Boolean);
 
 // --- ASSETS ROMPI DARI FOLDER ROMPI ---
 // --- ASSETS ROMPI DARI FOLDER ROMPI ---

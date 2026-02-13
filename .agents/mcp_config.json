@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "context7": {
+            "command": "node",
+            "args": [
+                "E:/context7/packages/mcp/dist/index.js",
+                "--api-key",
+                "ctx7sk-2c1e81b5-1881-4b37-bfa1-0fd2723828d5"
+            ]
+        }
+    }
+}

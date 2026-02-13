@@ -65,7 +65,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   // Dynamic video from assets/video folder
   const videoGlob = import.meta.glob('../assets/video/*.(mp4|webm|mov)', { eager: true, as: 'url' });
   const videoFiles = Object.values(videoGlob) as string[];
-  const heroVideo = videoFiles[0]; // Use first video found
+  const heroVideo = videoFiles[0] || 'https://www.bradwearindonesia.com/wp-content/uploads/2023/12/VID-20231201-WA0001.mp4'; // Use fallback if not found
 
   // Dynamic slideshow images from assets/slideshow folder
   const slideshowGlob = import.meta.glob('../assets/slideshow/*.(jpg|jpeg|png|webp)', { eager: true, as: 'url' });
@@ -628,39 +628,6 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       )}
 
-      {/* VIDEO SECTION */}
-      {heroVideo && (
-        <div className="px-6 py-12">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <h3 className={`text-3xl md:text-4xl font-black uppercase tracking-tighter mb-3 ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                LIHAT KAMI BEKERJA
-              </h3>
-              <p className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                Proses produksi profesional dengan standar industri modern
-              </p>
-            </div>
-            <div className="rounded-[48px] overflow-hidden shadow-2xl border border-white/10 bg-zinc-900 group relative">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-auto"
-              >
-                <source src={heroVideo} type="video/mp4" />
-                Browser Anda tidak mendukung video.
-              </video>
-              <div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest flex items-center gap-2">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                  LIVE PRODUCTION
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* DIPERCAYA RATUSAN INSTANSI (Our Partners) - Moved up and improved animation */}
       <div className="py-12 bg-emerald-500/5 border-y border-emerald-500/10 overflow-hidden">

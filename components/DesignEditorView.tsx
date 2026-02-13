@@ -7,7 +7,7 @@ import { Product, DesignData, DesignElement } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
 import { uploadImageToSupabase } from '../utils/supabaseService';
-import { getModelColorImage, getItemSpecificColors, COLOR_CATALOGS } from '../assets';
+import { getModelColorImage, getItemSpecificColors, COLOR_CATALOGS, ASSETS } from '../assets';
 import { analyzeImageWithGemini } from '../utils/geminiService';
 
 const DesignEditorView: React.FC<{
@@ -126,6 +126,9 @@ const DesignEditorView: React.FC<{
     location: ''
   });
 
+  const [showStepNotify, setShowStepNotify] = useState<{ step: number; msg: string } | null>(null);
+  const [showDownloadPrompt, setShowDownloadPrompt] = useState(false);
+
   const zoomContainerRef = useRef<HTMLDivElement>(null);
   const roiRef = useRef<HTMLDivElement>(null);
   const colorCodeRef = useRef<HTMLDivElement>(null);
@@ -196,13 +199,14 @@ const DesignEditorView: React.FC<{
 
   const handleNextStep = () => {
     if (editorStep === 'materials') {
+      setShowStepNotify({ step: 2, msg: "Sesuaikan logo dan nama sebagai acuan desain yang di inginkan" });
       if (product.category === 'Polo') {
         setEditorStep('finish');
       } else {
         setEditorStep('details');
       }
     } else if (editorStep === 'details') {
-      setEditorStep('finish');
+      setShowDownloadPrompt(true);
     }
   };
 
@@ -428,6 +432,12 @@ const DesignEditorView: React.FC<{
     pushToHistory(newElements);
     setActiveElementId(null);
   };
+
+  useEffect(() => {
+    if (editorStep === 'materials') {
+      setShowStepNotify({ step: 1, msg: "Pilih jenis bahan dan warna simulasi sebagai referensi" });
+    }
+  }, []);
 
   /* --- LOGIKA UPLOAD LOGO (SUPPORT MULTIPLE FILES) --- */
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetView?: 'Depan' | 'Belakang' | 'Kanan' | 'Kiri', targetPos?: { x: number, y: number }) => {
@@ -679,7 +689,17 @@ const DesignEditorView: React.FC<{
     if (!product.images) return product.image;
     switch (designData.view) {
       case 'Depan': return product.images.front; // Foto Tampak Depan
-      case 'Belakang': return product.images.back || product.image; // Foto Tampak Belakang
+      case 'Belakang':
+        if (product.images.back && !product.images.back.includes('unsplash') && !product.images.back.includes('bradwearindonesia.com')) {
+          return product.images.back;
+        }
+        // Fallback: Gunakan asset warna belakang jika tersedia
+        if (selectedColorObj) {
+          const colorKey = selectedColorObj.name.toUpperCase().replace(/\s+/g, '_');
+          const fallbackBack = (ASSETS.COLORS_BACK as any)[colorKey];
+          if (fallbackBack) return fallbackBack;
+        }
+        return product.images.back || product.image; // Foto Tampak Belakang
       case 'Kanan': return product.images.rightSleeve || product.image; // Foto Lengan Kanan
       case 'Kiri': return product.images.leftSleeve || product.image; // Foto Lengan Kiri
       default: return product.image;
@@ -692,24 +712,37 @@ const DesignEditorView: React.FC<{
     setIsExporting(true);
 
     try {
-      // Tunggu sebentar agar UI render sempurna
-      await new Promise(r => setTimeout(r, 100));
+      // RESET ZOOM & PAN AGAR HASIL CAPTURE PRESISI
+      const originalZoom = canvasZoom;
+      const originalPan = panPos;
+      setCanvasZoom(1);
+      setPanPos({ x: 0, y: 0 });
+
+      // Tunggu sebentar agar UI render sempurna tanpa zoom
+      await new Promise(r => setTimeout(r, 600));
 
       // Capture area canvas menjadi gambar
       const canvas = await html2canvas(canvasRef.current, {
         useCORS: true,
+        allowTaint: true,
         scale: 2, // Kualitas HD
-        backgroundColor: null
+        backgroundColor: null,
+        logging: false
       });
+
+      // Kembalikan Zoom jika perlu (opsional, tapi bagus untuk UX)
+      setCanvasZoom(originalZoom);
+      setPanPos(originalPan);
 
       // Ambil data base64
       const base64Data = canvas.toDataURL("image/png");
 
       // Gunakan Media Plugin untuk simpan ke Galeri (Android 10+ MediaStore API)
       try {
+        // Pada versi terbaru @capacitor-community/media, savePhoto akan otomatis memicu prompt izin jika belum ada.
         await Media.savePhoto({
           path: base64Data,
-          albumIdentifier: 'Bradwear Designs'
+          albumIdentifier: 'Bradmock Designs'
         });
         alert("Desain berhasil disimpan ke Galeri!");
       } catch (pluginErr) {
@@ -744,11 +777,17 @@ const DesignEditorView: React.FC<{
     const originalView = designData.view;
 
     try {
+      // RESET ZOOM & PAN
+      const originalZoom = canvasZoom;
+      const originalPan = panPos;
+      setCanvasZoom(1);
+      setPanPos({ x: 0, y: 0 });
+
       // 1. CAPTURE & UPLOAD DEPAN
       onUpdate({ view: 'Depan' });
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 1500));
 
-      const canvasFront = await html2canvas(canvasRef.current, { useCORS: true, scale: 2, backgroundColor: null });
+      const canvasFront = await html2canvas(canvasRef.current, { useCORS: true, allowTaint: true, scale: 2, backgroundColor: null });
       const imageFront = canvasFront.toDataURL("image/png");
 
       // Auto Download
@@ -764,9 +803,9 @@ const DesignEditorView: React.FC<{
 
       // 2. CAPTURE & UPLOAD BELAKANG
       onUpdate({ view: 'Belakang' });
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 1500));
 
-      const canvasBack = await html2canvas(canvasRef.current, { useCORS: true, scale: 2, backgroundColor: null });
+      const canvasBack = await html2canvas(canvasRef.current, { useCORS: true, allowTaint: true, scale: 2, backgroundColor: null });
       const imageBack = canvasBack.toDataURL("image/png");
 
       // Auto Download
@@ -780,6 +819,9 @@ const DesignEditorView: React.FC<{
       // Upload
       const backUrl = await uploadImageToSupabase(imageBack, `orders/back_${Date.now()}.png`);
 
+      // Restore state
+      setCanvasZoom(originalZoom);
+      setPanPos(originalPan);
       onUpdate({ view: originalView });
 
       // 3. PROCESS ITEMS & UPLOAD SCANS
@@ -876,7 +918,7 @@ const DesignEditorView: React.FC<{
       <div className={`w-full aspect-square md:w-[60%] lg:w-[65%] md:h-full relative flex flex-col items-center justify-center p-4 border-b md:border-b-0 md:border-r shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'bg-[#0a0a0a] border-white/5' : 'bg-zinc-200 border-zinc-300'}`}>
 
         {/* Undo/Redo/Back Header - Hidden when any popup is active */}
-        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && (
+        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showStepNotify && !showDownloadPrompt && (
           <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
             {/* Tombol Kembali (Menggunakan HandleBackCustom untuk reset) */}
             {/* Space Placeholder where Back Button was */}
@@ -953,11 +995,13 @@ const DesignEditorView: React.FC<{
                     }}
                   >
                     {el.type === 'text' ? (
-                      <div className={`px-2 py-1 rounded-sm whitespace-nowrap ${activeElementId === el.id
-                        ? 'border border-emerald-500 bg-emerald-500/10'
+                      <div className={`rounded-sm whitespace-nowrap transition-all ${activeElementId === el.id || el.content.trim() !== ''
+                        ? 'bg-white border border-zinc-300'
                         : 'bg-transparent'
-                        }`}>
-                        <span className={`text-[12px] md:text-[14px] font-bold uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] ${theme === 'dark' ? 'text-white' : 'text-zinc-100'}`} style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{el.content}</span>
+                        }`}
+                        style={{ padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1' }}
+                      >
+                        <span className="text-[12px] md:text-[14px] font-black uppercase text-black" style={{ display: 'block', lineHeight: '1' }}>{el.content}</span>
                       </div>
                     ) : (
                       /* --- ELEMENT GAMBAR (LOGO) --- */
@@ -978,7 +1022,7 @@ const DesignEditorView: React.FC<{
         </div>
 
         {/* View Controls (Navigation & Side Toggle) - Hidden when modals are active */}
-        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && (
+        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && !showStepNotify && !showDownloadPrompt && (
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 w-full max-w-[95%] md:max-w-max justify-center px-2">
 
             {/* Tombol Kembali Cepat */}
@@ -990,18 +1034,20 @@ const DesignEditorView: React.FC<{
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
             </button>
 
-            {/* View Toggle */}
-            <div className={`flex gap-2 p-1.5 rounded-2xl border backdrop-blur-md ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
-              {availableViews.map(v => (
-                <button
-                  key={v}
-                  onClick={() => onUpdate({ view: v as any })}
-                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
+            {/* View Toggle - Hidden for Jaket, Rompi, Celana, and Polo */}
+            {!['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category) && (
+              <div className={`flex gap-2 p-1.5 rounded-2xl border backdrop-blur-md ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
+                {availableViews.map(v => (
+                  <button
+                    key={v}
+                    onClick={() => onUpdate({ view: v as any })}
+                    className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Tombol Lanjut Cepat */}
             {editorStep !== 'finish' && (
@@ -1288,13 +1334,37 @@ const DesignEditorView: React.FC<{
                 />
               </div>
 
-              {/* Atribut Lain (Belakang) */}
+              {/* Atribut Lain (Lengan & Belakang) */}
               <div>
                 <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 block">Posisi Atribut Lain</label>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => fileInputRefLenganKanan.current?.click()}
+                    className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 group transition-all active:scale-95 ${theme === 'dark'
+                      ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
+                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
+                      }`}
+                  >
+                    <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kanan</span>
+                    <input type="file" ref={fileInputRefLenganKanan} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KANAN)} />
+                  </button>
+
+                  <button
+                    onClick={() => fileInputRefLenganKiri.current?.click()}
+                    className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 group transition-all active:scale-95 ${theme === 'dark'
+                      ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
+                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
+                      }`}
+                  >
+                    <svg className="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <span className="text-[9px] font-bold uppercase transition-colors">Lengan Kiri</span>
+                    <input type="file" ref={fileInputRefLenganKiri} className="hidden" multiple accept="image/*" onChange={(e) => handleLogoUpload(e, 'Depan', DEFAULT_POS.LENGAN_KIRI)} />
+                  </button>
+
                   <button
                     onClick={() => { onUpdate({ view: 'Belakang' }); fileInputRefBelakang.current?.click(); }}
-                    className={`p-4 rounded-xl border flex flex-row items-center justify-center gap-3 group transition-all active:scale-95 ${theme === 'dark'
+                    className={`col-span-2 p-4 rounded-xl border flex flex-row items-center justify-center gap-3 group transition-all active:scale-95 ${theme === 'dark'
                       ? 'border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800 text-zinc-500 hover:text-white'
                       : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-black'
                       }`}
@@ -1648,7 +1718,7 @@ const DesignEditorView: React.FC<{
           )}
 
           {/* Footer Actions */}
-          <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'}`}>
+          <div className={`p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'} ${showStepNotify || showDownloadPrompt ? 'hidden' : ''}`}>
             {editorStep !== 'finish' ? (
               <button
                 onClick={() => {
@@ -2235,6 +2305,96 @@ const DesignEditorView: React.FC<{
                 </div>
 
 
+              </div>
+            </div>
+          )}
+
+          {/* POPUP: STEP NOTIFICATION */}
+          {showStepNotify && (
+            <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-fade-in" onClick={() => setShowStepNotify(null)}>
+              <div className={`w-full max-w-sm p-8 rounded-[40px] text-center border shadow-2xl transform scale-100 transition-all ${theme === 'dark' ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200'}`} onClick={e => e.stopPropagation()}>
+                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6">
+                  <span className="text-2xl font-black text-emerald-500">{showStepNotify.step}</span>
+                </div>
+                <h3 className="text-xl font-black uppercase tracking-widest mb-4">Step {showStepNotify.step}</h3>
+                <p className={`text-sm font-bold uppercase tracking-wide leading-relaxed mb-8 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                  {showStepNotify.msg}
+                </p>
+                <button onClick={() => setShowStepNotify(null)} className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                  Mulai
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* POPUP: DOWNLOAD PROMPT (ANIMATED) */}
+          {showDownloadPrompt && (
+            <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-fade-in">
+              <div className={`w-full max-w-md p-10 rounded-[48px] text-center border shadow-premium relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`} onClick={e => e.stopPropagation()}>
+                {/* Background Decor */}
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px]"></div>
+
+                <div className="relative z-10">
+                  <div className="w-20 h-20 mx-auto rounded-3xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-8 animate-bounce">
+                    <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  </div>
+
+                  <h3 className="text-2xl font-black uppercase tracking-tighter mb-4">Unduh Hasil Desain</h3>
+                  <p className={`text-xs font-medium uppercase tracking-widest mb-10 opacity-60 leading-relaxed`}>
+                    Simpan gambar simulasi depan & belakang <br /> sebelum masuk ke daftar pesanan.
+                  </p>
+
+                  <div className="grid grid-cols-1 gap-4 mb-8">
+                    <button
+                      onClick={async () => {
+                        const originalView = designData.view;
+                        onUpdate({ view: 'Depan' });
+                        await new Promise(r => setTimeout(r, 1000));
+                        await handleSaveImage();
+                        onUpdate({ view: originalView });
+                      }}
+                      className="flex items-center justify-between p-5 rounded-2xl bg-black/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 group transition-all"
+                    >
+                      <span className="font-black uppercase tracking-widest text-[11px]">Tampak Depan</span>
+                      <svg className="w-5 h-5 text-emerald-500 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7-7-7m14-10l-7 7-7-7" /></svg>
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        const originalView = designData.view;
+                        onUpdate({ view: 'Belakang' });
+                        await new Promise(r => setTimeout(r, 600));
+
+                        // Check if back image exists, handled by currentDisplayImage logic
+                        await handleSaveImage();
+
+                        onUpdate({ view: originalView });
+                      }}
+                      className="flex items-center justify-between p-5 rounded-2xl bg-black/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 group transition-all"
+                    >
+                      <span className="font-black uppercase tracking-widest text-[11px]">Tampak Belakang</span>
+                      <svg className="w-5 h-5 text-emerald-500 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7-7-7m14-10l-7 7-7-7" /></svg>
+                    </button>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setShowDownloadPrompt(false)}
+                      className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${theme === 'dark' ? 'bg-zinc-800 text-zinc-400' : 'bg-zinc-100 text-zinc-500'}`}
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDownloadPrompt(false);
+                        setEditorStep('finish');
+                      }}
+                      className="flex-1 py-4 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
+                    >
+                      Lanjutkan
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
