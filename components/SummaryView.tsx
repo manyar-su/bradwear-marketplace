@@ -2,24 +2,20 @@
 import React, { useState, useMemo } from 'react';
 import { Product, DesignData, OrderItem, CustomMeasurements } from '../types';
 import { SIZES, COLORS } from '../constants';
+import { useStore } from '../context/StoreContext';
 
-interface SummaryViewProps {
-  product: Product;
-  designData: DesignData;
-  orderItems: OrderItem[];
-  setOrderItems: React.Dispatch<React.SetStateAction<OrderItem[]>>;
-  onBack: () => void;
-  theme: 'light' | 'dark';
-}
+const SummaryView: React.FC = () => {
+  const { 
+    selectedProduct: product, 
+    designData, 
+    orderItems, 
+    setOrderItems, 
+    handleGoBack: onBack, 
+    theme 
+  } = useStore();
 
-const SummaryView: React.FC<SummaryViewProps> = ({
-  product,
-  designData,
-  orderItems,
-  setOrderItems,
-  onBack,
-  theme
-}) => {
+  if (!product) return null; // Should not happen in this view
+
   const [isSending, setIsSending] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [showSizePicker, setShowSizePicker] = useState<number | null>(null);

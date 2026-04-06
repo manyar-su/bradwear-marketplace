@@ -33,9 +33,19 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
 
             // Tampilkan aset lokal dulu jika ada
             if (isMounted && allFoundImages.length > 0) {
-                const depanLocals = allFoundImages.filter(img => img.toLowerCase().includes('depan'));
-                const initialImages = depanLocals.length > 0 ? depanLocals : allFoundImages;
-                setImages(initialImages.slice(0, 10));
+                const depanLocals = allFoundImages.filter(img =>
+                    (img.toLowerCase().includes('depan') || img.toLowerCase().includes('front')) &&
+                    !(img.toLowerCase().includes('belakang') || img.toLowerCase().includes('back'))
+                );
+
+                // Fallback local: ambil yang bukan belakang
+                const finalLocals = depanLocals.length > 0 ? depanLocals : allFoundImages.filter(img => {
+                    const low = img.toLowerCase();
+                    const decodedStr = decodeURIComponent(low);
+                    return !(decodedStr.includes('belakang') || decodedStr.includes('back') || decodedStr.includes('blkg'));
+                });
+
+                setImages(finalLocals.length > 0 ? finalLocals.slice(0, 4) : [allFoundImages[0]]);
                 setLoading(false);
             }
 
@@ -48,7 +58,6 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
                 `Jacket/${folderName}`,
                 `Celana/${folderName}`,
                 `Rompi/${folderName}`,
-                `Kids Series/${folderName}`
             ];
 
             try {
@@ -60,15 +69,27 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
                     }
                 });
 
-                // Hapus duplikat dan limit maksimal 10 gambar untuk performa
-                const uniqueImages = Array.from(new Set(allFoundImages)).slice(0, 10);
+                // Hapus duplikat
+                const uniqueAll = Array.from(new Set(allFoundImages));
 
-                // Filter 'depan' tetap menjadi prioritas tampilan utama
-                const depanImages = uniqueImages.filter(img => img.toLowerCase().includes('depan'));
-                const finalImages = depanImages.length > 0 ? depanImages : uniqueImages;
+                // KHUSUS GRID KATALOG: Selalu tampilkan TAMPAK DEPAN
+                // Filter ketat: cari yang ada kata 'depan'/'front', dan buang yang ada kata 'belakang'/'back'
+                const depanImages = uniqueAll.filter(img => {
+                    const low = img.toLowerCase();
+                    const decodedStr = decodeURIComponent(low);
+                    return (decodedStr.includes('depan') || decodedStr.includes('front')) &&
+                        !(decodedStr.includes('belakang') || decodedStr.includes('back') || decodedStr.includes('blkg'));
+                });
+
+                // Fallback: jika tidak ada yang bernama 'depan', ambil yang setidaknya tidak bernama 'belakang'
+                const finalImages = depanImages.length > 0 ? depanImages : uniqueAll.filter(img => {
+                    const decodedStr = decodeURIComponent(img.toLowerCase());
+                    return !(decodedStr.includes('belakang') || decodedStr.includes('back') || decodedStr.includes('blkg'));
+                });
 
                 if (isMounted) {
-                    setImages(finalImages);
+                    const result = finalImages.length > 0 ? finalImages.slice(0, 4) : [fallbackImage];
+                    setImages(result);
                     setLoading(false);
                 }
             } catch (error) {
@@ -93,9 +114,12 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
 
     if (loading) {
         return (
-            <div className={`animate-pulse flex items-center justify-center ${className} ${theme === 'dark' ? 'bg-zinc-900' : 'bg-zinc-100'}`}>
-                <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
-            </div>
+             <img
+                src={fallbackImage}
+                className={className}
+                onClick={onImageClick}
+                alt={folderName}
+            />
         );
     }
 
@@ -132,8 +156,11 @@ const DynamicFolderGallery: React.FC<DynamicFolderGalleryProps> = ({
                         ))}
                     </div>
                     <div className="bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 shadow-2xl">
-                        <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span className="text-[9px] font-black text-white tracking-widest uppercase">KATALOG: {images.length} ITEM</span>
+                        <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" /></svg>
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[6px] font-bold text-zinc-400 tracking-wider uppercase">KATALOG</span>
+                            <span className="text-[9px] font-black text-white tracking-wide uppercase">{images.length} ITEM</span>
+                        </div>
                     </div>
                 </div>
             )}

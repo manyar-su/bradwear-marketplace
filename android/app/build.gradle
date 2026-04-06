@@ -1,16 +1,29 @@
 apply plugin: 'com.android.application'
 
 def packageJson = new groovy.json.JsonSlurper().parseText(file('../../package.json').text)
+def versionCodeFromName = { String versionName ->
+    def parts = (versionName ?: '0.0.0').tokenize('.')
+    def major = parts.size() > 0 ? parts[0].replaceAll(/\D.*/, '').toInteger() : 0
+    def minor = parts.size() > 1 ? parts[1].replaceAll(/\D.*/, '').toInteger() : 0
+    def patch = parts.size() > 2 ? parts[2].replaceAll(/\D.*/, '').toInteger() : 0
+    return (major * 10000) + (minor * 100) + patch
+}
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     namespace "com.bradwear.app"
     compileSdk = rootProject.ext.compileSdkVersion
+    buildToolsVersion "36.1.0"
     defaultConfig {
         applicationId "com.bradwear.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
         versionName packageJson.version
+        versionCode versionCodeFromName(packageJson.version)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -18,10 +31,19 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties.getProperty("storeFile", "release.keystore"))
+            storePassword keystoreProperties.getProperty("storePassword", System.getenv("BRADWEAR_STORE_PASSWORD") ?: "")
+            keyAlias keystoreProperties.getProperty("keyAlias", System.getenv("BRADWEAR_KEY_ALIAS") ?: "")
+            keyPassword keystoreProperties.getProperty("keyPassword", System.getenv("BRADWEAR_KEY_PASSWORD") ?: "")
+        }
+    }
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

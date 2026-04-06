@@ -106,12 +106,15 @@ export const listImagesInFolder = async (folderPath: string): Promise<string[]> 
 
         if (!data || data.length === 0) return [];
 
-        // Return public URLs for all files found
+        // Return public URLs for all files found with manual encoding for safety
         return data.map(file => {
-            const { data: urlData } = supabase.storage
-                .from(SUPABASE_BUCKET)
-                .getPublicUrl(`${folderPath}/${file.name}`);
-            return urlData.publicUrl;
+            // Encode path segments individually to handle spaces and special chars (e.g. parentheses)
+            const encodedFolder = folderPath.split('/').map(s => encodeURIComponent(s)).join('/');
+            const encodedFile = encodeURIComponent(file.name);
+            const supabaseUrl = (supabase as any).supabaseUrl;
+
+            // Manual construction is safer than getPublicUrl which might not encode strict chars
+            return `${supabaseUrl}/storage/v1/object/public/${SUPABASE_BUCKET}/${encodedFolder}/${encodedFile}`;
         });
     } catch (err) {
         console.error('Critical error in listImagesInFolder:', err);

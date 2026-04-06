@@ -1,0 +1,9 @@
+@echo off
+echo Starting Build 1.2.4...
+call npm run build
+echo Syncing Capacitor...
+call npx cap sync android
+echo Building APK...
+cd android
+call gradlew.bat assembleRelease
+echo Done.

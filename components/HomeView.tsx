@@ -6,17 +6,10 @@ import { ASSETS } from '../assets';
 import { useRef } from 'react';
 import OptimizedImage from './OptimizedImage';
 import DynamicFolderGallery from './DynamicFolderGallery';
+import { useStore } from '../context/StoreContext';
 
-interface HomeViewProps {
-  products: Product[];
-  workflowStages: WorkflowStage[];
-  orderCode: string;
-  branding: { title: string; subtitle: string };
-  onSelectProduct: (product: Product) => void;
-  theme: 'light' | 'dark';
-}
-
-const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode, branding, onSelectProduct, theme }) => {
+const HomeView: React.FC = () => {
+  const { products, userWorkflowStages: workflowStages, orderCode, handleSelectProduct: onSelectProduct, theme } = useStore();
   const [activeTab, setActiveTab] = useState<Category>('Kemeja');
   const [selectedCatalog, setSelectedCatalog] = useState<Product | null>(null);
 
@@ -46,6 +39,8 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
   const [promoSlide, setPromoSlide] = useState(0);
   const [catalogImages, setCatalogImages] = useState<string[]>([]);
   const [showAboutContent, setShowAboutContent] = useState(false);
+  const [trackingCode, setTrackingCode] = useState('');
+  const [isTracked, setIsTracked] = useState(false);
   const catalogRef = useRef<HTMLDivElement>(null);
 
   const scrollToCatalog = () => {
@@ -73,9 +68,9 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
 
   const promoSlides = [
     { title: "PRODUKSI MASAL", desc: "Kapasitas ribuan pcs per bulan dengan QC ketat.", img: slideshowImages[0] || "https://images.unsplash.com/photo-1558191053-8edcb01e1da3?auto=format&fit=crop&q=80&w=800", tag: "KAPASITAS" },
-    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin Jepang terbaru.", img: slideshowImages[1] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800", tag: "PRESISI" },
-    { title: "NAGATA DRILL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: slideshowImages[2] || "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
-    { title: "STANDAR TAILOR", desc: "Jahitan rapi & kuat kualitas ekspor.", img: slideshowImages[3] || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
+    { title: "BORDIR KOMPUTER", desc: "Detail tajam dengan mesin terbaik di kelasnya.", img: slideshowImages[1] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800", tag: "PRESISI" },
+    { title: "TROPICAL", desc: "Bahan adem, lembut, & tidak mudah luntur.", img: slideshowImages[2] || "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800", tag: "FAVORIT" },
+    { title: "KONVEKSI STANDAR TAILOR", desc: "Jahitan rapi, kuat, dan kualitas tinggi.", img: slideshowImages[3] || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800", tag: "KUALITAS" },
     { title: "BANYAK INSTANSI", desc: "Dipercaya ratusan instansi di seluruh Indonesia.", img: slideshowImages[4] || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800", tag: "KEPERCAYAAN" },
     { title: "MANUFAKTUR MODERN", desc: "Proses produksi cepat dengan teknologi terkini.", img: slideshowImages[5] || "https://images.unsplash.com/photo-1524234107056-1c1f48f64ab8?auto=format&fit=crop&q=80&w=800", tag: "MODERN" },
     { title: "HARGA PABRIK", desc: "Produksi tangan pertama, lebih hemat biaya.", img: slideshowImages[6] || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800", tag: "EKONOMIS" }
@@ -204,17 +199,64 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         ) : (
           <div
             onClick={scrollToCatalog}
-            className={`p-6 rounded-[32px] border flex items-center gap-5 glass cursor-pointer transition-all hover:scale-[1.02] active:scale-95 ${theme === 'dark' ? 'border-white/10 bg-gradient-to-r from-zinc-900/50 to-transparent' : 'border-zinc-200 bg-white shadow-lg'}`}
+            className={`p-0 rounded-[48px] border relative overflow-hidden glass cursor-pointer transition-all duration-700 hover:scale-[1.02] active:scale-95 group shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-zinc-900/40' : 'border-zinc-200 bg-white'}`}
           >
-            <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center shrink-0 border border-white/5">
-              <svg className="w-6 h-6 neon-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            {/* Rich Background Elements */}
+            <div className="absolute inset-0 z-0">
+              <img src={ASSETS.BRAND.HERO} className="w-full h-full object-cover opacity-[0.2] brightness-50 group-hover:scale-110 transition-transform duration-[4000ms]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+              <div className="absolute -top-12 -right-12 w-64 h-64 neon-bg opacity-10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000"></div>
             </div>
-            <div className="flex-1">
-              <p className="text-[11px] font-black adaptive-text uppercase leading-tight">Anda belum memesan,</p>
-              <p className="text-[9px] font-bold neon-text uppercase tracking-widest">Silakan kustom desain kemeja anda</p>
+
+            <div className="flex items-center gap-6 p-8 relative z-10">
+              {/* Animated Icon Container */}
+              <div className="relative shrink-0">
+                <div className="absolute inset-0 neon-bg opacity-20 blur-xl animate-pulse rounded-full"></div>
+                <div className="w-16 h-16 rounded-[24px] bg-zinc-900 flex items-center justify-center border border-white/5 shadow-inner relative z-10 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent"></div>
+                  <svg className="w-8 h-8 neon-text animate-floating" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em]">PRODUKSI AKTIF</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h3 className="text-[18px] font-black uppercase leading-none tracking-tighter text-white">
+                    Desain <span className="neon-text">Kemeja Dinas</span> Anda
+                  </h3>
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest opacity-80">Bersama Bradwear Indonesia</p>
+                </div>
+
+                {/* Vertical Category Loop Animation */}
+                <div className="h-5 overflow-hidden flex items-center pt-1">
+                  <div className="flex flex-col animate-slide-up-loop">
+                    {['KEMEJA', 'JAKET', 'CELANA', 'ROMPI', 'POLO', 'KEMEJA'].map((cat, idx) => (
+                      <div key={idx} className="h-5 flex items-center gap-2 whitespace-nowrap">
+                        <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">PILIHAN</span>
+                        <span className="text-[10px] font-black neon-text uppercase tracking-[0.2em]">{cat}</span>
+                        <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">{">>>"}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="w-14 h-14 rounded-3xl neon-bg flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.3)] group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                <svg className="w-7 h-7 text-black translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M9 5l7 7-7 7" /></svg>
+              </div>
             </div>
-            <div className="w-8 h-8 rounded-full neon-bg flex items-center justify-center shadow-lg">
-              <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M9 5l7 7-7 7" /></svg>
+
+            {/* Bottom Shimmer Bar */}
+            <div className="h-1 w-full bg-white/5 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent w-1/2 animate-marquee" style={{ animationDuration: '2s' }}></div>
             </div>
           </div>
         )}
@@ -251,7 +293,7 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
       <main ref={catalogRef} className="px-6 space-y-8 mt-4">
         {/* Category Tabs */}
         <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
-          {(['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo', 'Kids'] as Category[]).map(cat => (
+          {(['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as Category[]).map(cat => (
             <button key={cat} onClick={() => setActiveTab(cat)} className={`px-7 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${activeTab === cat ? 'neon-bg text-black neon-border shadow-lg scale-105' : theme === 'dark' ? 'bg-zinc-900/50 text-zinc-500 border-white/5' : 'bg-white text-zinc-500 border-zinc-200 shadow-sm'}`}>
               {cat}
             </button>
@@ -343,40 +385,86 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
         </div>
       </section>
 
-      {/* CTA SECTION */}
+      {/* CTA SECTION - ENHANCED WITH MODEL SHOWCASE */}
       <section className="mt-12 px-6">
-        <div className={`p-10 rounded-[48px] border glass relative overflow-hidden group shadow-2xl transition-all duration-700 hover:shadow-[0_40px_100px_rgba(191,255,0,0.25)] animate-breathe ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
-          <div className="absolute -top-12 -right-12 w-64 h-64 neon-bg opacity-10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000"></div>
-          <div className="absolute -bottom-24 -left-24 w-48 h-48 neon-bg opacity-5 rounded-full blur-[60px]"></div>
-          <div className="relative z-10 text-center space-y-8">
-            <div className="space-y-3">
-              <span className="text-[10px] font-black neon-text uppercase tracking-[0.5em] px-4 py-1.5 rounded-full border border-[#BFFF00]/20 bg-[#BFFF00]/5 inline-block animate-pulse">Konsultasi Prioritas</span>
-              <h2 className={`text-3xl font-black uppercase tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-zinc-600'}`}>Wujudkan Seragam<br /><span className="neon-text italic tracking-normal">Impian Unit Anda</span></h2>
-              <p className="text-xs font-medium adaptive-text-muted leading-relaxed px-4 opacity-80">Hubungi tim ahli kami untuk mendapatkan penawaran harga terbaik dan bantuan kustomisasi desain instansi Anda.</p>
+        <div className={`p-0 rounded-[48px] border glass relative overflow-hidden group shadow-2xl transition-all duration-1000 hover:shadow-[0_50px_120px_rgba(191,255,0,0.3)] ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'}`}>
+
+          {/* Background Animated Showcase */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
+            <div className="flex animate-marquee h-full opacity-40 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000">
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="flex gap-4 h-full py-4 px-2">
+                  {[
+                    ASSETS.KEMEJA.BRAD_V3.FRONT,
+                    ASSETS.JAKET.BOMBER,
+                    ASSETS.ROMPI.TACTICAL,
+                    ASSETS.CELANA.WARRIOR,
+                    ASSETS.KEMEJA.YOROI.FRONT,
+                    ASSETS.POLO.BASIC
+                  ].map((img, idx) => (
+                    <img key={idx} src={img} className="h-full aspect-[3/4] object-cover rounded-[32px] border border-white/5 shadow-2xl" alt="Showcase" />
+                  ))}
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-6 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-xl hover:scale-[1.05] active:scale-95 transition-all duration-300 text-center flex items-center justify-center gap-3"
+          </div>
+
+          {/* Content Overlay */}
+          <div className="relative z-20 p-10 text-center space-y-8 backdrop-blur-[2px]">
+            <div className="space-y-4">
+              <div className="flex justify-center gap-2">
+                {['KEMEJA', 'JAKET', 'ROMPI', 'CELANA'].map((cat, i) => (
+                  <span key={i} className="text-[7px] font-black neon-text uppercase tracking-[0.3em] px-3 py-1 rounded-full border border-[#BFFF00]/20 bg-[#BFFF00]/5 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}>
+                    {cat}
+                  </span>
+                ))}
+              </div>
+
+              <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">
+                Wujudkan Seragam<br />
+                <span className="neon-text italic tracking-normal drop-shadow-[0_0_15px_rgba(191,255,0,0.5)]">Impian Instansi Anda</span>
+              </h2>
+
+              <p className="text-xs font-medium text-zinc-300 leading-relaxed px-4 opacity-90 max-w-lg mx-auto">
+                Mulai kustomisasi desain dengan standar produksi tinggi. Pilih model, tentukan bahan, dan pasang atribut resmi unit Anda sekarang.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={scrollToCatalog}
+                className="w-full py-7 neon-bg text-black font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_0_40px_rgba(191,255,0,0.4)] hover:scale-[1.05] active:scale-95 transition-all duration-500 text-lg flex items-center justify-center gap-4 group/btn"
               >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
-                INSTAGRAM
-              </a>
-              <a
-                href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-6 bg-black text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-xl hover:scale-[1.05] active:scale-95 transition-all duration-300 text-center flex items-center justify-center gap-3 border border-white/10"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
-                TIKTOK
-              </a>
+                🚀 MULAI DESAIN SEKARANG
+                <svg className="w-6 h-6 group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </button>
+
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href="https://www.instagram.com/reel/DTPxcXbk3hp/?utm_source=ig_web_copy_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-5 bg-white/5 backdrop-blur-md text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-[24px] border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                  INSTAGRAM
+                </a>
+                <a
+                  href="https://www.tiktok.com/@bradwearindonesia?is_from_webapp=1&sender_device=pc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-5 bg-white/5 backdrop-blur-md text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-[24px] border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                  TIKTOK
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </section>
+
 
 
 
@@ -443,20 +531,72 @@ const HomeView: React.FC<HomeViewProps> = ({ products, workflowStages, orderCode
                 </div>
               )}
               {activeModal === 'tracking' && (
-                <div className="space-y-8">
-                  <div className="p-6 rounded-[28px] border text-center glass border-emerald-500/10 shadow-inner">
-                    <p className="text-[10px] font-black uppercase text-zinc-500 mb-2 tracking-widest">SINKRONISASI AKTIF</p>
-                    <h4 className="text-lg font-black uppercase tracking-tight neon-text">ORDER #{orderCode}</h4>
-                    <p className="text-[9px] font-bold adaptive-text mt-2 uppercase">TAHAP: {(currentStage.label === 'Shipping' ? 'DIKIRIM' : currentStage.label.toUpperCase())}</p>
-                  </div>
+                <div className="space-y-6">
+                  {/* Tracking Form */}
                   <div className="space-y-4">
-                    {workflowStages.map(s => (
-                      <div key={s.id} className="flex items-center gap-4">
-                        <div className={`w-3.5 h-3.5 rounded-full border-2 ${s.status === 'completed' ? 'neon-bg border-transparent shadow-[0_0_10px_rgba(191,255,0,0.5)]' : s.status === 'current' ? 'neon-border border-2 animate-pulse' : 'border-zinc-800'}`}></div>
-                        <p className={`text-[10px] font-black uppercase tracking-widest ${s.status !== 'pending' ? 'adaptive-text' : 'adaptive-text-muted opacity-50'}`}>{s.label.toUpperCase()}</p>
-                      </div>
-                    ))}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="MASUKKAN KODE BARANG..."
+                        value={trackingCode}
+                        onChange={(e) => {
+                          setTrackingCode(e.target.value);
+                          if (isTracked) setIsTracked(false);
+                        }}
+                        className={`w-full bg-white/5 border ${theme === 'dark' ? 'border-white/10' : 'border-zinc-200'} rounded-2xl px-6 py-5 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-emerald-500 transition-all outline-none adaptive-text`}
+                      />
+                      <button
+                        onClick={() => trackingCode.trim() !== '' && setIsTracked(true)}
+                        className="absolute right-2 top-2 bottom-2 px-6 bg-emerald-500 text-black text-[10px] font-black uppercase rounded-xl shadow-lg active:scale-95 transition-all"
+                      >
+                        CEK
+                      </button>
+                    </div>
+                    <div className="flex items-start gap-2 px-2">
+                      <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <p className="text-[10px] font-bold italic text-emerald-500 leading-relaxed">
+                        tanyakan kepada cs untuk melacak proses
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Tracking Results */}
+                  {isTracked && trackingCode.trim() !== '' && (
+                    <div className="space-y-8 animate-fade-in pt-4 border-t border-white/5">
+                      <div className="p-6 rounded-[28px] border text-center glass border-emerald-500/10 shadow-inner">
+                        <p className="text-[10px] font-black uppercase text-zinc-500 mb-2 tracking-widest">HASIL PELACAKAN</p>
+                        <h4 className="text-lg font-black uppercase tracking-tight neon-text">ID: {trackingCode.toUpperCase()}</h4>
+                        <p className="text-[9px] font-bold adaptive-text mt-2 uppercase">STATUS: <span className="text-emerald-500">PRODUKSI BERJALAN</span></p>
+                      </div>
+                      <div className="space-y-5 px-2">
+                        {workflowStages.map((s, idx) => {
+                          // Mockup: completed the first 3 stages if tracked
+                          const isDone = idx < 3;
+                          const isCurrent = idx === 3;
+                          return (
+                            <div key={s.id} className="flex items-center gap-5">
+                              <div className="relative flex items-center justify-center">
+                                {idx < workflowStages.length - 1 && (
+                                  <div className={`absolute top-4 bottom-0 w-0.5 left-1/2 -translate-x-1/2 ${isDone ? 'bg-emerald-500' : 'bg-zinc-800'}`} style={{ height: '24px' }}></div>
+                                )}
+                                <div className={`w-4 h-4 rounded-full border-2 z-10 ${isDone ? 'neon-bg border-transparent shadow-[0_0_10px_rgba(191,255,0,0.5)]' : isCurrent ? 'bg-zinc-900 border-emerald-500 animate-pulse' : 'bg-zinc-900 border-zinc-800'}`}>
+                                  {isDone && (
+                                    <svg className="w-3 h-3 text-black mx-auto mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <p className={`text-[10px] font-black uppercase tracking-widest ${isDone || isCurrent ? 'adaptive-text' : 'adaptive-text-muted opacity-50'}`}>
+                                  {s.label.toUpperCase()}
+                                </p>
+                                {isCurrent && <p className="text-[8px] neon-text font-bold uppercase tracking-widest mt-0.5 animate-pulse">TAHAP SAAT INI</p>}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               {activeModal === 'help' && (

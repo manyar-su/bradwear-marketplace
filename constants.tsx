@@ -7,13 +7,13 @@ const getRandomSold = () => Math.floor(Math.random() * (4500 - 2000 + 1)) + 2000
 export const PRODUCTS: Product[] = [
   {
     id: 'k2',
-    name: 'Brad-V1',
+    name: 'Brad-v1',
     category: 'Kemeja',
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.BRAD_V1.FRONT,
     images: {
       front: ASSETS.KEMEJA.BRAD_V1.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      back: ASSETS.KEMEJA.BRAD_V1.BACK,
       leftSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT,
       rightSleeve: ASSETS.KEMEJA.BRAD_V1.FRONT
     },
@@ -22,13 +22,13 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'k3',
-    name: 'Brad-V2',
+    name: 'Brad-v2',
     category: 'Kemeja',
     soldCount: getRandomSold(),
     image: ASSETS.KEMEJA.BRAD_V2.FRONT,
     images: {
       front: ASSETS.KEMEJA.BRAD_V2.FRONT,
-      back: ASSETS.KEMEJA.YOROI.BACK,
+      back: ASSETS.KEMEJA.BRAD_V2.BACK,
       leftSleeve: ASSETS.KEMEJA.BRAD_V2.FRONT,
       rightSleeve: ASSETS.KEMEJA.BRAD_V2.FRONT
     },
@@ -88,7 +88,7 @@ export const PRODUCTS: Product[] = [
     image: ASSETS.KEMEJA.VENTURA.FRONT,
     images: {
       front: ASSETS.KEMEJA.VENTURA.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK,
+      back: ASSETS.KEMEJA.VENTURA.BACK,
       leftSleeve: ASSETS.KEMEJA.VENTURA.FRONT,
       rightSleeve: ASSETS.KEMEJA.VENTURA.FRONT
     },
@@ -103,7 +103,7 @@ export const PRODUCTS: Product[] = [
     image: ASSETS.KEMEJA.PDH.FRONT,
     images: {
       front: ASSETS.KEMEJA.PDH.FRONT,
-      back: 'https://www.bradwearindonesia.com/wp-content/uploads/2023/05/PDH-White-2.jpg',
+      back: ASSETS.KEMEJA.PDH.BACK,
       leftSleeve: ASSETS.KEMEJA.PDH.FRONT,
       rightSleeve: ASSETS.KEMEJA.PDH.FRONT
     },
@@ -112,18 +112,18 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'k10',
-    name: 'Strazar',
+    name: 'Strazard',
     category: 'Kemeja',
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.STRAZAR.FRONT,
+    image: ASSETS.KEMEJA.STRAZAR.DISPLAY,
     images: {
       front: ASSETS.KEMEJA.STRAZAR.FRONT,
-      back: ASSETS.KEMEJA.YOROI.BACK,
+      back: ASSETS.KEMEJA.STRAZAR.BACK,
       leftSleeve: ASSETS.KEMEJA.STRAZAR.FRONT,
       rightSleeve: ASSETS.KEMEJA.STRAZAR.FRONT
     },
     gallery: ASSETS.KEMEJA.STRAZAR.GALLERY,
-    description: 'Strazar: Kemeja premium dengan standar kualitas ekspor.'
+    description: 'Strazard: Kemeja premium dengan standar kualitas ekspor.'
   },
   {
     id: 'j1',
@@ -141,19 +141,34 @@ export const PRODUCTS: Product[] = [
     description: 'Jaket Bomber premium industri dengan pilihan warna lengkap.'
   },
   {
+    id: 'k12',
+    name: 'Executive Series',
+    category: 'Kemeja',
+    soldCount: getRandomSold(),
+    image: ASSETS.KEMEJA.EXECUTIVE.FRONT,
+    images: {
+      front: ASSETS.KEMEJA.EXECUTIVE.FRONT,
+      back: ASSETS.KEMEJA.EXECUTIVE.BACK,
+      leftSleeve: ASSETS.KEMEJA.EXECUTIVE.FRONT,
+      rightSleeve: ASSETS.KEMEJA.EXECUTIVE.FRONT
+    },
+    gallery: ASSETS.KEMEJA.EXECUTIVE.GALLERY,
+    description: 'Executive Series: Seri kemeja formal tactical dengan material premium dan desain elegan.'
+  },
+  {
     id: 'r1',
-    name: 'Vest Bupati',
+    name: 'Tactical Vest',
     category: 'Rompi',
     soldCount: getRandomSold(),
-    image: ASSETS.ROMPI.BUPATI,
+    image: ASSETS.ROMPI.TACTICAL,
     images: {
-      front: ASSETS.ROMPI.BUPATI,
+      front: ASSETS.ROMPI.TACTICAL,
       back: ASSETS.ROMPI.BACK,
-      leftSleeve: ASSETS.ROMPI.BUPATI,
-      rightSleeve: ASSETS.ROMPI.BUPATI
+      leftSleeve: ASSETS.ROMPI.TACTICAL,
+      rightSleeve: ASSETS.ROMPI.TACTICAL
     },
     gallery: ASSETS.ROMPI.GALLERY,
-    description: 'Vest tactical untuk instansi pemerintah.'
+    description: 'Vest tactical kualitas premium.'
   },
   {
     id: 'r2',
@@ -196,39 +211,41 @@ export const PRODUCTS: Product[] = [
     description: 'Celana Armour: Perlindungan maksimal dengan material durabilitas tinggi.'
   },
   {
-    id: 'kid1',
-    name: 'Kemeja Anak TK',
-    category: 'Kids',
+    id: 'c3',
+    name: 'Bradwear V3',
+    category: 'Celana',
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.BRAD_V3.FRONT,
+    image: ASSETS.CELANA.BRADWEAR_V3,
     images: {
-      front: ASSETS.KEMEJA.BRAD_V3.FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK
+      front: ASSETS.CELANA.BRADWEAR_V3,
+      back: ASSETS.CELANA.BRADWEAR_V3_BACK || ASSETS.CELANA.BRADWEAR_V3
     },
-    description: 'Kemeja anak untuk seragam TK/PAUD.'
+    description: 'Celana Bradwear V3: Desain fungsional dengan kenyamanan maksimal.'
   },
   {
-    id: 'kid2',
-    name: 'Kemeja Anak SD',
-    category: 'Kids',
+    id: 'c4',
+    name: 'Bradwear V1',
+    category: 'Celana',
     soldCount: getRandomSold(),
-    image: ASSETS.KEMEJA.MTAC_FRONT,
+    image: ASSETS.CELANA.BRADWEAR_V1,
     images: {
-      front: ASSETS.KEMEJA.MTAC_FRONT,
-      back: ASSETS.KEMEJA.BRAD_V3.BACK
+      front: ASSETS.CELANA.BRADWEAR_V1,
+      back: ASSETS.CELANA.BRADWEAR_V1_BACK || ASSETS.CELANA.BRADWEAR_V1
     },
-    description: 'Kemeja anak untuk seragam SD.'
+    gallery: ASSETS.CELANA.BRADWEAR_V1_GALLERY,
+    description: 'Seri Bradwear-V1: Celana tactical tangguh dengan pilihan berbagai variasi warna.'
   },
   {
     id: 'p1',
-    name: 'Kaos Polo',
+    name: '(Polo Shirt)',
     category: 'Polo',
     soldCount: getRandomSold(),
     image: ASSETS.POLO.BASIC,
     images: {
       front: ASSETS.POLO.BASIC,
-      back: ASSETS.POLO.BASIC
+      back: ASSETS.POLO.BACK
     },
+    gallery: ASSETS.POLO.GALLERY,
     description: 'Kaos polo premium untuk seragam santai namun tetap profesional.'
   }
 ];
@@ -284,13 +301,13 @@ export const RANDOM_ORDERS = Array.from({ length: 30 }, (_, i) => ({
 
 export const MATERIALS = [
   'TROPICAL',
-  'BABY CANVAS',
-  'RIPSTOP PERNUSA',
   'NAGATA DRILL',
-  'SOFT DENIM',
-  'OXFORD',
+  'AMERICAN DRILL',
   'STF',
-  'AMERICAN DRILL'
+  'RIPSTOP PERNUSA',
+  'OXFORD',
+  'BABY CANVAS',
+  'SOFT DENIM'
 ];
 
 export const POLO_MATERIALS = [

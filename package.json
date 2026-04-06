@@ -1,7 +1,7 @@
 {
   "name": "bradermock-ui-ux-design",
   "private": false,
-  "version": "1.2.1",
+  "version": "1.4.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "@capacitor-community/media": "^9.0.1",
     "@capacitor/android": "^8.0.2",
     "@capacitor/app": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
     "@capacitor/cli": "^8.0.2",
     "@capacitor/core": "^8.0.2",
     "@capacitor/filesystem": "^8.1.1",

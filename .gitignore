@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Sensitive files - JANGAN di-commit
+.env
+.env.local
+.env.*.local
+android/app/release.keystore
+android/keystore.properties
+android/local.properties
+
+# Build outputs
+android/app/build/
+android/build/
+android/.gradle/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

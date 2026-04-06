@@ -1,0 +1,366 @@
+:root {
+  --neon-color: #059669;
+  --neon-glow: rgba(5, 150, 105, 0.1);
+  --accent-volt: #BFFF00;
+  --text-primary: #050505;
+}
+
+.dark {
+  --neon-color: #BFFF00;
+  --neon-glow: rgba(191, 255, 0, 0.2);
+  --text-primary: #FFFFFF;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #e4e4e7;
+  /* zinc-200 fallback */
+}
+
+.dark body {
+  background: #050505;
+}
+
+.adaptive-text {
+  color: var(--text-primary) !important;
+}
+
+.adaptive-text-muted {
+  color: #4b5563 !important;
+}
+
+.dark .adaptive-text-muted {
+  color: #9ca3af !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.neon-text {
+  color: var(--neon-color);
+  font-weight: 800;
+}
+
+.neon-bg {
+  background-color: var(--neon-color);
+}
+
+.neon-border {
+  border-color: var(--neon-color);
+}
+
+@keyframes notification-slide {
+  0% {
+    transform: translateY(100%) scale(0.9);
+    opacity: 0;
+  }
+
+  10% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  90% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.animate-notification {
+  animation: notification-slide 5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Animasi Bernapas (Breathe) */
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(191, 255, 0, 0.05);
+  }
+
+  50% {
+    transform: scale(1.015);
+    box-shadow: 0 0 40px rgba(191, 255, 0, 0.15);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 5s ease-in-out infinite;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.view-transition {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: translate(-50%, -20px) scale(0.9);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate(-50%, 10px) scale(1.05);
+  }
+
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes scanLine {
+  0% {
+    top: 0;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+.animate-scan-line {
+  animation: scanLine 2s linear infinite;
+}
+
+@keyframes flashEffect {
+  0% {
+    background: white;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-flash {
+  animation: flashEffect 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Infinite Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: fit-content;
+  animation: marquee 30s linear infinite;
+}
+
+.partner-logo-container {
+  background: linear-gradient(90deg, transparent 0%, rgba(191, 255, 0, 0.05) 50%, transparent 100%);
+  border-top: 1px solid rgba(191, 255, 0, 0.1);
+  border-bottom: 1px solid rgba(191, 255, 0, 0.1);
+  padding: 30px 0;
+}
+
+.logo-item {
+  filter: grayscale(1) brightness(0.8) contrast(1.2);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.5;
+}
+
+.logo-item:hover {
+  filter: grayscale(0) brightness(1) contrast(1);
+  opacity: 1;
+  transform: scale(1.1) rotate(3deg);
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-stagger-fade-in {
+  animation: staggerFadeIn 0.5s ease-out forwards;
+}
+
+/* Category Cycling Animation */
+@keyframes slide-up-loop {
+
+  0%,
+  15% {
+    transform: translateY(0);
+  }
+
+  20%,
+  35% {
+    transform: translateY(-20px);
+  }
+
+  40%,
+  55% {
+    transform: translateY(-40px);
+  }
+
+  60%,
+  75% {
+    transform: translateY(-60px);
+  }
+
+  80%,
+  95% {
+    transform: translateY(-80px);
+  }
+
+  100% {
+    transform: translateY(-100px);
+  }
+}
+
+.animate-slide-up-loop {
+  animation: slide-up-loop 12s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+/* Floating Animation */
+@keyframes floating {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-floating {
+  animation: floating 4s ease-in-out infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(191, 255, 0, 0.1), transparent);
+  animation: shimmer 3s infinite;
+}

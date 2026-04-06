@@ -547,7 +547,7 @@ const AdminView: React.FC<AdminViewProps> = ({
                   <div className="space-y-2 px-2">
                     <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">KATEGORI</label>
                     <select value={editingProduct.category} onChange={e => setEditingProduct({ ...editingProduct, category: e.target.value as any })} className="w-full p-5 rounded-2xl bg-white/5 border border-white/10 text-sm font-bold text-white outline-none focus:neon-border transition-all appearance-none">
-                      {['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Kids'].map(cat => <option key={cat} value={cat} className="bg-zinc-900">{cat}</option>)}
+                      {['Kemeja', 'Jaket', 'Celana', 'Rompi'].map(cat => <option key={cat} value={cat} className="bg-zinc-900">{cat}</option>)}
                     </select>
                   </div>
 

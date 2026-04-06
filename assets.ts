@@ -8,19 +8,33 @@
 // Universal Image Detection (supports all product categories + root assets + logos)
 const allImagesGlob = import.meta.glob('./assets/**/*.(jpeg|jpg|png|webp)', { eager: true, query: '?url', import: 'default' });
 
-// Import logo dan UI assets dynamically
-const LOGO_BRADWEAR = allImagesGlob['./assets/logo_bradwear.png'] as string || '';
-const HERO_BG = allImagesGlob['./assets/factory_hero.jpg'] as string || '';
-
 // Supabase Integration Toggle
 // Set 'true' untuk menggunakan asset dari Supabase Storage
-export const USE_SUPABASE_STORAGE = true;
+// Set 'false' untuk menggunakan asset lokal saat sedang memperbarui isi folder
+export const USE_SUPABASE_STORAGE = false;
 export const SUPABASE_BASE_URL = 'https://kppsavzarjxtwsljwzzi.supabase.co/storage/v1/object/public/assets';
+
+// Robust path resolver for constants and functions
+const resolveAsset = (key: string): string => {
+  if (!key) return '';
+  const localUrl = allImagesGlob[key] as string || '';
+  if (!USE_SUPABASE_STORAGE) return localUrl;
+
+  // Convert './assets/Kemeja/xxx.png' to 'Kemeja/xxx.png'
+  const remotePath = key.replace(/^\.\/assets\//, '');
+  // Encode each segment of the path separately to handle spaces, parentheses, etc.
+  const encodedPath = remotePath.split('/').map(segment => encodeURIComponent(segment)).join('/');
+  return `${SUPABASE_BASE_URL}/${encodedPath}`;
+};
 
 // Helper untuk mendapatkan path asset (lokal atau remote)
 const getAssetPath = (localPath: string, remotePath: string): string => {
   return USE_SUPABASE_STORAGE ? `${SUPABASE_BASE_URL}/${remotePath}` : localPath;
 };
+
+// Import logo dan UI assets dynamically
+const LOGO_BRADWEAR = resolveAsset('./assets/logo.png');
+const HERO_BG = resolveAsset('./assets/factory_hero.jpg');
 
 // Import Produk
 // Map untuk menyimpan folder -> path lengkap
@@ -28,9 +42,11 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
 const folderToPathMap = new Map<string, { parent: string, actual: string }>();
 const flatFilesMap = new Map<string, string>();
 
+// Helper untuk normalisasi string (Case-insensitive, remove spaces/hyphens, normalize jacket/jaket)
+const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '').replace('jacket', 'jaket').replace('warrior', 'warior');
+
 Object.keys(allImagesGlob).forEach(key => {
   const parts = key.split('/');
-  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
 
   if (parts.length > 3) {
     const parent = parts[2];
@@ -52,20 +68,19 @@ Object.keys(allImagesGlob).forEach(key => {
 
 // Catalog Images
 export const COLOR_CATALOGS = {
-  'Maryland': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/maryland/')).map(k => allImagesGlob[k] as string),
-  'Nagata': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/nagata/')).map(k => allImagesGlob[k] as string),
-  'Soft Denim': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/soft dennim/')).map(k => allImagesGlob[k] as string),
-  'American Drill': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/american drill/')).map(k => allImagesGlob[k] as string),
-  'Oxford': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/oxford/')).map(k => allImagesGlob[k] as string),
-  'Polo': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/polo/')).map(k => allImagesGlob[k] as string),
-  'Tropical': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/tropical/')).map(k => allImagesGlob[k] as string),
-  'Baby Canvas': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/baby canvas/')).map(k => allImagesGlob[k] as string),
-  'Ripstop': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/ripstop/')).map(k => allImagesGlob[k] as string),
+  'Tropical (Best Seller)': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/tropical/')).map(k => resolveAsset(k)),
+  'Nagata (Favorit)': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/nagata/')).map(k => resolveAsset(k)),
+  'American Drill': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/american drill/')).map(k => resolveAsset(k)),
+  'STF': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/stf/')).map(k => resolveAsset(k)),
+  'Soft Denim': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/soft denim/')).map(k => resolveAsset(k)),
+  'Oxford': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/oxford/')).map(k => resolveAsset(k)),
+  'Polo': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/polo/')).map(k => resolveAsset(k)),
+  'Baby Canvas': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/baby canvas/')).map(k => resolveAsset(k)),
+  'Ripstop': Object.keys(allImagesGlob).filter(k => k.toLowerCase().includes('katalog warna/ripstop/')).map(k => resolveAsset(k)),
 };
 
 // Helper untuk mencari folder secara case-insensitive & robust matching di semua kategori
 export const findFolderInfo = (folder: string, category?: string) => {
-  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
   const found = folderToPathMap.get(normalize(folder));
   if (found) return found;
 
@@ -75,7 +90,11 @@ export const findFolderInfo = (folder: string, category?: string) => {
 
   if (category) {
     const catNorm = normalize(category);
-    const matchedParent = allParentFolders.find(p => normalize(p) === catNorm || normalize(p) === normalize('Kaos ' + category));
+    const matchedParent = allParentFolders.find(p =>
+      normalize(p) === catNorm ||
+      normalize(p) === normalize('Kaos ' + category) ||
+      normalize(p) === normalize('Model ' + category)
+    );
     if (matchedParent) {
       return { parent: matchedParent, actual: '' };
     }
@@ -93,38 +112,41 @@ export const findFolderInfo = (folder: string, category?: string) => {
 
 const getModelAsset = (folder: string, fileName: string) => {
   const info = findFolderInfo(folder);
-  const extensions = ['png', 'jpg', 'jpeg', 'webp'];
-  const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
+  if (!info) return '';
 
-  if (info) {
-    // Jalur 1: Cari di subfolder model
-    const possibleNames = [fileName, `${folder}_${fileName}`, `series-${folder}-${fileName}`];
+  const prefix = `./assets/${info.parent}/${info.actual}${info.actual ? '/' : ''}`;
+  const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
 
-    for (const name of possibleNames) {
-      for (const ext of extensions) {
-        const key = `./assets/${info.parent}/${info.actual}/${name}.${ext}`;
-        if (allImagesGlob[key]) return allImagesGlob[key] as string;
-      }
-    }
+  if (folderFiles.length === 0) return '';
 
-    if (fileName === 'depan') {
-      const prefix = `./assets/${info.parent}/${info.actual}/`;
-      const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
-      if (folderFiles.length > 0) return allImagesGlob[folderFiles[0]] as string;
-    }
+  const isBack = fileName.toLowerCase().includes('belakang') || fileName.toLowerCase().includes('back');
+
+  // Collect candidates for the specific view
+  const candidates = folderFiles.filter(k => {
+    const low = k.toLowerCase();
+    const indicatesBack = low.includes('belakang') || low.includes('back') || low.includes('blkg') || low.endsWith('2.png') || low.endsWith('2.jpg') || low.endsWith('2.jpeg');
+    return isBack ? indicatesBack : !indicatesBack;
+  });
+
+  if (candidates.length === 0) return resolveAsset(folderFiles[0]);
+
+  // Priority logic for "Depan" (Front)
+  if (!isBack) {
+    // 1. Explicit "depan" or "front"
+    const explicit = candidates.find(k => k.toLowerCase().includes('depan') || k.toLowerCase().includes('front'));
+    if (explicit) return resolveAsset(explicit);
+
+    // 2. Numeric priority like "(brad v-3)1.png"
+    const numeric = candidates.find(k => /\d+\.png/.test(k.toLowerCase()));
+    if (numeric) return resolveAsset(numeric);
+
+    // 3. Just the first one
+    return resolveAsset(candidates[0]);
   }
 
-  // Jalur 2: Cari di flat files (Jacket/bomber_front.png)
-  const searchName = normalize(`${folder}${fileName === 'depan' ? '' : fileName}`);
-  for (const [key, value] of flatFilesMap.entries()) {
-    if (key.includes(normalize(folder))) {
-      if (fileName === 'depan' && (key.includes('depan') || key.includes('front') || !key.includes('back'))) return value;
-      if (fileName === 'belakang' && (key.includes('belakang') || key.includes('back'))) return value;
-      if (key.includes(normalize(fileName))) return value;
-    }
-  }
-
-  return '';
+  // Priority logic for "Belakang" (Back)
+  const explicitBack = candidates.find(k => k.toLowerCase().includes('belakang') || k.toLowerCase().includes('back'));
+  return resolveAsset(explicitBack || candidates[0]);
 };
 
 const getFrontImage = (folder: string) => getModelAsset(folder, 'depan');
@@ -139,7 +161,8 @@ const getModelColorImageInternal = (modelName: string, colorName: string, view: 
   if (!info) return '';
 
   const extensions = ['jpeg', 'jpg', 'png', 'webp'];
-  const isBack = view.toLowerCase().includes('belakang');
+  const isBack = view.toLowerCase().includes('belakang') || view.toLowerCase().includes('back');
+  const backIndicators = ['belakang', 'back', 'blkg', 'rear'];
   const suffix = isBack ? ' belakang' : '';
   const searchName = colorName.toLowerCase();
 
@@ -147,20 +170,52 @@ const getModelColorImageInternal = (modelName: string, colorName: string, view: 
 
   for (const ext of extensions) {
     const key = `./assets/${folderPath}/${searchName}${suffix}.${ext}`;
-    if (allImagesGlob[key]) return allImagesGlob[key] as string;
+    if (allImagesGlob[key]) return resolveAsset(key);
   }
 
   const prefix = `./assets/${folderPath}/`;
   const folderFiles = Object.keys(allImagesGlob).filter(k => k.startsWith(prefix));
 
+  // Collect all candidates first
+  const candidates: string[] = [];
+
   for (const key of folderFiles) {
-    const fileName = key.split('/').pop()?.toLowerCase() || '';
-    if (fileName.includes(searchName)) {
-      if (isBack && fileName.includes('belakang')) return allImagesGlob[key] as string;
-      if (!isBack && !fileName.includes('belakang')) return allImagesGlob[key] as string;
+    const rawFileName = key.split('/').pop()?.toLowerCase() || '';
+    const nameWithoutExt = rawFileName.split('.')[0];
+    const cleanFileName = nameWithoutExt.replace(/[\s_-]/g, '');
+    const cleanSearch = searchName.replace(/[\s_-]/g, '');
+
+    // Check if filename matches color name (fuzzy)
+    if (cleanSearch.includes(cleanFileName) || cleanFileName.includes(cleanSearch)) {
+      candidates.push(key);
+    } else if (nameWithoutExt.includes(searchName)) {
+      candidates.push(key);
     }
   }
 
+  if (candidates.length === 0) return '';
+
+  // Select the best candidate based on View
+  if (isBack) {
+    // Cari yang eksplisit ada kata 'belakang'/'back'
+    const bestBack = candidates.find(k => k.toLowerCase().includes('belakang') || k.toLowerCase().includes('back') || k.toLowerCase().includes('rear'));
+    if (bestBack) return resolveAsset(bestBack);
+  } else {
+    // VIEW DEPAN
+    // 1. Cari yang eksplisit 'depan'/'front'
+    const bestFront = candidates.find(k => k.toLowerCase().includes('depan') || k.toLowerCase().includes('front'));
+    if (bestFront) return resolveAsset(bestFront);
+
+    // 2. Cari yang TIDAK ada kata 'belakang' (default)
+    const cleanCandidates = candidates.filter(k =>
+      !k.toLowerCase().includes('belakang') &&
+      !k.toLowerCase().includes('back') &&
+      !k.toLowerCase().includes('blkg')
+    );
+    if (cleanCandidates.length > 0) return resolveAsset(cleanCandidates[0]);
+  }
+
+  // Last resort
   return '';
 };
 
@@ -172,14 +227,25 @@ export const getModelColorImage = (modelName: string, colorName: string, view: s
   // 2. If it's a Back view and not found, search globally in other folders for the same color & view
   if (view.toLowerCase().includes('belakang')) {
     const searchName = colorName.toLowerCase();
+    const backIndicators = ['belakang', 'back', 'blkg', 'rear']; // Ensure backIndicators is defined here too
 
-    // Search all images in all folders
+    // Search images globally, but prioritize same category
     for (const key of Object.keys(allImagesGlob)) {
-      const fileName = key.split('/').pop()?.toLowerCase() || '';
-      if (fileName.includes(searchName) && fileName.includes('belakang')) {
-        // Exclude specific gallery/series files that aren't product mockups
+      const pathParts = key.split('/');
+      const fileName = pathParts.pop()?.toLowerCase() || '';
+      const folderName = pathParts.pop()?.toLowerCase() || '';
+
+      if (fileName.includes(searchName) && backIndicators.some(ind => fileName.includes(ind))) {
         if (fileName.includes('series') || fileName.includes('gallery')) continue;
-        return allImagesGlob[key] as string;
+
+        // If category is provided, try to match it in the path
+        if (category) {
+          const cat = category.toLowerCase();
+          if (key.toLowerCase().includes(cat)) return resolveAsset(key);
+          // Continue searching for a category match before settling for anything else
+          continue;
+        }
+        return resolveAsset(key);
       }
     }
   }
@@ -194,11 +260,11 @@ export const getLocalImagesInFolder = (folderName: string): string[] => {
   const info = findFolderInfo(folderName);
   if (!info) return [];
 
-  const prefix = `./assets/${info.parent}/${info.actual}/`;
+  const prefix = `./assets/${info.parent}/${info.actual}${info.actual ? '/' : ''}`;
   // Optimized: Only filter keys that we know are in this parent/folder
   return Object.keys(allImagesGlob)
     .filter(key => key.startsWith(prefix))
-    .map(key => allImagesGlob[key] as string);
+    .map(key => resolveAsset(key));
 };
 
 /**
@@ -224,51 +290,64 @@ export const getItemSpecificColors = (productName: string, category: string) => 
       const fileName = key.split('/').pop()?.toLowerCase() || '';
       if (fileName.includes('series') || fileName.includes('gallery')) return;
 
-      // Deteksi model prefix (misal 'vest-')
       let colorPart = fileName;
 
       // Remove any content inside parentheses (e.g., "(brad v-1)biru muda.png" -> "biru muda.png")
       colorPart = colorPart.replace(/\(.*?\)/g, '').trim();
+      // Remove "warna " prefix if exists (e.g., "warna army" -> "army")
+      colorPart = colorPart.replace(/^warna\s+/i, '').trim();
 
-      const normalizedName = productName.toLowerCase().replace(/\s+/g, '');
+      const normalizedName = normalize(productName);
       const nameParts = productName.toLowerCase().split(/\s+/);
       const possiblePrefixes = [
         namePrefix,
         normalizedName,
         normalizedName + '-',
         (info.actual ? info.actual.toLowerCase() + '-' : ''),
+        (info.actual ? normalize(info.actual) + '-' : ''),
         ...nameParts.map(p => p + '-'),
+        ...nameParts.map(p => p + ' '),
         'kaospolo-',
-        'kaospolos-'
+        'kaospolos-',
+        'jaket-',
+        'jacket-'
       ];
 
-      let matchFound = false;
       for (const p of possiblePrefixes) {
         if (p && colorPart.startsWith(p)) {
           colorPart = colorPart.replace(p, '');
-          matchFound = true;
-          break;
         }
       }
 
       // If still has leading non-alphabetic chars (like hyphens or spaces), clean them
       colorPart = colorPart.replace(/^[^a-z0-9]+/i, '');
 
-      const isBack = colorPart.includes('belakang') || colorPart.includes('back');
-      // Bersihkan nama warna dari extension dan suffix
-      const colorName = colorPart.split('.')[0]
-        .replace(' belakang', '').replace('-belakang', '')
-        .replace(' back', '').replace('-back', '')
-        .trim();
+      const isBack = colorPart.includes('belakang') || colorPart.includes('back') || colorPart.includes('blkg');
+      const isFront = colorPart.includes('depan') || colorPart.includes('front') || colorPart.includes('dpn');
 
-      if (!colorName || /^\d+$/.test(colorName) || colorName === 'front' || colorName === 'depan') return;
+      // Clean color name from extension and view indicators
+      let colorName = colorPart.split('.')[0];
+      const viewWords = ['belakang', 'back', 'blkg', 'rear', 'depan', 'front', 'dpn'];
+      viewWords.forEach(w => {
+        colorName = colorName.replace(new RegExp(`\\b${w}\\b`, 'gi'), '');
+        colorName = colorName.replace(new RegExp(`[-_]${w}\\b`, 'gi'), '');
+        colorName = colorName.replace(new RegExp(`\\b${w}[-_]`, 'gi'), '');
+      });
+      colorName = colorName.replace(/[-_]/g, ' ').trim();
+
+      if (!colorName || /^\d+$/.test(colorName)) return;
 
       const existing = colorMap.get(colorName) || { name: colorName, image: '' };
+
       if (isBack) {
-        existing.backImage = allImagesGlob[key] as string;
+        existing.backImage = resolveAsset(key);
       } else {
-        existing.image = allImagesGlob[key] as string;
+        // Only set as primary image if it's explicitly 'depan' or if we don't have one yet
+        if (isFront || !existing.image) {
+          existing.image = resolveAsset(key);
+        }
       }
+
       colorMap.set(colorName, existing);
     }
   });
@@ -281,25 +360,44 @@ const allWarnaGlob = import.meta.glob('./assets/warna/**/*.(jpeg|jpg|png|webp)',
 
 const getColorAsset = (name: string): string => {
   const extensions = ['jpeg', 'jpg', 'png', 'webp'];
-  let detectedExt = 'jpeg'; // Default fallback
-  let localUrl = '';
 
-  // 1. Local File Check (Multiple Formats)
+  // 1. Try local glob with exact match in assets/warna (legacy)
   for (const ext of extensions) {
     const key = `./assets/warna/${name}.${ext}`;
-    if (allWarnaGlob[key]) {
-      localUrl = allWarnaGlob[key] as string;
-      detectedExt = ext;
-      break;
-    }
+    if (allImagesGlob[key]) return resolveAsset(key);
   }
 
-  // 2. Return Local URL if found (as requested: restore to load from assets warna)
-  if (localUrl) return localUrl;
+  // 2. Robust Search: Look for the color name in ALL folders
+  // Prioritize files that match the color name exactly or clearly indicate the color
+  const searchName = name.toLowerCase();
+  const allKeys = Object.keys(allImagesGlob);
 
-  // 3. Fallback to Supabase URL if enabled
+  // High priority: Exact match or starting with color (e.g., "hitam.jpeg", "hitam-belakang.png")
+  const candidates = allKeys.filter(k => {
+    const fileName = k.split('/').pop()?.toLowerCase() || '';
+    return fileName.startsWith(searchName) || fileName.includes(`-${searchName}`) || fileName.includes(` ${searchName}`);
+  });
+
+  if (candidates.length > 0) {
+    const isBackSearch = searchName.includes('belakang') || searchName.includes('back');
+
+    // If we are searching for a back view, prioritize files with 'belakang'
+    if (isBackSearch) {
+      const bestBack = candidates.find(k => k.toLowerCase().includes('belakang') || k.toLowerCase().includes('back'));
+      if (bestBack) return resolveAsset(bestBack);
+    } else {
+      // If searching for front color, avoid files with 'belakang' or 'back'
+      const bestFront = candidates.find(k => !k.toLowerCase().includes('belakang') && !k.toLowerCase().includes('back'));
+      if (bestFront) return resolveAsset(bestFront);
+    }
+
+    // Generic fallback to first candidate if no specific view match
+    return resolveAsset(candidates[0]);
+  }
+
+  // 3. Fallback to manual Supabase URL if NOT in glob
   if (USE_SUPABASE_STORAGE) {
-    return `${SUPABASE_BASE_URL}/warna/${encodeURIComponent(name)}.${detectedExt}`;
+    return `${SUPABASE_BASE_URL}/warna/${encodeURIComponent(name)}.jpeg`;
   }
 
   return '';
@@ -307,112 +405,85 @@ const getColorAsset = (name: string): string => {
 
 const BRAD_V3_FRONT = getFrontImage('Brad-V3') || getFrontImage('gatam');
 const BRAD_V3_BACK = getBackImage('Brad-V3') || getBackImage('gatam');
-const BRAD_V3_GAL_1 = getModelAsset('Brad-V3', '1') || getModelAsset('gatam', '1');
-const BRAD_V3_GAL_2 = getModelAsset('Brad-V3', '2') || getModelAsset('gatam', '2');
-const BRAD_V3_GAL_3 = getModelAsset('Brad-V3', '3') || getModelAsset('gatam', '3');
+const BRAD_V3_GAL = getLocalImagesInFolder('Brad-V3');
 
 const BRAD_V1_FRONT = getFrontImage('Brad-v1');
-const BRAD_V1_GAL_1 = getModelAsset('Brad-v1', '1');
-const BRAD_V1_GAL_2 = getModelAsset('Brad-v1', '2');
+const BRAD_V1_BACK = getBackImage('Brad-v1');
+const BRAD_V1_GAL = getLocalImagesInFolder('Brad-v1');
 
 const BRAD_V2_FRONT = getFrontImage('Brad-v2');
-const BRAD_V2_GAL_1 = getModelAsset('Brad-v2', '1');
-const BRAD_V2_GAL_2 = getModelAsset('Brad-v2', '2');
-const BRAD_V2_GAL_3 = getModelAsset('Brad-v2', '3');
+const BRAD_V2_BACK = getBackImage('Brad-v2');
+const BRAD_V2_GAL = getLocalImagesInFolder('Brad-v2');
 
 
 const PDH_FRONT = getFrontImage('Pdh');
-const PDH_GAL_1 = getModelAsset('Pdh', '1');
-const PDH_GAL_2 = getModelAsset('Pdh', '2');
-const PDH_GAL_3 = getModelAsset('Pdh', '3');
+const PDH_GAL = getLocalImagesInFolder('Pdh');
 
 const PDH_BARU_FRONT = getFrontImage('Pdh-baru');
-const PDH_BARU_GAL_1 = getModelAsset('Pdh-baru', '1');
-const PDH_BARU_GAL_2 = getModelAsset('Pdh-baru', '2');
+const PDH_BARU_GAL = getLocalImagesInFolder('Pdh-baru');
 
 const BRAD_V4_FRONT = getFrontImage('Brad-V4');
-const BRAD_V4_GAL_1 = getModelAsset('Brad-V4', '1');
-const BRAD_V4_GAL_2 = getModelAsset('Brad-V4', '2');
+const BRAD_V4_GAL = getLocalImagesInFolder('Brad-V4');
 
 const ROBOTIC_FRONT = getFrontImage('robotik');
-const ROBOTIC_GAL_1 = getModelAsset('robotik', '1');
-const ROBOTIC_GAL_2 = getModelAsset('robotik', '2');
+const ROBOTIC_GAL = getLocalImagesInFolder('robotik');
 
-const STRAZAR_FRONT = getFrontImage('Strazard');
-const STRAZAR_GAL_1 = getModelAsset('Strazard', '1');
-const STRAZAR_GAL_2 = getModelAsset('Strazard', '2');
-const STRAZAR_GAL_3 = getModelAsset('Strazard', '3');
+const STRAZAR_DISPLAY = getModelAsset('Strazard', 'display') || getModelAsset('Strazard', '1') || getLocalImagesInFolder('Strazard')[0];
+const STRAZAR_FRONT = getModelAsset('Strazard', 'depan') || getModelAsset('Strazard', 'front') || STRAZAR_DISPLAY;
+const STRAZAR_BACK = getModelAsset('Strazard', 'belakang') || getModelAsset('Strazard', 'back') || getModelAsset('Strazard', '2');
+const STRAZAR_GAL = getLocalImagesInFolder('Strazard');
 
 const VENTURA_FRONT = getFrontImage('Ventura');
-const VENTURA_GAL_1 = getModelAsset('Ventura', '1');
-const VENTURA_GAL_2 = getModelAsset('Ventura', '2');
-const VENTURA_GAL_3 = getModelAsset('Ventura', '3');
+const VENTURA_GAL = getLocalImagesInFolder('Ventura');
 
-// --- ASSETS JAKET DARI FOLDER JACKET ---
-const BOMBER_BRAD_FRONT = getFrontImage('Jacket') || getFrontImage('Bomber Brad');
-const BOMBER_BRAD_BACK = getBackImage('Jacket') || getBackImage('Bomber Brad');
-const BOMBER_BRAD_GAL = [
-  allImagesGlob['./assets/Jacket/jaket-hitam.jpeg'] as string,
-  allImagesGlob['./assets/Jacket/jaket-navi.jpeg'] as string,
-  allImagesGlob['./assets/Jacket/jaket-maroon.jpeg'] as string,
-  allImagesGlob['./assets/Jacket/jaket-hijau.jpeg'] as string,
-  allImagesGlob['./assets/Jacket/jaket-coklat.jpeg'] as string,
-  allImagesGlob['./assets/Jacket/jaket-cream.jpeg'] as string,
-].filter(Boolean);
+// --- ASSETS JAKET DARI FOLDER JAKET ---
+const BOMBER_BRAD_FRONT = getFrontImage('jaket') || getFrontImage('Jacket') || resolveAsset('./assets/jaket/jaket-depan-hitam.jpeg');
+const BOMBER_BRAD_BACK = getBackImage('jaket') || getBackImage('Jacket') || getColorAsset('hitam belakang');
+const BOMBER_BRAD_GAL = getLocalImagesInFolder('jaket');
 
 // --- ASSETS ROMPI DARI FOLDER ROMPI ---
-// --- ASSETS ROMPI DARI FOLDER ROMPI ---
-const VEST_BUPATI_FRONT = allImagesGlob['./assets/Rompi/Vest-hitam.jpeg'] as string || '';
-const VEST_BUPATI_BACK = allImagesGlob['./assets/Rompi/Vest-hitam.jpeg'] as string || '';
-const VEST_BUPATI_GAL = [
-  allImagesGlob['./assets/Rompi/Vest-abu muda.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-abu tua.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-biru tua.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-coklat.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-hijau.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-khaki.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-pink muda.jpeg'] as string,
-  allImagesGlob['./assets/Rompi/Vest-pink tua.jpeg'] as string
-].filter(Boolean);
+const TACTICAL_VEST_FRONT = getFrontImage('Tactical Vest') || resolveAsset('./assets/Rompi/Tactical Vest/Vest-hitam.jpeg');
+const TACTICAL_VEST_BACK = getBackImage('Tactical Vest') || TACTICAL_VEST_FRONT;
+const TACTICAL_VEST_GAL = getLocalImagesInFolder('Tactical Vest');
 
-const VEST_PARASUTE_FRONT = allImagesGlob['./assets/Rompi/Parasute/Vest-parasute-1.jpeg'] as string || '';
-const VEST_PARASUTE_BACK = allImagesGlob['./assets/Rompi/Parasute/Vest-parasute-2.jpeg'] as string || '';
-const VEST_PARASUTE_GAL = [3].map(n => allImagesGlob[`./assets/Rompi/Parasute/Vest-parasute-${n}.jpeg`] as string).filter(Boolean);
+const VEST_PARASUTE_FRONT = getFrontImage('Parasute') || resolveAsset('./assets/Rompi/Parasute/Vest-parasute-1.jpeg');
+const VEST_PARASUTE_BACK = getBackImage('Parasute') || resolveAsset('./assets/Rompi/Parasute/Vest-parasute-2.jpeg');
+const VEST_PARASUTE_GAL = getLocalImagesInFolder('Parasute');
 
-// --- ASSETS POLO DARI FOLDER KAOS POLO ---
-const KAOS_POLO_FRONT = allImagesGlob['./assets/Kaos polo/Kaospolo-hitam.png'] as string || '';
+// --- ASSETS POLO DARI FOLDER POLO SHIRT ---
+const POLO_SHIRT_FRONT = getFrontImage('Polo shirt') || resolveAsset('./assets/Polo shirt/Kaospolo-hitam.png');
+const POLO_SHIRT_BACK = getBackImage('Polo shirt') || POLO_SHIRT_FRONT;
+const POLO_SHIRT_GAL = getLocalImagesInFolder('Polo shirt');
 
 // --- ASSETS CELANA DARI FOLDER CELANA ---
 const CARGO_TACTICAL_FRONT = getFrontImage('Warrior') || getFrontImage('Cargo Tactical') || getFrontImage('Pant');
 const CARGO_TACTICAL_BACK = getBackImage('Warrior') || getBackImage('Cargo Tactical') || getBackImage('Pant');
 const ARMOUR_FRONT = getFrontImage('Armour') || getFrontImage('Armor');
 const ARMOUR_BACK = getBackImage('Armour') || getBackImage('Armor');
+const BRADWEAR_V3_CELANA_FRONT = getFrontImage('Bradwear V3') || resolveAsset('./assets/Celana/Bradwear V3/bradwear v-3.jpeg');
+const BRADWEAR_V3_CELANA_BACK = getBackImage('Bradwear V3') || resolveAsset('./assets/Celana/Bradwear V3/bradwear V-3 (1).jpeg');
 const CARGO_TACTICAL_GAL = [1, 2, 3, 4, 5, 6].map(n => getModelAsset('Warrior', n.toString()) || getModelAsset('Cargo Tactical', n.toString())).filter(Boolean);
 
-const MTAC_FRONT = allImagesGlob['./assets/mtac_front.png'] as string || '';
-const BOMBER_FRONT = allImagesGlob['./assets/Jacket/bomber_front.png.webp'] as string || '';
+const MTAC_FRONT = resolveAsset('./assets/mtac_front.png');
+const BOMBER_FRONT = resolveAsset('./assets/Jacket/bomber_front.png.webp');
 
-const YOROI_FRONT_ROOT = allImagesGlob['./assets/yoroidpn.jpeg'] as string || '';
-const YOROI_BACK_ROOT = allImagesGlob['./assets/yoroiblkg.jpeg'] as string || '';
-const YOROI_GAL_1 = allImagesGlob['./assets/yoroidpn2.png'] as string || '';
-const YOROI_GAL_2 = allImagesGlob['./assets/yoroidpn3.jpeg'] as string || '';
-
-const YOROI_FRONT = getFrontImage('Yoroi') || YOROI_FRONT_ROOT;
-const YOROI_BACK = getBackImage('Yoroi') || YOROI_BACK_ROOT;
+const YOROI_FRONT = getFrontImage('Yoroi') || resolveAsset('./assets/Model Kemeja/Yoroi/hitam.jpeg');
+const YOROI_BACK = getBackImage('Yoroi') || resolveAsset('./assets/Model Kemeja/Yoroi/hitam belakang.png');
+const YOROI_GAL_1 = resolveAsset('./assets/Model Kemeja/Yoroi/biru muda.jpeg');
+const YOROI_GAL_2 = resolveAsset('./assets/Model Kemeja/Yoroi/coklat.jpeg');
 
 // Partner Logos lookups
-const PARTNER_KEMENDAGRI_1 = allImagesGlob['./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png'] as string || '';
-const PARTNER_KEMENDAGRI = allImagesGlob['./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com.png'] as string || '';
-const PARTNER_TUTWURI = allImagesGlob['./assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.png'] as string || '';
-const PARTNER_HAM = allImagesGlob['./assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.png'] as string || '';
-const PARTNER_DPR = allImagesGlob['./assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.png'] as string || '';
-const PARTNER_BMKG = allImagesGlob['./assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.png'] as string || '';
-const PARTNER_BAPPENAS = allImagesGlob['./assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).png'] as string || '';
-const PARTNER_KPI = allImagesGlob['./assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.png'] as string || '';
-const PARTNER_BUMN = allImagesGlob['./assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.png'] as string || '';
-const PARTNER_PUPR = allImagesGlob['./assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.png'] as string || '';
-const PARTNER_HUB = allImagesGlob['./assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png'] as string || '';
-const PARTNER_PERINDUS = allImagesGlob['./assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png'] as string || '';
+const PARTNER_KEMENDAGRI = resolveAsset('./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png');
+const PARTNER_TUTWURI = resolveAsset('./assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.png');
+const PARTNER_HAM = resolveAsset('./assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.png');
+const PARTNER_DPR = resolveAsset('./assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.png');
+const PARTNER_BMKG = resolveAsset('./assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.png');
+const PARTNER_BAPPENAS = resolveAsset('./assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).png');
+const PARTNER_KPI = resolveAsset('./assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.png');
+const PARTNER_BUMN = resolveAsset('./assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.png');
+const PARTNER_PUPR = resolveAsset('./assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.png');
+const PARTNER_HUB = resolveAsset('./assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png');
+const PARTNER_PERINDUS = resolveAsset('./assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png');
 
 // --- COLORS ARE NOW LOADED DYNAMICALLY BELOW ---
 
@@ -423,7 +494,6 @@ export const ASSETS = {
     HERO: HERO_BG,
   },
 
-  // --- OUR PARTNERS ---
   PARTNERS: [
     PARTNER_KEMENDAGRI,
     PARTNER_HAM,
@@ -436,7 +506,6 @@ export const ASSETS = {
     PARTNER_HUB,
     PARTNER_PERINDUS,
     PARTNER_TUTWURI,
-    PARTNER_KEMENDAGRI_1
   ],
 
   // --- KATEGORI KEMEJA ---
@@ -444,52 +513,58 @@ export const ASSETS = {
     BRAD_V3: {
       FRONT: BRAD_V3_FRONT,
       BACK: BRAD_V3_BACK,
-      GALLERY: [BRAD_V3_GAL_1, BRAD_V3_GAL_2, BRAD_V3_GAL_3].filter(Boolean)
+      GALLERY: BRAD_V3_GAL
     },
     BRAD_V1: {
       FRONT: BRAD_V1_FRONT,
-      BACK: getBackImage('Brad-v1'),
-      GALLERY: [BRAD_V1_GAL_1, BRAD_V1_GAL_2].filter(Boolean)
+      BACK: BRAD_V1_BACK,
+      GALLERY: BRAD_V1_GAL
     },
     BRAD_V2: {
       FRONT: BRAD_V2_FRONT,
-      BACK: getBackImage('Brad-v2'),
-      GALLERY: [BRAD_V2_GAL_1, BRAD_V2_GAL_2, BRAD_V2_GAL_3].filter(Boolean)
+      BACK: BRAD_V2_BACK,
+      GALLERY: BRAD_V2_GAL
     },
     PDH: {
       FRONT: PDH_FRONT,
       BACK: getBackImage('Pdh'),
-      GALLERY: [PDH_GAL_1, PDH_GAL_2, PDH_GAL_3].filter(Boolean)
+      GALLERY: PDH_GAL
     },
     PDH_BARU: {
       FRONT: PDH_BARU_FRONT,
       BACK: getBackImage('Pdh-baru'),
-      GALLERY: [PDH_BARU_GAL_1, PDH_BARU_GAL_2].filter(Boolean)
+      GALLERY: PDH_BARU_GAL
     },
     BRAD_V4: {
       FRONT: BRAD_V4_FRONT,
       BACK: getBackImage('Brad-V4') || BRAD_V3_BACK,
-      GALLERY: [BRAD_V4_GAL_1, BRAD_V4_GAL_2].filter(Boolean)
+      GALLERY: BRAD_V4_GAL
     },
     ROBOTIC: {
       FRONT: ROBOTIC_FRONT,
       BACK: getBackImage('robotik'),
-      GALLERY: [ROBOTIC_GAL_1, ROBOTIC_GAL_2].filter(Boolean)
+      GALLERY: ROBOTIC_GAL
     },
     STRAZAR: {
       FRONT: STRAZAR_FRONT,
-      BACK: getBackImage('Strazard'),
-      GALLERY: [STRAZAR_GAL_1, STRAZAR_GAL_2, STRAZAR_GAL_3].filter(Boolean)
+      DISPLAY: STRAZAR_DISPLAY,
+      BACK: STRAZAR_BACK,
+      GALLERY: STRAZAR_GAL
     },
     VENTURA: {
       FRONT: VENTURA_FRONT,
       BACK: getBackImage('Ventura'),
-      GALLERY: [VENTURA_GAL_1, VENTURA_GAL_2, VENTURA_GAL_3].filter(Boolean)
+      GALLERY: VENTURA_GAL
     },
     YOROI: {
       FRONT: YOROI_FRONT,
       BACK: YOROI_BACK || getBackImage('Yoroi'),
-      GALLERY: [YOROI_GAL_1, YOROI_GAL_2].filter(Boolean)
+      GALLERY: getLocalImagesInFolder('Yoroi')
+    },
+    EXECUTIVE: {
+      FRONT: getFrontImage('Executive Series'),
+      BACK: getBackImage('Executive Series'),
+      GALLERY: getLocalImagesInFolder('Executive Series')
     },
 
     // Legacy / Fallback
@@ -509,15 +584,20 @@ export const ASSETS = {
     WARRIOR_BACK: CARGO_TACTICAL_BACK,
     ARMOUR: ARMOUR_FRONT,
     ARMOUR_BACK: ARMOUR_BACK,
+    BRADWEAR_V1: getFrontImage('Bradwear v1'),
+    BRADWEAR_V1_BACK: getBackImage('Bradwear v1'),
+    BRADWEAR_V1_GALLERY: getLocalImagesInFolder('Bradwear v1'),
+    BRADWEAR_V3: BRADWEAR_V3_CELANA_FRONT,
+    BRADWEAR_V3_BACK: BRADWEAR_V3_CELANA_BACK || BRADWEAR_V3_CELANA_FRONT,
     BACK: CARGO_TACTICAL_BACK,
     GALLERY: CARGO_TACTICAL_GAL
   },
 
   // --- KATEGORI ROMPI ---
   ROMPI: {
-    BUPATI: VEST_BUPATI_FRONT || 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
-    BACK: VEST_BUPATI_BACK,
-    GALLERY: VEST_BUPATI_GAL,
+    TACTICAL: TACTICAL_VEST_FRONT || 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=600',
+    BACK: TACTICAL_VEST_BACK,
+    GALLERY: TACTICAL_VEST_GAL,
     PARASUTE: VEST_PARASUTE_FRONT,
     PARASUTE_BACK: VEST_PARASUTE_BACK,
     PARASUTE_GALLERY: VEST_PARASUTE_GAL
@@ -525,7 +605,9 @@ export const ASSETS = {
 
   // --- KATEGORI POLO ---
   POLO: {
-    BASIC: KAOS_POLO_FRONT
+    BASIC: POLO_SHIRT_FRONT,
+    BACK: POLO_SHIRT_BACK,
+    GALLERY: POLO_SHIRT_GAL
   },
 
   // --- UI ASSETS (Avatars, etc) ---
@@ -535,49 +617,50 @@ export const ASSETS = {
   },
 
   // --- WARNA ---
+  // Kita jadikan getter agar mencari di folder model favorit (Brad-V3) sebagai icon
   COLORS: {
-    BIRU_MUDA: getColorAsset('biru muda'),
-    COKLAT_TUA: getColorAsset('coklat tua'),
-    COKLAT: getColorAsset('coklat'),
-    DENIM: getColorAsset('denim'),
-    HIJAU_ARMY: getColorAsset('hijau army'),
-    HIJAU_BUNGLON: getColorAsset('hijau bunglon'),
-    HIJAU: getColorAsset('hijau'),
-    HITAM: getColorAsset('hitam'),
-    KHAKI: getColorAsset('khaki'),
-    KUNING: getColorAsset('kuning'),
-    MAROON: getColorAsset('maroon'),
-    MERAH_CABE: getColorAsset('merah cabe'),
-    MOCHA: getColorAsset('mocha'),
-    NAVI: getColorAsset('navi'),
-    OREN: getColorAsset('oren'),
-    PUTIH: getColorAsset('putih'),
-    SAGE: getColorAsset('sage'),
-    UNGU_MUDA: getColorAsset('ungu muda'),
-    UNGU_TUA: getColorAsset('ungu tua'),
+    BIRU_MUDA: getModelColorImage('Brad-V3', 'biru muda', 'depan') || getColorAsset('biru muda'),
+    COKLAT_TUA: getModelColorImage('Brad-V3', 'coklat tua', 'depan') || getColorAsset('coklat tua'),
+    COKLAT: getModelColorImage('Brad-V3', 'coklat', 'depan') || getColorAsset('coklat'),
+    DENIM: getModelColorImage('Brad-V3', 'denim', 'depan') || getColorAsset('denim'),
+    HIJAU_ARMY: getModelColorImage('Brad-V3', 'hijau army', 'depan') || getColorAsset('hijau army'),
+    HIJAU_BUNGLON: getModelColorImage('Brad-V3', 'hijau bunglon', 'depan') || getColorAsset('hijau bunglon'),
+    HIJAU: getModelColorImage('Brad-V3', 'hijau', 'depan') || getColorAsset('hijau'),
+    HITAM: getModelColorImage('Brad-V3', 'hitam', 'depan') || getColorAsset('hitam'),
+    KHAKI: getModelColorImage('Brad-V3', 'khaki', 'depan') || getColorAsset('khaki'),
+    KUNING: getModelColorImage('Brad-V3', 'kuning', 'depan') || getColorAsset('kuning'),
+    MAROON: getModelColorImage('Brad-V3', 'maroon', 'depan') || getColorAsset('maroon'),
+    MERAH_CABE: getModelColorImage('Brad-V3', 'merah cabe', 'depan') || getColorAsset('merah cabe'),
+    MOCHA: getModelColorImage('Brad-V3', 'mocha', 'depan') || getColorAsset('mocha'),
+    NAVI: getModelColorImage('Brad-V3', 'navi', 'depan') || getColorAsset('navi'),
+    OREN: getModelColorImage('Brad-V3', 'oren', 'depan') || getColorAsset('oren'),
+    PUTIH: getModelColorImage('Brad-V3', 'putih', 'depan') || getColorAsset('putih'),
+    SAGE: getModelColorImage('Brad-V3', 'sage', 'depan') || getColorAsset('sage'),
+    UNGU_MUDA: getModelColorImage('Brad-V3', 'ungu muda', 'depan') || getColorAsset('ungu muda'),
+    UNGU_TUA: getModelColorImage('Brad-V3', 'ungu tua', 'depan') || getColorAsset('ungu tua'),
   },
 
   // --- WARNA BELAKANG ---
   COLORS_BACK: {
-    BIRU_MUDA: getColorAsset('biru muda belakang'),
-    COKLAT_TUA: getColorAsset('coklat tua belakang'),
-    COKLAT: getColorAsset('coklat belakang'),
-    DENIM: getColorAsset('denim belakang'),
-    HIJAU_ARMY: getColorAsset('hijau army belakang'),
-    HIJAU_BUNGLON: getColorAsset('hijau bunglon belakang'),
-    HIJAU: getColorAsset('hijau belakang'),
-    HITAM: getColorAsset('hitam belakang'),
-    KHAKI: getColorAsset('khaki belakang'),
-    KUNING: getColorAsset('kuning belakang'),
-    MAROON: getColorAsset('maroon belakang'),
-    MERAH_CABE: getColorAsset('merah cabe belakang'),
-    MOCHA: getColorAsset('mocha belakang'),
-    NAVI: getColorAsset('navi belakang'),
-    OREN: getColorAsset('oren belakang'),
-    PUTIH: getColorAsset('putih belakang'),
-    SAGE: getColorAsset('sage belakang'),
-    UNGU_MUDA: getColorAsset('ungu muda belakang'),
-    UNGU_TUA: getColorAsset('ungu tua belakang'),
+    BIRU_MUDA: getModelColorImage('Brad-V3', 'biru muda', 'belakang') || getColorAsset('biru muda belakang'),
+    COKLAT_TUA: getModelColorImage('Brad-V3', 'coklat tua', 'belakang') || getColorAsset('coklat tua belakang'),
+    COKLAT: getModelColorImage('Brad-V3', 'coklat', 'belakang') || getColorAsset('coklat belakang'),
+    DENIM: getModelColorImage('Brad-V3', 'denim', 'belakang') || getColorAsset('denim belakang'),
+    HIJAU_ARMY: getModelColorImage('Brad-V3', 'hijau army', 'belakang') || getColorAsset('hijau army belakang'),
+    HIJAU_BUNGLON: getModelColorImage('Brad-V3', 'hijau bunglon', 'belakang') || getColorAsset('hijau bunglon belakang'),
+    HIJAU: getModelColorImage('Brad-V3', 'hijau', 'belakang') || getColorAsset('hijau belakang'),
+    HITAM: getModelColorImage('Brad-V3', 'hitam', 'belakang') || getColorAsset('hitam belakang'),
+    KHAKI: getModelColorImage('Brad-V3', 'khaki', 'belakang') || getColorAsset('khaki belakang'),
+    KUNING: getModelColorImage('Brad-V3', 'kuning', 'belakang') || getColorAsset('kuning belakang'),
+    MAROON: getModelColorImage('Brad-V3', 'maroon', 'belakang') || getColorAsset('maroon belakang'),
+    MERAH_CABE: getModelColorImage('Brad-V3', 'merah cabe', 'belakang') || getColorAsset('merah cabe belakang'),
+    MOCHA: getModelColorImage('Brad-V3', 'mocha', 'belakang') || getColorAsset('mocha belakang'),
+    NAVI: getModelColorImage('Brad-V3', 'navi', 'belakang') || getColorAsset('navi belakang'),
+    OREN: getModelColorImage('Brad-V3', 'oren', 'belakang') || getColorAsset('oren belakang'),
+    PUTIH: getModelColorImage('Brad-V3', 'putih', 'belakang') || getColorAsset('putih belakang'),
+    SAGE: getModelColorImage('Brad-V3', 'sage', 'belakang') || getColorAsset('sage belakang'),
+    UNGU_MUDA: getModelColorImage('Brad-V3', 'ungu muda', 'belakang') || getColorAsset('ungu muda belakang'),
+    UNGU_TUA: getModelColorImage('Brad-V3', 'ungu tua', 'belakang') || getColorAsset('ungu tua belakang'),
   }
 };
 
@@ -595,4 +678,23 @@ export const getAssetByName = (name: string): string => {
   };
   const result = flatAssets[name];
   return typeof result === 'string' ? result : '';
+};
+
+/**
+ * Preload critical assets to improve speed
+ */
+export const preloadCriticalAssets = () => {
+  const critical = [
+    LOGO_BRADWEAR,
+    HERO_BG,
+    // Add first few products or frequent images
+    ...Object.values(ASSETS.KEMEJA.BRAD_V3).flatMap(v => Array.isArray(v) ? v : [v as string]),
+    ...COLOR_CATALOGS['Tropical (Best Seller)'].slice(0, 5)
+  ];
+
+  critical.forEach(url => {
+    if (!url) return;
+    const img = new Image();
+    img.src = url;
+  });
 };
