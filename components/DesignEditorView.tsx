@@ -733,38 +733,52 @@ const DesignEditorView: React.FC = () => {
     }
   }, [product, designData.view, designData.color, isSpecificColorImage, selectedColorObj]);
 
-  /* --- HELPER: Load image as blob (bypass CORS) --- */
+  /* --- HELPER: Load image as blob (bypass CORS, support semua sumber) --- */
   const loadImageAsBlob = (src: string): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
+      const isBase64 = src.startsWith('data:');
+      const isLocal = !src.startsWith('http') && !src.startsWith('data:');
+
+      // Base64 atau asset lokal: langsung load tanpa crossOrigin
+      if (isBase64 || isLocal) {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+        return;
+      }
+
+      // URL remote: coba dengan crossOrigin dulu
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
       img.onerror = () => {
-        // Retry tanpa crossOrigin jika gagal (untuk gambar lokal/base64)
+        // Fallback: tanpa crossOrigin (untuk URL yang tidak support CORS header)
         const img2 = new Image();
         img2.onload = () => resolve(img2);
         img2.onerror = reject;
         img2.src = src;
       };
-      img.src = src + (src.includes('?') ? '&' : '?') + 't=' + Date.now();
+      // Cache-busting hanya untuk URL remote
+      img.src = src + (src.includes('?') ? '&' : '?') + '_t=' + Date.now();
     });
   };
 
   /* --- FUNGSI RENDER CANVAS MANUAL (Tidak bergantung html2canvas/CORS) --- */
   const renderDesignToCanvas = async (): Promise<string> => {
-    const SIZE = 1200; // Output HD 1200x1200
+    const SIZE = 1200;
     const offscreen = document.createElement('canvas');
     offscreen.width = SIZE;
     offscreen.height = SIZE;
     const ctx = offscreen.getContext('2d')!;
 
-    // Background transparan
-    ctx.clearRect(0, 0, SIZE, SIZE);
+    // Background putih (bukan transparan) agar hasil download tidak hitam di semua device
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
 
     // 1. Gambar produk utama
     try {
       const productImg = await loadImageAsBlob(currentDisplayImage);
-      // Fit gambar ke canvas dengan aspect ratio terjaga
       const scale = Math.min(SIZE / productImg.width, SIZE / productImg.height);
       const w = productImg.width * scale;
       const h = productImg.height * scale;
@@ -777,7 +791,7 @@ const DesignEditorView: React.FC = () => {
 
     // 2. Overlay warna jika tidak pakai gambar spesifik
     if (!isSpecificColorImage && designData.color) {
-      ctx.globalAlpha = 0.5;
+      ctx.globalAlpha = 0.45;
       ctx.globalCompositeOperation = 'multiply';
       ctx.fillStyle = designData.color;
       ctx.fillRect(0, 0, SIZE, SIZE);
@@ -792,22 +806,21 @@ const DesignEditorView: React.FC = () => {
       const posY = (el.pos.y / 100) * SIZE;
 
       if (el.type === 'text') {
-        const fontSize = Math.round(24 * el.scale);
-        ctx.font = `900 ${fontSize}px Arial`;
+        const fontSize = Math.round(28 * el.scale);
+        ctx.font = `900 ${fontSize}px Arial, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        // Background putih untuk teks
         const metrics = ctx.measureText(el.content);
-        const textW = metrics.width + 12;
-        const textH = fontSize + 8;
-        ctx.fillStyle = 'white';
+        const textW = metrics.width + 16;
+        const textH = fontSize + 10;
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
         ctx.fillRect(posX - textW / 2, posY - textH / 2, textW, textH);
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = '#000000';
         ctx.fillText(el.content.toUpperCase(), posX, posY);
       } else if (el.type === 'image') {
         try {
           const logoImg = await loadImageAsBlob(el.content);
-          const logoSize = Math.round(80 * el.scale);
+          const logoSize = Math.round(90 * el.scale);
           ctx.drawImage(logoImg, posX - logoSize / 2, posY - logoSize / 2, logoSize, logoSize);
         } catch (e) {
           console.warn('Gagal load logo:', e);
@@ -815,7 +828,8 @@ const DesignEditorView: React.FC = () => {
       }
     }
 
-    return offscreen.toDataURL('image/png');
+    // Kembalikan sebagai JPEG (lebih kompatibel di semua Android) dengan kualitas 95%
+    return offscreen.toDataURL('image/jpeg', 0.95);
   };
 
   /* --- FUNGSI SIMPAN GAMBAR KE PERANGKAT --- */
@@ -824,73 +838,96 @@ const DesignEditorView: React.FC = () => {
     setIsExporting(true);
 
     try {
-      // Render canvas manual (tidak bergantung html2canvas/CORS)
       const base64Data = await renderDesignToCanvas();
-      const base64Content = base64Data.split(',')[1];
-      const fileName = `BRADWEAR_${product.name}_${Date.now()}.png`;
+      // JPEG bukan PNG
+      const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, '');
+      const fileName = `BRADWEAR_${product.name.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
 
-      // Deteksi apakah berjalan di native Android (Capacitor)
       const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
 
       if (isNative) {
-        // --- NATIVE ANDROID: Simpan ke Galeri ---
+        // --- NATIVE ANDROID ---
         const { Media } = await import('@capacitor-community/media');
-        try {
-          if ((Media as any).requestPermissions) await (Media as any).requestPermissions();
-        } catch (e) { /* lanjut saja */ }
 
+        // Request permission dulu (Android 13+)
+        try {
+          if ((Media as any).requestPermissions) {
+            await (Media as any).requestPermissions();
+          }
+        } catch (e) { /* lanjut */ }
+
+        // Tulis ke cache dulu
+        let tempUri = '';
         try {
           const tempFile = await Filesystem.writeFile({
             path: fileName,
             data: base64Content,
-            directory: Directory.Cache
+            directory: Directory.Cache,
           });
+          tempUri = tempFile.uri;
+        } catch (writeErr) {
+          console.warn('Cache write failed:', writeErr);
+          // Fallback: tulis ke Documents
           try {
-            await Media.savePhoto({ path: tempFile.uri, albumIdentifier: 'Bradmock' });
-          } catch {
-            await Media.savePhoto({ path: tempFile.uri });
-          }
-          alert("✅ Desain tersimpan di Galeri (Album: Bradmock)");
-          return;
-        } catch (mediaErr) {
-          console.warn("Gallery save failed, fallback ke Documents...", mediaErr);
-          try {
-            await Filesystem.writeFile({
-              path: `Bradmock_Design_${Date.now()}.png`,
+            const docFile = await Filesystem.writeFile({
+              path: `Bradmock/${fileName}`,
               data: base64Content,
               directory: Directory.Documents,
-              recursive: true
+              recursive: true,
             });
-            alert("📁 Tersimpan di Dokumen\n\nBuka File Manager > Documents untuk melihatnya.");
-            return;
-          } catch (fsErr) { /* lanjut ke web fallback */ }
+            tempUri = docFile.uri;
+          } catch (docErr) {
+            throw new Error('Tidak bisa menulis file ke storage');
+          }
         }
+
+        // Simpan ke galeri
+        let savedToGallery = false;
+        try {
+          await Media.savePhoto({ path: tempUri, albumIdentifier: 'Bradmock' });
+          savedToGallery = true;
+        } catch {
+          try {
+            await Media.savePhoto({ path: tempUri });
+            savedToGallery = true;
+          } catch (e2) {
+            console.warn('Media.savePhoto gagal:', e2);
+          }
+        }
+
+        if (savedToGallery) {
+          alert('✅ Desain tersimpan di Galeri (Album: Bradmock)');
+        } else {
+          alert('📁 Desain tersimpan di Dokumen\n\nBuka File Manager > Documents > Bradmock');
+        }
+        return;
       }
 
-      // --- WEB / PWA: Share Sheet atau Download Browser ---
+      // --- WEB / BROWSER ---
+      // Coba Web Share API (Android Chrome, Samsung Internet)
       try {
         const blob = await (await fetch(base64Data)).blob();
-        const file = new File([blob], fileName, { type: 'image/png' });
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
         if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: 'Desain Bradwear' });
           return;
         }
       } catch (shareErr) {
-        console.warn("Share API gagal:", shareErr);
+        console.warn('Share API gagal:', shareErr);
       }
 
-      // Fallback: download langsung via <a> tag
+      // Fallback: download via <a> tag
       const link = document.createElement('a');
       link.href = base64Data;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      alert("⬇️ Gambar diunduh ke perangkat.");
+      alert('⬇️ Gambar diunduh ke perangkat.');
 
     } catch (err) {
-      console.error("Save failed", err);
-      alert("Terjadi kesalahan saat menyimpan gambar.");
+      console.error('Save failed:', err);
+      alert('Gagal menyimpan gambar. Pastikan izin penyimpanan sudah diberikan di Pengaturan > Aplikasi > Bradwear > Izin.');
     } finally {
       setIsExporting(false);
     }

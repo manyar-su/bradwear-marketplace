@@ -7,16 +7,18 @@
 -renamesourcefileattribute SourceFile
 
 # ============================================================
-# Capacitor Core
+# Capacitor Core - JANGAN dihapus R8
 # ============================================================
 -keep class com.getcapacitor.** { *; }
 -keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
 -keepclassmembers class * extends com.getcapacitor.Plugin {
     @com.getcapacitor.annotation.PluginMethod public *;
 }
+-keep class com.getcapacitor.BridgeActivity { *; }
+-keep class com.getcapacitor.BridgeFragment { *; }
 
 # ============================================================
-# WebView JavaScript Interface (wajib untuk Capacitor WebView)
+# WebView JavaScript Interface
 # ============================================================
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
@@ -24,40 +26,75 @@
 -keepattributes JavascriptInterface
 
 # ============================================================
-# Capacitor Plugins
+# Capacitor Plugins - semua plugin yang dipakai
 # ============================================================
 -keep class com.capacitorjs.plugins.** { *; }
+
+# Media plugin (simpan gambar ke galeri)
 -keep class com.capacitorjs.community.media.** { *; }
+-keep class capacitor.android.plugins.** { *; }
+
+# Filesystem plugin
+-keep class com.capacitorjs.plugins.filesystem.** { *; }
+
+# App plugin (back button)
+-keep class com.capacitorjs.plugins.app.** { *; }
+
+# Haptics plugin
+-keep class com.capacitorjs.plugins.haptics.** { *; }
 
 # ============================================================
-# AndroidX & Support Library
+# App sendiri
+# ============================================================
+-keep class com.bradwear.app.** { *; }
+-keep class com.bradwear.app.MainActivity { *; }
+
+# ============================================================
+# AndroidX
 # ============================================================
 -keep class androidx.** { *; }
 -dontwarn androidx.**
+-keep class androidx.core.content.FileProvider { *; }
 
 # ============================================================
-# Jangan hapus class yang dipakai via reflection
+# Annotations & Reflection
 # ============================================================
 -keepattributes *Annotation*
 -keepattributes Signature
 -keepattributes Exceptions
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
 
 # ============================================================
-# Supabase / OkHttp / Retrofit (networking)
+# Networking (Supabase, OkHttp)
 # ============================================================
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -keep class okhttp3.** { *; }
 -keep class okio.** { *; }
+-keep interface okhttp3.** { *; }
 
 # ============================================================
-# Gson / JSON serialization
+# Kotlin
+# ============================================================
+-keep class kotlin.** { *; }
+-keep class kotlinx.** { *; }
+-dontwarn kotlin.**
+
+# ============================================================
+# Gson / JSON
 # ============================================================
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
 
 # ============================================================
-# Jangan obfuscate nama app sendiri
+# Enum (sering dihapus R8 padahal dipakai)
 # ============================================================
--keep class com.bradwear.app.** { *; }
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
