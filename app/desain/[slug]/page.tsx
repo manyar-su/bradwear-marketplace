@@ -45,14 +45,18 @@ export default async function DesainPage({ params }: Params) {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Design Studio</h1>
-      <p className="text-sm text-slate-600">
-        Atur desain kemeja Anda. Setelah selesai, download atau langsung checkout.
-      </p>
+      <section className="rounded-[28px] border border-neutral-200 bg-gradient-to-r from-neutral-950 via-slate-900 to-neutral-900 px-5 py-6 text-white md:px-7">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-300">Bradwear Custom Lab</p>
+        <h1 className="mt-2 text-2xl font-black tracking-tight md:text-3xl">Design Studio</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-200">
+          Atur desain kemeja secara live seperti mockup Bradflow: ubah teks, upload logo, pilih warna dasar, lalu simpan atau lanjut checkout.
+        </p>
+      </section>
       <DesignStudio
         slug={product.slug}
         productName={product.name}
         color={product.canvas_config?.color || "#dbeafe"}
+        productImage={product.thumbnail_url}
       />
     </div>
   );
