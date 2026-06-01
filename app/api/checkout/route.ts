@@ -8,6 +8,7 @@ const schema = z.object({
   productId: z.string().min(1),
   designId: z.string().optional(),
   designDataUrl: z.string().optional(),
+  designJson: z.record(z.string(), z.any()).optional(),
   fullName: z.string().min(2),
   phone: z.string().min(8),
   email: z.string().email(),
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
             product_id: payload.productId,
             design_url: upload.secureUrl,
             preview_url: upload.secureUrl,
-            design_json: { generated_from: "checkout" },
+            design_json: payload.designJson || { generated_from: "checkout" },
             is_downloaded: false,
           },
         ] as unknown as never[])
@@ -136,6 +137,7 @@ export async function POST(request: Request) {
       deskripsi_pekerjaan: [
         "Pesanan dari Bradwear Marketplace",
         `Design URL: ${designUrl || "-"}`,
+        `Design Schema: ${payload.designJson?.schema_version || "legacy"}`,
         `Alamat: ${payload.address}`,
         `Catatan: ${payload.notes || "-"}`,
       ].join("\n"),

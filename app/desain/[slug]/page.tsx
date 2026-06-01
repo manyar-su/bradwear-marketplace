@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { DesignStudio } from "@/components/design-studio";
 import { fallbackProducts } from "@/lib/fallback-products";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getModelBySlug } from "@/lib/design-catalog";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -9,7 +10,20 @@ type Params = {
 
 export default async function DesainPage({ params }: Params) {
   const { slug } = await params;
-  const fallback = fallbackProducts.find((item) => item.slug === slug) || fallbackProducts[0];
+  const modelFallback = getModelBySlug(slug);
+  const fallback =
+    fallbackProducts.find((item) => item.slug === slug) ||
+    (modelFallback
+      ? {
+          id: modelFallback.id,
+          slug: modelFallback.slug,
+          name: modelFallback.name,
+          category: modelFallback.category,
+          base_price: modelFallback.basePrice || 0,
+          thumbnail_url: modelFallback.image,
+          canvas_config: { color: "#1A237E", label: modelFallback.name },
+        }
+      : fallbackProducts[0]);
 
   let product = fallback;
   try {

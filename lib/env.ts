@@ -6,6 +6,9 @@ export const env = {
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || "",
+  ocrApiKey: process.env.OCR_API_KEY || "",
+  ocrEndpoint: process.env.OCR_API_ENDPOINT || "",
+  ocrModel: process.env.OCR_MODEL || "",
 };
 
 export function assertServerEnv() {
@@ -13,4 +16,3 @@ export function assertServerEnv() {
     throw new Error("Supabase env belum lengkap.");
   }
 }
-

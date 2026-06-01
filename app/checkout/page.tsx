@@ -20,6 +20,11 @@ export default function CheckoutPage() {
     productSlug?: string;
     productName?: string;
     designDataUrl?: string;
+    designJson?: Record<string, unknown>;
+    qty?: number;
+    warna?: string;
+    model?: string;
+    sizeDetails?: Array<{ size: string; qty: number; gender?: string; sleeve?: string }>;
   } | null>(() => {
     if (typeof window === "undefined") return null;
     const seedRaw = localStorage.getItem("marketplace_checkout_seed");
@@ -62,23 +67,29 @@ export default function CheckoutPage() {
         fullName: current.full_name,
         email: current.email,
         phone: current.phone || "",
+        qty: designSeed?.qty || prev.qty,
+        warna: designSeed?.warna || prev.warna,
+        model: designSeed?.model || designSeed?.productName || prev.model,
       }));
       setLoadingUser(false);
     })();
 
-  }, [router]);
+  }, [router, designSeed]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPlacing(true);
     setMessage("");
 
-    const sizeDetails = [
-      { size: "S", qty: Number(form.sizeS) },
-      { size: "M", qty: Number(form.sizeM) },
-      { size: "L", qty: Number(form.sizeL) },
-      { size: "XL", qty: Number(form.sizeXL) },
-    ];
+    const sizeDetails =
+      designSeed?.sizeDetails && designSeed.sizeDetails.length > 0
+        ? designSeed.sizeDetails
+        : [
+            { size: "S", qty: Number(form.sizeS) },
+            { size: "M", qty: Number(form.sizeM) },
+            { size: "L", qty: Number(form.sizeL) },
+            { size: "XL", qty: Number(form.sizeXL) },
+          ];
 
     const res = await fetch("/api/checkout", {
       method: "POST",
@@ -86,6 +97,7 @@ export default function CheckoutPage() {
       body: JSON.stringify({
         productId: designSeed?.productSlug || "manual",
         designDataUrl: designSeed?.designDataUrl,
+        designJson: designSeed?.designJson,
         fullName: form.fullName,
         phone: form.phone,
         email: form.email,
