@@ -287,10 +287,98 @@ export const TESTIMONIALS = [
   { name: 'Bp. Farhan', text: 'Pengiriman tepat waktu dan packing sangat aman.', agency: 'PLN', avatar: 'https://images.unsplash.com/photo-1556157382-97edd2f9e1c4?w=150&h=150&fit=crop&crop=face' }
 ];
 
-export const FAQS = [
-  { q: 'Berapa minimal order di Bradwear?', a: 'Minimal pemesanan kustom adalah 12 pcs per model untuk hasil produksi yang maksimal.' },
-  { q: 'Apakah bisa kustom logo instansi?', a: 'Tentu! Kami melayani bordir komputer berkualitas tinggi untuk semua logo instansi Anda.' },
-  { q: 'Berapa lama proses produksi?', a: 'Proses produksi memakan waktu 14-21 hari kerja tergantung jumlah antrian.' },
+export interface FaqItem {
+  slug: string;
+  category: 'Pemesanan' | 'Produksi' | 'Kustomisasi' | 'Pengiriman' | 'Pembayaran';
+  q: string;
+  a: string;
+}
+
+export const FAQS: FaqItem[] = [
+  {
+    slug: 'minimal-order',
+    category: 'Pemesanan',
+    q: 'Berapa minimal order di Bradwear?',
+    a: 'Minimal pemesanan kustom adalah 12 pcs per model agar proses produksi dan quality control tetap optimal.',
+  },
+  {
+    slug: 'custom-logo-instansi',
+    category: 'Kustomisasi',
+    q: 'Apakah bisa kustom logo instansi?',
+    a: 'Bisa. Kami melayani bordir komputer dan penempatan logo sesuai guideline instansi Anda.',
+  },
+  {
+    slug: 'estimasi-produksi',
+    category: 'Produksi',
+    q: 'Berapa lama proses produksi?',
+    a: 'Estimasi produksi normal 14-21 hari kerja, disesuaikan dengan volume dan antrean aktif.',
+  },
+  {
+    slug: 'revisi-desain',
+    category: 'Kustomisasi',
+    q: 'Apakah desain bisa direvisi sebelum produksi?',
+    a: 'Bisa. Revisi dapat dilakukan pada tahap approval sebelum order masuk jadwal cutting.',
+  },
+  {
+    slug: 'warna-kain-sesuai',
+    category: 'Kustomisasi',
+    q: 'Bagaimana memastikan warna kain sesuai kebutuhan?',
+    a: 'Tim kami akan melakukan konfirmasi kode warna dan referensi material sebelum produksi dimulai.',
+  },
+  {
+    slug: 'kombinasi-ukuran',
+    category: 'Pemesanan',
+    q: 'Apakah satu order boleh campur ukuran?',
+    a: 'Boleh. Anda bisa mengisi kombinasi ukuran dalam satu model sesuai kebutuhan tim atau instansi.',
+  },
+  {
+    slug: 'ukuran-kustom',
+    category: 'Pemesanan',
+    q: 'Apakah tersedia ukuran kustom di luar size chart?',
+    a: 'Tersedia. Untuk kebutuhan khusus, Anda dapat input detail ukuran kustom saat checkout desain.',
+  },
+  {
+    slug: 'material-tersedia',
+    category: 'Produksi',
+    q: 'Material apa saja yang paling sering digunakan?',
+    a: 'Material favorit meliputi Tropical, Nagata Drill, American Drill, Ripstop, dan Oxford sesuai fungsi seragam.',
+  },
+  {
+    slug: 'pembayaran-dp',
+    category: 'Pembayaran',
+    q: 'Apakah bisa sistem DP terlebih dahulu?',
+    a: 'Bisa. Skema pembayaran akan diinformasikan admin sesuai nilai order dan timeline produksi.',
+  },
+  {
+    slug: 'invoice-dokumen',
+    category: 'Pembayaran',
+    q: 'Apakah tersedia invoice resmi untuk instansi?',
+    a: 'Ya, kami menyediakan invoice dan dokumen pendukung administrasi sesuai kebutuhan pemesanan.',
+  },
+  {
+    slug: 'pengiriman-luar-kota',
+    category: 'Pengiriman',
+    q: 'Apakah melayani pengiriman luar kota?',
+    a: 'Melayani pengiriman seluruh Indonesia melalui ekspedisi yang disepakati bersama.',
+  },
+  {
+    slug: 'tracking-order',
+    category: 'Pengiriman',
+    q: 'Bagaimana cara melacak status pesanan?',
+    a: 'Status dapat dipantau melalui update workflow produksi dan konfirmasi admin hingga tahap pengiriman.',
+  },
+  {
+    slug: 'jadwal-prioritas',
+    category: 'Produksi',
+    q: 'Bisakah order diprioritaskan untuk kebutuhan event tertentu?',
+    a: 'Bisa diajukan. Tim produksi akan mengevaluasi kapasitas agar jadwal event tetap bisa terkejar.',
+  },
+  {
+    slug: 'quality-control',
+    category: 'Produksi',
+    q: 'Apakah ada quality control sebelum barang dikirim?',
+    a: 'Ada. Semua produk melewati tahapan QC sebelum packing dan diserahkan ke ekspedisi.',
+  },
 ];
 
 export const RANDOM_ORDERS = Array.from({ length: 30 }, (_, i) => ({

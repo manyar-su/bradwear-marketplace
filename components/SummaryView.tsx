@@ -72,8 +72,9 @@ const SummaryView: React.FC = () => {
   };
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden ${theme === 'dark' ? 'bg-black text-zinc-100' : 'bg-zinc-50 text-zinc-900'}`}>
-      <main className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar pb-32">
+    <div className="mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden bg-[var(--surface-subtle)] text-[var(--text-primary)]">
+      <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8">
+        <div className="mx-auto max-w-4xl space-y-8 rounded-[24px] border border-[var(--border-soft)] bg-white p-6 shadow-sm md:p-8">
         <div className="flex items-center justify-between gap-4 mb-2">
           <div className="flex items-center gap-4">
             <button onClick={onBack} className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-zinc-900' : 'bg-zinc-200'}`}><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg></button>
@@ -142,8 +143,7 @@ const SummaryView: React.FC = () => {
             <button onClick={addNewRow} className={`w-full py-4 text-[9px] font-black uppercase adaptive-text-muted hover:adaptive-text transition-all border-t ${theme === 'dark' ? 'border-white/5' : 'border-zinc-100'}`}>+ TAMBAH BARIS</button>
           </div>
         </section>
-
-
+        </div>
       </main>
 
       {/* Modal Pemilih Ukuran */}
@@ -237,7 +237,7 @@ const SummaryView: React.FC = () => {
         </div>
       )}
 
-      <footer className={`p-6 border-t z-50 absolute bottom-0 left-0 right-0 ${theme === 'dark' ? 'bg-black border-white/5' : 'bg-white border-zinc-200 shadow-2xl'}`}>
+      <footer className="sticky bottom-0 z-30 border-t border-[var(--border-soft)] bg-white p-4 shadow-[0_-8px_20px_rgba(15,23,42,0.06)] md:p-5">
         <button onClick={handleSendToCS} disabled={totalQty === 0 || isSending} className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all ${totalQty === 0 ? 'bg-zinc-900 text-zinc-700 cursor-not-allowed' : 'neon-bg text-black hover:brightness-110 active:scale-95 shadow-xl'}`}>
           {isSending ? 'MEMPROSES...' : 'KONFIRMASI WHATSAPP'}
         </button>

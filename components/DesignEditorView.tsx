@@ -950,6 +950,52 @@ const DesignEditorView: React.FC = () => {
     setShowOrdererForm(true);
   };
 
+  /* --- DOWNLOAD DESAIN LANGSUNG (TANPA WHATSAPP) --- */
+  const handleDownloadDesign = async () => {
+    if (!canvasRef.current) return;
+    setIsExporting(true);
+
+    const originalView = designData.view;
+    const originalZoom = canvasZoom;
+    const originalPan = panPos;
+
+    try {
+      setCanvasZoom(1);
+      setPanPos({ x: 0, y: 0 });
+
+      // Download DEPAN
+      onUpdate({ view: 'Depan' });
+      await new Promise(r => setTimeout(r, 800));
+      const canvasFront = await html2canvas(canvasRef.current, { useCORS: true, allowTaint: true, scale: 2, backgroundColor: null });
+      const linkFront = document.createElement('a');
+      linkFront.href = canvasFront.toDataURL('image/png');
+      linkFront.download = `BRADWEAR_DEPAN_${product.name}_${Date.now()}.png`;
+      document.body.appendChild(linkFront);
+      linkFront.click();
+      document.body.removeChild(linkFront);
+
+      // Download BELAKANG
+      onUpdate({ view: 'Belakang' });
+      await new Promise(r => setTimeout(r, 800));
+      const canvasBack = await html2canvas(canvasRef.current, { useCORS: true, allowTaint: true, scale: 2, backgroundColor: null });
+      const linkBack = document.createElement('a');
+      linkBack.href = canvasBack.toDataURL('image/png');
+      linkBack.download = `BRADWEAR_BELAKANG_${product.name}_${Date.now()}.png`;
+      document.body.appendChild(linkBack);
+      linkBack.click();
+      document.body.removeChild(linkBack);
+
+    } catch (err) {
+      console.error('Download failed', err);
+      alert('Gagal mengunduh desain. Coba lagi.');
+    } finally {
+      setCanvasZoom(originalZoom);
+      setPanPos(originalPan);
+      onUpdate({ view: originalView });
+      setIsExporting(false);
+    }
+  };
+
   const executeWhatsAppExport = async () => {
     if (!canvasRef.current) return;
     setIsExporting(true);
@@ -1083,7 +1129,7 @@ const DesignEditorView: React.FC = () => {
   };
 
   return (
-    <div className={`flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden ${theme === 'dark' ? 'bg-[#050505]' : 'bg-zinc-50'} relative transition-colors duration-500`}>
+    <div className="mx-auto flex h-full w-full max-w-[1320px] flex-col overflow-y-auto rounded-[24px] bg-[var(--surface-subtle)] md:flex-row md:overflow-hidden">
       <style>{`
         .step-transition-container {
           display: flex;
@@ -1120,7 +1166,7 @@ const DesignEditorView: React.FC = () => {
 
       {/* LEFT PANEL: PREVIEW */}
       <div
-        className={`w-full aspect-square md:w-[60%] lg:w-[65%] md:h-full relative flex flex-col items-center justify-center p-4 border-b md:border-b-0 md:border-r shrink-0 transition-all duration-700 ${theme === 'dark' ? 'border-white/5' : 'border-zinc-300'}`}
+        className={`w-full md:w-[60%] lg:w-[65%] md:h-full relative flex flex-col border-b md:border-b-0 md:border-r shrink-0 transition-all duration-700 ${theme === 'dark' ? 'border-white/5' : 'border-zinc-300'}`}
         style={{
           background: theme === 'dark'
             ? `radial-gradient(circle at center, ${designData.color}15 0%, #0a0a0a 100%)`
@@ -1128,22 +1174,56 @@ const DesignEditorView: React.FC = () => {
         }}
       >
 
-        {/* Undo/Redo/Back Header - Hidden when any popup is active */}
-        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showStepNotify && !showDownloadPrompt && (
-          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
-            {/* Tombol Kembali (Menggunakan HandleBackCustom untuk reset) */}
-            {/* Space Placeholder where Back Button was */}
-            <div className="w-9 h-9"></div>
-            <div className={`flex gap-1 rounded-lg p-1 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60 shadow-sm'}`}>
-              <button onClick={undo} disabled={historyPointer === 0} className={`p-2 rounded transition-all ${historyPointer === 0 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
-              </button>
-              <button onClick={redo} disabled={historyPointer === history.length - 1} className={`p-2 rounded transition-all ${historyPointer === history.length - 1 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
-              </button>
+        {/* Section Title - di atas canvas, bukan overlay */}
+        {!isProcessing && !isExporting && (
+          <div className={`shrink-0 flex items-center justify-between px-5 py-3 border-b z-10 ${theme === 'dark' ? 'border-white/5' : 'border-zinc-200'}`}>
+            <div>
+              <h2 className={`text-sm font-black uppercase tracking-widest neon-text`}>
+                {editorStep === 'materials' ? 'Desain Warna & Bahan' : editorStep === 'details' ? 'Detail Atribut' : 'Data Pesanan'}
+              </h2>
+              <div className="flex gap-1.5 mt-1.5">
+                {['materials', 'details', 'finish'].map((s, i) => (
+                  <div
+                    key={s}
+                    className={`h-1 rounded-full transition-all duration-500 ${editorStep === s ? 'w-6 bg-emerald-500' :
+                      (i < ['materials', 'details', 'finish'].indexOf(editorStep) ? 'w-3 bg-emerald-500/40' : 'w-3 bg-zinc-700')
+                      }`}
+                  />
+                ))}
+              </div>
             </div>
+            {/* Undo/Redo + Download */}
+            {!viewingModel && !expandedMaterial && !showCustomSizeModal && !showStepNotify && !showDownloadPrompt && (
+              <div className="flex items-center gap-2">
+                <div className={`flex gap-1 rounded-lg p-1 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60 shadow-sm'}`}>
+                  <button onClick={undo} disabled={historyPointer === 0} className={`p-2 rounded transition-all ${historyPointer === 0 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                  </button>
+                  <button onClick={redo} disabled={historyPointer === history.length - 1} className={`p-2 rounded transition-all ${historyPointer === history.length - 1 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
+                  </button>
+                </div>
+                {/* Tombol Download Desain */}
+                <button
+                  onClick={handleDownloadDesign}
+                  disabled={isExporting}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${isExporting ? 'opacity-50 cursor-not-allowed' : ''} ${theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' : 'bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100'}`}
+                  title="Download Desain"
+                >
+                  {isExporting ? (
+                    <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  )}
+                  <span className="hidden sm:inline">Download</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Canvas area - flex-1 mengisi sisa ruang */}
+        <div className="flex-1 relative min-h-0">
 
         {/* Canvas */}
         <div id="design-canvas" className="relative w-full h-full flex items-center justify-center overflow-hidden">
@@ -1231,45 +1311,47 @@ const DesignEditorView: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* END Canvas area */}
+        </div>
 
-        {/* View Controls (Navigation & Side Toggle) - Hidden when modals are active */}
+        {/* View Controls (Navigation & Side Toggle) - Footer normal, bukan absolute */}
         {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && !showStepNotify && !showDownloadPrompt && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 w-full max-w-[95%] md:max-w-max justify-center px-2">
+          <div className={`shrink-0 flex flex-col items-center gap-2 py-3 px-4 border-t z-10 ${theme === 'dark' ? 'border-white/5' : 'border-zinc-200'}`}>
 
-            {/* Tombol Kembali Cepat */}
-            <button
-              onClick={handleBackCustom}
-              className={`flex items-center justify-center w-12 h-12 rounded-2xl border backdrop-blur-md transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10 text-white' : 'bg-white/90 border-zinc-200 text-zinc-800 shadow-xl'}`}
-              title="Kembali"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
-            </button>
+            {/* View Toggle - DEPAN/BELAKANG di atas */}
+            <div className={`flex gap-2 p-1.5 rounded-2xl border ${theme === 'dark' ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-md'}`}>
+              {availableViews.map(v => (
+                <button
+                  key={v}
+                  onClick={() => onUpdate({ view: v as any })}
+                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
 
-            {/* View Toggle - Visible for all models that have Depan/Belakang views */}
-            {true && (
-              <div className={`flex gap-2 p-1.5 rounded-2xl border backdrop-blur-md ${theme === 'dark' ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-zinc-200 shadow-xl'}`}>
-                {availableViews.map(v => (
-                  <button
-                    key={v}
-                    onClick={() => onUpdate({ view: v as any })}
-                    className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Tombol Lanjut Cepat */}
-            {editorStep !== 'finish' && (
+            {/* Tombol Kembali & Lanjut di bawah toggle */}
+            <div className="flex items-center gap-3">
               <button
-                onClick={handleNextStep}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95 transition-all animate-pulse hover:animate-none"
+                onClick={handleBackCustom}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl border transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 border-white/10 text-white' : 'bg-white border-zinc-200 text-zinc-800 shadow-md'}`}
+                title="Kembali"
               >
-                <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Lanjut</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                <span className="text-[10px] font-black uppercase tracking-widest">Kembali</span>
               </button>
-            )}
+
+              {editorStep !== 'finish' && (
+                <button
+                  onClick={handleNextStep}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95 transition-all animate-pulse hover:animate-none"
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest">Lanjut</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              )}
+            </div>
           </div>
         )}
 
@@ -1278,17 +1360,14 @@ const DesignEditorView: React.FC = () => {
       {/* RIGHT PANEL: EDITOR */}
       <div className={`w-full md:w-[40%] lg:w-[35%] flex-shrink-0 md:h-full flex flex-col border-t md:border-t-0 md:border-l relative z-10 shadow-2xl transition-colors duration-500 overflow-visible md:overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`}>
 
-        {/* Panel Header */}
-        <div className={`px-5 py-5 md:px-8 md:py-6 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
-          <h2 className="text-xl font-black uppercase tracking-widest neon-text mb-1">
-            {editorStep === 'materials' ? 'Desain Warna & Bahan' : editorStep === 'details' ? 'Detail Atribut' : 'Data Pesanan'}
-          </h2>
-          <div className="flex gap-1.5 mt-2">
+        {/* Panel Header - hanya step indicator */}
+        <div className={`px-5 py-2 md:px-8 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
+          <div className="flex gap-1.5">
             {['materials', 'details', 'finish'].map((s, i) => (
               <div
                 key={s}
-                className={`h-1.5 rounded-full transition-all duration-500 ${editorStep === s ? 'w-8 bg-emerald-500' :
-                  (i < ['materials', 'details', 'finish'].indexOf(editorStep) ? 'w-4 bg-emerald-500/40' : 'w-4 bg-zinc-800')
+                className={`h-1 rounded-full transition-all duration-500 ${editorStep === s ? 'w-6 bg-emerald-500' :
+                  (i < ['materials', 'details', 'finish'].indexOf(editorStep) ? 'w-3 bg-emerald-500/40' : 'w-3 bg-zinc-800')
                   }`}
               />
             ))}
