@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { buildOrderWhatsAppMessage, getWhatsAppHref } from "@/lib/site-content";
 
 type User = {
   id: string;
@@ -16,14 +17,30 @@ export default function CheckoutPage() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [message, setMessage] = useState("");
   const [placing, setPlacing] = useState(false);
+  const [whatsAppHref, setWhatsAppHref] = useState<string | null>(null);
   const [designSeed] = useState<{
     productSlug?: string;
     productName?: string;
+    category?: string;
+    material?: string;
     designDataUrl?: string;
     designJson?: Record<string, unknown>;
     qty?: number;
     warna?: string;
     model?: string;
+    orderItems?: Array<{
+      modelName?: string;
+      size?: string;
+      qty?: number;
+      gender?: string;
+      sleeve?: string;
+      colorCode?: string;
+      note?: string;
+    }>;
+    scanMetadata?: {
+      normalizedColorName?: string | null;
+      colorCode?: string | null;
+    } | null;
     sizeDetails?: Array<{ size: string; qty: number; gender?: string; sleeve?: string }>;
   } | null>(() => {
     if (typeof window === "undefined") return null;
@@ -80,6 +97,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     setPlacing(true);
     setMessage("");
+    setWhatsAppHref(null);
 
     const sizeDetails =
       designSeed?.sizeDetails && designSeed.sizeDetails.length > 0
@@ -118,8 +136,29 @@ export default function CheckoutPage() {
       return;
     }
 
-    setMessage(`Order berhasil dibuat. Kode: ${data.order?.kode_barang}`);
+    const whatsAppMessage = buildOrderWhatsAppMessage({
+      orderCode: data.order?.kode_barang,
+      productName: designSeed?.productName || form.model,
+      category: designSeed?.category,
+      model: form.model,
+      material: designSeed?.material,
+      warna: form.warna,
+      qty: Number(form.qty),
+      sizeDetails,
+      orderItems: designSeed?.orderItems,
+      scanColorName: designSeed?.scanMetadata?.normalizedColorName,
+      scanColorCode: designSeed?.scanMetadata?.colorCode,
+      customerName: form.fullName,
+      customerPhone: form.phone,
+      customerEmail: form.email,
+      address: form.address,
+      notes: form.notes,
+    });
+    const nextWhatsAppHref = getWhatsAppHref(whatsAppMessage);
+    setWhatsAppHref(nextWhatsAppHref);
+    setMessage(`Order berhasil dibuat. Kode: ${data.order?.kode_barang}. WhatsApp konfirmasi dibuka otomatis.`);
     localStorage.removeItem("marketplace_checkout_seed");
+    window.open(nextWhatsAppHref, "_blank", "noopener,noreferrer");
   }
 
   if (loadingUser) {
@@ -249,6 +288,16 @@ export default function CheckoutPage() {
           {placing ? "Mengirim Pesanan..." : "Kirim Pesanan"}
         </button>
         {message ? <p className="text-sm text-slate-700">{message}</p> : null}
+        {whatsAppHref ? (
+          <a
+            href={whatsAppHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+          >
+            Buka ulang konfirmasi WhatsApp
+          </a>
+        ) : null}
       </form>
 
       <aside className="card h-fit p-4">
@@ -259,6 +308,8 @@ export default function CheckoutPage() {
         <p className="text-sm font-semibold">Desain Terpilih</p>
         <p className="mt-1 text-sm text-slate-700">{designSeed?.productName || "Belum ada desain"}</p>
         <p className="text-xs text-slate-500">{designSeed?.productSlug || "-"}</p>
+        <p className="mt-2 text-xs text-slate-500">Material: {designSeed?.material || "-"}</p>
+        <p className="text-xs text-slate-500">Kategori: {designSeed?.category || "-"}</p>
       </aside>
     </div>
   );

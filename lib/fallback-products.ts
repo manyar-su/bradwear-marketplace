@@ -17,7 +17,7 @@ export const fallbackProducts = [
     name: "Brad V2 Custom",
     category: "Kemeja Custom",
     base_price: 215000,
-    thumbnail_url: "/assets/katalog/Model Kemeja/Brad-v2/(brad v-2)warna navi.png",
+    thumbnail_url: "/assets/katalog/Model Kemeja/Brad-v2/(brad v-2)warna hitam.png",
     canvas_config: {
       color: "#1e3a8a",
       label: "Brad V2",
@@ -62,7 +62,7 @@ export const fallbackProducts = [
     name: "Warrior Custom",
     category: "Celana",
     base_price: 245000,
-    thumbnail_url: "/assets/katalog/Celana/Warrior/warrior-depan-hitam.jpeg",
+    thumbnail_url: "/assets/katalog/Celana/Warrior/warior-depan-hitam.jpeg",
     canvas_config: { color: "#1f2937", label: "Celana Warrior" },
   },
   {

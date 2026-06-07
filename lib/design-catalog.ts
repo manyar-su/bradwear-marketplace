@@ -46,15 +46,21 @@ export const MATERIALS_BY_CATEGORY: Record<DesignCategory, string[]> = {
 };
 
 const CATALOGS: Record<string, string[]> = {
-  "Tropical (Best Seller)": ["/assets/katalog/Katalog warna/Tropical/2. Tropical.jpg"],
+  "Tropical (Best Seller)": [
+    "/assets/katalog/Katalog warna/Tropical/WhatsApp Image 2026-02-12 at 08.57.04.jpeg",
+  ],
   Nagata: ["/assets/katalog/Katalog warna/Nagata/2. Nagata.jpg"],
-  "American Drill": ["/assets/katalog/Katalog warna/American Drill/2. American Drill.jpg"],
-  STF: ["/assets/katalog/Katalog warna/STF/2. STF.jpg"],
+  "American Drill": [
+    "/assets/katalog/Katalog warna/American drill/WhatsApp Image 2026-02-12 at 09.22.21.jpeg",
+  ],
+  STF: ["/assets/katalog/Katalog warna/STF/WhatsApp Image 2026-02-12 at 09.11.33.jpeg"],
   "Soft Denim": ["/assets/katalog/Katalog warna/Soft denim/WhatsApp Image 2026-02-12 at 09.13.31.jpeg"],
   Oxford: ["/assets/katalog/Katalog warna/Oxford/2. Oxford Sari Warna.jpg"],
   Ripstop: ["/assets/katalog/Katalog warna/Ripstop/WhatsApp Image 2026-02-12 at 09.14.53.jpeg"],
-  Polo: ["/assets/katalog/Katalog warna/Polo/2. Polo.jpg"],
-  "Baby Canvas": ["/assets/katalog/Katalog warna/Baby canvas/2. Baby Canvas.jpg"],
+  Polo: ["/assets/katalog/Katalog warna/Polo/E-Catalog Version 2023.01 5_page-0046.jpg"],
+  "Baby Canvas": [
+    "/assets/katalog/Katalog warna/Baby canvas/WhatsApp Image 2026-02-12 at 09.23.22.jpeg",
+  ],
 };
 
 function viewsByCategory(category: DesignCategory): DesignViewLabel[] {
@@ -100,7 +106,7 @@ export const DESIGN_MODELS: ProductCatalogModel[] = [
     "brad-v2-custom",
     "Brad-v2",
     "Kemeja",
-    "/assets/katalog/Model Kemeja/Brad-v2/(brad v-2)warna navi.png",
+    "/assets/katalog/Model Kemeja/Brad-v2/(brad v-2)warna hitam.png",
     "/assets/katalog/Model Kemeja/Brad-v2/navi belakang.png"
   ),
   createModel(
@@ -188,8 +194,8 @@ export const DESIGN_MODELS: ProductCatalogModel[] = [
     "warrior-custom",
     "Warrior",
     "Celana",
-    "/assets/katalog/Celana/Warrior/warrior-depan-hitam.jpeg",
-    "/assets/katalog/Celana/Warrior/warrior-depan-hitam.jpeg"
+    "/assets/katalog/Celana/Warrior/warior-depan-hitam.jpeg",
+    "/assets/katalog/Celana/Warrior/warior-belakang-hitam.jpeg"
   ),
   createModel(
     "c2",
@@ -204,8 +210,8 @@ export const DESIGN_MODELS: ProductCatalogModel[] = [
     "celana-bradwear-v3-custom",
     "Bradwear V3",
     "Celana",
-    "/assets/katalog/Celana/Bradwear V3/bradwear v-3.jpeg",
-    "/assets/katalog/Celana/Bradwear V3/bradwear V-3 (1).jpeg"
+    "/assets/katalog/Celana/Bradwear V3/bradwear V-3 coklat.jpeg",
+    "/assets/katalog/Celana/Bradwear V3/bradwear v-3 abu.jpeg"
   ),
   createModel(
     "p1",

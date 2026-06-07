@@ -1,12 +1,42 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DesignStudio } from "@/components/design-studio";
 import { fallbackProducts } from "@/lib/fallback-products";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getModelBySlug } from "@/lib/design-catalog";
+import { buildMetadata } from "@/lib/seo";
 
 type Params = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const fallback =
+    fallbackProducts.find((item) => item.slug === slug) ||
+    getModelBySlug(slug);
+
+  if (!fallback) {
+    return buildMetadata({
+      title: "Design Studio Seragam Custom",
+      description:
+        "Gunakan design studio Bradflow untuk menyiapkan pemesanan kemeja custom, seragam kantor, seragam dinas, dan seragam komunitas.",
+      path: `/desain/${slug}`,
+    });
+  }
+
+  const name = "name" in fallback ? fallback.name : slug;
+  const image = "thumbnail_url" in fallback ? fallback.thumbnail_url : fallback.image;
+
+  return buildMetadata({
+    title: `${name} untuk Pemesanan Kemeja dan Seragam Custom`,
+    description:
+      `Buka design studio ${name} untuk pemesanan kemeja custom, seragam kantor, seragam dinas, atau seragam komunitas dengan brief desain yang lebih rapi.`,
+    path: `/desain/${slug}`,
+    keywords: ["pemesanan kemeja", "kemeja custom", "seragam kantor", name],
+    image,
+  });
+}
 
 export default async function DesainPage({ params }: Params) {
   const { slug } = await params;
@@ -63,7 +93,7 @@ export default async function DesainPage({ params }: Params) {
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-300">Bradwear Custom Lab</p>
         <h1 className="mt-2 text-2xl font-black tracking-tight md:text-3xl">Design Studio</h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-200">
-          Atur desain kemeja secara live seperti mockup Bradflow: ubah teks, upload logo, pilih warna dasar, lalu simpan atau lanjut checkout.
+          Atur desain kemeja secara live seperti mockup Bradflow untuk pemesanan kemeja custom, seragam kantor, seragam dinas, dan seragam komunitas: ubah teks, upload logo, pilih warna dasar, lalu simpan atau lanjut checkout.
         </p>
       </section>
       <DesignStudio

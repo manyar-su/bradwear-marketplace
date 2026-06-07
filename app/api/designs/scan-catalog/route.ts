@@ -26,6 +26,33 @@ function extractTextFromProvider(payload: unknown): string {
   return "";
 }
 
+function extractStructuredScanResponse(raw: string) {
+  const normalized = raw.trim();
+
+  try {
+    const parsed = JSON.parse(normalized) as {
+      raw_label_text?: string;
+      color_name?: string;
+      color_code?: string;
+    };
+
+    return {
+      rawLabelText: parsed.raw_label_text?.trim() || "",
+      colorName: parsed.color_name?.trim() || "",
+      colorCode: parsed.color_code?.trim() || "",
+    };
+  } catch {
+    const colorNameMatch = normalized.match(/color[_ ]?name\s*[:=-]\s*(.+)/i);
+    const colorCodeMatch = normalized.match(/color[_ ]?code\s*[:=-]\s*([a-z0-9 -]+)/i);
+
+    return {
+      rawLabelText: normalized,
+      colorName: colorNameMatch?.[1]?.trim() || "",
+      colorCode: colorCodeMatch?.[1]?.trim() || "",
+    };
+  }
+}
+
 export async function POST(request: Request) {
   const user = await getCurrentMarketplaceUser();
   if (!user) {
@@ -41,8 +68,14 @@ export async function POST(request: Request) {
 
     const endpoint = env.ocrEndpoint || "https://ai.sumopod.com/v1/chat/completions";
     const model = env.ocrModel || "gemini/gemini-2.0-flash";
-    const prompt =
-      "Extract text from this catalog image. Return short plain text containing color name and color code only.";
+    const prompt = [
+      "You are reading a small catalog swatch label.",
+      "Focus on the text printed inside the swatch/scan box and the nearest color label.",
+      "Read the color code exactly as printed if visible, such as C-016 or C016.",
+      "Return strict JSON with keys raw_label_text, color_name, color_code.",
+      'Example: {"raw_label_text":"C-016","color_name":"Hitam","color_code":"C-016"}',
+      "If a field is not visible, return an empty string for that field.",
+    ].join(" ");
 
     if (!env.ocrApiKey) {
       const fallback = parseScanText(parsed.data.imageDataUrl, DESIGN_ASSET_MAP.colors);
@@ -104,7 +137,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const scanResult = parseScanText(extracted, DESIGN_ASSET_MAP.colors);
+    const structured = extractStructuredScanResponse(extracted);
+    const sourceText = [structured.rawLabelText, structured.colorName, structured.colorCode]
+      .filter(Boolean)
+      .join(" ");
+    const scanResult = parseScanText(sourceText || extracted, DESIGN_ASSET_MAP.colors);
+
     return NextResponse.json({ ok: true, mode: "ai", result: scanResult }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Internal Server Error";

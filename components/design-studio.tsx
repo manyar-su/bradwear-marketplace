@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { useRouter } from "next/navigation";
@@ -88,6 +89,8 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
   const [status, setStatus] = useState("");
   const [scanResult, setScanResult] = useState<CatalogScanResult | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [scanPreviewUrl, setScanPreviewUrl] = useState<string | null>(null);
+  const [allowManualColorCodeEdit, setAllowManualColorCodeEdit] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderItemDraft[]>([]);
   const [itemForm, setItemForm] = useState<ItemForm>({
     size: "L",
@@ -274,11 +277,14 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
         productSlug: model.slug,
         productName: model.name,
         category: model.category,
+        material,
         designDataUrl: image,
         designJson: payload,
         qty: orderItems.reduce((sum, item) => sum + item.qty, 0) || 1,
         model: model.name,
         warna: findColorByHex(activeColor)?.name || activeColor,
+        orderItems,
+        scanMetadata: scanResult,
         sizeDetails:
           orderItems.length > 0
             ? orderItems.map((item) => ({
@@ -297,7 +303,9 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
     const reader = new FileReader();
     reader.onload = async () => {
       const imageDataUrl = String(reader.result || "");
+      setScanPreviewUrl(imageDataUrl);
       setScanning(true);
+      setAllowManualColorCodeEdit(false);
       setStatus("Menganalisa scan katalog...");
       try {
         const res = await fetch("/api/designs/scan-catalog", {
@@ -321,8 +329,14 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
         }
         if (result.colorCode) {
           setItemForm((prev) => ({ ...prev, colorCode: result.colorCode || prev.colorCode }));
+        } else {
+          setAllowManualColorCodeEdit(true);
         }
-        setStatus("Scan selesai, data warna berhasil dipetakan.");
+        setStatus(
+          result.colorCode
+            ? `Scan selesai. Kode warna ${result.colorCode} terisi otomatis.`
+            : "Scan selesai, tetapi kode warna belum terbaca jelas."
+        );
       } finally {
         setScanning(false);
       }
@@ -345,6 +359,9 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
     };
     setOrderItems((prev) => [item, ...prev]);
     setItemForm((prev) => ({ ...prev, qty: 1, note: "" }));
+    setAllowManualColorCodeEdit(false);
+    setStep("finish");
+    setStatus("Detail pesanan disimpan. Editor langsung masuk ke step finish.");
   }
 
   const materials = MATERIALS_BY_CATEGORY[model.category];
@@ -352,9 +369,9 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
   const totalQty = orderItems.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <div className="rounded-[32px] border border-emerald-300/20 bg-neutral-950 p-3 text-slate-100 shadow-[0_30px_80px_rgba(0,0,0,0.45)] md:p-5">
-      <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-3">
-        <div className="mb-3 grid grid-cols-3 gap-2">
+    <div className="rounded-[28px] border border-emerald-300/20 bg-neutral-950 p-3 text-slate-100 shadow-[0_30px_80px_rgba(0,0,0,0.45)] md:p-4 xl:p-5">
+      <div className="mb-4 rounded-[24px] border border-white/10 bg-white/5 p-3 md:p-4">
+        <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {STEP_LABELS.map((item) => (
             <button
               key={item.key}
@@ -371,7 +388,7 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
           ))}
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
           <label className="text-xs">
             <span className="mb-1 block uppercase tracking-wider text-slate-300">Model</span>
             <select
@@ -439,10 +456,10 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px,1fr,330px]">
-        <section className="space-y-3 rounded-[24px] border border-white/10 bg-white/5 p-4">
+      <div className="grid gap-4 2xl:grid-cols-[280px,minmax(0,1fr),360px] xl:grid-cols-[280px,minmax(0,1fr)]">
+        <section className="h-fit space-y-3 rounded-[24px] border border-white/10 bg-white/5 p-4 xl:sticky xl:top-24">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-300">Panel Kontrol</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
             <button
               type="button"
               onClick={() => addTextElement("nama")}
@@ -502,7 +519,7 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
 
           <div>
             <p className="mb-1 text-[11px] uppercase tracking-wider text-slate-300">Pilihan Warna</p>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 xl:grid-cols-5 2xl:grid-cols-6">
               {DESIGN_ASSET_MAP.colors.map((item) => (
                 <button
                   key={item.name}
@@ -581,8 +598,8 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
           </div>
         </section>
 
-        <section className="rounded-[24px] border border-white/10 bg-gradient-to-b from-slate-900/80 to-black p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <section className="min-w-0 rounded-[24px] border border-white/10 bg-gradient-to-b from-slate-900/80 to-black p-4">
+          <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
             <div>
               <h3 className="text-lg font-black tracking-tight">{model.name}</h3>
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">
@@ -595,7 +612,7 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
           </div>
 
           <div
-            className="relative mx-auto h-[520px] w-full max-w-[370px] overflow-hidden rounded-[36px] border border-white/20 bg-neutral-900"
+            className="relative mx-auto h-[460px] w-full max-w-[440px] overflow-hidden rounded-[32px] border border-white/20 bg-neutral-900 sm:h-[520px]"
             onPointerMove={(e) => moveElementFromPointer(e.clientX, e.clientY)}
             onPointerUp={() => {
               if (draggingId) commitElementMutation();
@@ -673,6 +690,23 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
             </div>
           </div>
 
+          <div className="mt-3 flex flex-wrap gap-2">
+            {availableViews.map((view) => (
+              <button
+                key={`preview-${view}`}
+                type="button"
+                onClick={() => setActiveView(view)}
+                className={`rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition ${
+                  activeView === view
+                    ? "bg-emerald-400 text-neutral-950"
+                    : "border border-white/15 bg-white/5 text-slate-300 hover:bg-white/10"
+                }`}
+              >
+                {view}
+              </button>
+            ))}
+          </div>
+
           {selectedElement ? (
             <div className="mt-3 grid gap-2 rounded-xl border border-white/10 bg-black/30 p-3 md:grid-cols-3">
               <label className="text-xs">
@@ -731,57 +765,145 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
           ) : null}
         </section>
 
-        <section className="space-y-3 rounded-[24px] border border-white/10 bg-white/5 p-4">
+        <section className="space-y-3 rounded-[24px] border border-white/10 bg-white/5 p-4 xl:col-span-2 2xl:col-span-1 2xl:sticky 2xl:top-24 2xl:h-fit">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-300">Produksi & Aksi</h3>
 
           <div className="grid gap-2 rounded-2xl border border-white/10 bg-black/35 p-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-300">Tambah Item Pesanan</p>
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={itemForm.size}
-                onChange={(e) => setItemForm((prev) => ({ ...prev, size: e.target.value }))}
-                className="rounded-lg border border-white/15 bg-black/30 px-2 py-1.5 text-xs"
-              >
-                {SIZE_OPTIONS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                min={1}
-                value={itemForm.qty}
-                onChange={(e) => setItemForm((prev) => ({ ...prev, qty: Number(e.target.value) }))}
-                className="rounded-lg border border-white/15 bg-black/30 px-2 py-1.5 text-xs"
-              />
-              <select
-                value={itemForm.gender}
-                onChange={(e) =>
-                  setItemForm((prev) => ({ ...prev, gender: e.target.value as ItemForm["gender"] }))
-                }
-                className="rounded-lg border border-white/15 bg-black/30 px-2 py-1.5 text-xs"
-              >
-                <option>Pria</option>
-                <option>Wanita</option>
-              </select>
-              <select
-                value={itemForm.sleeve}
-                onChange={(e) =>
-                  setItemForm((prev) => ({ ...prev, sleeve: e.target.value as ItemForm["sleeve"] }))
-                }
-                className="rounded-lg border border-white/15 bg-black/30 px-2 py-1.5 text-xs"
-              >
-                <option>Panjang</option>
-                <option>Pendek</option>
-              </select>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="text-[11px] uppercase tracking-wider text-slate-300">
+                Ukuran
+                <select
+                  value={itemForm.size}
+                  onChange={(e) => setItemForm((prev) => ({ ...prev, size: e.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-2 py-2 text-xs"
+                >
+                  {SIZE_OPTIONS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-[11px] uppercase tracking-wider text-slate-300">
+                Qty
+                <input
+                  type="number"
+                  min={1}
+                  value={itemForm.qty}
+                  onChange={(e) => setItemForm((prev) => ({ ...prev, qty: Number(e.target.value) }))}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-2 py-2 text-xs"
+                />
+              </label>
+              <label className="text-[11px] uppercase tracking-wider text-slate-300">
+                Gender
+                <select
+                  value={itemForm.gender}
+                  onChange={(e) =>
+                    setItemForm((prev) => ({ ...prev, gender: e.target.value as ItemForm["gender"] }))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-2 py-2 text-xs"
+                >
+                  <option>Pria</option>
+                  <option>Wanita</option>
+                </select>
+              </label>
+              <label className="text-[11px] uppercase tracking-wider text-slate-300">
+                Lengan
+                <select
+                  value={itemForm.sleeve}
+                  onChange={(e) =>
+                    setItemForm((prev) => ({ ...prev, sleeve: e.target.value as ItemForm["sleeve"] }))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-2 py-2 text-xs"
+                >
+                  <option>Panjang</option>
+                  <option>Pendek</option>
+                </select>
+              </label>
             </div>
-            <input
-              value={itemForm.colorCode}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, colorCode: e.target.value }))}
-              placeholder="Kode warna (hasil scan/manual)"
-              className="rounded-lg border border-white/15 bg-black/30 px-2 py-1.5 text-xs"
-            />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+                  Kode Warna
+                </p>
+                <Link href="/katalog" className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300">
+                  Lihat Katalog
+                </Link>
+              </div>
+
+              {scanPreviewUrl ? (
+                <div className="rounded-2xl border border-dashed border-emerald-300/35 bg-emerald-300/5 p-3">
+                  <div className="grid items-center gap-3 sm:grid-cols-[84px,1fr,auto]">
+                    <div className="overflow-hidden rounded-xl border border-emerald-300/25 bg-black/30">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={scanPreviewUrl}
+                        alt="Preview scan katalog"
+                        className="h-16 w-full object-cover"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-200">
+                        {scanResult?.colorCode ? "Terpilih" : "Hasil scan"}
+                      </p>
+                      <p className="text-sm font-black tracking-wide text-white">
+                        {itemForm.colorCode || scanResult?.colorCode || "Belum terbaca"}
+                      </p>
+                      <p className="text-[11px] text-slate-300">
+                        {scanResult?.normalizedColorName || "Kode warna akan terisi dari hasil OCR."}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 sm:flex-col">
+                      <button
+                        type="button"
+                        onClick={() => scanRef.current?.click()}
+                        className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/15"
+                      >
+                        Ubah
+                      </button>
+                      {scanResult?.colorCode ? (
+                        <button
+                          type="button"
+                          onClick={() => setAllowManualColorCodeEdit((prev) => !prev)}
+                          className="rounded-xl border border-emerald-300/30 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/20"
+                        >
+                          {allowManualColorCodeEdit ? "Kunci" : "Edit"}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  {scanResult?.rawText ? (
+                    <p className="mt-2 text-[11px] text-slate-400">Teks terbaca: {scanResult.rawText}</p>
+                  ) : null}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => scanRef.current?.click()}
+                  className="flex w-full items-center justify-center rounded-2xl border border-dashed border-white/20 bg-black/20 px-3 py-4 text-xs font-semibold text-slate-300 hover:border-emerald-300/40 hover:text-emerald-100"
+                >
+                  Scan katalog agar kode warna terisi otomatis
+                </button>
+              )}
+
+              <input
+                value={itemForm.colorCode}
+                onChange={(e) => setItemForm((prev) => ({ ...prev, colorCode: e.target.value }))}
+                placeholder="Kode warna akan terisi dari hasil scan"
+                readOnly={Boolean(scanResult?.colorCode) && !allowManualColorCodeEdit}
+                className={`rounded-lg border px-2 py-2 text-xs ${
+                  Boolean(scanResult?.colorCode) && !allowManualColorCodeEdit
+                    ? "border-emerald-300/25 bg-emerald-300/5 text-emerald-100"
+                    : "border-white/15 bg-black/30 text-slate-100"
+                }`}
+              />
+              <p className="text-[11px] text-slate-400">
+                {Boolean(scanResult?.colorCode) && !allowManualColorCodeEdit
+                  ? "Field terkunci karena kode warna sudah terbaca dari scan."
+                  : "Field ini bisa diedit jika hasil OCR perlu dikoreksi."}
+              </p>
+            </div>
             <textarea
               value={itemForm.note}
               onChange={(e) => setItemForm((prev) => ({ ...prev, note: e.target.value }))}
@@ -804,17 +926,56 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
             <p className="text-xs text-slate-300">Material: {material}</p>
             <p className="text-xs text-slate-300">Total Item: {orderItems.length}</p>
             <p className="text-xs text-slate-300">Total Qty: {totalQty}</p>
+            <p className="text-xs text-slate-300">Warna Aktif: {findColorByHex(activeColor)?.name || activeColor}</p>
           </div>
 
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-semibold hover:bg-white/20"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </button>
+          {orderItems.length > 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+              <p className="mb-2 text-xs uppercase tracking-wider text-slate-300">Order Draft Items</p>
+              <div className="max-h-[260px] space-y-2 overflow-y-auto pr-1">
+                {orderItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="font-semibold text-slate-100">{item.modelName}</p>
+                        <p className="text-slate-300">
+                          {item.size} • {item.qty} pcs • {item.gender} • {item.sleeve}
+                        </p>
+                        <p className="text-slate-400">Kode warna: {item.colorCode || "-"}</p>
+                        {item.note ? <p className="text-slate-400">Catatan: {item.note}</p> : null}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOrderItems((prev) => prev.filter((row) => row.id !== item.id))}
+                        className="rounded-md border border-red-300/40 bg-red-500/15 px-2 py-1 text-[11px] text-red-100"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div
+            className={`grid gap-2 ${
+              step === "finish" ? "sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-1" : "sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-1"
+            }`}
+          >
+            {step !== "finish" ? (
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-semibold hover:bg-white/20"
+              >
+                <Download className="h-4 w-4" />
+                Download
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={handleSave}
@@ -841,30 +1002,6 @@ export function DesignStudio({ slug, productName, color, productImage }: Props) 
         </section>
       </div>
 
-      {orderItems.length > 0 ? (
-        <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3">
-          <p className="mb-2 text-xs uppercase tracking-wider text-slate-300">Order Draft Items</p>
-          <div className="space-y-2">
-            {orderItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs"
-              >
-                <span>
-                  {item.modelName} • {item.size} • {item.qty} pcs • {item.colorCode || "-"}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setOrderItems((prev) => prev.filter((row) => row.id !== item.id))}
-                  className="rounded-md border border-red-300/40 bg-red-500/15 px-2 py-1 text-red-100"
-                >
-                  Hapus
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
