@@ -33,8 +33,12 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
 };
 
 // Import logo dan UI assets dynamically
-const LOGO_BRADWEAR = resolveAsset('./assets/logo.png');
-const HERO_BG = resolveAsset('./assets/factory_hero.jpg');
+const LOGO_BRADWEAR = resolveAsset('./assets/logo.webp');
+const HERO_BG = resolveAsset('./assets/factory_hero.webp');
+const HERO_SLIDES = Object.keys(allImagesGlob)
+  .filter((key) => key.toLowerCase().includes('/slideshow/'))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  .map((key) => resolveAsset(key));
 
 // Import Produk
 // Map untuk menyimpan folder -> path lengkap
@@ -473,17 +477,17 @@ const YOROI_GAL_1 = resolveAsset('./assets/Model Kemeja/Yoroi/biru muda.jpeg');
 const YOROI_GAL_2 = resolveAsset('./assets/Model Kemeja/Yoroi/coklat.jpeg');
 
 // Partner Logos lookups
-const PARTNER_KEMENDAGRI = resolveAsset('./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).png');
-const PARTNER_TUTWURI = resolveAsset('./assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.png');
-const PARTNER_HAM = resolveAsset('./assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.png');
-const PARTNER_DPR = resolveAsset('./assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.png');
-const PARTNER_BMKG = resolveAsset('./assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.png');
-const PARTNER_BAPPENAS = resolveAsset('./assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).png');
-const PARTNER_KPI = resolveAsset('./assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.png');
-const PARTNER_BUMN = resolveAsset('./assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.png');
-const PARTNER_PUPR = resolveAsset('./assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.png');
-const PARTNER_HUB = resolveAsset('./assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.png');
-const PARTNER_PERINDUS = resolveAsset('./assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.png');
+const PARTNER_KEMENDAGRI = resolveAsset('./assets/Logo our partner/GKL14_Kemendagri (Kementerian Dalam Negeri) - koleksilogo.com (1).webp');
+const PARTNER_TUTWURI = resolveAsset('./assets/Logo our partner/GKL15_Tut Wuri Handayani - koleksilogo.com.webp');
+const PARTNER_HAM = resolveAsset('./assets/Logo our partner/GKL16_Kementerian Hak Asasi Manusia - koleksilogo.com.webp');
+const PARTNER_DPR = resolveAsset('./assets/Logo our partner/GKL21_DPR RI (Dewan Perwakilan Daerah) - koleksilogo.com.webp');
+const PARTNER_BMKG = resolveAsset('./assets/Logo our partner/GKL29_BMKG - Koleksilogo.com.webp');
+const PARTNER_BAPPENAS = resolveAsset('./assets/Logo our partner/GKL29_Bappenas 2023 (Kementerian Perencanaan Pembangunan Nasional).webp');
+const PARTNER_KPI = resolveAsset('./assets/Logo our partner/GKL74_Komisi Penyiaran Indonesia (KPI) - koleksilogo.com.webp');
+const PARTNER_BUMN = resolveAsset('./assets/Logo our partner/Kementerian BUMN (Baru 2020) Logo (PNG-1080p) - Logopedia.webp');
+const PARTNER_PUPR = resolveAsset('./assets/Logo our partner/Logo Kementerian PUPR (PNG-2160p) - Logopedia.webp');
+const PARTNER_HUB = resolveAsset('./assets/Logo our partner/Logo Kementerian Perhubungan Indonesia (Kemenhub)  (PNG-2160p) - Logopedia.webp');
+const PARTNER_PERINDUS = resolveAsset('./assets/Logo our partner/Logo Kementerian Perindustrian Indonesia (PNG-2160p) - Logopedia.webp');
 
 // --- COLORS ARE NOW LOADED DYNAMICALLY BELOW ---
 
@@ -491,7 +495,8 @@ export const ASSETS = {
   // --- UI & BRANDING ---
   BRAND: {
     LOGO: LOGO_BRADWEAR,
-    HERO: HERO_BG,
+    HERO: HERO_SLIDES[0] || HERO_BG,
+    SLIDES: HERO_SLIDES.length > 0 ? HERO_SLIDES : [HERO_BG],
   },
 
   PARTNERS: [

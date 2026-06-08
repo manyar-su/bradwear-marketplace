@@ -35,3 +35,5 @@ android/.gradle/
 *.njsproj
 *.sln
 *.sw?
+
+.vercel

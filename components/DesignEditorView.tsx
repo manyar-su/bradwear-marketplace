@@ -4,13 +4,14 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Media } from '@capacitor-community/media';
 import html2canvas from 'html2canvas';
-import { Product, DesignData, DesignElement, View } from '../types';
+import { Product, DesignData, DesignElement, RouteKey } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
 import { removeBackground } from '../utils/imageProcessor';
 import { uploadImageToSupabase } from '../utils/supabaseService';
 import { getModelColorImage, getItemSpecificColors, COLOR_CATALOGS, ASSETS } from '../assets';
 import { analyzeImageWithGemini } from '../utils/geminiService';
 import { useStore } from '../context/StoreContext';
+import { buildWhatsAppUrl } from '../lib/siteConfig';
 
 const DesignEditorView: React.FC = () => {
   const { 
@@ -21,7 +22,7 @@ const DesignEditorView: React.FC = () => {
     handleSelectProduct: onSelectProduct, 
     theme,
     setOrderItems,
-    setCurrentView
+    setCurrentRoute
   } = useStore();
 
   if (!product) return null;
@@ -283,19 +284,6 @@ const DesignEditorView: React.FC = () => {
   const fileInputRefJabatan = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Hardware Back Button Handler
-  useEffect(() => {
-    const handleHardwareBack = (e: PopStateEvent) => {
-      e.preventDefault();
-      // Push state back to maintain our position in history
-      window.history.pushState(null, '', window.location.pathname);
-      handleBackCustom();
-    };
-
-    window.history.pushState(null, '', window.location.pathname);
-    window.addEventListener('popstate', handleHardwareBack);
-    return () => window.removeEventListener('popstate', handleHardwareBack);
-  }, [editorStep]); // Re-bind when step changes so handleBackCustom has right context
   const fileInputRefLenganKanan = useRef<HTMLInputElement>(null);
   const fileInputRefLenganKiri = useRef<HTMLInputElement>(null);
   const fileInputRefBelakang = useRef<HTMLInputElement>(null);
@@ -942,7 +930,7 @@ const DesignEditorView: React.FC = () => {
       sleeve: item.sleeve
     }));
     setOrderItems(simpleItems);
-    setCurrentView(View.SUMMARY);
+    setCurrentRoute(RouteKey.SUMMARY);
   };
 
   /* --- LOGIKA EKSPOR WHATSAPP (MODAL FORM TERLEBIH DAHULU) --- */
@@ -1115,7 +1103,28 @@ const DesignEditorView: React.FC = () => {
         `   Back: ${backUrl || '(Lihat Lampiran)'}%0a%0a` +
         `Mohon info total harga dan invoice resminya. Terima kasih! 🙏`;
 
-      window.open(`https://wa.me/?text=${text}`, '_blank');
+      const waMessage = [
+        `Halo tim Bradwear Indonesia, saya konsumen dari website Bradwear dan ingin melanjutkan order produksi ${product.category} custom.`,
+        '',
+        'DATA PEMESAN',
+        `- Nama: ${ordererInfo.name || '-'}`,
+        `- Instansi: ${ordererInfo.agency || '-'}`,
+        `- Lokasi: ${ordererInfo.location || '-'}`,
+        '',
+        'MATERIAL INFO',
+        `- Model: ${product.name}`,
+        `- Bahan: ${materialName}`,
+        '',
+        'DETAIL PESANAN',
+        ordersText,
+        'PREVIEW DESAIN',
+        `- Front: ${frontUrl || '(Lihat lampiran)'}`,
+        `- Back: ${backUrl || '(Lihat lampiran)'}`,
+        '',
+        'Mohon bantuannya untuk estimasi harga, timeline produksi, dan langkah approval berikutnya. Terima kasih.',
+      ].join('\n');
+
+      window.open(buildWhatsAppUrl(waMessage), '_blank');
       alert(`✅ Berhasil! Link gambar telah disematkan di WhatsApp.`);
       handleBackCustom();
 
@@ -1129,7 +1138,7 @@ const DesignEditorView: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-[1320px] flex-col overflow-y-auto rounded-[24px] bg-[var(--surface-subtle)] md:flex-row md:overflow-hidden">
+    <div className="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-none flex-col overflow-y-auto bg-[var(--surface-subtle)] md:h-[calc(100vh-96px)] md:flex-row md:overflow-hidden">
       <style>{`
         .step-transition-container {
           display: flex;
@@ -1316,7 +1325,7 @@ const DesignEditorView: React.FC = () => {
 
         {/* View Controls (Navigation & Side Toggle) - Footer normal, bukan absolute */}
         {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && !showStepNotify && !showDownloadPrompt && (
-          <div className={`shrink-0 flex flex-col items-center gap-2 py-3 px-4 border-t z-10 ${theme === 'dark' ? 'border-white/5' : 'border-zinc-200'}`}>
+          <div className={`absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-2 rounded-2xl px-3 py-2 backdrop-blur-md ${theme === 'dark' ? 'bg-black/60' : 'bg-white/90 shadow-xl shadow-black/10'}`}>
 
             {/* View Toggle - DEPAN/BELAKANG di atas */}
             <div className={`flex gap-2 p-1.5 rounded-2xl border ${theme === 'dark' ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-md'}`}>
@@ -2118,7 +2127,7 @@ const DesignEditorView: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className={`p-4 md:p-6 border-t shrink-0 z-20 backdrop-blur-md ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/60'} ${showStepNotify || showDownloadPrompt ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
+        <div className={`sticky bottom-0 z-20 shrink-0 border-t p-4 backdrop-blur-md md:p-6 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify || showDownloadPrompt ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
           {editorStep !== 'finish' ? (
             <button
               onClick={() => {
@@ -2137,7 +2146,7 @@ const DesignEditorView: React.FC = () => {
 
               <button
                 onClick={handleReviewOrder}
-                className="w-full py-4 neon-bg text-black font-black uppercase tracking-[0.2em] rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3"
+                className="w-full rounded-xl bg-[var(--brand-accent)] py-4 text-sm font-black uppercase tracking-normal text-white shadow-lg shadow-red-500/20 transition-all hover:brightness-110 active:scale-95"
               >
                 LANJUT KE RINGKASAN
               </button>

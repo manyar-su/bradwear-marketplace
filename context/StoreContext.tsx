@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
-import { View, Product, DesignData, OrderItem, ProductionOrder, WorkflowStage } from '../types';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
+import { RouteKey, Product, DesignData, OrderItem, ProductionOrder, WorkflowStage } from '../types';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from '../constants';
 import { COLORS } from '../constants'; // Sometimes needed for designData defaults
+import { ROUTE_PATHS, pathToRoute } from '../lib/siteConfig';
 
 interface StoreState {
-  currentView: View;
-  setCurrentView: (view: View) => void;
+  currentRoute: RouteKey;
+  setCurrentRoute: (route: RouteKey, options?: { replace?: boolean }) => void;
   theme: 'light' | 'dark';
   setTheme: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
   products: Product[];
@@ -33,8 +34,9 @@ const StoreContext = createContext<StoreState | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // --- STATE DEFINITIONS ---
 
-  const [currentView, setCurrentView] = useState<View>(() => {
-    return (localStorage.getItem('bradwear_current_view') as View) || View.HOME;
+  const [currentRoute, setCurrentRouteState] = useState<RouteKey>(() => {
+    const persistedRoute = localStorage.getItem('bradwear_current_route') as RouteKey | null;
+    return pathToRoute(window.location.pathname) || persistedRoute || RouteKey.HOME;
   });
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -95,6 +97,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return saved ? JSON.parse(saved) : [];
   });
 
+  const setCurrentRoute = useCallback((route: RouteKey, options?: { replace?: boolean }) => {
+    setCurrentRouteState(route);
+
+    const nextPath = ROUTE_PATHS[route];
+    if (window.location.pathname !== nextPath) {
+      const method = options?.replace ? 'replaceState' : 'pushState';
+      window.history[method](null, '', nextPath);
+    }
+  }, []);
+
   // --- EFFECTS ---
 
   useEffect(() => {
@@ -110,7 +122,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     localStorage.setItem('bradwear_production_orders', JSON.stringify(productionOrders));
 
     localStorage.setItem('bradwear_theme', theme);
-    localStorage.setItem('bradwear_current_view', currentView);
+    localStorage.setItem('bradwear_current_route', currentRoute);
     localStorage.setItem('bradwear_order_code', orderCode);
     localStorage.setItem('bradwear_design_data', JSON.stringify(designData));
     localStorage.setItem('bradwear_order_items', JSON.stringify(orderItems));
@@ -119,14 +131,30 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     } else {
       localStorage.removeItem('bradwear_selected_product');
     }
-  }, [products, productionOrders, currentView, theme, designData, orderItems, selectedProduct, orderCode]);
+  }, [products, productionOrders, currentRoute, theme, designData, orderItems, selectedProduct, orderCode]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const nextRoute = pathToRoute(window.location.pathname);
+      setCurrentRouteState(nextRoute);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedProduct && (currentRoute === RouteKey.EDITOR || currentRoute === RouteKey.SUMMARY)) {
+      setCurrentRoute(RouteKey.HOME, { replace: true });
+    }
+  }, [currentRoute, selectedProduct, setCurrentRoute]);
 
   // --- ACTIONS ---
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setDesignData(prev => ({ ...prev, productId: product.id }));
-    setCurrentView(View.EDITOR);
+    setCurrentRoute(RouteKey.EDITOR);
   };
 
   const updateDesignData = (data: Partial<DesignData>) => {
@@ -134,13 +162,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const handleGoBack = () => {
-    setCurrentView(View.HOME);
+    setCurrentRoute(RouteKey.HOME);
     setSelectedProduct(null);
   };
 
   return (
     <StoreContext.Provider value={{
-      currentView, setCurrentView,
+      currentRoute, setCurrentRoute,
       theme, setTheme,
       products, setProducts,
       orderCode, setOrderCode,

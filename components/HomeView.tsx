@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Category } from '../types';
 import { CLIENT_LOGOS, FAQS, TESTIMONIALS } from '../constants';
 import { ASSETS } from '../assets';
@@ -6,11 +6,52 @@ import { useStore } from '../context/StoreContext';
 
 const CATEGORIES: Category[] = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'];
 
+const getHoverImage = (product: { image: string; images?: { back?: string }; gallery?: string[] }) => {
+  const candidates = [product.images?.back, ...(product.gallery ?? [])].filter(Boolean) as string[];
+  return candidates.find((image) => image !== product.image) ?? product.image;
+};
+
+const ProductCardImage: React.FC<{ product: { image: string; name: string; images?: { back?: string }; gallery?: string[] } }> = ({ product }) => {
+  const hoverImage = getHoverImage(product);
+  const hasHoverImage = hoverImage !== product.image;
+
+  return (
+    <div className="product-card-media">
+      <img
+        src={product.image}
+        alt={product.name}
+        className={`product-card-image product-card-image-primary ${hasHoverImage ? 'has-hover' : ''}`}
+      />
+      {hasHoverImage ? (
+        <img
+          src={hoverImage}
+          alt={`${product.name} alternate view`}
+          className="product-card-image product-card-image-hover"
+        />
+      ) : null}
+    </div>
+  );
+};
+
 const HomeView: React.FC = () => {
   const { products, handleSelectProduct: onSelectProduct } = useStore();
   const [activeCategory, setActiveCategory] = useState<Category>('Kemeja');
   const [openFaq, setOpenFaq] = useState<number>(0);
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const catalogRef = useRef<HTMLElement | null>(null);
+  const heroSlides = useMemo(
+    () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
+    [],
+  );
+  const safeHeroSlides = heroSlides.length > 0 ? heroSlides : [ASSETS.KEMEJA.BRAD_V3.FRONT];
+
+  useEffect(() => {
+    if (safeHeroSlides.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length);
+    }, 4200);
+    return () => window.clearInterval(timer);
+  }, [safeHeroSlides]);
 
   const featured = useMemo(
     () => products.filter((p) => p.category === activeCategory && !p.isHidden),
@@ -24,38 +65,79 @@ const HomeView: React.FC = () => {
 
   return (
     <div className="overflow-y-auto pb-16">
-      <section className="px-6 pb-8 pt-8 md:px-10">
-        <div className="grid gap-6 rounded-[28px] border border-[var(--border-soft)] bg-gradient-to-br from-white to-[var(--surface-subtle)] p-8 md:grid-cols-[1.2fr_1fr] md:items-center">
-          <div className="space-y-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--text-muted)]">Bradwear Official Studio</p>
-            <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-[var(--text-primary)] md:text-5xl">
-              Bangun Seragam Instansi dengan Workflow Web yang Lebih Cepat
-            </h2>
-            <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)] md:text-base">
-              Katalog, kustomisasi, dan ringkasan pesanan sekarang disajikan dalam pengalaman web-first yang ringan,
-              responsif, dan mudah dipakai dari desktop maupun mobile browser.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className="rounded-full bg-[var(--brand-accent)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:brightness-110"
-              >
-                Lihat Katalog
-              </button>
-              <a
-                href="https://wa.me/"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-[var(--border-soft)] bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:bg-[var(--surface-hover)]"
-              >
-                Konsultasi CS
-              </a>
+      <section className="home-hero">
+        <article className="hero-banner">
+          <div className="hero-banner-stage">
+            {safeHeroSlides.map((slide, index) => (
+              <img
+                key={`${slide}-${index}`}
+                src={slide}
+                alt={`Bradwear banner ${index + 1}`}
+                className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
+              />
+            ))}
+            <div className="hero-banner-overlay" />
+            <div className="hero-copy">
+              <p className="hero-kicker">Bradwear Official Studio</p>
+              <h2>Marketplace Seragam Instansi Premium</h2>
+              <p>Pilih model terbaik, kustom desain, lalu lanjutkan ringkasan order dalam satu alur web yang cepat dan responsif.</p>
+              <div className="hero-actions">
+                <button
+                  type="button"
+                  onClick={() => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="hero-primary"
+                >
+                  Lihat Katalog
+                </button>
+                <a href="https://wa.me/" target="_blank" rel="noreferrer" className="hero-secondary">
+                  Konsultasi CS
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-white shadow-sm">
-            <img src={ASSETS.BRAND.HERO} alt="Bradwear Hero" className="h-full w-full object-cover transition duration-700 hover:scale-105" />
+          <button
+            type="button"
+            onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
+            className="hero-arrow hero-arrow-left"
+            aria-label="Banner sebelumnya"
+          >
+            &lt;
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
+            className="hero-arrow hero-arrow-right"
+            aria-label="Banner berikutnya"
+          >
+            &gt;
+          </button>
+          <ul className="hero-dots" aria-label="Slide indicator">
+            {safeHeroSlides.map((slide, index) => (
+              <li key={`${slide}-dot-${index}`}>
+                <button
+                  type="button"
+                  onClick={() => setActiveHeroSlide(index)}
+                  className={`hero-dot ${index === activeHeroSlide ? 'is-active' : ''}`}
+                  aria-label={`Tampilkan banner ${index + 1}`}
+                />
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <div className="hero-benefits">
+          <div>
+            <strong>Tidak ada pesanan minimum khusus sampel.</strong>
+            <span>Kustomisasi bisa dimulai dari konsultasi kebutuhan tim.</span>
+          </div>
+          <div>
+            <strong>Desain hari ini, produksi lebih rapi.</strong>
+            <span>Alur katalog, editor, dan ringkasan dibuat dalam satu web.</span>
+          </div>
+          <div>
+            <strong>Pengiriman seluruh Indonesia.</strong>
+            <span>Cocok untuk instansi, komunitas, dan kebutuhan operasional.</span>
           </div>
         </div>
       </section>
@@ -70,7 +152,7 @@ const HomeView: React.FC = () => {
               className="group rounded-3xl border border-[var(--border-soft)] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="mb-4 aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--surface-soft)]">
-                <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <ProductCardImage product={product} />
               </div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Best Seller</p>
               <h3 className="mt-1 text-base font-bold text-[var(--text-primary)]">{product.name}</h3>
@@ -112,7 +194,7 @@ const HomeView: React.FC = () => {
             >
               <button type="button" onClick={() => onSelectProduct(product)} className="w-full text-left">
                 <div className="mb-4 aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--surface-soft)]">
-                  <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <ProductCardImage product={product} />
                 </div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{product.category}</p>
                 <h4 className="mt-1 text-base font-bold text-[var(--text-primary)]">{product.name}</h4>
@@ -129,16 +211,20 @@ const HomeView: React.FC = () => {
         </div>
       </section>
 
-      <section className="px-6 pb-8 md:px-10">
-        <div className="rounded-[28px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+      <section className="partner-section">
+        <div className="content-wrap">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Dipercaya Instansi</p>
-          <div className="marquee-track">
-            {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((client, index) => (
-              <div key={`${client.name}-${index}`} className="marquee-item">
-                <img src={client.logo} alt={client.name} className="h-8 w-8 object-contain" />
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">{client.name}</span>
-              </div>
-            ))}
+          <div className="marquee-mask">
+            <div className="marquee-track">
+              {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((client, index) => (
+                <div key={`${client.name}-${index}`} className="marquee-item">
+                  <div className="partner-logo-frame">
+                    <img src={client.logo} alt={client.name} />
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">{client.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

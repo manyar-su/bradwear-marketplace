@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Product, DesignData, OrderItem, CustomMeasurements } from '../types';
 import { SIZES, COLORS } from '../constants';
 import { useStore } from '../context/StoreContext';
+import { buildWhatsAppUrl } from '../lib/siteConfig';
 
 const SummaryView: React.FC = () => {
   const { 
@@ -66,7 +67,16 @@ const SummaryView: React.FC = () => {
         `📦 *TOTAL*: ${totalQty} pcs\n` +
         `🖼️ *DESAIN*:\n\n` +
         `(Mohon bantuannya untuk proses produksi 🙏)`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+      const waMessage =
+        `Halo tim Bradwear Indonesia, saya konsumen dari website Bradwear dan ingin memesan ${product.name} custom.\n\n` +
+        `DETAIL PESANAN\n` +
+        `- Bahan: ${designData.material}\n` +
+        `- Warna: ${designData.color}\n` +
+        `- Personalisasi: ${displayCustomName || '-'}\n\n` +
+        `DAFTAR UKURAN\n- ${detailOrder}${kustomInfo}\n\n` +
+        `TOTAL\n- ${totalQty} pcs\n\n` +
+        `Mohon bantuannya untuk estimasi produksi, konfirmasi detail, dan langkah order berikutnya. Terima kasih.`;
+      window.open(buildWhatsAppUrl(waMessage), '_blank');
       setIsSending(false);
     }, 2000);
   };

@@ -260,19 +260,18 @@ export const INITIAL_WORKFLOW_STAGES: WorkflowStage[] = [
 ];
 
 export const CLIENT_LOGOS = [
-  { name: 'DISHUB', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Logo_Perhubungan.png' },
-  { name: 'SATPOL PP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Logo_Satpol_PP.png/800px-Logo_Satpol_PP.png' },
-  { name: 'DAMKAR', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Logo_Pemadam_Kebakaran_Indonesia.png/800px-Logo_Pemadam_Kebakaran_Indonesia.png' },
-  { name: 'POLRI', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Logo_Polri.png/1200px-Logo_Polri.png' },
-  { name: 'TNI AD', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Logo_TNI_AD.png/800px-Logo_TNI_AD.png' },
-  { name: 'KEMENHUB', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo_Kementerian_Perhubungan.png/1200px-Logo_Kementerian_Perhubungan.png' },
-  { name: 'BASARNAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Logo_BASARNAS.png/800px-Logo_BASARNAS.png' },
-  { name: 'BNPB', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Logo_BNPB.png/800px-Logo_BNPB.png' },
-  { name: 'BMKG', logo: 'https://upload.wikimedia.org/wikipedia/id/thumb/d/d4/Logo_BMKG.png/800px-Logo_BMKG.png' },
-  { name: 'KEMENKES', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Logo_Kementrian_Kesehatan.png/800px-Logo_Kementrian_Kesehatan.png' },
-  { name: 'PLN', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Logo_PLN.svg/1200px-Logo_PLN.svg.png' },
-  { name: 'SATGAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Logo_Satuan_Tugas_Penanganan_COVID-19_Indonesia.png/800px-Logo_Satuan_Tugas_Penanganan_COVID-19_Indonesia.png' }
-];
+  { name: 'KEMENDAGRI', logo: ASSETS.PARTNERS[0] },
+  { name: 'KEMENHAM', logo: ASSETS.PARTNERS[1] },
+  { name: 'DPR RI', logo: ASSETS.PARTNERS[2] },
+  { name: 'BMKG', logo: ASSETS.PARTNERS[3] },
+  { name: 'BAPPENAS', logo: ASSETS.PARTNERS[4] },
+  { name: 'KPI', logo: ASSETS.PARTNERS[5] },
+  { name: 'BUMN', logo: ASSETS.PARTNERS[6] },
+  { name: 'PUPR', logo: ASSETS.PARTNERS[7] },
+  { name: 'KEMENHUB', logo: ASSETS.PARTNERS[8] },
+  { name: 'KEMENPERIN', logo: ASSETS.PARTNERS[9] },
+  { name: 'TUT WURI', logo: ASSETS.PARTNERS[10] },
+].filter((client) => client.logo);
 
 export const TESTIMONIALS = [
   { name: 'Bp. Hendra', text: 'Kualitas jahitannya sangat rapi, benar-benar standar dinas.', agency: 'DISHUB', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },

@@ -1,11 +1,82 @@
 
-export enum View {
+export enum RouteKey {
   HOME = 'HOME',
+  KATALOG = 'KATALOG',
+  PANTS = 'PANTS',
+  ARTIKEL = 'ARTIKEL',
+  CARA_ORDER = 'CARA_ORDER',
+  LAYANAN_PELANGGAN = 'LAYANAN_PELANGGAN',
+  LACAK_PESANAN = 'LACAK_PESANAN',
+  TEMUKAN_TOKO = 'TEMUKAN_TOKO',
+  BRAD_AI = 'BRAD_AI',
   EDITOR = 'EDITOR',
   SUMMARY = 'SUMMARY'
 }
 
 export type Category = 'Kemeja' | 'Celana' | 'Rompi' | 'Jaket' | 'Polo';
+
+export interface NavItem {
+  label: string;
+  route: RouteKey;
+  description?: string;
+}
+
+export interface Article {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  readTime: string;
+  body: string[];
+}
+
+export interface CourierProvider {
+  id: string;
+  name: string;
+  helperText: string;
+  trackingUrl: string;
+  prefillMode: 'none' | 'query';
+  queryParam?: string;
+}
+
+export interface SeoMeta {
+  title: string;
+  description: string;
+  path: string;
+  keywords: string[];
+  schema: Record<string, unknown>[];
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  status?: 'idle' | 'loading' | 'error';
+}
+
+export interface BradAiContextSection {
+  heading: string;
+  body: string;
+}
+
+export interface SiteFaqItem {
+  slug: string;
+  title: string;
+  answer: string;
+}
+
+export interface ContactChannel {
+  label: string;
+  value: string;
+  note: string;
+}
+
+export interface HowToOrderStep {
+  id: string;
+  title: string;
+  description: string;
+  detail: string;
+}
 
 export interface ProductImages {
   front: string;
@@ -82,4 +153,16 @@ export interface ProductionOrder {
   orderItems: OrderItem[]; // Detail ukuran & gender
   stages: WorkflowStage[];
   createdAt: string;
+  courier?: string;
+  resi?: string;
+  trackingUrl?: string;
+}
+
+export interface CompletedOrder {
+  code: string;
+  productName: string;
+  completedAt: string;
+  resi: string;
+  courier?: string;
+  trackingUrl?: string;
 }
