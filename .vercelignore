@@ -1,0 +1,11 @@
+android
+dist
+node_modules
+.git
+.idea
+.vscode
+.agents
+build-output.txt
+build_debug.log
+*.log
+*.local
