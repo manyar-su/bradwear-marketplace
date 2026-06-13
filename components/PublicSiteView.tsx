@@ -20,6 +20,7 @@ import BradAiChat from './BradAiChat';
 import SiteFooter from './SiteFooter';
 
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
+const ALL_MODELS = 'Semua Model';
 
 const getHoverImage = (product: { image: string; images?: { back?: string }; gallery?: string[] }) => {
   const candidates = [product.images?.back, ...(product.gallery ?? [])].filter(Boolean) as string[];
@@ -48,15 +49,48 @@ const ProductCardImage: React.FC<{ product: Product }> = ({ product }) => {
   );
 };
 
+const ShippingIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h11v8H3z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h3l3 3v2h-6z" />
+    <circle cx="7.5" cy="17.5" r="1.5" />
+    <circle cx="17.5" cy="17.5" r="1.5" />
+  </svg>
+);
+
+const WorkflowIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h4v4H6zM14 14h4v4h-4z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10 8h4m-2 0v4m0 0h4m-4 0H8" />
+  </svg>
+);
+
+const WorkshopIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 20V9l8-5 8 5v11" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 20v-5h6v5" />
+  </svg>
+);
+
 const PublicSiteView: React.FC = () => {
-  const { currentRoute, setCurrentRoute, products, handleSelectProduct, productionOrders } = useStore();
+  const {
+    currentRoute,
+    setCurrentRoute,
+    products,
+    handleSelectProduct,
+    productionOrders,
+    preferredCatalogCategory,
+    setPreferredCatalogCategory,
+  } = useStore();
   const [activeCategory, setActiveCategory] = useState<typeof CATEGORIES[number]>('Kemeja');
+  const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
   const [trackingLookup, setTrackingLookup] = useState('');
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
+  const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const catalogRef = useRef<HTMLElement | null>(null);
 
   const heroSlides = useMemo(
@@ -74,6 +108,17 @@ const PublicSiteView: React.FC = () => {
   }, [safeHeroSlides]);
 
   useEffect(() => {
+    if (currentRoute === RouteKey.PANTS) {
+      setActiveCategory('Celana');
+      setActiveModelFilter(ALL_MODELS);
+      return;
+    }
+
+    setActiveCategory(preferredCatalogCategory);
+    setActiveModelFilter(ALL_MODELS);
+  }, [currentRoute, preferredCatalogCategory]);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('bradwear_order_history');
       if (saved) {
@@ -85,9 +130,16 @@ const PublicSiteView: React.FC = () => {
   }, []);
 
   const visibleProducts = useMemo(() => products.filter((product) => !product.isHidden), [products]);
+  const categoryModelOptions = useMemo(() => {
+    const names = visibleProducts.filter((product) => product.category === activeCategory).map((product) => product.name);
+    return [ALL_MODELS, ...Array.from(new Set(names))];
+  }, [visibleProducts, activeCategory]);
   const featured = useMemo(
-    () => visibleProducts.filter((product) => product.category === activeCategory),
-    [visibleProducts, activeCategory],
+    () =>
+      visibleProducts.filter(
+        (product) => product.category === activeCategory && (activeModelFilter === ALL_MODELS || product.name === activeModelFilter),
+      ),
+    [visibleProducts, activeCategory, activeModelFilter],
   );
   const pantsProducts = useMemo(
     () => visibleProducts.filter((product) => product.category === 'Celana'),
@@ -159,6 +211,48 @@ const PublicSiteView: React.FC = () => {
     </article>
   );
 
+  const heroBenefits = [
+    {
+      title: 'Pengiriman ke seluruh Indonesia',
+      copy: 'Cocok untuk instansi, operasional lapangan, proyek, dan pengadaan tim dengan alur kirim yang rapi.',
+      icon: <ShippingIcon />,
+    },
+    {
+      title: 'Editor desain dan follow up yang singkat',
+      copy: 'Ringkasan order dibuat lebih cepat dipahami supaya revisi, approval, dan konsultasi tidak berputar-putar.',
+      icon: <WorkflowIcon />,
+    },
+    {
+      title: 'Workshop aktif di Tasikmalaya',
+      copy: 'Tim Bradwear menangani pengembangan sample, pengecekan detail, dan kontrol kualitas sebelum produksi jalan.',
+      icon: <WorkshopIcon />,
+    },
+  ];
+
+  const renderFaqAccordion = () => (
+    <div className="grid gap-4 md:grid-cols-2">
+      {SITE_FAQS.map((faq) => {
+        const isOpen = openFaqSlug === faq.slug;
+
+        return (
+          <article key={faq.slug} className="rounded-[24px] bg-[var(--surface-subtle)] p-2">
+            <button
+              type="button"
+              onClick={() => setOpenFaqSlug(isOpen ? null : faq.slug)}
+              className="flex w-full items-start justify-between gap-3 rounded-[18px] px-4 py-4 text-left transition hover:bg-[var(--surface-base)]"
+            >
+              <span className="text-base font-bold leading-relaxed text-[var(--text-primary)]">{faq.title}</span>
+              <span className={`faq-chevron ${isOpen ? 'open' : ''}`}>+</span>
+            </button>
+            <div className={`faq-answer ${isOpen ? 'open' : ''}`}>
+              <p className="px-4 pb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+
   const renderHome = () => (
     <>
       <section className="home-hero">
@@ -174,10 +268,6 @@ const PublicSiteView: React.FC = () => {
               Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi yang butuh proses lebih cepat,
               lebih rapi, dan lebih mudah dipahami.
             </h1>
-            <p className="hero-lead">
-              Bradwear Indonesia membantu tim perusahaan, komunitas, dan instansi memilih model, bahan, lalu masuk ke alur
-              order yang jelas tanpa membuat tampilan terasa padat di mobile.
-            </p>
             <div className="hero-actions">
               <button
                 type="button"
@@ -187,7 +277,7 @@ const PublicSiteView: React.FC = () => {
                     catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 120);
                 }}
-                className="hero-primary"
+                className="hero-primary brand-cta"
               >
                 Jelajahi Katalog
               </button>
@@ -227,10 +317,6 @@ const PublicSiteView: React.FC = () => {
                 />
               ))}
               <div className="hero-banner-overlay" />
-              <div className="hero-slide-caption">
-                <p>Editorial Preview</p>
-                <strong>Slide visual produk dipisahkan dari judul agar tampilan lebih clean.</strong>
-              </div>
             </div>
 
             <button
@@ -253,32 +339,32 @@ const PublicSiteView: React.FC = () => {
         </div>
 
         <div className="hero-benefits">
-          <div>
-            <strong>Pengiriman ke seluruh Indonesia.</strong>
-            <span>Cocok untuk instansi, operasional lapangan, proyek, dan pengadaan tim.</span>
-          </div>
-          <div>
-            <strong>Editor desain, ringkasan order, lalu follow up CS.</strong>
-            <span>Alur digital dibuat singkat agar keputusan lebih cepat dan revisi lebih tertata.</span>
-          </div>
-          <div>
-            <strong>Berbasis di Tasikmalaya, Jawa Barat.</strong>
-            <span>Workshop Bradwear membantu pengembangan sample, approval, dan kontrol kualitas.</span>
-          </div>
+          {heroBenefits.map((benefit) => (
+            <article
+              key={benefit.title}
+              className="group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+            >
+              <div className="mb-4 inline-flex h-11 w-11 animate-floating items-center justify-center rounded-2xl bg-[var(--brand-accent-soft)] text-[var(--brand-accent-strong)]">
+                {benefit.icon}
+              </div>
+              <strong className="block text-base font-black text-[var(--text-primary)]">{benefit.title}</strong>
+              <span className="mt-2 block text-sm leading-relaxed text-[var(--text-secondary)]">{benefit.copy}</span>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="px-6 pb-8 md:px-10">
         <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
           <article className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Siap Untuk AI Search dan GEO</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Ringkas Tentang Bradwear</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">
-              Bradwear Indonesia hadir untuk kebutuhan seragam custom instansi dan perusahaan
+              Seragam custom yang dirancang supaya proses order lebih jelas dari pemilihan model sampai pengiriman
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              Kami membantu pelanggan memilih model, bahan, warna, dan detail identitas seragam agar proses approval lebih
-              cepat. Kebutuhan umum meliputi kemeja dinas, rompi lapangan, jaket kerja, polo shirt, dan celana tactical.
-              Pengiriman meliputi Jakarta, Bandung, Surabaya, Tasikmalaya, dan area lain di seluruh Indonesia.
+              Bradwear membantu instansi, perusahaan, dan komunitas memilih model, bahan, warna, dan detail identitas
+              tanpa membuat alur approval terasa rumit. Fokusnya tetap pada hasil visual yang rapi, keputusan yang cepat,
+              dan tindak lanjut yang mudah dipahami oleh tim Anda.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               {[RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN, RouteKey.LACAK_PESANAN].map((route) => (
@@ -300,12 +386,12 @@ const PublicSiteView: React.FC = () => {
             <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href={STORE_MAP_URL}
+                href={buildWhatsAppUrl(buildConsultationMessage('kunjungan atau konsultasi ke workshop Tasikmalaya'))}
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-900"
               >
-                Buka Google Maps
+                Konsultasi Lokasi
               </a>
               <button
                 type="button"
@@ -326,19 +412,44 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-8 md:px-10">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {ARTICLES.map((article) => (
+        <div className="grid gap-4 lg:grid-cols-[0.72fr_1fr]">
+          <article className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f8fafc,#ffffff)] p-6 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
+            <h3 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Judul artikel dibuat ringkas agar mudah dipindai</h3>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+              Buka daftar artikel untuk melihat panduan bahan, model, checklist produksi, dan tips order tanpa kartu yang terlalu penuh isi.
+            </p>
             <button
               type="button"
-              key={article.slug}
               onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
-              className="rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.1)]"
+              className="mt-6 rounded-full bg-[var(--brand-ink)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">{article.category} · {article.readTime}</p>
-              <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--text-primary)]">{article.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+              Lihat Daftar Artikel
             </button>
-          ))}
+          </article>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {ARTICLES.map((article, index) => (
+              <button
+                type="button"
+                key={article.slug}
+                onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
+                className="group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-[var(--brand-accent)] hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    {String(index + 1).padStart(2, '0')} · {article.category}
+                  </span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">{article.readTime}</span>
+                </div>
+                <h3 className="mt-4 text-lg font-black leading-snug tracking-tight text-[var(--text-primary)]">{article.title}</h3>
+                <span className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+                  Buka artikel
+                  <span className="transition group-hover:translate-x-1">-&gt;</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -357,14 +468,7 @@ const PublicSiteView: React.FC = () => {
               Ke layanan pelanggan
             </button>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {SITE_FAQS.map((faq) => (
-              <article key={faq.slug} className="rounded-[24px] bg-[var(--surface-subtle)] p-5">
-                <h4 className="text-base font-bold text-[var(--text-primary)]">{faq.title}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
-              </article>
-            ))}
-          </div>
+          {renderFaqAccordion()}
         </div>
       </section>
     </>
@@ -381,7 +485,7 @@ const PublicSiteView: React.FC = () => {
             <button
               type="button"
               onClick={() => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+              className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
             >
               Lihat Semua Model
             </button>
@@ -429,17 +533,37 @@ const PublicSiteView: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setActiveCategory(category);
+                  setPreferredCatalogCategory(category);
+                  setActiveModelFilter(ALL_MODELS);
                   if (category === 'Celana') {
                     setCurrentRoute(RouteKey.PANTS);
+                    return;
                   }
+                  setCurrentRoute(RouteKey.KATALOG);
                 }}
                 className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition ${
                   activeCategory === category
-                    ? 'bg-[var(--brand-accent)] text-white'
+                    ? 'brand-cta text-white'
                     : 'bg-[var(--surface-base)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
                 {category}
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {categoryModelOptions.map((modelName) => (
+              <button
+                key={modelName}
+                type="button"
+                onClick={() => setActiveModelFilter(modelName)}
+                className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] transition ${
+                  activeModelFilter === modelName
+                    ? 'border-[var(--brand-accent)] bg-[var(--brand-accent-soft)] text-[var(--brand-accent-strong)]'
+                    : 'border-[var(--border-soft)] bg-[var(--surface-base)] text-[var(--text-muted)] hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]'
+                }`}
+              >
+                {modelName}
               </button>
             ))}
           </div>
@@ -574,7 +698,7 @@ const PublicSiteView: React.FC = () => {
               href={buildWhatsAppUrl(buildConsultationMessage('estimasi biaya, bahan, dan timeline produksi'))}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-[var(--brand-accent)] px-5 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-white"
+                className="brand-cta rounded-full px-5 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-white"
             >
               Konsultasi via WhatsApp
             </a>
@@ -696,7 +820,7 @@ const PublicSiteView: React.FC = () => {
             <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{selectedCourier.helperText}</p>
             <button
               type="submit"
-              className="rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+              className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
             >
               Buka tracking resmi
             </button>
@@ -739,7 +863,7 @@ const PublicSiteView: React.FC = () => {
               href={STORE_MAP_URL}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+              className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
             >
               Buka di Google Maps
             </a>
@@ -796,7 +920,6 @@ const PublicSiteView: React.FC = () => {
           pantsProducts,
           'Pants dan celana tactical untuk kebutuhan kerja aktif',
           'Halaman ini fokus pada kategori celana agar user yang mencari pants tidak perlu bercampur dengan produk lain. Cocok untuk tim lapangan, operasional, dan kebutuhan kerja yang membutuhkan mobilitas tinggi.',
-          false,
         );
       case RouteKey.ARTIKEL:
         return renderArticles();
@@ -817,7 +940,7 @@ const PublicSiteView: React.FC = () => {
   })();
 
   return (
-    <main className="overflow-y-auto pb-14">
+    <main className="overflow-y-auto pb-0">
       {content}
       <SiteFooter onNavigate={setCurrentRoute} />
     </main>

@@ -6,7 +6,6 @@ import {
   SITE_FAQS,
   STORE_ADDRESS,
   STORE_MAP_URL,
-  WHATSAPP_NUMBER,
   buildConsultationMessage,
   buildWhatsAppUrl,
 } from './siteConfig';
@@ -127,7 +126,7 @@ const buildLocalAnswer = (messages: BradAiMessage[]) => {
 
   if (/(cs|whatsapp|kontak|hubungi|admin)/.test(q)) {
     return [
-      `WhatsApp konsultasi Bradwear: https://wa.me/${WHATSAPP_NUMBER}`,
+      `WhatsApp konsultasi Bradwear: ${buildWhatsAppUrl(buildConsultationMessage('konsultasi layanan Bradwear'))}`,
       `Jam operasional: ${CUSTOMER_SERVICE_HOURS.join(' | ')}`,
       buildWhatsAppHelp('konsultasi seragam custom'),
     ].join('\n\n');

@@ -145,7 +145,6 @@ const DesignEditorView: React.FC = () => {
   });
 
   const [showStepNotify, setShowStepNotify] = useState<{ step: number; msg: string } | null>(null);
-  const [showDownloadPrompt, setShowDownloadPrompt] = useState(false);
 
   const zoomContainerRef = useRef<HTMLDivElement>(null);
   const roiRef = useRef<HTMLDivElement>(null);
@@ -227,7 +226,7 @@ const DesignEditorView: React.FC = () => {
         setEditorStep('details');
       }
     } else if (editorStep === 'details') {
-      setShowDownloadPrompt(true);
+      setEditorStep('finish');
     }
   };
 
@@ -1202,7 +1201,7 @@ const DesignEditorView: React.FC = () => {
               </div>
             </div>
             {/* Undo/Redo + Download */}
-            {!viewingModel && !expandedMaterial && !showCustomSizeModal && !showStepNotify && !showDownloadPrompt && (
+            {!viewingModel && !expandedMaterial && !showCustomSizeModal && !showStepNotify && (
               <div className="flex items-center gap-2">
                 <div className={`flex gap-1 rounded-lg p-1 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60 shadow-sm'}`}>
                   <button onClick={undo} disabled={historyPointer === 0} className={`p-2 rounded transition-all ${historyPointer === 0 ? 'opacity-20' : theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-zinc-200 text-zinc-800'}`}>
@@ -1323,63 +1322,56 @@ const DesignEditorView: React.FC = () => {
         {/* END Canvas area */}
         </div>
 
-        {/* View Controls (Navigation & Side Toggle) - Footer normal, bukan absolute */}
-        {!viewingModel && !expandedMaterial && !showCustomSizeModal && !isProcessing && !isExporting && !showCatalogModal && !showStepNotify && !showDownloadPrompt && (
-          <div className={`absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-2 rounded-2xl px-3 py-2 backdrop-blur-md ${theme === 'dark' ? 'bg-black/60' : 'bg-white/90 shadow-xl shadow-black/10'}`}>
-
-            {/* View Toggle - DEPAN/BELAKANG di atas */}
-            <div className={`flex gap-2 p-1.5 rounded-2xl border ${theme === 'dark' ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-md'}`}>
-              {availableViews.map(v => (
-                <button
-                  key={v}
-                  onClick={() => onUpdate({ view: v as any })}
-                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-
-            {/* Tombol Kembali & Lanjut di bawah toggle */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleBackCustom}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl border transition-all active:scale-90 ${theme === 'dark' ? 'bg-zinc-900 border-white/10 text-white' : 'bg-white border-zinc-200 text-zinc-800 shadow-md'}`}
-                title="Kembali"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
-                <span className="text-[10px] font-black uppercase tracking-widest">Kembali</span>
-              </button>
-
-              {editorStep !== 'finish' && (
-                <button
-                  onClick={handleNextStep}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95 transition-all animate-pulse hover:animate-none"
-                >
-                  <span className="text-[10px] font-black uppercase tracking-widest">Lanjut</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
       </div>
 
       {/* RIGHT PANEL: EDITOR */}
       <div className={`w-full md:w-[40%] lg:w-[35%] flex-shrink-0 md:h-full flex flex-col border-t md:border-t-0 md:border-l relative z-10 shadow-2xl transition-colors duration-500 overflow-visible md:overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`}>
 
         {/* Panel Header - hanya step indicator */}
-        <div className={`px-5 py-2 md:px-8 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
-          <div className="flex gap-1.5">
-            {['materials', 'details', 'finish'].map((s, i) => (
-              <div
-                key={s}
-                className={`h-1 rounded-full transition-all duration-500 ${editorStep === s ? 'w-6 bg-emerald-500' :
-                  (i < ['materials', 'details', 'finish'].indexOf(editorStep) ? 'w-3 bg-emerald-500/40' : 'w-3 bg-zinc-800')
-                  }`}
-              />
-            ))}
+        <div className={`px-5 py-3 md:px-8 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex gap-1.5">
+              {['materials', 'details', 'finish'].map((s, i) => (
+                <div
+                  key={s}
+                  className={`h-1 rounded-full transition-all duration-500 ${editorStep === s ? 'w-6 bg-emerald-500' :
+                    (i < ['materials', 'details', 'finish'].indexOf(editorStep) ? 'w-3 bg-emerald-500/40' : 'w-3 bg-zinc-800')
+                    }`}
+                />
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <div className={`flex gap-2 rounded-2xl border p-1 ${theme === 'dark' ? 'border-white/10 bg-zinc-900' : 'border-zinc-200 bg-white shadow-sm'}`}>
+                {availableViews.map(v => (
+                  <button
+                    key={v}
+                    onClick={() => onUpdate({ view: v as any })}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handleBackCustom}
+                className={`flex items-center gap-2 rounded-2xl border px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${theme === 'dark' ? 'border-white/10 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-800 shadow-sm'}`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                Kembali
+              </button>
+
+              {editorStep !== 'finish' ? (
+                <button
+                  onClick={handleNextStep}
+                  className="flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                >
+                  Lanjut
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -2127,7 +2119,7 @@ const DesignEditorView: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className={`sticky bottom-0 z-20 shrink-0 border-t p-4 backdrop-blur-md md:p-6 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify || showDownloadPrompt ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
+        <div className={`sticky bottom-0 z-20 shrink-0 border-t p-4 backdrop-blur-md md:p-6 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
           {editorStep !== 'finish' ? (
             <button
               onClick={() => {
@@ -2728,109 +2720,44 @@ const DesignEditorView: React.FC = () => {
 
       {/* POPUP: STEP NOTIFICATION */}
       {showStepNotify && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-fade-in" onClick={() => setShowStepNotify(null)}>
-          <div className={`w-full max-w-sm p-8 rounded-[40px] text-center border shadow-2xl transform scale-100 transition-all ${theme === 'dark' ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200'}`} onClick={e => e.stopPropagation()}>
-            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6">
-              <span className="text-2xl font-black text-emerald-500">{showStepNotify.step}</span>
-            </div>
-            <h3 className="text-xl font-black uppercase tracking-widest mb-4">Step {showStepNotify.step}</h3>
-            <p className={`text-sm font-bold uppercase tracking-wide leading-relaxed mb-8 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
-              {showStepNotify.msg}
-            </p>
-            <button onClick={() => setShowStepNotify(null)} className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-              Mulai
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* POPUP: DOWNLOAD PROMPT (ANIMATED) */}
-      {showDownloadPrompt && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-fade-in">
-          <div className={`w-full max-w-md p-10 rounded-[48px] text-center border shadow-premium relative overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`} onClick={e => e.stopPropagation()}>
-            {/* Background Decor */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px]"></div>
-
-            <div className="relative z-10">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-8 animate-bounce">
-                <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),rgba(15,23,42,0.86))] p-6 backdrop-blur-md animate-fade-in" onClick={() => setShowStepNotify(null)}>
+          <div className={`w-full max-w-md overflow-hidden rounded-[36px] border shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-zinc-950' : 'border-emerald-100 bg-white'}`} onClick={e => e.stopPropagation()}>
+            <div className="bg-[linear-gradient(135deg,#0f3d25,#10b981)] px-7 py-6 text-white">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70">Panduan Editor</p>
+                  <h3 className="mt-2 text-2xl font-black uppercase tracking-[0.16em]">Step {showStepNotify.step}</h3>
+                </div>
+                <div className="flex gap-2">
+                  {[1, 2, 3].map((step) => (
+                    <span
+                      key={step}
+                      className={`inline-flex h-9 w-9 items-center justify-center rounded-full border text-sm font-black transition ${
+                        step === showStepNotify.step ? 'border-white/50 bg-white/20 text-white' : 'border-white/15 bg-black/10 text-white/55'
+                      }`}
+                    >
+                      {step}
+                    </span>
+                  ))}
+                </div>
               </div>
+            </div>
 
-              <h3 className="text-2xl font-black uppercase tracking-tighter mb-4">Unduh Hasil Desain</h3>
-              <p className={`text-xs font-medium uppercase tracking-widest mb-10 opacity-60 leading-relaxed`}>
-                Simpan gambar simulasi depan & belakang <br /> sebelum masuk ke daftar pesanan.
+            <div className="px-7 py-7">
+              <p className={`text-base font-semibold leading-relaxed ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                {showStepNotify.msg}
               </p>
 
-              <div className="grid grid-cols-1 gap-4 mb-8">
-                <button
-                  onClick={async () => {
-                    const originalView = designData.view;
-                    // 1. Capture Front
-                    onUpdate({ view: 'Depan' });
-                    await new Promise(r => setTimeout(r, 600));
-                    await handleSaveImage();
-
-                    // 2. Capture Back
-                    onUpdate({ view: 'Belakang' });
-                    await new Promise(r => setTimeout(r, 600));
-                    await handleSaveImage();
-
-                    onUpdate({ view: originalView });
-                  }}
-                  className="flex items-center justify-center p-6 rounded-[32px] bg-emerald-500 text-white border border-emerald-400 shadow-lg shadow-emerald-500/20 group transition-all active:scale-95 mb-2"
-                >
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="font-black uppercase tracking-[0.2em] text-[12px]">SIMPAN KEDUANYA (HD)</span>
-                    <span className="text-[8px] font-bold opacity-80 uppercase tracking-widest">Otomatis Depan & Belakang</span>
-                  </div>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    const originalView = designData.view;
-                    onUpdate({ view: 'Depan' });
-                    await new Promise(r => setTimeout(r, 300));
-                    await handleSaveImage();
-                    onUpdate({ view: originalView });
-                  }}
-                  className="flex items-center justify-between p-5 rounded-2xl bg-black/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 group transition-all"
-                >
-                  <span className="font-black uppercase tracking-widest text-[11px]">Tampak Depan</span>
-                  <svg className="w-5 h-5 text-emerald-500 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7-7-7m14-10l-7 7-7-7" /></svg>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    const originalView = designData.view;
-                    onUpdate({ view: 'Belakang' });
-                    await new Promise(r => setTimeout(r, 300));
-                    await handleSaveImage();
-                    onUpdate({ view: originalView });
-                  }}
-                  className="flex items-center justify-between p-5 rounded-2xl bg-black/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 group transition-all"
-                >
-                  <span className="font-black uppercase tracking-widest text-[11px]">Tampak Belakang</span>
-                  <svg className="w-5 h-5 text-emerald-500 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7-7-7m14-10l-7 7-7-7" /></svg>
-                </button>
+              <div className="mt-6 rounded-[24px] border border-emerald-500/15 bg-emerald-500/5 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Interaktif dan Bertahap</p>
+                <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                  Ikuti step satu per satu agar warna, bahan, identitas, dan daftar pesanan tetap sinkron sampai akhir.
+                </p>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setShowDownloadPrompt(false)}
-                  className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${theme === 'dark' ? 'bg-zinc-800 text-zinc-400' : 'bg-zinc-100 text-zinc-500'}`}
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDownloadPrompt(false);
-                    setEditorStep('finish');
-                  }}
-                  className="flex-1 py-4 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
-                >
-                  Lanjutkan
-                </button>
-              </div>
+              <button onClick={() => setShowStepNotify(null)} className="mt-6 w-full rounded-2xl bg-emerald-500 py-4 text-sm font-black uppercase tracking-[0.22em] text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
+                Mulai
+              </button>
             </div>
           </div>
         </div>

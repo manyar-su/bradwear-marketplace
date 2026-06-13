@@ -17,7 +17,7 @@ const SUGGESTIONS = [
 const createInitialMessage = (): ChatMessage => ({
   id: 'assistant-welcome',
   role: 'assistant',
-  content: 'Halo, saya Brad Ai. Saya bisa bantu jelaskan katalog, bahan, alur order, tracking, dan layanan Bradwear Indonesia.',
+  content: 'Halo, saya Brodi. Saya bisa bantu jelaskan katalog, bahan, alur order, tracking, dan layanan Bradwear Indonesia.',
 });
 
 const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) => {
@@ -54,7 +54,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload?.error || 'Brad Ai sedang tidak tersedia.');
+        throw new Error(payload?.error || 'Brodi sedang tidak tersedia.');
       }
 
       setMessages((current) => [
@@ -72,7 +72,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
           id: `assistant-error-${Date.now()}`,
           role: 'assistant',
           status: 'error',
-          content: 'Brad Ai belum bisa menjawab saat ini. Anda bisa lanjut konsultasi ke tim kami melalui WhatsApp agar dibantu langsung.',
+          content: 'Brodi belum bisa menjawab saat ini. Anda bisa lanjut konsultasi ke tim kami melalui WhatsApp agar dibantu langsung.',
         },
       ]);
     } finally {
@@ -83,13 +83,13 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
   return (
     <div
       className={`flex h-full flex-col overflow-hidden rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_20px_45px_rgba(15,23,42,0.12)] ${
-        variant === 'widget' ? 'min-h-[520px]' : 'min-h-[600px]'
+        variant === 'widget' ? 'min-h-0 max-h-full' : 'min-h-[600px]'
       }`}
     >
       <div className="flex items-start justify-between gap-4 border-b border-[var(--border-soft)] bg-[linear-gradient(135deg,#10210c,#1d3913)] px-4 py-4 text-white md:px-5 md:py-5">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b7f39a]">Brad Ai</p>
-          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Asisten AI untuk kebutuhan Bradwear</h3>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b7f39a]">Brodi</p>
+          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Asisten cepat untuk kebutuhan Bradwear</h3>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
             Tanya soal bahan, model, cara order, tracking, layanan pelanggan, dan lokasi toko Bradwear Indonesia.
           </p>
@@ -99,9 +99,9 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
             type="button"
             onClick={onClose}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-lg text-white transition hover:bg-white/20"
-            aria-label="Tutup Brad Ai"
+            aria-label="Tutup Brodi"
           >
-            ×
+            X
           </button>
         ) : null}
       </div>
@@ -135,7 +135,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
             }`}
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">
-              {message.role === 'user' ? 'Anda' : 'Brad Ai'}
+              {message.role === 'user' ? 'Anda' : 'Brodi'}
             </p>
             <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
           </article>
@@ -143,7 +143,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
 
         {messages.length === 1 ? (
           <div className="rounded-[24px] border border-dashed border-[var(--border-soft)] bg-[var(--surface-base)]/90 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Brad Ai bisa bantu</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Brodi bisa bantu</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
               Bahan yang cocok, beda model, alur order, status tracking, lokasi workshop, dan pertanyaan FAQ seputar Bradwear.
             </p>
@@ -152,7 +152,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
 
         {isSending ? (
           <article className="max-w-[88%] rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-[var(--text-secondary)] shadow-sm">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">Brad Ai</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">Brodi</p>
             <p className="mt-2 text-sm leading-relaxed">Sedang menyiapkan jawaban...</p>
           </article>
         ) : null}
@@ -179,9 +179,9 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
             <button
               type="submit"
               disabled={!input.trim() || isSending}
-              className="rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSending ? 'Mengirim...' : 'Kirim ke Brad Ai'}
+              {isSending ? 'Mengirim...' : 'Kirim ke Brodi'}
             </button>
           </div>
         </form>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
-import { RouteKey, Product, DesignData, OrderItem, ProductionOrder, WorkflowStage } from '../types';
+import { RouteKey, Product, DesignData, OrderItem, ProductionOrder, WorkflowStage, Category } from '../types';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from '../constants';
 import { COLORS } from '../constants'; // Sometimes needed for designData defaults
 import { ROUTE_PATHS, pathToRoute } from '../lib/siteConfig';
@@ -16,6 +16,8 @@ interface StoreState {
   productionOrders: ProductionOrder[];
   setProductionOrders: (orders: ProductionOrder[]) => void;
   userWorkflowStages: WorkflowStage[];
+  preferredCatalogCategory: Category;
+  setPreferredCatalogCategory: React.Dispatch<React.SetStateAction<Category>>;
   selectedProduct: Product | null;
   setSelectedProduct: (product: Product | null) => void;
   designData: DesignData;
@@ -44,6 +46,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   });
 
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [preferredCatalogCategory, setPreferredCatalogCategory] = useState<Category>(() => {
+    return (localStorage.getItem('bradwear_catalog_category') as Category | null) || 'Kemeja';
+  });
 
   const [orderCode, setOrderCode] = useState(() => {
     return localStorage.getItem('bradwear_order_code') || Math.floor(Math.random() * 9000 + 1000).toString();
@@ -123,6 +128,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     localStorage.setItem('bradwear_theme', theme);
     localStorage.setItem('bradwear_current_route', currentRoute);
+    localStorage.setItem('bradwear_catalog_category', preferredCatalogCategory);
     localStorage.setItem('bradwear_order_code', orderCode);
     localStorage.setItem('bradwear_design_data', JSON.stringify(designData));
     localStorage.setItem('bradwear_order_items', JSON.stringify(orderItems));
@@ -131,7 +137,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     } else {
       localStorage.removeItem('bradwear_selected_product');
     }
-  }, [products, productionOrders, currentRoute, theme, designData, orderItems, selectedProduct, orderCode]);
+  }, [products, productionOrders, currentRoute, theme, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -174,6 +180,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       orderCode, setOrderCode,
       productionOrders, setProductionOrders,
       userWorkflowStages,
+      preferredCatalogCategory, setPreferredCatalogCategory,
       selectedProduct, setSelectedProduct,
       designData, setDesignData, updateDesignData,
       orderItems, setOrderItems,

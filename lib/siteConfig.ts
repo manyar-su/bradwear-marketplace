@@ -376,7 +376,7 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
 };
 
 export const buildWhatsAppUrl = (message: string) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
 
 export const buildConsultationMessage = (subject?: string) => {
   const topic = subject?.trim() ? subject.trim() : 'kebutuhan seragam custom';

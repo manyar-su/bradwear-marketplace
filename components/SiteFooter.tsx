@@ -1,10 +1,10 @@
 ﻿import React from 'react';
 import { ASSETS } from '../assets';
+import { CLIENT_LOGOS } from '../constants';
 import {
   CONTACT_CHANNELS,
   PRIMARY_NAV_ITEMS,
   SITE_NAME,
-  SITE_TAGLINE,
   STORE_ADDRESS,
   buildConsultationMessage,
   buildWhatsAppUrl,
@@ -22,13 +22,31 @@ const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
 const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
   return (
     <footer className="site-footer">
+      <div className="site-footer-partners">
+        <div className="site-footer-partners-copy">
+          <p className="site-footer-partners-kicker">Partner Instansi</p>
+          <h2 className="site-footer-partners-title">Dipercaya berbagai institusi dan tim operasional</h2>
+        </div>
+        <div className="marquee-mask site-footer-marquee-mask">
+          <div className="marquee-track site-footer-marquee-track">
+            {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((client, index) => (
+              <div key={`${client.name}-${index}`} className="marquee-item site-footer-marquee-item">
+                <div className="partner-logo-frame site-footer-logo-frame">
+                  <img src={client.logo} alt={client.name} />
+                </div>
+                <span className="site-footer-marquee-name">{client.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="site-footer-grid">
         <div className="site-footer-brand">
           <div className="site-footer-logo-shell">
             <img src={ASSETS.BRAND.LOGO} alt={SITE_NAME} className="site-footer-logo" />
           </div>
           <p className="site-footer-title">{SITE_NAME}</p>
-          <p className="site-footer-copy">{SITE_TAGLINE}</p>
           <p className="site-footer-address">{STORE_ADDRESS}</p>
         </div>
 
@@ -50,7 +68,6 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
               <div key={channel.label} className="site-footer-contact-card">
                 <p className="site-footer-contact-label">{channel.label}</p>
                 <p className="site-footer-contact-value">{channel.value}</p>
-                <p className="site-footer-contact-note">{channel.note}</p>
               </div>
             ))}
           </div>
@@ -58,14 +75,11 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
 
         <div>
           <p className="site-footer-heading">Mulai Konsultasi</p>
-          <p className="site-footer-copy">
-            Kirim kebutuhan model, bahan, jumlah, atau target produksi ke tim Bradwear untuk dibantu lebih cepat.
-          </p>
           <a
             href={buildWhatsAppUrl(buildConsultationMessage('konsultasi seragam custom untuk instansi atau perusahaan'))}
             target="_blank"
             rel="noreferrer"
-            className="site-footer-whatsapp"
+            className="site-footer-whatsapp brand-cta"
           >
             Konsultasi via WhatsApp
           </a>
@@ -73,8 +87,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
       </div>
 
       <div className="site-footer-meta">
-        <p>Bradwear Indonesia · Tasikmalaya · Melayani pengiriman ke seluruh Indonesia.</p>
-        <p>UI dirancang ringan, compact, dan siap dipakai di mobile maupun desktop.</p>
+        <p>Bradwear Indonesia · Tasikmalaya · Pengiriman seragam custom ke seluruh Indonesia.</p>
       </div>
     </footer>
   );

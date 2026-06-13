@@ -79,21 +79,9 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, theme, selectedPr
         <div className="nav-actions">
           <div className="nav-route-details">
             <span className="route-chip route-chip-mobile">{ROUTE_LABELS[currentRoute]}</span>
-            {selectedProductName ? (
-              <p className="nav-route-product">{selectedProductName}</p>
-            ) : null}
           </div>
 
           <div className="nav-action-row">
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              className="theme-toggle theme-toggle-mobile"
-              aria-label={theme === 'dark' ? 'Aktifkan tema terang' : 'Aktifkan tema gelap'}
-            >
-              <span className={`theme-toggle-option ${theme === 'light' ? 'is-active' : ''}`}>Light</span>
-              <span className={`theme-toggle-option ${theme === 'dark' ? 'is-active' : ''}`}>Dark</span>
-            </button>
             <button
               type="button"
               onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}

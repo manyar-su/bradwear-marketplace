@@ -63,9 +63,9 @@ const App: React.FC = () => {
             </React.Suspense>
           </div>
 
-          <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+          <div className={`fixed right-5 z-50 flex flex-col items-end gap-3 ${currentRoute === RouteKey.EDITOR ? 'bottom-24' : 'bottom-5'}`}>
             {showBradAiWidget ? (
-              <div className="w-[min(92vw,420px)]">
+              <div className="animate-fade-in-up w-[min(92vw,420px)] max-h-[min(78vh,720px)]">
                 <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
               </div>
             ) : null}
@@ -79,7 +79,7 @@ const App: React.FC = () => {
               }`}
             >
               <span className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
-              Brad Ai
+              Brodi
             </button>
           </div>
         </div>
