@@ -33,7 +33,7 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
 };
 
 // Import logo dan UI assets dynamically
-const LOGO_BRADWEAR = resolveAsset('./assets/logo.webp');
+const LOGO_BRADWEAR = resolveAsset('./assets/logo.png');
 const HERO_BG = resolveAsset('./assets/factory_hero.webp');
 const HERO_SLIDES = Object.keys(allImagesGlob)
   .filter((key) => key.toLowerCase().includes('/slideshow/'))

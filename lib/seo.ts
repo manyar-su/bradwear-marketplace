@@ -1,4 +1,4 @@
-import { BRAD_AI_CONTEXT, ROUTE_LABELS, ROUTE_PATHS, SEO_META, SITE_NAME, SITE_URL, SITE_TAGLINE, STORE_ADDRESS } from './siteConfig';
+import { BRAD_AI_CONTEXT, ROUTE_LABELS, ROUTE_PATHS, SEO_META, SITE_NAME, SITE_URL, SITE_TAGLINE, STORE_ADDRESS, WHATSAPP_NUMBER } from './siteConfig';
 import { Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
@@ -21,7 +21,7 @@ const upsertLinkTag = (selector: string, attributes: Record<string, string>) => 
   Object.entries(attributes).forEach(([key, value]) => tag?.setAttribute(key, value));
 };
 
-const buildBaseSchemas = (meta: SeoMeta) => {
+const buildBaseSchemas = (meta: SeoMeta): Record<string, unknown>[] => {
   const canonical = `${SITE_URL}${meta.path}`;
   return [
     {
@@ -30,7 +30,15 @@ const buildBaseSchemas = (meta: SeoMeta) => {
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_TAGLINE,
+      logo: `${SITE_URL}/assets/logo.png`,
       sameAs: [SITE_URL],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        telephone: `+${WHATSAPP_NUMBER}`,
+        areaServed: 'ID',
+        availableLanguage: ['id'],
+      },
     },
     {
       '@context': 'https://schema.org',
@@ -46,6 +54,7 @@ const buildBaseSchemas = (meta: SeoMeta) => {
       url: canonical,
       areaServed: 'Indonesia',
       description: meta.description,
+      image: `${SITE_URL}/assets/logo.png`,
     },
     {
       '@context': 'https://schema.org',
@@ -53,6 +62,7 @@ const buildBaseSchemas = (meta: SeoMeta) => {
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_TAGLINE,
+      inLanguage: 'id-ID',
     },
     {
       '@context': 'https://schema.org',
@@ -140,14 +150,26 @@ export const applySeoMeta = (route: RouteKey, products: Product[], faqs: SiteFaq
   upsertMetaTag('meta[name="description"]', { name: 'description', content: meta.description });
   upsertMetaTag('meta[name="keywords"]', { name: 'keywords', content: meta.keywords.join(', ') });
   upsertMetaTag('meta[name="robots"]', { name: 'robots', content: 'index,follow,max-image-preview:large' });
+  upsertMetaTag('meta[name="author"]', { name: 'author', content: SITE_NAME });
+  upsertMetaTag('meta[name="application-name"]', { name: 'application-name', content: SITE_NAME });
+  upsertMetaTag('meta[name="apple-mobile-web-app-title"]', { name: 'apple-mobile-web-app-title', content: SITE_NAME });
+  upsertMetaTag('meta[name="theme-color"]', { name: 'theme-color', content: '#75f21a' });
+  upsertMetaTag('meta[name="color-scheme"]', { name: 'color-scheme', content: 'light dark' });
+  upsertMetaTag('meta[name="geo.region"]', { name: 'geo.region', content: 'ID-JB' });
+  upsertMetaTag('meta[name="geo.placename"]', { name: 'geo.placename', content: 'Tasikmalaya' });
+  upsertMetaTag('meta[name="ICBM"]', { name: 'ICBM', content: '-7.3506, 108.2172' });
   upsertMetaTag('meta[property="og:title"]', { property: 'og:title', content: meta.title });
   upsertMetaTag('meta[property="og:description"]', { property: 'og:description', content: meta.description });
   upsertMetaTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
   upsertMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonical });
   upsertMetaTag('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
+  upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
+  upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${SITE_URL}/assets/logo.png` });
   upsertMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title });
   upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description });
+  upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${SITE_URL}/assets/logo.png` });
+  upsertMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: SITE_NAME });
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
 
   let script = document.getElementById('bradwear-jsonld');

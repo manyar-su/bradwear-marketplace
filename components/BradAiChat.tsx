@@ -1,5 +1,5 @@
-import React, { FormEvent, useMemo, useState } from 'react';
-import { BRAD_AI_CONTEXT, buildConsultationMessage, buildWhatsAppUrl } from '../lib/siteConfig';
+import React, { FormEvent, useState } from 'react';
+import { buildConsultationMessage, buildWhatsAppUrl } from '../lib/siteConfig';
 import { ChatMessage } from '../types';
 
 interface BradAiChatProps {
@@ -24,11 +24,6 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
   const [messages, setMessages] = useState<ChatMessage[]>([createInitialMessage()]);
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
-
-  const contextPreview = useMemo(
-    () => BRAD_AI_CONTEXT.map((section) => `${section.heading}: ${section.body}`).join('\n'),
-    [],
-  );
 
   const handleSend = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -70,7 +65,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
           content: payload.answer || 'Maaf, saya belum menemukan jawaban yang tepat.',
         },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((current) => [
         ...current,
         {
@@ -86,11 +81,15 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
   };
 
   return (
-    <div className={`flex h-full flex-col overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-white shadow-[0_20px_45px_rgba(15,23,42,0.12)] ${variant === 'widget' ? 'min-h-[540px]' : 'min-h-[620px]'}`}>
-      <div className="flex items-start justify-between gap-4 border-b border-[var(--border-soft)] bg-[linear-gradient(135deg,#111827,#1f2937)] px-5 py-5 text-white">
+    <div
+      className={`flex h-full flex-col overflow-hidden rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_20px_45px_rgba(15,23,42,0.12)] ${
+        variant === 'widget' ? 'min-h-[520px]' : 'min-h-[600px]'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4 border-b border-[var(--border-soft)] bg-[linear-gradient(135deg,#10210c,#1d3913)] px-4 py-4 text-white md:px-5 md:py-5">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Brad Ai</p>
-          <h3 className="mt-1 text-xl font-black tracking-tight">Asisten AI untuk kebutuhan Bradwear</h3>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b7f39a]">Brad Ai</p>
+          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Asisten AI untuk kebutuhan Bradwear</h3>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
             Tanya soal bahan, model, cara order, tracking, layanan pelanggan, dan lokasi toko Bradwear Indonesia.
           </p>
@@ -107,7 +106,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         ) : null}
       </div>
 
-      <div className="grid gap-3 border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] px-5 py-4">
+      <div className="grid gap-3 border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 md:px-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pertanyaan cepat</p>
         <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((suggestion) => (
@@ -115,7 +114,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
               key={suggestion}
               type="button"
               onClick={() => setInput(suggestion)}
-              className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-3 py-2 text-left text-[11px] font-semibold text-[var(--text-secondary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
             >
               {suggestion}
             </button>
@@ -123,16 +122,16 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto bg-[linear-gradient(180deg,#fff,#f8fafc)] px-5 py-5">
+      <div className="flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,var(--surface-base),var(--surface-subtle))] px-4 py-4 md:px-5 md:py-5">
         {messages.map((message) => (
           <article
             key={message.id}
-            className={`max-w-[92%] rounded-3xl px-4 py-3 shadow-sm ${
+            className={`max-w-[94%] rounded-[24px] px-4 py-3 shadow-sm ${
               message.role === 'user'
                 ? 'ml-auto bg-[var(--brand-accent)] text-white'
                 : message.status === 'error'
                   ? 'bg-amber-50 text-amber-900'
-                  : 'border border-[var(--border-soft)] bg-white text-[var(--text-primary)]'
+                  : 'border border-[var(--border-soft)] bg-[var(--surface-base)] text-[var(--text-primary)]'
             }`}
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">
@@ -143,21 +142,30 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         ))}
 
         {messages.length === 1 ? (
-          <div className="rounded-3xl border border-dashed border-[var(--border-soft)] bg-white/80 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Konteks yang dipakai Brad Ai</p>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-secondary)]">{contextPreview}</p>
+          <div className="rounded-[24px] border border-dashed border-[var(--border-soft)] bg-[var(--surface-base)]/90 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Brad Ai bisa bantu</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+              Bahan yang cocok, beda model, alur order, status tracking, lokasi workshop, dan pertanyaan FAQ seputar Bradwear.
+            </p>
           </div>
+        ) : null}
+
+        {isSending ? (
+          <article className="max-w-[88%] rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-[var(--text-secondary)] shadow-sm">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">Brad Ai</p>
+            <p className="mt-2 text-sm leading-relaxed">Sedang menyiapkan jawaban...</p>
+          </article>
         ) : null}
       </div>
 
-      <div className="border-t border-[var(--border-soft)] bg-white px-5 py-4">
+      <div className="border-t border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-4 md:px-5">
         <form onSubmit={handleSend} className="space-y-3">
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Tulis pertanyaan Anda seputar produk, bahan, cara order, pengiriman, atau layanan Bradwear..."
             rows={variant === 'widget' ? 3 : 4}
-            className="w-full resize-none rounded-3xl border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--brand-accent)] focus:bg-white"
+            className="w-full resize-none rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--brand-accent)] focus:bg-white"
           />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <a

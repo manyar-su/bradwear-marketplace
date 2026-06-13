@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS } from '../assets';
 import { useStore } from '../context/StoreContext';
 import {
@@ -17,6 +17,7 @@ import {
 } from '../lib/siteConfig';
 import { CompletedOrder, CourierProvider, Product, RouteKey } from '../types';
 import BradAiChat from './BradAiChat';
+import SiteFooter from './SiteFooter';
 
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
 
@@ -132,7 +133,7 @@ const PublicSiteView: React.FC = () => {
   const renderProductCard = (product: Product, badge?: string) => (
     <article
       key={product.id}
-      className="group rounded-[28px] border border-[var(--border-soft)] bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
+      className="group rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
     >
       <button type="button" onClick={() => handleSelectProduct(product)} className="w-full text-left">
         <div className="mb-4 aspect-[4/5] overflow-hidden rounded-[24px] bg-[var(--surface-soft)]">
@@ -161,66 +162,95 @@ const PublicSiteView: React.FC = () => {
   const renderHome = () => (
     <>
       <section className="home-hero">
-        <article className="hero-banner">
-          <div className="hero-banner-stage">
-            {safeHeroSlides.map((slide, index) => (
-              <img
-                key={`${slide}-${index}`}
-                src={slide}
-                alt={`Bradwear banner ${index + 1}`}
-                className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-              />
-            ))}
-            <div className="hero-banner-overlay" />
-            <div className="hero-copy">
-              <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
-              <h1>Konveksi seragam custom yang siap membantu instansi bergerak lebih rapi</h1>
-              <p>
-                Bradwear Indonesia melayani produksi kemeja, rompi, jaket, polo, dan pants custom untuk kebutuhan
-                perusahaan, komunitas, dan instansi di seluruh Indonesia dengan alur order yang jelas dan mudah dipahami.
-              </p>
-              <div className="hero-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentRoute(RouteKey.KATALOG);
-                    window.setTimeout(() => {
-                      catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 120);
-                  }}
-                  className="hero-primary"
-                >
-                  Jelajahi Katalog
-                </button>
-                <a
-                  href={buildWhatsAppUrl(buildConsultationMessage('seragam custom untuk instansi atau perusahaan'))}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-secondary"
-                >
-                  Konsultasi ke WhatsApp
-                </a>
+        <div className="hero-split">
+          <article className="hero-panel">
+            <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
+            <div className="hero-badge-row">
+              <span className="hero-badge">Konveksi Seragam Custom</span>
+              <span className="hero-badge">Mobile Friendly</span>
+              <span className="hero-badge">Kirim Seluruh Indonesia</span>
+            </div>
+            <h1>
+              Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi yang butuh proses lebih cepat,
+              lebih rapi, dan lebih mudah dipahami.
+            </h1>
+            <p className="hero-lead">
+              Bradwear Indonesia membantu tim perusahaan, komunitas, dan instansi memilih model, bahan, lalu masuk ke alur
+              order yang jelas tanpa membuat tampilan terasa padat di mobile.
+            </p>
+            <div className="hero-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentRoute(RouteKey.KATALOG);
+                  window.setTimeout(() => {
+                    catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 120);
+                }}
+                className="hero-primary"
+              >
+                Jelajahi Katalog
+              </button>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('seragam custom untuk instansi atau perusahaan'))}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-secondary"
+              >
+                Konsultasi ke WhatsApp
+              </a>
+            </div>
+            <div className="hero-micro-stats">
+              <div>
+                <strong>12 pcs</strong>
+                <span>Minimal order per model</span>
+              </div>
+              <div>
+                <strong>14-21 hari</strong>
+                <span>Estimasi produksi normal</span>
+              </div>
+              <div>
+                <strong>AI + CS</strong>
+                <span>Jawaban cepat lalu follow up manusia</span>
               </div>
             </div>
-          </div>
+          </article>
 
-          <button
-            type="button"
-            onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
-            className="hero-arrow hero-arrow-left"
-            aria-label="Banner sebelumnya"
-          >
-            &lt;
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
-            className="hero-arrow hero-arrow-right"
-            aria-label="Banner berikutnya"
-          >
-            &gt;
-          </button>
-        </article>
+          <article className="hero-banner">
+            <div className="hero-banner-stage">
+              {safeHeroSlides.map((slide, index) => (
+                <img
+                  key={`${slide}-${index}`}
+                  src={slide}
+                  alt={`Bradwear banner ${index + 1}`}
+                  className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
+                />
+              ))}
+              <div className="hero-banner-overlay" />
+              <div className="hero-slide-caption">
+                <p>Editorial Preview</p>
+                <strong>Slide visual produk dipisahkan dari judul agar tampilan lebih clean.</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
+              className="hero-arrow hero-arrow-left"
+              aria-label="Banner sebelumnya"
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
+              className="hero-arrow hero-arrow-right"
+              aria-label="Banner berikutnya"
+            >
+              &gt;
+            </button>
+          </article>
+        </div>
 
         <div className="hero-benefits">
           <div>
@@ -240,7 +270,7 @@ const PublicSiteView: React.FC = () => {
 
       <section className="px-6 pb-8 md:px-10">
         <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
-          <article className="rounded-[30px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+          <article className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Siap Untuk AI Search dan GEO</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">
               Bradwear Indonesia hadir untuk kebutuhan seragam custom instansi dan perusahaan
@@ -273,7 +303,7 @@ const PublicSiteView: React.FC = () => {
                 href={STORE_MAP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-900"
+                className="rounded-full bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-900"
               >
                 Buka Google Maps
               </a>
@@ -302,7 +332,7 @@ const PublicSiteView: React.FC = () => {
               type="button"
               key={article.slug}
               onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
-              className="rounded-[26px] border border-[var(--border-soft)] bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.1)]"
+              className="rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.1)]"
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">{article.category} · {article.readTime}</p>
               <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--text-primary)]">{article.title}</h3>
@@ -313,7 +343,7 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-10 md:px-10">
-        <div className="rounded-[30px] border border-[var(--border-soft)] bg-white p-6 shadow-sm md:p-8">
+        <div className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm md:p-8">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Ringkas</p>
@@ -359,7 +389,7 @@ const PublicSiteView: React.FC = () => {
               href={buildWhatsAppUrl(buildConsultationMessage('model seragam yang paling cocok untuk kebutuhan saya'))}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
+              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
             >
               Konsultasi model
             </a>
@@ -367,7 +397,7 @@ const PublicSiteView: React.FC = () => {
         </article>
 
         {spotlightProduct ? (
-          <article className="rounded-[32px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Spotlight Model</p>
             <div className="mt-4 grid gap-4 sm:grid-cols-[0.8fr_1fr]">
               <div className="aspect-[4/5] overflow-hidden rounded-[26px] bg-[var(--surface-soft)]">
@@ -406,7 +436,7 @@ const PublicSiteView: React.FC = () => {
                 className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition ${
                   activeCategory === category
                     ? 'bg-[var(--brand-accent)] text-white'
-                    : 'bg-white text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'
+                    : 'bg-[var(--surface-base)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'
                 }`}
               >
                 {category}
@@ -435,7 +465,7 @@ const PublicSiteView: React.FC = () => {
 
       <section className="mt-8 grid gap-6">
         {ARTICLES.map((article) => (
-          <article key={article.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+          <article key={article.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
                 {article.category}
@@ -470,7 +500,7 @@ const PublicSiteView: React.FC = () => {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="lg:sticky lg:top-[120px] lg:self-start">
-          <div className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-white p-4 shadow-sm">
+          <div className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm">
             <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
               {[ASSETS.KEMEJA.BRAD_V3.FRONT, ASSETS.CELANA.WARRIOR, ASSETS.JAKET.BOMBER].map((image, index) => (
                 <div
@@ -490,7 +520,7 @@ const PublicSiteView: React.FC = () => {
 
         <div className="space-y-5">
           {HOW_TO_ORDER_STEPS.map((step, index) => (
-            <article key={step.id} className="rounded-[30px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+            <article key={step.id} className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--brand-accent)] text-sm font-black text-white">
                   {index + 1}
@@ -512,7 +542,7 @@ const PublicSiteView: React.FC = () => {
   const renderCustomerService = () => (
     <div className="px-6 py-8 md:px-10">
       <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Layanan Pelanggan</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Bantuan cepat untuk konsultasi, revisi, dan follow up order</h1>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
@@ -534,7 +564,7 @@ const PublicSiteView: React.FC = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Jam Operasional</p>
           <div className="mt-4 space-y-3">
             {CUSTOMER_SERVICE_HOURS.map((hour) => (
-              <div key={hour} className="rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 text-sm font-semibold text-[var(--text-secondary)]">
+              <div key={hour} className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-4 text-sm font-semibold text-[var(--text-secondary)]">
                 {hour}
               </div>
             ))}
@@ -559,7 +589,7 @@ const PublicSiteView: React.FC = () => {
         </article>
       </section>
 
-      <section className="mt-8 rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+      <section className="mt-8 rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Layanan</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {SITE_FAQS.map((faq) => (
@@ -576,7 +606,7 @@ const PublicSiteView: React.FC = () => {
   const renderTracking = () => (
     <div className="px-6 py-8 md:px-10">
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Lacak pesanan Bradwear</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Cek status produksi internal dengan order code atau nomor resi</h1>
           <form onSubmit={lookupTracking} className="mt-6 space-y-4">
@@ -585,7 +615,7 @@ const PublicSiteView: React.FC = () => {
               value={trackingCodeInput}
               onChange={(event) => setTrackingCodeInput(event.target.value)}
               placeholder="Masukkan order code atau nomor resi"
-              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none transition focus:border-[var(--brand-accent)] focus:bg-white"
+              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none transition focus:border-[var(--brand-accent)] focus:bg-[var(--surface-base)]"
             />
             <button
               type="submit"
@@ -604,7 +634,7 @@ const PublicSiteView: React.FC = () => {
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">Pelanggan: {currentProductionOrder.customerName} · Qty {currentProductionOrder.totalQty} pcs</p>
                   <div className="mt-5 space-y-3">
                     {currentProductionOrder.stages.map((stage) => (
-                      <div key={stage.id} className="rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3">
+                      <div key={stage.id} className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-bold text-[var(--text-primary)]">{stage.label}</p>
                           <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
@@ -648,7 +678,7 @@ const PublicSiteView: React.FC = () => {
             <select
               value={selectedCourier.id}
               onChange={(event) => setSelectedCourier(getTrackingProviderById(event.target.value))}
-              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none"
+              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none"
             >
               {COURIER_PROVIDERS.map((provider) => (
                 <option key={provider.id} value={provider.id}>
@@ -661,7 +691,7 @@ const PublicSiteView: React.FC = () => {
               value={trackingReceipt}
               onChange={(event) => setTrackingReceipt(event.target.value)}
               placeholder="Masukkan nomor resi ekspedisi"
-              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none"
+              className="w-full rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-4 text-sm font-semibold text-[var(--text-primary)] outline-none"
             />
             <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{selectedCourier.helperText}</p>
             <button
@@ -679,7 +709,7 @@ const PublicSiteView: React.FC = () => {
                 href={provider.trackingUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3 text-sm font-semibold text-[var(--text-primary)]"
+                className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)]"
               >
                 {provider.name}
               </a>
@@ -693,7 +723,7 @@ const PublicSiteView: React.FC = () => {
   const renderStoreLocator = () => (
     <div className="px-6 py-8 md:px-10">
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Temukan Toko</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Workshop dan titik konsultasi Bradwear Indonesia</h1>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
@@ -717,7 +747,7 @@ const PublicSiteView: React.FC = () => {
               href={buildWhatsAppUrl(buildConsultationMessage('kunjungan atau konsultasi ke workshop Tasikmalaya'))}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
+              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
             >
               Konfirmasi via WhatsApp
             </a>
@@ -725,7 +755,7 @@ const PublicSiteView: React.FC = () => {
         </article>
 
         <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfeff,#ffffff)] p-6 shadow-sm">
-          <div className="aspect-[4/4.4] overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-white">
+          <div className="aspect-[4/4.4] overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-base)]">
             <iframe
               title="Google Maps Bradwear Indonesia"
               src={`https://www.google.com/maps?q=${encodeURIComponent(STORE_ADDRESS)}&z=15&output=embed`}
@@ -786,7 +816,15 @@ const PublicSiteView: React.FC = () => {
     }
   })();
 
-  return <main className="overflow-y-auto pb-14">{content}</main>;
+  return (
+    <main className="overflow-y-auto pb-14">
+      {content}
+      <SiteFooter onNavigate={setCurrentRoute} />
+    </main>
+  );
 };
 
 export default PublicSiteView;
+
+
+

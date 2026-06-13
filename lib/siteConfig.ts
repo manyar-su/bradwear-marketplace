@@ -288,6 +288,14 @@ export const BASE_KEYWORDS = [
   'polo shirt custom',
   'garment jawa barat',
   'pengiriman seragam seluruh indonesia',
+  'vendor seragam perusahaan',
+  'konveksi seragam lapangan',
+  'uniform supplier indonesia',
+  'workwear custom tasikmalaya',
+  'pdh pdl custom',
+  'bordir logo instansi',
+  'seragam operasional custom',
+  'seragam komunitas custom',
 ];
 
 const makeMeta = (route: RouteKey, title: string, description: string, extraKeywords: string[] = []): SeoMeta => ({

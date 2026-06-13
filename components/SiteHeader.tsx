@@ -5,32 +5,59 @@ import { ASSETS } from '../assets';
 
 interface SiteHeaderProps {
   currentRoute: RouteKey;
+  theme: 'light' | 'dark';
   selectedProductName?: string | null;
+  onToggleTheme: () => void;
   onNavigate: (route: RouteKey) => void;
 }
 
 const flowRoutes = [RouteKey.HOME, RouteKey.EDITOR, RouteKey.SUMMARY];
 
-const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, selectedProductName, onNavigate }) => {
+const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, theme, selectedProductName, onToggleTheme, onNavigate }) => {
   return (
     <header className="site-header">
-      <div className="hidden items-center justify-end gap-2 border-b border-[var(--border-soft)] px-5 py-2 text-[11px] text-[var(--text-muted)] md:flex">
-        {UTILITY_NAV_ITEMS.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            onClick={() => onNavigate(item.route)}
-            className="rounded-full px-3 py-1 transition hover:bg-[var(--surface-soft)] hover:text-[var(--brand-accent-strong)]"
-          >
-            {item.label}
+      <div className="site-utility">
+        <div className="site-utility-leading">
+          <button className="brand-mark brand-mark-utility" onClick={() => onNavigate(RouteKey.HOME)} aria-label="Bradwear home">
+            <span className="brand-mark-shell">
+              <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
+            </span>
           </button>
-        ))}
-        <span className="rounded-full border border-[var(--border-soft)] px-3 py-1 font-semibold text-[var(--text-secondary)]">ID</span>
+          <span className="route-chip route-chip-utility">{ROUTE_LABELS[currentRoute]}</span>
+        </div>
+
+        <div className="site-utility-links">
+          {UTILITY_NAV_ITEMS.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => onNavigate(item.route)}
+              className="site-utility-link"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="site-utility-controls">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="theme-toggle theme-toggle-utility"
+            aria-label={theme === 'dark' ? 'Aktifkan tema terang' : 'Aktifkan tema gelap'}
+          >
+            <span className={`theme-toggle-option ${theme === 'light' ? 'is-active' : ''}`}>Light</span>
+            <span className={`theme-toggle-option ${theme === 'dark' ? 'is-active' : ''}`}>Dark</span>
+          </button>
+          <span className="locale-chip">ID</span>
+        </div>
       </div>
 
       <div className="site-nav">
-        <button className="brand-mark" onClick={() => onNavigate(RouteKey.HOME)} aria-label="Bradwear home">
-          <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
+        <button className="brand-mark brand-mark-mobile" onClick={() => onNavigate(RouteKey.HOME)} aria-label="Bradwear home">
+          <span className="brand-mark-shell">
+            <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
+          </span>
         </button>
 
         <nav aria-label="Menu marketplace" className="market-nav">
@@ -50,20 +77,33 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, selectedProductNa
         </nav>
 
         <div className="nav-actions">
-          <div className="hidden min-w-0 md:block">
-            <span className="route-chip">{ROUTE_LABELS[currentRoute]}</span>
+          <div className="nav-route-details">
+            <span className="route-chip route-chip-mobile">{ROUTE_LABELS[currentRoute]}</span>
             {selectedProductName ? (
-              <p className="mt-2 max-w-[220px] truncate text-[11px] font-semibold text-[var(--text-muted)]">{selectedProductName}</p>
+              <p className="nav-route-product">{selectedProductName}</p>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}
-            className="design-cta"
-          >
-            Mulai Design Custom
-          </button>
-          <ul className="hidden items-center gap-4 xl:flex" aria-label="Alur aplikasi">
+
+          <div className="nav-action-row">
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="theme-toggle theme-toggle-mobile"
+              aria-label={theme === 'dark' ? 'Aktifkan tema terang' : 'Aktifkan tema gelap'}
+            >
+              <span className={`theme-toggle-option ${theme === 'light' ? 'is-active' : ''}`}>Light</span>
+              <span className={`theme-toggle-option ${theme === 'dark' ? 'is-active' : ''}`}>Dark</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}
+              className="design-cta"
+            >
+              Mulai Design Custom
+            </button>
+          </div>
+
+          <ul className="flow-nav" aria-label="Alur aplikasi">
             {flowRoutes.map((route) => (
               <li key={route}>
                 <button

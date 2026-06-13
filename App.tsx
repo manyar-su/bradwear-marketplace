@@ -11,13 +11,12 @@ import SiteHeader from './components/SiteHeader';
 import BradAiChat from './components/BradAiChat';
 
 const App: React.FC = () => {
-  const { currentRoute, setCurrentRoute, setTheme, selectedProduct, products } = useStore();
+  const { currentRoute, setCurrentRoute, theme, setTheme, selectedProduct, products } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
 
   useEffect(() => {
     preloadCriticalAssets();
-    setTheme('light');
-  }, [setTheme]);
+  }, []);
 
   useEffect(() => {
     if ((currentRoute === RouteKey.EDITOR || currentRoute === RouteKey.SUMMARY) && !selectedProduct) {
@@ -35,7 +34,9 @@ const App: React.FC = () => {
         <div className="web-shell min-h-screen overflow-hidden">
           <SiteHeader
             currentRoute={currentRoute}
+            theme={theme}
             selectedProductName={selectedProduct?.name}
+            onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
             onNavigate={(route) => {
               if ((route === RouteKey.EDITOR || route === RouteKey.SUMMARY) && !selectedProduct) {
                 setCurrentRoute(RouteKey.KATALOG);
@@ -48,7 +49,7 @@ const App: React.FC = () => {
           <div className="flex-1">
             <React.Suspense
               fallback={
-                <div className="flex min-h-[70vh] items-center justify-center bg-white">
+                <div className="flex min-h-[70vh] items-center justify-center bg-[var(--surface-base)]">
                   <div className="flex flex-col items-center gap-3">
                     <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border-soft)] border-t-[var(--brand-accent)]" />
                     <p className="text-sm font-medium text-[var(--text-muted)]">Memuat halaman...</p>
@@ -71,9 +72,13 @@ const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowBradAiWidget((current) => !current)}
-              className="inline-flex items-center gap-3 rounded-full bg-[linear-gradient(135deg,#ef4444,#7c3aed)] px-5 py-3 text-sm font-black tracking-tight text-white shadow-[0_18px_40px_rgba(124,58,237,0.28)]"
+              className={`inline-flex items-center gap-3 rounded-full px-4 py-3 text-sm font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 ${
+                theme === 'dark'
+                  ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
+                  : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
+              }`}
             >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-lg">AI</span>
+              <span className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
               Brad Ai
             </button>
           </div>
