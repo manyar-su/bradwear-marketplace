@@ -46,7 +46,6 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Home', route: RouteKey.HOME, description: 'Landing page utama Bradwear Indonesia.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
-  { label: 'Pants', route: RouteKey.PANTS, description: 'Katalog khusus celana tactical dan celana kerja custom.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
   { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN, description: 'Bantuan konsultasi, revisi, dan follow up order.' },

@@ -426,9 +426,9 @@ const PublicSiteView: React.FC = () => {
         <div className="grid gap-4 lg:grid-cols-[0.72fr_1fr]">
           <article className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f8fafc,#ffffff)] p-6 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
-            <h3 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Judul artikel dibuat ringkas agar mudah dipindai</h3>
+            <h3 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Panduan seragam custom untuk persiapan order yang lebih matang</h3>
             <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-              Buka daftar artikel untuk melihat panduan bahan, model, checklist produksi, dan tips order tanpa kartu yang terlalu penuh isi.
+              Pelajari cara memilih bahan, membandingkan model, menyiapkan data ukuran, dan memastikan detail produksi sebelum melakukan pemesanan.
             </p>
             <button
               type="button"
