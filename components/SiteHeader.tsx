@@ -1,6 +1,6 @@
 import React from 'react';
 import { PRIMARY_NAV_ITEMS, ROUTE_LABELS, UTILITY_NAV_ITEMS } from '../lib/siteConfig';
-import { RouteKey } from '../types';
+import { Category, RouteKey } from '../types';
 import { ASSETS } from '../assets';
 
 interface SiteHeaderProps {
@@ -9,11 +9,20 @@ interface SiteHeaderProps {
   selectedProductName?: string | null;
   onToggleTheme: () => void;
   onNavigate: (route: RouteKey) => void;
+  onSelectCatalogCategory: (category: Category) => void;
 }
 
 const flowRoutes = [RouteKey.HOME, RouteKey.EDITOR, RouteKey.SUMMARY];
+const catalogCategories: Category[] = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'];
 
-const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, theme, selectedProductName, onToggleTheme, onNavigate }) => {
+const SiteHeader: React.FC<SiteHeaderProps> = ({
+  currentRoute,
+  theme,
+  selectedProductName,
+  onToggleTheme,
+  onNavigate,
+  onSelectCatalogCategory,
+}) => {
   return (
     <header className="site-header">
       <div className="site-utility">
@@ -64,13 +73,40 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({ currentRoute, theme, selectedPr
           <ul className="no-scrollbar flex items-center gap-1 overflow-x-auto">
             {PRIMARY_NAV_ITEMS.map((item) => (
               <li key={item.route}>
-                <button
-                  type="button"
-                  onClick={() => onNavigate(item.route)}
-                  className={`market-link ${currentRoute === item.route ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''}`}
-                >
-                  {item.label}
-                </button>
+                {item.route === RouteKey.KATALOG ? (
+                  <details className="catalog-dropdown">
+                    <summary
+                      className={`market-link catalog-dropdown-trigger ${
+                        currentRoute === RouteKey.KATALOG ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
+                      }`}
+                    >
+                      {item.label}
+                    </summary>
+                    <div className="catalog-dropdown-menu">
+                      {catalogCategories.map((category) => (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={(event) => {
+                            onSelectCatalogCategory(category);
+                            event.currentTarget.closest('details')?.removeAttribute('open');
+                          }}
+                          className="catalog-dropdown-item"
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onNavigate(item.route)}
+                    className={`market-link ${currentRoute === item.route ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                )}
               </li>
             ))}
           </ul>

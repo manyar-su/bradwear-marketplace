@@ -11,7 +11,7 @@ import SiteHeader from './components/SiteHeader';
 import BradAiChat from './components/BradAiChat';
 
 const App: React.FC = () => {
-  const { currentRoute, setCurrentRoute, theme, setTheme, selectedProduct, products } = useStore();
+  const { currentRoute, setCurrentRoute, theme, setTheme, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
 
   useEffect(() => {
@@ -37,6 +37,10 @@ const App: React.FC = () => {
             theme={theme}
             selectedProductName={selectedProduct?.name}
             onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+            onSelectCatalogCategory={(category) => {
+              setPreferredCatalogCategory(category);
+              setCurrentRoute(category === 'Celana' ? RouteKey.PANTS : RouteKey.KATALOG);
+            }}
             onNavigate={(route) => {
               if ((route === RouteKey.EDITOR || route === RouteKey.SUMMARY) && !selectedProduct) {
                 setCurrentRoute(RouteKey.KATALOG);
@@ -63,22 +67,22 @@ const App: React.FC = () => {
             </React.Suspense>
           </div>
 
-          <div className={`fixed right-5 z-50 flex flex-col items-end gap-3 ${currentRoute === RouteKey.EDITOR ? 'bottom-24' : 'bottom-5'}`}>
+          <div className={`fixed right-2 z-50 flex flex-col items-end gap-2 sm:right-5 sm:gap-3 ${currentRoute === RouteKey.EDITOR ? 'bottom-20 sm:bottom-24' : 'bottom-3 sm:bottom-5'}`}>
             {showBradAiWidget ? (
-              <div className="animate-fade-in-up w-[min(92vw,420px)] max-h-[min(78vh,720px)]">
+              <div className="animate-fade-in-up h-[min(76dvh,720px)] w-[min(94vw,420px)] max-h-[calc(100dvh-7rem)]">
                 <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
               </div>
             ) : null}
             <button
               type="button"
               onClick={() => setShowBradAiWidget((current) => !current)}
-              className={`inline-flex items-center gap-3 rounded-full px-4 py-3 text-sm font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 ${
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
                 theme === 'dark'
                   ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
                   : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
               }`}
             >
-              <span className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
+              <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
               Brodi
             </button>
           </div>
