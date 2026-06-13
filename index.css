@@ -1346,17 +1346,33 @@ a {
   }
 
   .hero-benefits {
-    grid-template-columns: repeat(3, minmax(210px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    overflow-x: auto;
     padding: 12px 0 4px;
-    scroll-snap-type: x proximity;
   }
 
   .hero-benefits article {
     min-height: 100%;
-    padding: 14px;
-    scroll-snap-align: start;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .hero-benefits article > div:first-child {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 10px;
+    border-radius: 13px;
+  }
+
+  .hero-benefits strong {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .hero-benefits span {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.45;
   }
 
   .hero-arrow {
@@ -1439,5 +1455,15 @@ a {
   .site-footer-whatsapp {
     padding: 10px 12px;
     font-size: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-benefits article:last-child {
+    grid-column: 1 / -1;
   }
 }

@@ -28,6 +28,11 @@ const App: React.FC = () => {
     applySeoMeta(currentRoute, products, SITE_FAQS);
   }, [currentRoute, products]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.querySelector('main')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [currentRoute]);
+
   return (
     <div className="min-h-screen w-full bg-[var(--surface-subtle)] text-[var(--text-primary)]">
       <div className="min-h-screen w-full">

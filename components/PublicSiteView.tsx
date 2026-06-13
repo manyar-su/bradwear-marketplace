@@ -72,6 +72,16 @@ const WorkshopIcon = () => (
   </svg>
 );
 
+const GoogleMapsIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0">
+    <path fill="#34A853" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Z" />
+    <path fill="#FBBC04" d="M5.72 5.94A6.97 6.97 0 0 0 5 9c0 2.13 1.15 4.77 2.54 7.08L12 11.62 5.72 5.94Z" />
+    <path fill="#EA4335" d="M12 2a7 7 0 0 0-6.28 3.94L12 11.62l3.71-3.71L18 5.6A6.98 6.98 0 0 0 12 2Z" />
+    <path fill="#4285F4" d="M18 5.6 12 11.62l4.43 4.43C17.84 13.72 19 11.1 19 9c0-1.22-.31-2.38-1-3.4Z" />
+    <circle cx="12" cy="9" r="2.4" fill="#fff" />
+  </svg>
+);
+
 const PublicSiteView: React.FC = () => {
   const {
     currentRoute,
@@ -386,12 +396,13 @@ const PublicSiteView: React.FC = () => {
             <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href={buildWhatsAppUrl(buildConsultationMessage('kunjungan atau konsultasi ke workshop Tasikmalaya'))}
+                href={STORE_MAP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-900"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5"
               >
-                Konsultasi Lokasi
+                <GoogleMapsIcon />
+                Google Maps
               </a>
               <button
                 type="button"
