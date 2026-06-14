@@ -1,29 +1,52 @@
 import { scanColorCode } from '../lib/colorScan';
+import {
+  RequestLike,
+  ResponseLike,
+  applyApiSecurityHeaders,
+  extractClientIp,
+  jsonError,
+  requireSameOrigin,
+  setRateLimitHeaders,
+  takeRateLimit,
+} from './_lib/security';
 
-type RequestLike = {
-  method?: string;
-  body?: {
-    image?: string;
-  };
+const SCAN_COLOR_RATE_LIMIT = {
+  windowMs: 60 * 1000,
+  max: 8,
 };
 
-type ResponseLike = {
-  status: (code: number) => ResponseLike;
-  json: (body: unknown) => void;
-  setHeader: (key: string, value: string) => void;
-};
+const MAX_IMAGE_PAYLOAD_LENGTH = 6_000_000;
 
 export default async function handler(req: RequestLike, res: ResponseLike) {
+  applyApiSecurityHeaders(res);
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    jsonError(res, 405, 'Method not allowed');
+    return;
+  }
+
+  if (!requireSameOrigin(req, res)) {
+    return;
+  }
+
+  const rateLimit = takeRateLimit('scan-color', extractClientIp(req), SCAN_COLOR_RATE_LIMIT);
+  setRateLimitHeaders(res, rateLimit);
+  if (!rateLimit.allowed) {
+    jsonError(res, 429, 'Terlalu banyak percobaan scan warna. Coba lagi sebentar.', {
+      retryAfter: rateLimit.retryAfter,
+    });
     return;
   }
 
   const image = req.body?.image;
   if (!image) {
-    res.status(400).json({ error: 'Payload image wajib diisi.' });
+    jsonError(res, 400, 'Payload image wajib diisi.');
+    return;
+  }
+
+  if (typeof image !== 'string' || image.length > MAX_IMAGE_PAYLOAD_LENGTH) {
+    jsonError(res, 413, 'Payload gambar terlalu besar atau tidak valid.');
     return;
   }
 
@@ -32,6 +55,6 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     res.status(200).json({ code });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'OCR kode warna gagal diproses.';
-    res.status(500).json({ error: message });
+    jsonError(res, 500, message);
   }
 }

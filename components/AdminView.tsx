@@ -24,6 +24,12 @@ interface OrderHistoryItem {
   resi: string;
 }
 
+type AdminUser = {
+  id: string;
+  name: string;
+  role?: string;
+};
+
 const AdminView: React.FC<AdminViewProps> = ({
   products,
   setProducts,
@@ -33,18 +39,17 @@ const AdminView: React.FC<AdminViewProps> = ({
   theme
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<CustomerService | null>(null);
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isSubmittingLogin, setIsSubmittingLogin] = useState(false);
   const [activeTab, setActiveTab] = useState<'workflow' | 'layout' | 'riwayat'>('workflow');
   const [showResiModal, setShowResiModal] = useState<string | null>(null);
   const [resiInput, setResiInput] = useState('');
   const [showViewEditor, setShowViewEditor] = useState<string | null>(null);
   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
-  const [showSudoPrompt, setShowSudoPrompt] = useState(false);
-  const [sudoValue, setSudoValue] = useState('');
-  const [isSudoVerified, setIsSudoVerified] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -70,17 +75,81 @@ const AdminView: React.FC<AdminViewProps> = ({
     localStorage.setItem('bradwear_order_history', JSON.stringify(orderHistory));
   }, [orderHistory]);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const csMatch = CS_TEAM.find(cs => cs.name.toLowerCase() === loginId.toLowerCase() && cs.loginKey === password);
-    const isAdmin = loginId.toLowerCase() === 'admin' && password === 'admin123';
+  useEffect(() => {
+    let isMounted = true;
 
-    if (csMatch || isAdmin) {
+    const restoreSession = async () => {
+      try {
+        const response = await fetch('/api/admin/session', {
+          credentials: 'same-origin',
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (response.ok && payload?.authenticated && payload?.user) {
+          setIsLoggedIn(true);
+          setCurrentUser(payload.user as AdminUser);
+        }
+      } catch {
+        if (isMounted) {
+          setError('Sesi admin tidak dapat diverifikasi.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingSession(false);
+        }
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmittingLogin) return;
+
+    setIsSubmittingLogin(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/admin/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          loginId,
+          password,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          typeof payload?.error === 'string' ? payload.error : 'Login admin gagal diproses.',
+        );
+      }
+
       setIsLoggedIn(true);
-      setCurrentUser(csMatch || { id: 'admin', name: 'Super Admin', avatar: '', isOnline: true, phone: '' });
+      setCurrentUser(
+        payload?.user && typeof payload.user.name === 'string'
+          ? (payload.user as AdminUser)
+          : { id: 'admin', name: 'Admin' },
+      );
       setError('');
-    } else {
-      setError('ID atau Kunci Login salah!');
+      setPassword('');
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'ID atau password salah.');
+    } finally {
+      setIsSubmittingLogin(false);
     }
   };
 
@@ -270,11 +339,19 @@ const AdminView: React.FC<AdminViewProps> = ({
     setEditingProduct(newProduct);
   };
 
-  const verifySudo = () => {
-    if (sudoValue === 'bradsudo123') {
-      setIsSudoVerified(true);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/session', {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      });
+    } catch {
+      // noop
+    } finally {
+      setIsLoggedIn(false);
+      setCurrentUser(null);
+      setPassword('');
       setError('');
-      setError('SUDO CODE INVALID!');
     }
   };
 
@@ -289,33 +366,18 @@ const AdminView: React.FC<AdminViewProps> = ({
             <h2 className="text-2xl font-black uppercase tracking-tighter adaptive-text">Admin Login</h2>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
-            <input required type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="ID LOGIN" />
-            <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="PASSWORD" />
+            <input required disabled={isCheckingSession || isSubmittingLogin} type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all disabled:opacity-60 ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="ID LOGIN" autoComplete="username" />
+            <input required disabled={isCheckingSession || isSubmittingLogin} type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full px-6 py-5 rounded-2xl text-sm font-bold border outline-none focus:neon-border transition-all disabled:opacity-60 ${theme === 'dark' ? 'bg-black border-white/5 text-white' : 'bg-white border-zinc-300 text-zinc-900'}`} placeholder="PASSWORD" autoComplete="current-password" />
 
-            <div className="flex justify-center">
-              <button type="button" onClick={() => setShowSudoPrompt(true)} className="text-[9px] font-black neon-text uppercase tracking-widest underline decoration-emerald-500/30 underline-offset-4">Lihat Daftar Kunci</button>
-            </div>
-
-            {showSudoPrompt && !isSudoVerified && (
-              <div className="space-y-3 p-4 bg-red-500/5 border border-red-500/10 rounded-2xl">
-                <input type="password" value={sudoValue} onChange={(e) => setSudoValue(e.target.value)} placeholder="MASUKKAN SUDO CODE" className="w-full p-4 rounded-xl text-[10px] font-black uppercase bg-black/40 border border-white/10 text-red-500 text-center outline-none" />
-                <button type="button" onClick={verifySudo} className="w-full py-4 bg-red-600 text-white text-[10px] font-black rounded-xl">VERIFIKASI SUDO</button>
-              </div>
-            )}
-
-            {isSudoVerified && (
-              <div className="p-4 rounded-2xl border text-[8px] font-black uppercase tracking-widest leading-relaxed bg-zinc-900/50 border-white/5">
-                <p className="neon-text mb-2">DAFTAR KUNCI CS:</p>
-                <div className="grid grid-cols-2 gap-2 opacity-80">
-                  {CS_TEAM.map(cs => <div key={cs.id} className="border-l border-emerald-500/20 pl-2"><span>{cs.name}:</span> <span className="text-zinc-500">{cs.loginKey}</span></div>)}
-                  <div className="border-l border-emerald-500/20 pl-2"><span>ADMIN:</span> <span className="text-zinc-500">admin123</span></div>
-                </div>
-              </div>
-            )}
+            <p className="text-[10px] text-center font-bold uppercase tracking-widest adaptive-text-muted">
+              Kredensial diverifikasi di server dan sesi disimpan aman di cookie HttpOnly.
+            </p>
 
             {error && <p className="text-red-500 text-[10px] text-center font-black uppercase tracking-widest bg-red-500/10 py-2 rounded-xl">{error}</p>}
 
-            <button type="submit" className="w-full py-6 neon-bg text-black font-black uppercase tracking-widest rounded-3xl shadow-lg active:scale-95 transition-all">MASUK SISTEM</button>
+            <button type="submit" disabled={isCheckingSession || isSubmittingLogin} className="w-full py-6 neon-bg text-black font-black uppercase tracking-widest rounded-3xl shadow-lg active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-60">
+              {isCheckingSession ? 'MEMERIKSA SESI...' : isSubmittingLogin ? 'MEMPROSES LOGIN...' : 'MASUK SISTEM'}
+            </button>
             <button type="button" onClick={onBack} className="w-full adaptive-text-muted text-[10px] font-black uppercase tracking-widest py-2">KEMBALI</button>
           </form>
         </div>
@@ -336,7 +398,7 @@ const AdminView: React.FC<AdminViewProps> = ({
           </div>
         </div>
         <h1 className="text-[11px] font-black uppercase tracking-[0.3em] neon-text">ADMIN CONTROL</h1>
-        <button onClick={() => { setIsLoggedIn(false); setSudoValue(''); setIsSudoVerified(false); }} className="text-[10px] font-black text-red-500 uppercase">LOGOUT</button>
+        <button onClick={handleLogout} className="text-[10px] font-black text-red-500 uppercase">LOGOUT</button>
       </header>
 
       <div className="flex px-4 pt-4 gap-4 border-b border-white/5 bg-white/5 backdrop-blur z-20">

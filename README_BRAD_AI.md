@@ -29,9 +29,13 @@
 Tambahkan environment berikut untuk menjalankan endpoint server:
 
 ```env
-SUMOPOD_API_KEY=sk-p0fpWYHoE5THbYQjwKvcxQ
+SUMOPOD_API_KEY=your_sumopod_api_key
 SUMOPOD_BASE_URL=https://ai.sumopod.com
 SUMOPOD_MODEL=gemini/gemini-2.5-flash-lite
+ADMIN_LOGIN_ID=admin
+ADMIN_LOGIN_PASSWORD=replace_with_strong_password
+ADMIN_SESSION_SECRET=replace_with_long_random_secret
+ADMIN_DISPLAY_NAME=Admin
 ```
 
-Endpoint server berada di `api/brad-ai.ts`.
+Endpoint server berada di `api/brad-ai.ts`. Session admin berada di `api/admin/session.ts`.
