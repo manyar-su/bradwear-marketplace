@@ -1,4 +1,4 @@
-import { BRAD_AI_CONTEXT, ROUTE_LABELS, ROUTE_PATHS, SEO_META, SITE_NAME, SITE_URL, SITE_TAGLINE, STORE_ADDRESS, WHATSAPP_NUMBER } from './siteConfig';
+import { BRAD_AI_CONTEXT, ROUTE_LABELS, ROUTE_PATHS, SEO_META, SITE_NAME, SITE_URL, SITE_TAGLINE, STORE_ADDRESS, STORE_MAP_URL, WHATSAPP_NUMBER } from './siteConfig';
 import { Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
@@ -44,6 +44,7 @@ const buildBaseSchemas = (meta: SeoMeta): Record<string, unknown>[] => {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
       name: SITE_NAME,
+      telephone: `+${WHATSAPP_NUMBER}`,
       address: {
         '@type': 'PostalAddress',
         streetAddress: STORE_ADDRESS,
@@ -52,6 +53,7 @@ const buildBaseSchemas = (meta: SeoMeta): Record<string, unknown>[] => {
         addressCountry: 'ID',
       },
       url: canonical,
+      hasMap: STORE_MAP_URL,
       areaServed: 'Indonesia',
       description: meta.description,
       image: `${SITE_URL}/assets/logo.png`,
@@ -63,6 +65,28 @@ const buildBaseSchemas = (meta: SeoMeta): Record<string, unknown>[] => {
       url: SITE_URL,
       description: SITE_TAGLINE,
       inLanguage: 'id-ID',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${SITE_URL}/katalog`,
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: `${SITE_NAME} Custom Uniform Service`,
+      serviceType: 'Konveksi seragam custom',
+      provider: {
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
+      areaServed: 'Indonesia',
+      availableChannel: {
+        '@type': 'ServiceChannel',
+        serviceUrl: `${SITE_URL}/layanan-pelanggan`,
+      },
+      description: meta.description,
     },
     {
       '@context': 'https://schema.org',
@@ -132,7 +156,7 @@ export const buildPageSchema = (route: RouteKey, products: Product[], faqs: Site
     base.push({
       '@context': 'https://schema.org',
       '@type': 'WebPage',
-      name: 'Brad Ai',
+      name: 'Brodi',
       description: BRAD_AI_CONTEXT.map((section) => `${section.heading}: ${section.body}`).join(' '),
     });
   }
@@ -165,11 +189,14 @@ export const applySeoMeta = (route: RouteKey, products: Product[], faqs: SiteFaq
   upsertMetaTag('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
   upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
   upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${SITE_URL}/assets/logo.png` });
+  upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} logo` });
   upsertMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title });
   upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description });
   upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${SITE_URL}/assets/logo.png` });
+  upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${SITE_NAME} logo` });
   upsertMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: SITE_NAME });
+  upsertMetaTag('meta[name="format-detection"]', { name: 'format-detection', content: 'telephone=no,address=no,email=no' });
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
 
   let script = document.getElementById('bradwear-jsonld');

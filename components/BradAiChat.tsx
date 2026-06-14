@@ -8,10 +8,22 @@ interface BradAiChatProps {
 }
 
 const SUGGESTIONS = [
-  'Bahan apa yang cocok untuk seragam lapangan?',
-  'Bagaimana alur order di Bradwear?',
-  'Apakah bisa kirim ke luar Jawa?',
-  'Apa beda model PDH dan lapangan?',
+  {
+    label: 'Bahan lapangan',
+    prompt: 'Bahan apa yang cocok untuk seragam lapangan?',
+  },
+  {
+    label: 'Alur order',
+    prompt: 'Bagaimana alur order di Bradwear?',
+  },
+  {
+    label: 'Kirim luar Jawa',
+    prompt: 'Apakah bisa kirim ke luar Jawa?',
+  },
+  {
+    label: 'Beda PDH',
+    prompt: 'Apa beda model PDH dan lapangan?',
+  },
 ];
 
 const createInitialMessage = (): ChatMessage => ({
@@ -86,12 +98,16 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         variant === 'widget' ? 'min-h-0 max-h-full' : 'min-h-[600px]'
       }`}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-[var(--border-soft)] bg-[linear-gradient(135deg,#10210c,#1d3913)] px-4 py-4 text-white md:px-5 md:py-5">
+      <div
+        className={`flex items-start justify-between gap-4 border-b border-[var(--border-soft)] bg-[linear-gradient(135deg,#10210c,#1d3913)] text-white ${
+          variant === 'widget' ? 'px-4 py-3.5 md:px-5 md:py-4' : 'px-4 py-4 md:px-5 md:py-5'
+        }`}
+      >
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b7f39a]">Brodi</p>
-          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Asisten cepat untuk kebutuhan Bradwear</h3>
+          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Tanya Brodi</h3>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
-            Tanya soal bahan, model, cara order, tracking, layanan pelanggan, dan lokasi toko Bradwear Indonesia.
+            Bahan, model, order, tracking, dan workshop Bradwear.
           </p>
         </div>
         {onClose ? (
@@ -106,23 +122,31 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         ) : null}
       </div>
 
-      <div className="grid gap-3 border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 md:px-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pertanyaan cepat</p>
+      <div
+        className={`grid gap-2 border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] ${
+          variant === 'widget' ? 'px-4 py-3 md:px-5' : 'px-4 py-4 md:px-5'
+        }`}
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Cepat</p>
         <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((suggestion) => (
             <button
-              key={suggestion}
+              key={suggestion.label}
               type="button"
-              onClick={() => setInput(suggestion)}
+              onClick={() => setInput(suggestion.prompt)}
               className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-3 py-2 text-left text-[11px] font-semibold text-[var(--text-secondary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
             >
-              {suggestion}
+              {suggestion.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,var(--surface-base),var(--surface-subtle))] px-4 py-4 md:px-5 md:py-5">
+      <div
+        className={`flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,var(--surface-base),var(--surface-subtle))] ${
+          variant === 'widget' ? 'px-4 py-3.5 md:px-5 md:py-4' : 'px-4 py-4 md:px-5 md:py-5'
+        }`}
+      >
         {messages.map((message) => (
           <article
             key={message.id}
@@ -141,15 +165,6 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
           </article>
         ))}
 
-        {messages.length === 1 ? (
-          <div className="rounded-[24px] border border-dashed border-[var(--border-soft)] bg-[var(--surface-base)]/90 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Brodi bisa bantu</p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-              Bahan yang cocok, beda model, alur order, status tracking, lokasi workshop, dan pertanyaan FAQ seputar Bradwear.
-            </p>
-          </div>
-        ) : null}
-
         {isSending ? (
           <article className="max-w-[88%] rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-[var(--text-secondary)] shadow-sm">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">Brodi</p>
@@ -163,8 +178,8 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Tulis pertanyaan Anda seputar produk, bahan, cara order, pengiriman, atau layanan Bradwear..."
-            rows={variant === 'widget' ? 3 : 4}
+            placeholder="Tulis pertanyaan tentang bahan, model, order, atau tracking..."
+            rows={variant === 'widget' ? 2 : 4}
             className="w-full resize-none rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--brand-accent)] focus:bg-white"
           />
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -174,7 +189,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
               rel="noreferrer"
               className="text-sm font-semibold text-[var(--text-secondary)] underline decoration-[var(--border-soft)] underline-offset-4"
             >
-              Butuh bantuan manusia? Konsultasi via WhatsApp
+              Butuh bantuan manusia? WhatsApp
             </a>
             <button
               type="submit"

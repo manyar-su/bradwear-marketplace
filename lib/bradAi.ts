@@ -20,7 +20,7 @@ const MODEL = process.env.SUMOPOD_MODEL || 'gemini/gemini-2.5-flash-lite';
 const API_KEY = process.env.SUMOPOD_API_KEY;
 
 const SYSTEM_PROMPT = [
-  'Anda adalah Brad Ai, asisten resmi untuk website Bradwear Indonesia.',
+  'Anda adalah Brodi, asisten resmi untuk website Bradwear Indonesia.',
   'Jawab dalam bahasa Indonesia yang natural, ringkas, jelas, dan fokus pada konteks website Bradwear.',
   'Topik yang boleh dibahas: katalog produk, bahan, model, cara order, tracking, layanan pelanggan, FAQ, dan lokasi toko.',
   'Jika data spesifik belum tersedia, katakan dengan jujur dan arahkan user ke WhatsApp Bradwear.',
@@ -54,11 +54,11 @@ const buildLocalAnswer = (messages: BradAiMessage[]) => {
   const q = normalize(question);
 
   if (!q) {
-    return 'Halo, saya Brad Ai. Saya bisa bantu jelaskan bahan, model, cara order, tracking, lokasi workshop, dan layanan Bradwear Indonesia.';
+    return 'Halo, saya Brodi. Saya bisa bantu jelaskan bahan, model, cara order, tracking, lokasi workshop, dan layanan Bradwear Indonesia.';
   }
 
   if (/(halo|hai|hi|selamat)/.test(q)) {
-    return 'Halo, saya Brad Ai. Saya siap bantu jelaskan katalog, bahan, alur order, tracking, dan layanan Bradwear Indonesia.';
+    return 'Halo, saya Brodi. Saya siap bantu jelaskan katalog, bahan, alur order, tracking, dan layanan Bradwear Indonesia.';
   }
 
   if (/(bahan|material).*(lapangan|outdoor|operasional)/.test(q) || /(lapangan|outdoor|operasional).*(bahan|material)/.test(q)) {
@@ -188,7 +188,7 @@ const callSumopod = async (messages: BradAiMessage[]) => {
     }
   }
 
-  throw new Error('Brad Ai gagal terhubung ke layanan AI upstream.');
+  throw new Error('Brodi gagal terhubung ke layanan AI upstream.');
 };
 
 export const getBradAiAnswer = async (messages: BradAiMessage[]) => {

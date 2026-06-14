@@ -72,25 +72,27 @@ const App: React.FC = () => {
             </React.Suspense>
           </div>
 
-          <div className={`fixed right-2 z-50 flex flex-col items-end gap-2 sm:right-5 sm:gap-3 ${currentRoute === RouteKey.EDITOR ? 'bottom-20 sm:bottom-24' : 'bottom-3 sm:bottom-5'}`}>
-            {showBradAiWidget ? (
-              <div className="animate-fade-in-up h-[min(76dvh,720px)] w-[min(94vw,420px)] max-h-[calc(100dvh-7rem)]">
-                <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
-              </div>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => setShowBradAiWidget((current) => !current)}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
-                theme === 'dark'
-                  ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
-                  : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
-              }`}
-            >
-              <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
-              Brodi
-            </button>
-          </div>
+          {currentRoute !== RouteKey.EDITOR ? (
+            <div className="fixed bottom-3 right-2 z-50 flex flex-col items-end gap-2 sm:bottom-5 sm:right-5 sm:gap-3">
+              {showBradAiWidget ? (
+                <div className="animate-fade-in-up h-[min(80dvh,760px)] w-[min(96vw,420px)] max-h-[calc(100dvh-5.25rem)]">
+                  <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => setShowBradAiWidget((current) => !current)}
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
+                  theme === 'dark'
+                    ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
+                    : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
+                }`}
+              >
+                <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
+                Brodi
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
