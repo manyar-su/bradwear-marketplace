@@ -70,7 +70,53 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
         </button>
 
         <nav aria-label="Menu marketplace" className="market-nav">
-          <ul className="no-scrollbar flex items-center gap-1 overflow-x-auto">
+          <details className="mobile-main-menu">
+            <summary className="market-link mobile-main-menu-trigger">Home</summary>
+            <div className="mobile-main-menu-panel">
+              {PRIMARY_NAV_ITEMS.map((item) =>
+                item.route === RouteKey.KATALOG ? (
+                  <details key={item.route} className="catalog-dropdown mobile-catalog-dropdown">
+                    <summary
+                      className={`market-link catalog-dropdown-trigger mobile-main-menu-link ${
+                        currentRoute === RouteKey.KATALOG ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
+                      }`}
+                    >
+                      {item.label}
+                    </summary>
+                    <div className="catalog-dropdown-menu mobile-catalog-dropdown-menu">
+                      {catalogCategories.map((category) => (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={(event) => {
+                            onSelectCatalogCategory(category);
+                            event.currentTarget.closest('.mobile-main-menu')?.removeAttribute('open');
+                          }}
+                          className="catalog-dropdown-item"
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                ) : (
+                  <button
+                    key={item.route}
+                    type="button"
+                    onClick={(event) => {
+                      onNavigate(item.route);
+                      event.currentTarget.closest('.mobile-main-menu')?.removeAttribute('open');
+                    }}
+                    className={`market-link mobile-main-menu-link ${currentRoute === item.route ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                ),
+              )}
+            </div>
+          </details>
+
+          <ul className="no-scrollbar market-nav-desktop flex items-center gap-1 overflow-x-auto">
             {PRIMARY_NAV_ITEMS.map((item) => (
               <li key={item.route}>
                 {item.route === RouteKey.KATALOG ? (

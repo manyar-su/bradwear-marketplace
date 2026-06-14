@@ -2119,7 +2119,7 @@ const DesignEditorView: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className={`sticky bottom-0 z-20 shrink-0 border-t p-4 backdrop-blur-md md:p-6 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
+        <div className={`sticky bottom-0 z-20 shrink-0 border-t px-4 pb-3 pt-2 backdrop-blur-md md:px-6 md:pb-5 md:pt-3 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
           {editorStep !== 'finish' ? (
             <button
               onClick={() => {

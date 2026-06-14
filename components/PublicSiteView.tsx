@@ -248,25 +248,25 @@ const PublicSiteView: React.FC = () => {
   const renderProductCard = (product: Product, badge?: string) => (
     <article
       key={product.id}
-      className="group rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
+      className="group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-3 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] sm:rounded-[28px] sm:p-4"
     >
       <button type="button" onClick={() => handleSelectProduct(product)} className="w-full text-left">
-        <div className="mb-4 aspect-[4/5] overflow-hidden rounded-[24px] bg-[var(--surface-soft)]">
+        <div className="mb-3 aspect-[4/4.8] overflow-hidden rounded-[18px] bg-[var(--surface-soft)] sm:mb-4 sm:aspect-[4/5] sm:rounded-[24px]">
           <ProductCardImage product={product} />
         </div>
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{product.category}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)] sm:text-[11px] sm:tracking-[0.18em]">{product.category}</p>
           {badge ? (
-            <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+            <span className="rounded-full bg-[var(--brand-accent-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-accent-strong)] sm:px-3 sm:text-[10px] sm:tracking-[0.18em]">
               {badge}
             </span>
           ) : null}
         </div>
-        <h3 className="mt-2 text-lg font-black tracking-tight text-[var(--text-primary)]">{product.name}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{product.description}</p>
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-sm font-semibold text-[var(--text-primary)]">{product.soldCount.toLocaleString('id-ID')}+ order</span>
-          <span className="rounded-full border border-[var(--border-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <h3 className="mt-2 text-base font-black tracking-tight text-[var(--text-primary)] sm:text-lg">{product.name}</h3>
+        <p className="mt-1.5 text-xs leading-relaxed text-[var(--text-secondary)] sm:mt-2 sm:text-sm">{product.description}</p>
+        <div className="mt-3 flex items-center justify-between gap-2 sm:mt-4">
+          <span className="text-xs font-semibold text-[var(--text-primary)] sm:text-sm">{product.soldCount.toLocaleString('id-ID')}+ order</span>
+          <span className="rounded-full border border-[var(--border-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] sm:px-3 sm:text-[10px] sm:tracking-[0.18em]">
             Kustom
           </span>
         </div>
@@ -452,10 +452,11 @@ const PublicSiteView: React.FC = () => {
                 href={STORE_MAP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5"
+                aria-label="Google Maps Bradwear Indonesia"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3 sm:text-xs sm:font-bold sm:uppercase sm:tracking-[0.14em]"
               >
                 <GoogleMapsIcon />
-                Google Maps
+                <span className="hidden sm:inline">Google Maps</span>
               </a>
               <button
                 type="button"
@@ -470,7 +471,7 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-6 md:px-10">
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {topProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Top Pick' : 'Best Seller'))}
         </div>
       </section>

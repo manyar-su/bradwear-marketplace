@@ -42,7 +42,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
       </div>
 
       <div className="site-footer-grid">
-        <div className="site-footer-brand">
+        <div className="site-footer-brand site-footer-panel site-footer-brand-panel">
           <div className="site-footer-logo-shell">
             <img src={ASSETS.BRAND.LOGO} alt={SITE_NAME} className="site-footer-logo" />
           </div>
@@ -50,7 +50,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
           <p className="site-footer-address">{STORE_ADDRESS}</p>
         </div>
 
-        <div>
+        <div className="site-footer-panel">
           <p className="site-footer-heading">Navigasi</p>
           <div className="site-footer-links">
             {footerRoutes.map((item) => (
@@ -61,7 +61,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div>
+        <div className="site-footer-panel">
           <p className="site-footer-heading">Kontak Cepat</p>
           <div className="site-footer-links">
             {CONTACT_CHANNELS.map((channel) => (
@@ -73,7 +73,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div>
+        <div className="site-footer-panel site-footer-cta-panel">
           <p className="site-footer-heading">Mulai Konsultasi</p>
           <a
             href={buildWhatsAppUrl(buildConsultationMessage('konsultasi seragam custom untuk instansi atau perusahaan'))}
