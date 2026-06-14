@@ -58,6 +58,14 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
                 {item.label}
               </button>
             ))}
+            <a
+              href="https://www.bradwear.web.id/"
+              target="_blank"
+              rel="noreferrer"
+              className="site-footer-link"
+            >
+              Dashboard
+            </a>
           </div>
         </div>
 

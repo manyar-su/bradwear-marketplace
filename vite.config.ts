@@ -3,6 +3,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { getBradAiAnswer } from './lib/bradAi';
+import { scanColorCode } from './lib/colorScan';
 
 const readJsonBody = async (req: NodeJS.ReadableStream) => {
   const chunks: Buffer[] = [];
@@ -50,6 +51,35 @@ export default defineConfig(({ mode }) => {
               res.end(JSON.stringify({ answer }));
             } catch (error) {
               const message = error instanceof Error ? error.message : 'Brad Ai gagal memproses permintaan.';
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: message }));
+            }
+          });
+
+          server.middlewares.use('/api/scan-color', async (req, res, next) => {
+            if (req.method !== 'POST') {
+              next();
+              return;
+            }
+
+            try {
+              const body = await readJsonBody(req);
+              const image = typeof body?.image === 'string' ? body.image : '';
+
+              if (!image) {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: 'Payload image wajib diisi.' }));
+                return;
+              }
+
+              const code = await scanColorCode(image);
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ code }));
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'OCR kode warna gagal diproses.';
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ error: message }));

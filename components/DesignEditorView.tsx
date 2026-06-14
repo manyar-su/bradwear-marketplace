@@ -13,6 +13,24 @@ import { analyzeImageWithGemini } from '../utils/geminiService';
 import { useStore } from '../context/StoreContext';
 import { buildWhatsAppUrl } from '../lib/siteConfig';
 
+const STEP_GUIDE_CONTENT = {
+  1: {
+    heading: 'Pilih bahan dan warna utama',
+    body: 'Tentukan jenis kain dan referensi warna yang paling mendekati kebutuhan seragam Anda agar simulasi visual menjadi lebih akurat sejak awal.',
+    next: 'Setelah itu, lanjutkan ke pengaturan identitas seperti logo, nama, dan detail penempatan.',
+  },
+  2: {
+    heading: 'Atur identitas seragam',
+    body: 'Sesuaikan logo, nama, jabatan, atau elemen identitas lain agar tampilan desain mewakili kebutuhan instansi, perusahaan, atau tim Anda.',
+    next: 'Berikutnya, lengkapi data pesanan per item sebelum masuk ke ringkasan akhir.',
+  },
+  3: {
+    heading: 'Lengkapi data item pesanan',
+    body: 'Tambahkan ukuran, gender, lengan, jumlah, dan kode warna untuk setiap item agar tim produksi menerima brief yang rapi dan mudah ditindaklanjuti.',
+    next: 'Jika semua item sudah sesuai, lanjutkan ke ringkasan untuk meninjau data sebelum dikirim.',
+  },
+} as const;
+
 const DesignEditorView: React.FC = () => {
   const { 
     selectedProduct: product, 
@@ -219,14 +237,16 @@ const DesignEditorView: React.FC = () => {
 
   const handleNextStep = () => {
     if (editorStep === 'materials') {
-      setShowStepNotify({ step: 2, msg: "Sesuaikan logo dan nama sebagai acuan desain yang di inginkan" });
       if (product.category === 'Polo') {
         setEditorStep('finish');
+        setShowStepNotify({ step: 3, msg: 'Lengkapi item pesanan dan kode warna agar data siap diringkas.' });
       } else {
         setEditorStep('details');
+        setShowStepNotify({ step: 2, msg: 'Sesuaikan logo, nama, dan detail identitas sebagai acuan desain final.' });
       }
     } else if (editorStep === 'details') {
       setEditorStep('finish');
+      setShowStepNotify({ step: 3, msg: 'Tambahkan item pesanan, ukuran, dan kode warna sebelum lanjut ke ringkasan.' });
     }
   };
 
@@ -445,7 +465,11 @@ const DesignEditorView: React.FC = () => {
 
   useEffect(() => {
     if (editorStep === 'materials') {
-      setShowStepNotify({ step: 1, msg: "Pilih jenis bahan dan warna simulasi sebagai referensi" });
+      setShowStepNotify({ step: 1, msg: 'Pilih bahan dan warna simulasi sebagai referensi awal desain.' });
+    } else if (editorStep === 'details') {
+      setShowStepNotify({ step: 2, msg: 'Sesuaikan identitas desain agar tampilan seragam sesuai kebutuhan tim Anda.' });
+    } else {
+      setShowStepNotify({ step: 3, msg: 'Lengkapi item pesanan dan kode warna sebelum masuk ke ringkasan akhir.' });
     }
   }, []);
 
@@ -1842,7 +1866,7 @@ const DesignEditorView: React.FC = () => {
 
                 <h4 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
                   <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                  Tambah Item Baru
+                  Tambahkan Item Pesanan
                 </h4>
 
                 {/* 1. MODEL & WARNA SELECTOR */}
@@ -2112,6 +2136,21 @@ const DesignEditorView: React.FC = () => {
                       + Tambah
                     </button>
                   </div>
+
+                  {editorStep === 'finish' && (
+                    <div className={`mt-4 rounded-2xl border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-zinc-200 bg-white'}`}>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Finalisasi Ringkasan</p>
+                      <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                        Setelah daftar item sudah sesuai, lanjutkan ke ringkasan untuk meninjau detail pesanan sebelum dikirim ke tim Bradwear.
+                      </p>
+                      <button
+                        onClick={handleReviewOrder}
+                        className="mt-4 w-full rounded-xl bg-[var(--brand-accent)] py-4 text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-red-500/20 transition-all hover:brightness-110 active:scale-95"
+                      >
+                        Lanjut ke Ringkasan
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2119,8 +2158,8 @@ const DesignEditorView: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className={`sticky bottom-0 z-20 shrink-0 border-t px-4 pb-3 pt-2 backdrop-blur-md md:px-6 md:pb-5 md:pt-3 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
-          {editorStep !== 'finish' ? (
+        {editorStep !== 'finish' ? (
+          <div className={`sticky bottom-0 z-20 shrink-0 border-t px-4 pb-3 pt-2 backdrop-blur-md md:px-6 md:pb-5 md:pt-3 ${theme === 'dark' ? 'border-white/5 bg-black/80' : 'border-zinc-200 bg-white/95'} ${showStepNotify ? 'hidden' : (editorStep === 'details' ? 'hidden md:block' : '')}`}>
             <button
               onClick={() => {
                 if (['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category)) {
@@ -2131,20 +2170,10 @@ const DesignEditorView: React.FC = () => {
               }}
               className={`w-full py-4 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg animate-pulse hover:animate-none ${theme === 'dark' ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-xl'}`}
             >
-              {['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category) ? 'Pesan Sekarang →' : 'Lanjut →'}
+              {['Celana', 'Rompi', 'Polo', 'Jaket'].includes(product.category) ? 'Pesan Sekarang' : 'Lanjut ke Tahap Berikutnya'}
             </button>
-          ) : (
-            <div className="flex flex-col gap-3">
-
-              <button
-                onClick={handleReviewOrder}
-                className="w-full rounded-xl bg-[var(--brand-accent)] py-4 text-sm font-black uppercase tracking-normal text-white shadow-lg shadow-red-500/20 transition-all hover:brightness-110 active:scale-95"
-              >
-                LANJUT KE RINGKASAN
-              </button>
-            </div>
-          )}
-        </div>
+          </div>
+        ) : null}
       </div>
 
 
@@ -2749,9 +2778,14 @@ const DesignEditorView: React.FC = () => {
               </p>
 
               <div className="mt-6 rounded-[24px] border border-emerald-500/15 bg-emerald-500/5 p-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Interaktif dan Bertahap</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">
+                  {STEP_GUIDE_CONTENT[showStepNotify.step as 1 | 2 | 3]?.heading || 'Panduan Singkat'}
+                </p>
                 <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                  Ikuti step satu per satu agar warna, bahan, identitas, dan daftar pesanan tetap sinkron sampai akhir.
+                  {STEP_GUIDE_CONTENT[showStepNotify.step as 1 | 2 | 3]?.body}
+                </p>
+                <p className={`mt-3 text-xs leading-relaxed ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                  {STEP_GUIDE_CONTENT[showStepNotify.step as 1 | 2 | 3]?.next}
                 </p>
               </div>
 
@@ -2768,3 +2802,4 @@ const DesignEditorView: React.FC = () => {
 };
 
 export default DesignEditorView;
+

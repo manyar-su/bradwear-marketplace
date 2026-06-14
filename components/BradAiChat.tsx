@@ -30,7 +30,7 @@ const SUGGESTIONS = [
 const createInitialMessage = (): ChatMessage => ({
   id: 'assistant-welcome',
   role: 'assistant',
-  content: 'Halo, saya Brodi. Saya bisa bantu jelaskan katalog, bahan, alur order, tracking, dan layanan Bradwear Indonesia.',
+  content: 'Halo, saya Brodi. Saya siap membantu penjelasan katalog, bahan, alur pemesanan, tracking, dan layanan Bradwear Indonesia.',
 });
 
 const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) => {
@@ -117,9 +117,9 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
       >
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b7f39a]">Brodi</p>
-          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Tanya Brodi</h3>
+          <h3 className="mt-1 text-lg font-black tracking-tight md:text-xl">Konsultasi awal bersama Brodi</h3>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
-            Bahan, model, order, tracking, dan workshop Bradwear.
+            Bahan, model, alur pemesanan, tracking, dan lokasi workshop Bradwear.
           </p>
         </div>
         {onClose ? (
@@ -148,7 +148,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         >
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Pesan cepat</p>
-            <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Pilih pertanyaan umum untuk Brodi</p>
+            <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Pilih pertanyaan singkat yang paling relevan</p>
           </div>
           <span
             className={`text-lg font-black leading-none text-[var(--brand-accent-strong)] transition-transform ${

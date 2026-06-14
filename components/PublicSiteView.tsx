@@ -328,8 +328,8 @@ const PublicSiteView: React.FC = () => {
               <span className="hero-badge">Kirim Seluruh Indonesia</span>
             </div>
             <h1>
-              Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi yang butuh proses lebih cepat,
-              lebih rapi, dan lebih mudah dipahami.
+              Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi, perusahaan, dan tim
+              operasional yang membutuhkan proses lebih cepat, rapi, dan mudah dipahami.
             </h1>
             <div className="hero-actions">
               <button
@@ -364,7 +364,7 @@ const PublicSiteView: React.FC = () => {
               </div>
               <div>
                 <strong>AI + CS</strong>
-                <span>Jawaban cepat lalu follow up manusia</span>
+                <span>Respon awal digital lalu tindak lanjut oleh tim layanan</span>
               </div>
             </div>
           </article>
@@ -482,7 +482,7 @@ const PublicSiteView: React.FC = () => {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-2xl">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-200/85">TikTok Bradwear</p>
-                <h3 className="mt-3 text-3xl font-black tracking-tight text-white">Video workshop dan hasil jadi dalam format portrait</h3>
+                <h3 className="mt-3 text-3xl font-black tracking-tight text-white">Lihat referensi workshop dan hasil produksi dalam format portrait</h3>
               </div>
 
               <a
@@ -747,10 +747,10 @@ const PublicSiteView: React.FC = () => {
     <div className="px-6 py-8 md:px-10">
       <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#111827,#1e293b)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Cara Order</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight">Panduan visual yang dibuat agar user cepat paham sebelum order</h1>
+        <h1 className="mt-3 text-4xl font-black tracking-tight">Panduan pemesanan yang dibuat agar proses konsultasi dan produksi mudah diikuti</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Halaman ini memakai komposisi sticky visual dan alur bertahap agar pengguna dapat mengikuti proses dari memilih
-          model sampai follow up ke layanan pelanggan tanpa bingung.
+          Halaman ini merangkum alur dari pemilihan model, penyesuaian desain, hingga konfirmasi data pesanan secara
+          bertahap agar kebutuhan tim Anda dapat diproses lebih jelas.
         </p>
       </section>
 
@@ -1029,7 +1029,7 @@ const PublicSiteView: React.FC = () => {
     <div className="px-6 py-8 md:px-10">
       <section className="mb-6 rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#eef2ff,#ffffff)] p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Brodi</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Asisten AI untuk pertanyaan seputar Bradwear</h1>
+        <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Asisten AI untuk konsultasi awal seputar layanan Bradwear</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
           Brodi dirancang agar jawaban tetap natural, informatif, dan fokus pada layanan, produk, bahan, cara order,
           tracking, lokasi toko, serta FAQ yang relevan dengan website ini.
@@ -1045,13 +1045,13 @@ const PublicSiteView: React.FC = () => {
         return renderCatalog(
           featured,
           'Katalog seragam custom yang lebih mudah dipilih',
-          'Tampilan katalog dibuat lebih editorial agar pengguna bisa fokus membandingkan model, fungsi, dan kesiapan untuk masuk ke editor desain.',
+          'Tampilan katalog disusun lebih terarah agar pengunjung mudah membandingkan model, fungsi, dan kesiapan desain sebelum masuk ke editor.',
         );
       case RouteKey.PANTS:
         return renderCatalog(
           pantsProducts,
           'Pants dan celana tactical untuk kebutuhan kerja aktif',
-          'Halaman ini fokus pada kategori celana agar user yang mencari pants tidak perlu bercampur dengan produk lain. Cocok untuk tim lapangan, operasional, dan kebutuhan kerja yang membutuhkan mobilitas tinggi.',
+          'Halaman ini difokuskan pada kategori celana agar proses pemilihan model lebih ringkas. Cocok untuk tim lapangan, operasional, dan kebutuhan kerja dengan mobilitas tinggi.',
         );
       case RouteKey.ARTIKEL:
         return renderArticles();
