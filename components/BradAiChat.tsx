@@ -1,5 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { buildConsultationMessage, buildWhatsAppUrl } from '../lib/siteConfig';
+import { getBradAiLocalAnswer } from '../lib/bradAiLocal';
 import { ChatMessage } from '../types';
 
 interface BradAiChatProps {
@@ -36,6 +37,7 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
   const [messages, setMessages] = useState<ChatMessage[]>([createInitialMessage()]);
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 
   const handleSend = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -64,27 +66,37 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
         }),
       });
 
-      const payload = await response.json();
+      const rawPayload = await response.text();
+      let payload: { answer?: string; error?: string } = {};
+
+      try {
+        payload = rawPayload ? JSON.parse(rawPayload) : {};
+      } catch {
+        payload = {};
+      }
+
       if (!response.ok) {
         throw new Error(payload?.error || 'Brodi sedang tidak tersedia.');
       }
+
+      const answer = payload.answer?.trim() || getBradAiLocalAnswer(optimisticMessages);
 
       setMessages((current) => [
         ...current,
         {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: payload.answer || 'Maaf, saya belum menemukan jawaban yang tepat.',
+          content: answer,
         },
       ]);
     } catch {
+      const fallbackAnswer = getBradAiLocalAnswer(optimisticMessages);
       setMessages((current) => [
         ...current,
         {
           id: `assistant-error-${Date.now()}`,
           role: 'assistant',
-          status: 'error',
-          content: 'Brodi belum bisa menjawab saat ini. Anda bisa lanjut konsultasi ke tim kami melalui WhatsApp agar dibantu langsung.',
+          content: fallbackAnswer,
         },
       ]);
     } finally {
@@ -123,22 +135,54 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
       </div>
 
       <div
-        className={`grid gap-2 border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] ${
+        className={`border-b border-[var(--border-soft)] bg-[var(--surface-subtle)] ${
           variant === 'widget' ? 'px-4 py-3 md:px-5' : 'px-4 py-4 md:px-5'
         }`}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Cepat</p>
-        <div className="flex flex-wrap gap-2">
-          {SUGGESTIONS.map((suggestion) => (
-            <button
-              key={suggestion.label}
-              type="button"
-              onClick={() => setInput(suggestion.prompt)}
-              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-3 py-2 text-left text-[11px] font-semibold text-[var(--text-secondary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-            >
-              {suggestion.label}
-            </button>
-          ))}
+        <button
+          type="button"
+          onClick={() => setIsSuggestionsOpen((current) => !current)}
+          className="flex w-full items-center justify-between gap-3 rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-3.5 py-3 text-left transition hover:border-[var(--brand-accent)]"
+          aria-expanded={isSuggestionsOpen}
+          aria-controls="brodi-quick-prompts"
+        >
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Pesan cepat</p>
+            <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Pilih pertanyaan umum untuk Brodi</p>
+          </div>
+          <span
+            className={`text-lg font-black leading-none text-[var(--brand-accent-strong)] transition-transform ${
+              isSuggestionsOpen ? 'rotate-45' : ''
+            }`}
+          >
+            +
+          </span>
+        </button>
+
+        <div
+          id="brodi-quick-prompts"
+          className={`overflow-hidden transition-all duration-300 ease-out ${
+            isSuggestionsOpen ? 'max-h-72 pt-3 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="grid gap-2 sm:grid-cols-2">
+            {SUGGESTIONS.map((suggestion) => (
+              <button
+                key={suggestion.label}
+                type="button"
+                onClick={() => {
+                  setInput(suggestion.prompt);
+                  setIsSuggestionsOpen(false);
+                }}
+                className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-3.5 py-3 text-left text-[12px] font-semibold text-[var(--text-secondary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+              >
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                  {suggestion.label}
+                </span>
+                <span className="mt-1 block text-sm leading-snug text-[var(--text-primary)]">{suggestion.prompt}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
