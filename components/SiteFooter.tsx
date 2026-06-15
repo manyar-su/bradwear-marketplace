@@ -16,7 +16,7 @@ interface SiteFooterProps {
 }
 
 const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
-  [RouteKey.HOME, RouteKey.KATALOG, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN, RouteKey.BRAD_AI].includes(item.route),
+  [RouteKey.HOME, RouteKey.KATALOG, RouteKey.CLIENT, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN, RouteKey.BRAD_AI].includes(item.route),
 );
 
 const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {

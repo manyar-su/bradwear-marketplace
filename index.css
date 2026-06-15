@@ -64,6 +64,49 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.brodi-page-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.brodi-page-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--brand-accent) 26%, transparent) 0, transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.22) 0, transparent 26%),
+    radial-gradient(circle at 50% 78%, color-mix(in srgb, var(--brand-accent-soft) 72%, transparent) 0, transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-base) 86%, #eef6ff 14%) 0%, color-mix(in srgb, var(--surface-subtle) 92%, #dff0d2 8%) 100%);
+  background-attachment: fixed;
+}
+
+.brodi-page-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.38;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-accent) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-accent) 16%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2));
+}
+
+.brodi-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+.brodi-hero-shell {
+  background: color-mix(in srgb, var(--surface-base) 76%, rgba(255, 255, 255, 0.56));
+  backdrop-filter: blur(10px);
+}
+
 img,
 video {
   max-width: 100%;
@@ -87,6 +130,14 @@ a {
   background: color-mix(in srgb, var(--surface-base) 92%, transparent);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary) 10%, transparent);
   backdrop-filter: blur(12px);
+}
+
+@media (max-width: 767px) {
+  .brodi-page-shell::before,
+  .brodi-page-shell::after {
+    position: absolute;
+    inset: 0;
+  }
 }
 
 .site-utility {
@@ -307,6 +358,10 @@ a {
   transform: rotate(45deg);
 }
 
+.catalog-dropdown.is-open .catalog-dropdown-trigger::after {
+  transform: rotate(45deg);
+}
+
 .catalog-dropdown-menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -321,6 +376,10 @@ a {
   padding: 7px;
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(14px);
+}
+
+.catalog-dropdown-menu[hidden] {
+  display: none;
 }
 
 .catalog-dropdown-item {

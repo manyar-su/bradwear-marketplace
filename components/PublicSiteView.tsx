@@ -109,6 +109,57 @@ const GooglePlayIcon = () => (
   </svg>
 );
 
+const SocialServiceIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-6.5-4.35-6.5-10.07A3.93 3.93 0 0 1 9.44 7a4.55 4.55 0 0 1 2.56.87A4.55 4.55 0 0 1 14.56 7a3.93 3.93 0 0 1 3.94 3.93C18.5 16.65 12 21 12 21Z" />
+  </svg>
+);
+
+const JusticeIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16M7 8h10M6 8l-2 4h4L6 8Zm12 0-2 4h4l-2-4ZM8 20h8" />
+  </svg>
+);
+
+const MedicalIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+const GovernmentIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h16M6 10v7m4-7v7m4-7v7m4-7v7M3 20h18M12 4l8 4H4l8-4Z" />
+  </svg>
+);
+
+const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; gradient: string; icon: React.ReactNode }> = {
+  dinsos: {
+    title: 'Dinsos',
+    subtitle: 'Dokumentasi seragam untuk kebutuhan layanan sosial dan aktivitas lapangan.',
+    gradient: 'linear-gradient(135deg, #0f766e, #22c55e)',
+    icon: <SocialServiceIcon />,
+  },
+  kejagung: {
+    title: 'Kejagung',
+    subtitle: 'Galeri hasil jadi dengan karakter formal, tegas, dan siap dipresentasikan.',
+    gradient: 'linear-gradient(135deg, #7c2d12, #dc2626)',
+    icon: <JusticeIcon />,
+  },
+  medis: {
+    title: 'Medis',
+    subtitle: 'Referensi visual seragam dengan nuansa bersih, ringan, dan profesional.',
+    gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)',
+    icon: <MedicalIcon />,
+  },
+  pemkab: {
+    title: 'Pemkab',
+    subtitle: 'Portofolio seragam instansi pemerintah daerah untuk kebutuhan dinas dan operasional.',
+    gradient: 'linear-gradient(135deg, #4338ca, #22c55e)',
+    icon: <GovernmentIcon />,
+  },
+};
+
 const PublicSiteView: React.FC = () => {
   const {
     currentRoute,
@@ -122,6 +173,7 @@ const PublicSiteView: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<typeof CATEGORIES[number]>('Kemeja');
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
@@ -135,6 +187,10 @@ const PublicSiteView: React.FC = () => {
     [],
   );
   const safeHeroSlides = heroSlides.length > 0 ? heroSlides : [ASSETS.KEMEJA.BRAD_V3.FRONT];
+  const middleContentSlides = useMemo(
+    () => (ASSETS.CONTENT.MIDDLE_SLIDES?.length ? ASSETS.CONTENT.MIDDLE_SLIDES : safeHeroSlides).filter(Boolean),
+    [safeHeroSlides],
+  );
 
   useEffect(() => {
     if (safeHeroSlides.length < 2) return;
@@ -143,6 +199,14 @@ const PublicSiteView: React.FC = () => {
     }, 4200);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
+
+  useEffect(() => {
+    if (middleContentSlides.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveMiddleSlide((prev) => (prev + 1) % middleContentSlides.length);
+    }, 3600);
+    return () => window.clearInterval(timer);
+  }, [middleContentSlides]);
 
   useEffect(() => {
     if (currentRoute === RouteKey.PANTS) {
@@ -212,6 +276,10 @@ const PublicSiteView: React.FC = () => {
       },
     ],
     [safeHeroSlides],
+  );
+  const clientGalleryGroups = useMemo(
+    () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
+    [],
   );
 
   const currentProductionOrder = useMemo(
@@ -603,11 +671,80 @@ const PublicSiteView: React.FC = () => {
           {renderFaqAccordion()}
         </div>
       </section>
+
+      <section className="px-6 pb-12 md:px-10">
+        <div className="grid gap-5 overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f6fff0,#ffffff_58%,#eff6ff)] p-6 shadow-sm lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
+          <article className="flex flex-col justify-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Middle Content</p>
+            <h3 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Highlight visual tambahan untuk hasil produksi dan suasana pengerjaan</h3>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
+              Slideshow ini menampilkan aset promosi tambahan dari folder `Middle content` agar transisi setelah FAQ terasa lebih hidup dan tetap relevan dengan konteks katalog Bradwear.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
+                className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+              >
+                Lihat client gallery
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
+              >
+                Buka katalog
+              </button>
+            </div>
+          </article>
+
+          <article className="relative overflow-hidden rounded-[28px] bg-slate-950 shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
+            <div className="relative aspect-[16/10] overflow-hidden">
+              {middleContentSlides.map((slide, index) => (
+                <img
+                  key={`${slide}-${index}`}
+                  src={slide}
+                  alt={`Bradwear middle content ${index + 1}`}
+                  className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${index === activeMiddleSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'}`}
+                />
+              ))}
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.12)_60%,rgba(15,23,42,0.5))]" />
+            </div>
+
+            <div className="absolute inset-x-0 bottom-0 flex justify-center p-5">
+              <div className="flex gap-2 rounded-full bg-slate-950/36 px-3 py-2 backdrop-blur-sm">
+                {middleContentSlides.map((_, index) => (
+                  <button
+                    key={`middle-dot-${index}`}
+                    type="button"
+                    onClick={() => setActiveMiddleSlide(index)}
+                    className={`h-2 rounded-full transition-all ${index === activeMiddleSlide ? 'w-8 bg-[var(--brand-accent)]' : 'w-2 bg-white/40'}`}
+                    aria-label={`Tampilkan slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
     </>
   );
 
   const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
     <div className="px-6 py-8 md:px-10">
+      {ASSETS.CONTENT.SIZE_GUIDE ? (
+        <section className="mb-6 overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff,#eef6ff)] p-4 shadow-sm md:p-5">
+          <p className="px-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Size Guide</p>
+          <div className="mt-3 overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)]">
+            <img
+              src={ASSETS.CONTENT.SIZE_GUIDE}
+              alt="Bradwear size guide"
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        </section>
+      ) : null}
+
       <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
         <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff,#fee2e2)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Katalog Editorial</p>
@@ -1025,17 +1162,90 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
-  const renderBradAiPage = () => (
+  const renderClientGallery = () => (
     <div className="px-6 py-8 md:px-10">
-      <section className="mb-6 rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#eef2ff,#ffffff)] p-6 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Brodi</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Asisten AI untuk konsultasi awal seputar layanan Bradwear</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-          Brodi dirancang agar jawaban tetap natural, informatif, dan fokus pada layanan, produk, bahan, cara order,
-          tracking, lokasi toko, serta FAQ yang relevan dengan website ini.
+      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#102b14_48%,#183153)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Client Gallery</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight">Dokumentasi visual hasil produksi dari folder client Bradwear</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
+          Halaman ini menampilkan galeri per folder client agar hasil jadi lebih mudah dipresentasikan. Setiap blok memakai identitas visual yang disesuaikan dengan nama folder sumber asetnya.
         </p>
       </section>
-      <BradAiChat variant="page" />
+
+      <section className="mt-8 grid gap-6">
+        {clientGalleryGroups.map((group) => {
+          const meta = CLIENT_GALLERY_META[group.slug] ?? {
+            title: group.name,
+            subtitle: 'Dokumentasi hasil jadi client Bradwear Indonesia.',
+            gradient: 'linear-gradient(135deg,#166534,#1d4ed8)',
+            icon: <GovernmentIcon />,
+          };
+          const [featuredImage, ...otherImages] = group.images;
+
+          return (
+            <article key={group.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-16 w-16 items-center justify-center rounded-[22px] text-white shadow-[0_16px_36px_rgba(15,23,42,0.16)]"
+                    style={{ background: meta.gradient }}
+                  >
+                    {meta.icon}
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Folder {group.slug}</p>
+                    <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
+                  </div>
+                </div>
+                <div className="rounded-full bg-[var(--surface-subtle)] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                  {group.images.length} gambar
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+                {featuredImage ? (
+                  <div className="overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-subtle)]">
+                    <img
+                      src={featuredImage}
+                      alt={`${meta.title} featured`}
+                      className="h-full w-full object-cover transition duration-500 hover:scale-[1.02]"
+                    />
+                  </div>
+                ) : null}
+
+                <div className={`grid gap-4 ${otherImages.length > 1 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
+                  {(otherImages.length > 0 ? otherImages : featuredImage ? [featuredImage] : []).map((image, index) => (
+                    <div key={`${group.slug}-${index}-${image}`} className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-subtle)]">
+                      <img
+                        src={image}
+                        alt={`${meta.title} gallery ${index + 1}`}
+                        className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+    </div>
+  );
+
+  const renderBradAiPage = () => (
+    <div className="brodi-page-shell px-6 py-8 md:px-10">
+      <div className="brodi-page-content">
+        <section className="brodi-hero-shell mb-6 rounded-[32px] border border-[var(--border-soft)] p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Brodi</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Asisten AI untuk konsultasi awal seputar layanan Bradwear</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
+            Brodi dirancang agar jawaban tetap natural, informatif, dan fokus pada layanan, produk, bahan, cara order,
+            tracking, lokasi toko, serta FAQ yang relevan dengan website ini.
+          </p>
+        </section>
+        <BradAiChat variant="page" />
+      </div>
     </div>
   );
 
@@ -1047,6 +1257,8 @@ const PublicSiteView: React.FC = () => {
           'Katalog seragam custom yang lebih mudah dipilih',
           'Tampilan katalog disusun lebih terarah agar pengunjung mudah membandingkan model, fungsi, dan kesiapan desain sebelum masuk ke editor.',
         );
+      case RouteKey.CLIENT:
+        return renderClientGallery();
       case RouteKey.PANTS:
         return renderCatalog(
           pantsProducts,

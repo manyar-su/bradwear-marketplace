@@ -2,6 +2,7 @@
 export enum RouteKey {
   HOME = 'HOME',
   KATALOG = 'KATALOG',
+  CLIENT = 'CLIENT',
   PANTS = 'PANTS',
   ARTIKEL = 'ARTIKEL',
   CARA_ORDER = 'CARA_ORDER',

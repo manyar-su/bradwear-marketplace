@@ -23,6 +23,9 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
   onNavigate,
   onSelectCatalogCategory,
 }) => {
+  const [isDesktopCatalogOpen, setIsDesktopCatalogOpen] = React.useState(false);
+  const isCatalogRoute = currentRoute === RouteKey.KATALOG || currentRoute === RouteKey.PANTS;
+
   return (
     <header className="site-header">
       <div className="site-utility">
@@ -78,7 +81,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                   <details key={item.route} className="catalog-dropdown mobile-catalog-dropdown">
                     <summary
                       className={`market-link catalog-dropdown-trigger mobile-main-menu-link ${
-                        currentRoute === RouteKey.KATALOG ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
+                        isCatalogRoute ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
                       }`}
                     >
                       {item.label}
@@ -120,22 +123,36 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
             {PRIMARY_NAV_ITEMS.map((item) => (
               <li key={item.route}>
                 {item.route === RouteKey.KATALOG ? (
-                  <details className="catalog-dropdown">
-                    <summary
+                  <div
+                    className={`catalog-dropdown ${isDesktopCatalogOpen ? 'is-open' : ''}`}
+                    onMouseEnter={() => setIsDesktopCatalogOpen(true)}
+                    onMouseLeave={() => setIsDesktopCatalogOpen(false)}
+                    onFocusCapture={() => setIsDesktopCatalogOpen(true)}
+                    onBlurCapture={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsDesktopCatalogOpen(false);
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      aria-expanded={isDesktopCatalogOpen}
+                      aria-haspopup="menu"
                       className={`market-link catalog-dropdown-trigger ${
-                        currentRoute === RouteKey.KATALOG ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
+                        isCatalogRoute ? 'bg-[var(--surface-soft)] text-[var(--brand-accent-strong)]' : ''
                       }`}
+                      onClick={() => onNavigate(RouteKey.KATALOG)}
                     >
                       {item.label}
-                    </summary>
-                    <div className="catalog-dropdown-menu">
+                    </button>
+                    <div className="catalog-dropdown-menu" hidden={!isDesktopCatalogOpen}>
                       {catalogCategories.map((category) => (
                         <button
                           key={category}
                           type="button"
-                          onClick={(event) => {
+                          onClick={() => {
                             onSelectCatalogCategory(category);
-                            event.currentTarget.closest('details')?.removeAttribute('open');
+                            setIsDesktopCatalogOpen(false);
                           }}
                           className="catalog-dropdown-item"
                         >
@@ -143,7 +160,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                         </button>
                       ))}
                     </div>
-                  </details>
+                  </div>
                 ) : (
                   <button
                     type="button"

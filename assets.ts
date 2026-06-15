@@ -39,6 +39,41 @@ const HERO_SLIDES = Object.keys(allImagesGlob)
   .filter((key) => key.toLowerCase().includes('/slideshow/'))
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   .map((key) => resolveAsset(key));
+const MIDDLE_CONTENT_SLIDES = Object.keys(allImagesGlob)
+  .filter((key) => key.toLowerCase().includes('/middle content/'))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  .map((key) => resolveAsset(key));
+const SIZE_GUIDE = resolveAsset('./assets/size guide.webp');
+
+const CLIENT_GALLERY_ORDER = ['dinsos', 'kejagung', 'medis', 'pemkab'] as const;
+const formatFolderLabel = (value: string) =>
+  value
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+const clientGalleryBuckets = Object.keys(allImagesGlob)
+  .filter((key) => key.toLowerCase().includes('/galery client/'))
+  .reduce<Record<string, string[]>>((acc, key) => {
+    const parts = key.split('/');
+    const folderName = parts[3];
+    if (!folderName) return acc;
+    if (!acc[folderName]) {
+      acc[folderName] = [];
+    }
+    acc[folderName].push(resolveAsset(key));
+    return acc;
+  }, {});
+
+const CLIENT_GALLERY_GROUPS = [
+  ...CLIENT_GALLERY_ORDER.filter((slug) => clientGalleryBuckets[slug]),
+  ...Object.keys(clientGalleryBuckets).filter((slug) => !CLIENT_GALLERY_ORDER.includes(slug as typeof CLIENT_GALLERY_ORDER[number])),
+].map((slug) => ({
+  slug,
+  name: formatFolderLabel(slug),
+  images: (clientGalleryBuckets[slug] ?? []).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+}));
 
 // Import Produk
 // Map untuk menyimpan folder -> path lengkap
@@ -499,6 +534,13 @@ export const ASSETS = {
     SLIDES: HERO_SLIDES.length > 0 ? HERO_SLIDES : [HERO_BG],
   },
 
+  CONTENT: {
+    MIDDLE_SLIDES: MIDDLE_CONTENT_SLIDES,
+    SIZE_GUIDE,
+  },
+
+  CLIENT_GALLERY: CLIENT_GALLERY_GROUPS,
+
   PARTNERS: [
     PARTNER_KEMENDAGRI,
     PARTNER_HAM,
@@ -692,9 +734,11 @@ export const preloadCriticalAssets = () => {
   const critical = [
     LOGO_BRADWEAR,
     HERO_BG,
+    SIZE_GUIDE,
     // Add first few products or frequent images
     ...Object.values(ASSETS.KEMEJA.BRAD_V3).flatMap(v => Array.isArray(v) ? v : [v as string]),
-    ...COLOR_CATALOGS['Tropical (Best Seller)'].slice(0, 5)
+    ...COLOR_CATALOGS['Tropical (Best Seller)'].slice(0, 5),
+    ...MIDDLE_CONTENT_SLIDES.slice(0, 2),
   ];
 
   critical.forEach(url => {

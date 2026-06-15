@@ -20,6 +20,7 @@ export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${
 export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.HOME]: '/',
   [RouteKey.KATALOG]: '/katalog',
+  [RouteKey.CLIENT]: '/client',
   [RouteKey.PANTS]: '/pants',
   [RouteKey.ARTIKEL]: '/artikel',
   [RouteKey.CARA_ORDER]: '/cara-order',
@@ -34,6 +35,7 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
 export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.HOME,
   RouteKey.KATALOG,
+  RouteKey.CLIENT,
   RouteKey.PANTS,
   RouteKey.ARTIKEL,
   RouteKey.CARA_ORDER,
@@ -46,6 +48,7 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Home', route: RouteKey.HOME, description: 'Landing page utama Bradwear Indonesia.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
+  { label: 'Client', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi client Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
   { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN, description: 'Bantuan konsultasi, revisi, dan follow up order.' },
@@ -64,6 +67,7 @@ export const UTILITY_NAV_ITEMS: NavItem[] = [
 export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.HOME]: 'Home / Beranda',
   [RouteKey.KATALOG]: 'Home / Katalog',
+  [RouteKey.CLIENT]: 'Home / Client Gallery',
   [RouteKey.PANTS]: 'Home / Pants',
   [RouteKey.ARTIKEL]: 'Home / Artikel',
   [RouteKey.CARA_ORDER]: 'Home / Cara Order',
@@ -330,6 +334,12 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
     'Katalog Seragam Custom Bradwear Indonesia',
     'Lihat katalog kemeja, jaket, rompi, polo, dan model seragam custom Bradwear Indonesia untuk kebutuhan dinas, lapangan, dan perusahaan.',
     ['katalog seragam custom', 'kemeja dinas', 'jaket bomber custom', 'rompi lapangan', 'polo custom', 'pants tactical']
+  ),
+  [RouteKey.CLIENT]: makeMeta(
+    RouteKey.CLIENT,
+    'Client Gallery Bradwear Indonesia',
+    'Lihat dokumentasi hasil produksi dan galeri client Bradwear Indonesia untuk kebutuhan instansi, medis, kejaksaan, dan pemerintah daerah.',
+    ['client gallery', 'galeri client bradwear', 'hasil jadi seragam', 'portfolio seragam custom', 'dokumentasi client']
   ),
   [RouteKey.PANTS]: makeMeta(
     RouteKey.PANTS,
