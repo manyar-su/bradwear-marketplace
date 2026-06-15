@@ -209,6 +209,60 @@ const PublicSiteView: React.FC = () => {
   }, [middleContentSlides]);
 
   useEffect(() => {
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    const parallaxNodes = Array.from(
+      main.querySelectorAll<HTMLElement>('section > div, section > article, .hero-benefits > article'),
+    ).filter((node) => node.offsetHeight > 80 && !node.closest('.hero-banner-stage') && !node.closest('.faq-answer'));
+
+    if (parallaxNodes.length === 0) return;
+
+    parallaxNodes.forEach((node) => node.classList.add('scroll-parallax'));
+
+    let frame = 0;
+    const updateParallax = () => {
+      frame = 0;
+      const viewportHeight = window.innerHeight || 1;
+
+      parallaxNodes.forEach((node) => {
+        const rect = node.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const distance = (center - viewportHeight * 0.52) / viewportHeight;
+        const offset = Math.max(-26, Math.min(26, distance * -26));
+        node.style.setProperty('--parallax-offset', `${offset.toFixed(2)}px`);
+
+        if (rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.08) {
+          node.classList.add('is-visible');
+        }
+      });
+    };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateParallax);
+    };
+
+    updateParallax();
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate);
+    main.addEventListener('scroll', requestUpdate, { passive: true });
+
+    return () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+      window.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('resize', requestUpdate);
+      main.removeEventListener('scroll', requestUpdate);
+      parallaxNodes.forEach((node) => {
+        node.classList.remove('scroll-parallax', 'is-visible');
+        node.style.removeProperty('--parallax-offset');
+      });
+    };
+  }, [currentRoute]);
+
+  useEffect(() => {
     if (currentRoute === RouteKey.PANTS) {
       setActiveCategory('Celana');
       setActiveModelFilter(ALL_MODELS);
@@ -397,7 +451,7 @@ const PublicSiteView: React.FC = () => {
             </div>
             <h1>
               Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi, perusahaan, dan tim
-              operasional yang membutuhkan proses lebih cepat, rapi, dan mudah dipahami.
+              seragam team yang membutuhkan seragam kustom, rapi, dan cepat.
             </h1>
             <div className="hero-actions">
               <button
@@ -432,7 +486,7 @@ const PublicSiteView: React.FC = () => {
               </div>
               <div>
                 <strong>AI + CS</strong>
-                <span>Respon awal digital lalu tindak lanjut oleh tim layanan</span>
+                <span>Cs berbasis Ai untuk melayani anda 24/7 atau CS staff yang aktif.</span>
               </div>
             </div>
           </article>
@@ -673,57 +727,36 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-12 md:px-10">
-        <div className="grid gap-5 overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f6fff0,#ffffff_58%,#eff6ff)] p-6 shadow-sm lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
-          <article className="flex flex-col justify-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Middle Content</p>
-            <h3 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Highlight visual tambahan untuk hasil produksi dan suasana pengerjaan</h3>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              Slideshow ini menampilkan aset promosi tambahan dari folder `Middle content` agar transisi setelah FAQ terasa lebih hidup dan tetap relevan dengan konteks katalog Bradwear.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
-                className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
-              >
-                Lihat client gallery
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
-              >
-                Buka katalog
-              </button>
-            </div>
-          </article>
-
-          <article className="relative overflow-hidden rounded-[28px] bg-slate-950 shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
-            <div className="relative aspect-[16/10] overflow-hidden">
+        <div className="middle-showcase-shell overflow-hidden rounded-[34px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+          <article className="hero-banner middle-showcase-banner">
+            <div className="hero-banner-stage middle-showcase-stage">
               {middleContentSlides.map((slide, index) => (
                 <img
                   key={`${slide}-${index}`}
                   src={slide}
                   alt={`Bradwear middle content ${index + 1}`}
-                  className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${index === activeMiddleSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'}`}
+                  className={`hero-banner-image ${index === activeMiddleSlide ? 'is-active' : ''}`}
                 />
               ))}
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.12)_60%,rgba(15,23,42,0.5))]" />
+              <div className="hero-banner-overlay middle-showcase-overlay" />
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 flex justify-center p-5">
-              <div className="flex gap-2 rounded-full bg-slate-950/36 px-3 py-2 backdrop-blur-sm">
-                {middleContentSlides.map((_, index) => (
-                  <button
-                    key={`middle-dot-${index}`}
-                    type="button"
-                    onClick={() => setActiveMiddleSlide(index)}
-                    className={`h-2 rounded-full transition-all ${index === activeMiddleSlide ? 'w-8 bg-[var(--brand-accent)]' : 'w-2 bg-white/40'}`}
-                    aria-label={`Tampilkan slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setActiveMiddleSlide((prev) => (prev - 1 + middleContentSlides.length) % middleContentSlides.length)}
+              className="hero-arrow hero-arrow-left"
+              aria-label="Slide middle content sebelumnya"
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMiddleSlide((prev) => (prev + 1) % middleContentSlides.length)}
+              className="hero-arrow hero-arrow-right"
+              aria-label="Slide middle content berikutnya"
+            >
+              &gt;
+            </button>
           </article>
         </div>
       </section>
@@ -1118,7 +1151,7 @@ const PublicSiteView: React.FC = () => {
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
         <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Temukan Toko</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Workshop dan titik konsultasi Bradwear Indonesia</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Workshop dan titik lokasi Bradwear Indonesia</h1>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
             Lokasi ini menjadi titik konsultasi, pengembangan sample, dan koordinasi order Bradwear Indonesia untuk
             kebutuhan seragam custom di Tasikmalaya dan sekitarnya.
@@ -1292,6 +1325,5 @@ const PublicSiteView: React.FC = () => {
 };
 
 export default PublicSiteView;
-
 
 

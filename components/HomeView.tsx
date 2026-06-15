@@ -129,15 +129,15 @@ const HomeView: React.FC = () => {
         <div className="hero-benefits">
           <div>
             <strong>Tidak ada pesanan minimum khusus sampel.</strong>
-            <span>Kustomisasi bisa dimulai dari konsultasi kebutuhan tim.</span>
+            <span>Konsultasi desain kemeja sesuai kebutuhan anda.</span>
           </div>
           <div>
-            <strong>Desain hari ini, produksi lebih rapi.</strong>
-            <span>Alur katalog, editor, dan ringkasan dibuat dalam satu web.</span>
+            <strong>Desain sekarang, produksi bisa lebih cepat.</strong>
+            <span>Semua fitur tersedia untuk memudahkan anda dalam pemesanan.</span>
           </div>
           <div>
             <strong>Pengiriman seluruh Indonesia.</strong>
-            <span>Cocok untuk instansi, komunitas, dan kebutuhan operasional.</span>
+            <span>Cocok untuk keperluan pembuatan seragam dinas, instansi dan team anda.</span>
           </div>
         </div>
       </section>
@@ -233,7 +233,7 @@ const HomeView: React.FC = () => {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             { title: 'Lead Time Transparan', desc: 'Estimasi produksi 14-21 hari kerja dengan update tahap berkala.' },
-            { title: 'MOQ Fleksibel', desc: 'Mulai dari 12 pcs per model untuk produksi kustom instansi.' },
+            { title: 'MOQ Fleksibel', desc: 'Tanpa minimal produksi bisa satuan untuk kebutuhan Sample.' },
             { title: 'QC Berlapis', desc: 'Cutting, sewing, dan finishing melewati quality control berstandar industri.' },
           ].map((item) => (
             <article key={item.title} className="rounded-3xl border border-[var(--border-soft)] bg-white p-6 shadow-sm">

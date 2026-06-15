@@ -64,6 +64,22 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.scroll-parallax {
+  --parallax-offset: 0px;
+  opacity: 0.01;
+  transform: translate3d(0, calc(var(--parallax-offset) + 34px), 0);
+  transition:
+    transform 780ms var(--ease-smooth),
+    opacity 780ms var(--ease-smooth),
+    box-shadow 260ms var(--ease-smooth);
+  will-change: transform, opacity;
+}
+
+.scroll-parallax.is-visible {
+  opacity: 1;
+  transform: translate3d(0, var(--parallax-offset), 0);
+}
+
 .brodi-page-shell {
   position: relative;
   isolation: isolate;
@@ -707,6 +723,24 @@ a {
   pointer-events: none;
 }
 
+.middle-showcase-shell {
+  position: relative;
+}
+
+.middle-showcase-banner {
+  border-radius: 34px;
+  overflow: hidden;
+  background: #08111e;
+}
+
+.middle-showcase-stage {
+  aspect-ratio: 16 / 7;
+}
+
+.middle-showcase-overlay {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.36));
+}
+
 .home-hero {
   padding: 24px clamp(16px, 4vw, 66px) 30px;
   background: var(--surface-base);
@@ -1216,6 +1250,14 @@ a {
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-parallax {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 

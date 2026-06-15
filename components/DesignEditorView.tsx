@@ -16,17 +16,17 @@ import { buildWhatsAppUrl } from '../lib/siteConfig';
 const STEP_GUIDE_CONTENT = {
   1: {
     heading: 'Pilih bahan dan warna utama',
-    body: 'Tentukan jenis kain dan referensi warna yang paling mendekati kebutuhan seragam Anda agar simulasi visual menjadi lebih akurat sejak awal.',
+    body: 'Tentukan jenis kain dan referensi warna yang paling mendekati kebutuhan seragam Anda, ini hanya simulasi untuk memudahkan anda dalam visual produk jadi nantinya.',
     next: 'Setelah itu, lanjutkan ke pengaturan identitas seperti logo, nama, dan detail penempatan.',
   },
   2: {
     heading: 'Atur identitas seragam',
-    body: 'Sesuaikan logo, nama, jabatan, atau elemen identitas lain agar tampilan desain mewakili kebutuhan instansi, perusahaan, atau tim Anda.',
+    body: 'Sesuaikan logo, nama, jabatan, atau elemen identitas lain, upload dan atur posisi.',
     next: 'Berikutnya, lengkapi data pesanan per item sebelum masuk ke ringkasan akhir.',
   },
   3: {
     heading: 'Lengkapi data item pesanan',
-    body: 'Tambahkan ukuran, gender, lengan, jumlah, dan kode warna untuk setiap item agar tim produksi menerima brief yang rapi dan mudah ditindaklanjuti.',
+    body: 'Tambahkan ukuran, gender, lengan, jumlah, dan kode warna untuk setiap item.',
     next: 'Jika semua item sudah sesuai, lanjutkan ke ringkasan untuk meninjau data sebelum dikirim.',
   },
 } as const;
