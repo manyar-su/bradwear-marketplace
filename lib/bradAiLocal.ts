@@ -29,7 +29,7 @@ const formatOrderSteps = () =>
   HOW_TO_ORDER_STEPS.map((step, index) => `${index + 1}. ${step.title}: ${step.description}`).join('\n');
 
 const buildWhatsAppHelp = (subject: string) =>
-  `Jika Anda ingin dibantu lebih lanjut, lanjutkan ke WhatsApp Bradwear: ${buildWhatsAppUrl(buildConsultationMessage(subject))}`;
+  `Butuh bantuan lanjutan? Lanjut ke WhatsApp Bradwear.\n\n${buildWhatsAppUrl(buildConsultationMessage(subject))}`;
 
 export const getBradAiLocalAnswer = (messages: BradAiLocalMessage[]) => {
   const question = latestUserMessage(messages);

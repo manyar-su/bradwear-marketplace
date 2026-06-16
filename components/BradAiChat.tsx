@@ -33,6 +33,43 @@ const createInitialMessage = (): ChatMessage => ({
   content: 'Halo, saya Brodi. Saya siap membantu penjelasan katalog, bahan, alur pemesanan, tracking, dan layanan Bradwear Indonesia.',
 });
 
+const WHATSAPP_URL_PATTERN = /whatsapp:\/\/send\?[^\s]+/i;
+
+const parseMessageContent = (content: string) => {
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  let whatsappHref: string | undefined;
+  const visibleParagraphs: string[] = [];
+
+  paragraphs.forEach((paragraph) => {
+    const match = paragraph.match(WHATSAPP_URL_PATTERN);
+    if (!match) {
+      visibleParagraphs.push(paragraph);
+      return;
+    }
+
+    whatsappHref ??= match[0];
+
+    const stripped = paragraph
+      .replace(WHATSAPP_URL_PATTERN, '')
+      .replace(/\s*:\s*$/, '')
+      .trim();
+
+    if (!stripped) return;
+    if (/^(jika anda ingin dibantu lebih lanjut|whatsapp konsultasi bradwear)/i.test(stripped)) return;
+
+    visibleParagraphs.push(stripped);
+  });
+
+  return {
+    body: visibleParagraphs.join('\n\n').trim(),
+    whatsappHref,
+  };
+};
+
 const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([createInitialMessage()]);
   const [input, setInput] = useState('');
@@ -191,23 +228,38 @@ const BradAiChat: React.FC<BradAiChatProps> = ({ variant = 'page', onClose }) =>
           variant === 'widget' ? 'px-4 py-3.5 md:px-5 md:py-4' : 'px-4 py-4 md:px-5 md:py-5'
         }`}
       >
-        {messages.map((message) => (
-          <article
-            key={message.id}
-            className={`max-w-[94%] rounded-[24px] px-4 py-3 shadow-sm ${
-              message.role === 'user'
-                ? 'ml-auto bg-[var(--brand-accent)] text-white'
-                : message.status === 'error'
-                  ? 'bg-amber-50 text-amber-900'
-                  : 'border border-[var(--border-soft)] bg-[var(--surface-base)] text-[var(--text-primary)]'
-            }`}
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">
-              {message.role === 'user' ? 'Anda' : 'Brodi'}
-            </p>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
-          </article>
-        ))}
+        {messages.map((message) => {
+          const parsedMessage = message.role === 'assistant' ? parseMessageContent(message.content) : null;
+          const visibleContent = parsedMessage ? parsedMessage.body : message.content;
+
+          return (
+            <article
+              key={message.id}
+              className={`max-w-[94%] rounded-[24px] px-4 py-3 shadow-sm ${
+                message.role === 'user'
+                  ? 'ml-auto bg-[var(--brand-accent)] text-white'
+                  : message.status === 'error'
+                    ? 'bg-amber-50 text-amber-900'
+                    : 'border border-[var(--border-soft)] bg-[var(--surface-base)] text-[var(--text-primary)]'
+              }`}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">
+                {message.role === 'user' ? 'Anda' : 'Brodi'}
+              </p>
+              {visibleContent ? <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{visibleContent}</p> : null}
+              {parsedMessage?.whatsappHref ? (
+                <a
+                  href={parsedMessage.whatsappHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="brand-cta mt-3 inline-flex rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.16em] text-white"
+                >
+                  Kirim pesan
+                </a>
+              ) : null}
+            </article>
+          );
+        })}
 
         {isSending ? (
           <article className="max-w-[88%] rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-[var(--text-secondary)] shadow-sm">

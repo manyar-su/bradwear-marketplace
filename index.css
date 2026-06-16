@@ -67,10 +67,10 @@ body {
 .scroll-parallax {
   --parallax-offset: 0px;
   opacity: 0.01;
-  transform: translate3d(0, calc(var(--parallax-offset) + 34px), 0);
+  transform: translate3d(0, calc(var(--parallax-offset) + 18px), 0);
   transition:
-    transform 780ms var(--ease-smooth),
-    opacity 780ms var(--ease-smooth),
+    transform 640ms var(--ease-smooth),
+    opacity 640ms var(--ease-smooth),
     box-shadow 260ms var(--ease-smooth);
   will-change: transform, opacity;
 }

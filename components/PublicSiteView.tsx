@@ -214,7 +214,13 @@ const PublicSiteView: React.FC = () => {
 
     const parallaxNodes = Array.from(
       main.querySelectorAll<HTMLElement>('section > div, section > article, .hero-benefits > article'),
-    ).filter((node) => node.offsetHeight > 80 && !node.closest('.hero-banner-stage') && !node.closest('.faq-answer'));
+    ).filter(
+      (node) =>
+        node.offsetHeight > 80 &&
+        !node.closest('.hero-banner-stage') &&
+        !node.closest('.faq-answer') &&
+        !node.closest('.parallax-static-zone'),
+    );
 
     if (parallaxNodes.length === 0) return;
 
@@ -229,7 +235,7 @@ const PublicSiteView: React.FC = () => {
         const rect = node.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
         const distance = (center - viewportHeight * 0.52) / viewportHeight;
-        const offset = Math.max(-26, Math.min(26, distance * -26));
+        const offset = Math.max(-14, Math.min(14, distance * -14));
         node.style.setProperty('--parallax-offset', `${offset.toFixed(2)}px`);
 
         if (rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.08) {
@@ -1205,7 +1211,7 @@ const PublicSiteView: React.FC = () => {
         </p>
       </section>
 
-      <section className="mt-8 grid gap-6">
+      <section className="parallax-static-zone mt-8 grid gap-6">
         {clientGalleryGroups.map((group) => {
           const meta = CLIENT_GALLERY_META[group.slug] ?? {
             title: group.name,
@@ -1325,5 +1331,3 @@ const PublicSiteView: React.FC = () => {
 };
 
 export default PublicSiteView;
-
-
