@@ -22,7 +22,12 @@ import SiteFooter from './SiteFooter';
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
 const ALL_MODELS = 'Semua Model';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
-const TIKTOK_FEATURED_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7635951960125869332';
+const TIKTOK_FEATURED_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7633289301333134612';
+const TIKTOK_FEATURED_EMBED_ID = '7633289301333134612';
+const TIKTOK_DETAIL_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7635951960125869332';
+const TIKTOK_DETAIL_EMBED_ID = '7635951960125869332';
+const TIKTOK_WORKSHOP_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7650752558176210197';
+const TIKTOK_WORKSHOP_EMBED_ID = '7650752558176210197';
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bradwear.app';
 
@@ -174,6 +179,7 @@ const PublicSiteView: React.FC = () => {
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
+  const [activeShirtSlide, setActiveShirtSlide] = useState(0);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
@@ -191,6 +197,19 @@ const PublicSiteView: React.FC = () => {
     () => (ASSETS.CONTENT.MIDDLE_SLIDES?.length ? ASSETS.CONTENT.MIDDLE_SLIDES : safeHeroSlides).filter(Boolean),
     [safeHeroSlides],
   );
+  const shirtShowcaseSlides = useMemo(
+    () =>
+      [
+        ASSETS.KEMEJA.BRAD_V3.FRONT,
+        ASSETS.KEMEJA.BRAD_V4.FRONT,
+        ASSETS.KEMEJA.PDH.FRONT,
+        ASSETS.KEMEJA.EXECUTIVE.FRONT,
+        ...(ASSETS.KEMEJA.BRAD_V3.GALLERY ?? []),
+      ]
+        .filter(Boolean)
+        .filter((slide, index, allSlides) => allSlides.indexOf(slide) === index),
+    [],
+  );
 
   useEffect(() => {
     if (safeHeroSlides.length < 2) return;
@@ -207,6 +226,14 @@ const PublicSiteView: React.FC = () => {
     }, 3600);
     return () => window.clearInterval(timer);
   }, [middleContentSlides]);
+
+  useEffect(() => {
+    if (shirtShowcaseSlides.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveShirtSlide((prev) => (prev + 1) % shirtShowcaseSlides.length);
+    }, 3200);
+    return () => window.clearInterval(timer);
+  }, [shirtShowcaseSlides]);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -306,10 +333,15 @@ const PublicSiteView: React.FC = () => {
     () => visibleProducts.filter((product) => product.category === 'Celana'),
     [visibleProducts],
   );
+  const kemejaProducts = useMemo(
+    () => visibleProducts.filter((product) => product.category === 'Kemeja'),
+    [visibleProducts],
+  );
   const topProducts = useMemo(
     () => [...visibleProducts].sort((a, b) => b.soldCount - a.soldCount).slice(0, 4),
     [visibleProducts],
   );
+  const shirtSpotlightProduct = kemejaProducts[0] ?? featured.find((product) => product.category === 'Kemeja') ?? null;
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
   const socialVideoCards = useMemo(
     () => [
@@ -319,20 +351,23 @@ const PublicSiteView: React.FC = () => {
         duration: '00:31',
         poster: safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
         href: TIKTOK_FEATURED_VIDEO_URL,
+        embedId: TIKTOK_FEATURED_EMBED_ID,
       },
       {
         title: 'Detail bordir',
         tag: 'Detail',
         duration: '00:18',
         poster: safeHeroSlides[1] ?? safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
-        href: TIKTOK_URL,
+        href: TIKTOK_DETAIL_VIDEO_URL,
+        embedId: TIKTOK_DETAIL_EMBED_ID,
       },
       {
         title: 'Suasana workshop',
         tag: 'Workshop',
         duration: '00:24',
         poster: safeHeroSlides[2] ?? safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
-        href: TIKTOK_URL,
+        href: TIKTOK_WORKSHOP_VIDEO_URL,
+        embedId: TIKTOK_WORKSHOP_EMBED_ID,
       },
     ],
     [safeHeroSlides],
@@ -444,6 +479,33 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
+  const renderWorkshopHighlight = () => (
+    <article className="rounded-[30px] bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Alamat workshop</p>
+      <h3 className="mt-3 text-2xl font-black tracking-tight">Karisma Residence, Mangunreja, Tasikmalaya</h3>
+      <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <a
+          href={STORE_MAP_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Google Maps Bradwear Indonesia"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3 sm:text-xs sm:font-bold sm:uppercase sm:tracking-[0.14em]"
+        >
+          <GoogleMapsIcon />
+          <span className="hidden sm:inline">Google Maps</span>
+        </a>
+        <button
+          type="button"
+          onClick={() => setCurrentRoute(RouteKey.TEMUKAN_TOKO)}
+          className="rounded-full border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+        >
+          Detail Toko
+        </button>
+      </div>
+    </article>
+  );
+
   const renderHome = () => (
     <>
       <section className="home-hero">
@@ -529,6 +591,8 @@ const PublicSiteView: React.FC = () => {
           </article>
         </div>
 
+        <div className="mt-4">{renderWorkshopHighlight()}</div>
+
         <div className="hero-benefits">
           {heroBenefits.map((benefit) => (
             <article
@@ -546,54 +610,93 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-8 md:px-10">
-        <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
-          <article className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Ringkas Tentang Bradwear</p>
+        <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+          <article className="rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f7fbee,#ffffff)] p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Custom Desain Bradwear</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">
-              Seragam custom yang dirancang supaya proses order lebih jelas dari pemilihan model sampai pengiriman
+              Mulai desain kemeja custom lalu lanjutkan pemesanan tanpa alur yang berputar
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              Bradwear membantu instansi, perusahaan, dan komunitas memilih model, bahan, warna, dan detail identitas
-              tanpa membuat alur approval terasa rumit. Fokusnya tetap pada hasil visual yang rapi, keputusan yang cepat,
-              dan tindak lanjut yang mudah dipahami oleh tim Anda.
+            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+              Pilih model kemeja yang paling dekat dengan kebutuhan instansi Anda, masuk ke editor desain, lalu lanjutkan
+              konsultasi atau pemesanan saat konsep sudah siap.
             </p>
+            {shirtSpotlightProduct ? (
+              <div className="mt-5 rounded-[24px] bg-[var(--surface-base)] p-4 shadow-[inset_0_0_0_1px_var(--border-soft)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Model kemeja unggulan</p>
+                <h3 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">{shirtSpotlightProduct.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{shirtSpotlightProduct.description}</p>
+              </div>
+            ) : null}
             <div className="mt-6 flex flex-wrap gap-3">
-              {[RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN, RouteKey.LACAK_PESANAN].map((route) => (
-                <button
-                  key={route}
-                  type="button"
-                  onClick={() => setCurrentRoute(route)}
-                  className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-                >
-                  {route === RouteKey.CARA_ORDER ? 'Cara Order' : route === RouteKey.LAYANAN_PELANGGAN ? 'Layanan Pelanggan' : 'Lacak Pesanan'}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  if (shirtSpotlightProduct) {
+                    handleSelectProduct(shirtSpotlightProduct);
+                    return;
+                  }
+                  setCurrentRoute(RouteKey.KATALOG);
+                }}
+                className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+              >
+                Custom Desain
+              </button>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('pesan kemeja custom untuk instansi atau perusahaan'))}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+              >
+                Pesan Sekarang
+              </a>
             </div>
           </article>
 
-          <article className="rounded-[30px] bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Alamat workshop</p>
-            <h3 className="mt-3 text-2xl font-black tracking-tight">Karisma Residence, Mangunreja, Tasikmalaya</h3>
-            <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href={STORE_MAP_URL}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Google Maps Bradwear Indonesia"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3 sm:text-xs sm:font-bold sm:uppercase sm:tracking-[0.14em]"
-              >
-                <GoogleMapsIcon />
-                <span className="hidden sm:inline">Google Maps</span>
-              </a>
+          <article className="middle-showcase-shell overflow-hidden rounded-[34px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+            <div className="flex items-center justify-between gap-3 px-5 pt-5">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Slider Kemeja</p>
+                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Preview model kemeja custom</h3>
+              </div>
               <button
                 type="button"
-                onClick={() => setCurrentRoute(RouteKey.TEMUKAN_TOKO)}
-                className="rounded-full border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Detail Toko
+                Lihat katalog
               </button>
             </div>
+
+            <article className="hero-banner middle-showcase-banner mt-4">
+              <div className="hero-banner-stage middle-showcase-stage">
+                {shirtShowcaseSlides.map((slide, index) => (
+                  <img
+                    key={`${slide}-${index}`}
+                    src={slide}
+                    alt={`Slider kemeja Bradwear ${index + 1}`}
+                    className={`hero-banner-image ${index === activeShirtSlide ? 'is-active' : ''}`}
+                  />
+                ))}
+                <div className="hero-banner-overlay middle-showcase-overlay" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveShirtSlide((prev) => (prev - 1 + shirtShowcaseSlides.length) % shirtShowcaseSlides.length)}
+                className="hero-arrow hero-arrow-left"
+                aria-label="Slide kemeja sebelumnya"
+              >
+                &lt;
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveShirtSlide((prev) => (prev + 1) % shirtShowcaseSlides.length)}
+                className="hero-arrow hero-arrow-right"
+                aria-label="Slide kemeja berikutnya"
+              >
+                &gt;
+              </button>
+            </article>
           </article>
         </div>
       </section>
@@ -625,47 +728,75 @@ const PublicSiteView: React.FC = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {socialVideoCards.map((video) => (
-                <a
-                  key={video.title}
-                  href={video.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group relative isolate aspect-[9/16] overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 p-4 text-left transition hover:-translate-y-1 hover:border-emerald-300/35"
-                >
-                  <img
-                    src={video.poster}
-                    alt={video.title}
-                    className="absolute inset-0 h-full w-full object-cover opacity-72 transition duration-500 group-hover:scale-[1.05]"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,12,0.08),rgba(8,8,12,0.52)_42%,rgba(8,8,12,0.92))]" />
-                  <div className="relative flex h-full flex-col justify-between">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
-                        <TikTokIcon />
-                        {video.tag}
-                      </span>
-                      <span className="rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
-                        {video.duration}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-center py-6">
-                      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/14 shadow-[0_16px_36px_rgba(0,0,0,0.25)] backdrop-blur">
-                        <span className="ml-0.5 h-0 w-0 border-y-[10px] border-y-transparent border-l-[15px] border-l-white" />
-                      </span>
-                    </div>
-
-                    <div>
-                      <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
-                        <div className="h-full w-[56%] rounded-full bg-[linear-gradient(90deg,#7cff2b,#166534)]" />
+              {socialVideoCards.map((video) =>
+                video.embedId ? (
+                  <article
+                    key={video.title}
+                    className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 shadow-[0_18px_42px_rgba(0,0,0,0.25)]"
+                  >
+                    <iframe
+                      src={`https://www.tiktok.com/player/v1/${video.embedId}?controls=1&progress_bar=1&play_button=1&volume_control=1&description=0&music_info=0`}
+                      title={`${video.title} TikTok`}
+                      allow="fullscreen"
+                      className="aspect-[9/16] w-full border-0 bg-slate-950"
+                    />
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 text-white">
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">{video.tag}</p>
+                        <h4 className="mt-1 text-base font-black tracking-tight">{video.title}</h4>
                       </div>
-                      <h4 className="mt-4 text-xl font-black tracking-tight text-white">{video.title}</h4>
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200/78">Bradwear Indonesia</p>
+                      <a
+                        href={video.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-full border border-white/12 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/78 transition hover:border-emerald-300/40 hover:text-white"
+                      >
+                        Buka
+                      </a>
                     </div>
-                  </div>
-                </a>
-              ))}
+                  </article>
+                ) : (
+                  <a
+                    key={video.title}
+                    href={video.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group relative isolate aspect-[9/16] overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 p-4 text-left transition hover:-translate-y-1 hover:border-emerald-300/35"
+                  >
+                    <img
+                      src={video.poster}
+                      alt={video.title}
+                      className="absolute inset-0 h-full w-full object-cover opacity-72 transition duration-500 group-hover:scale-[1.05]"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,12,0.08),rgba(8,8,12,0.52)_42%,rgba(8,8,12,0.92))]" />
+                    <div className="relative flex h-full flex-col justify-between">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
+                          <TikTokIcon />
+                          {video.tag}
+                        </span>
+                        <span className="rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
+                          {video.duration}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-center py-6">
+                        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/14 shadow-[0_16px_36px_rgba(0,0,0,0.25)] backdrop-blur">
+                          <span className="ml-0.5 h-0 w-0 border-y-[10px] border-y-transparent border-l-[15px] border-l-white" />
+                        </span>
+                      </div>
+
+                      <div>
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
+                          <div className="h-full w-[56%] rounded-full bg-[linear-gradient(90deg,#7cff2b,#166534)]" />
+                        </div>
+                        <h4 className="mt-4 text-xl font-black tracking-tight text-white">{video.title}</h4>
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200/78">Bradwear Indonesia</p>
+                      </div>
+                    </div>
+                  </a>
+                ),
+              )}
             </div>
           </article>
 
