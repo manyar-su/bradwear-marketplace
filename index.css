@@ -725,20 +725,32 @@ a {
 
 .middle-showcase-shell {
   position: relative;
+  overflow: visible !important;
 }
 
 .middle-showcase-banner {
   border-radius: 34px;
-  overflow: hidden;
+  overflow: visible;
   background: #08111e;
 }
 
 .middle-showcase-stage {
   aspect-ratio: 16 / 7;
+  overflow: hidden;
+  background: #08111e;
+}
+
+.middle-showcase-stage .hero-banner-image {
+  object-fit: contain;
+  transform: scale(1);
 }
 
 .middle-showcase-overlay {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.36));
+}
+
+.middle-showcase-banner .hero-arrow {
+  z-index: 6;
 }
 
 .home-hero {
