@@ -50,27 +50,75 @@ const TESTIMONIALS = [
     name: 'Rizky Pratama',
     institution: 'Dinas Operasional Lapangan',
     avatar: 'RP',
-    comment: 'Bradwear bisa dipercaya untuk order seragam kantor. Kualitas jahitan bagus, bahan nyaman, dan hasilnya sesuai approval desain. Lain kali kami pesan lagi.',
+    comment: 'Bradwear bisa dipercaya untuk order seragam kantor. Kualitas jahitan bagus, bahan nyaman, dan hasilnya sesuai persetujuan desain. Kami siap pesan lagi untuk kebutuhan berikutnya.',
   },
   {
     name: 'Maya Lestari',
     institution: 'Komunitas Kesehatan Indonesia',
     avatar: 'ML',
-    comment: 'Timnya responsif, detail logo rapi, dan komunikasi order jelas dari awal. Kami puas dengan kualitas Bradwear dan akan repeat order untuk batch berikutnya.',
+    comment: 'Timnya responsif, detail logo rapi, dan komunikasi order jelas dari awal. Kami puas dengan kualitas Bradwear dan siap pesan lagi untuk batch berikutnya.',
   },
   {
     name: 'Andi Setiawan',
     institution: 'PT Karya Mandiri Nusantara',
     avatar: 'AS',
-    comment: 'Seragam custom dari Bradwear terlihat profesional. Ukuran, warna, dan finishing sesuai kebutuhan tim. Pelayanan membuat kami yakin untuk pesan lagi.',
+    comment: 'Seragam custom dari Bradwear terlihat profesional. Ukuran, warna, dan finishing sesuai kebutuhan tim. Pelayanannya membuat kami yakin untuk pesan lagi.',
   },
   {
     name: 'Nadia Safitri',
     institution: 'Event Organizer Bandung',
     avatar: 'NS',
-    comment: 'Order sample dan produksi dibantu sampai jelas. Kualitas bagus, timeline transparan, dan hasil seragam membuat tim kami lebih percaya diri.',
+    comment: 'Order sampel dan produksi dibantu sampai jelas sejak awal. Kualitas bagus, timeline transparan, dan hasil seragam membuat tim kami lebih percaya diri.',
   },
 ];
+
+const HERO_PROOF_ITEMS = [
+  {
+    label: 'Sampel awal',
+    value: 'Bisa mulai dari 1 pcs untuk cek model, bahan, dan arah desain.',
+  },
+  {
+    label: 'Estimasi normal',
+    value: 'Produksi berjalan 14-21 hari kerja setelah detail disetujui.',
+  },
+  {
+    label: 'Respons awal',
+    value: 'Brodi AI dan tim CS membantu menjawab kebutuhan awal dengan cepat.',
+  },
+] as const;
+
+const CLIENT_PROOF_ITEMS = [
+  {
+    sector: 'Instansi lapangan',
+    title: 'Hasil jadi tetap rapi untuk kebutuhan kerja aktif',
+    focus: 'Penempatan identitas, kekuatan jahitan, dan kesiapan dipakai harian.',
+    outcome: 'Cocok untuk order yang butuh tampilan profesional tanpa mengganggu mobilitas tim.',
+  },
+  {
+    sector: 'Seragam kegiatan resmi',
+    title: 'Visual lebih tegas saat dipakai untuk acara dan operasional',
+    focus: 'Warna, bordir, dan detail panel dibuat konsisten antar-item.',
+    outcome: 'Memberi kesan seragam yang lebih tertata saat dipresentasikan ke internal instansi.',
+  },
+  {
+    sector: 'Tim perusahaan',
+    title: 'Finishing lebih bersih agar nyaman dipakai dalam batch besar',
+    focus: 'Kontrol kualitas dilakukan sebelum produksi penuh berjalan.',
+    outcome: 'Memudahkan approval sebelum masuk ke pengadaan jumlah lebih banyak.',
+  },
+  {
+    sector: 'Order custom',
+    title: 'Detail desain tetap terbaca saat masuk ke produksi',
+    focus: 'Layout logo, nama, dan proporsi model disesuaikan sejak tahap brief.',
+    outcome: 'Mengurangi revisi berulang karena hasil visual sudah lebih jelas sejak awal.',
+  },
+  {
+    sector: 'Kebutuhan institusi',
+    title: 'Order terlihat siap kirim dengan tampilan yang lebih meyakinkan',
+    focus: 'Seragam dirapikan dari sisi bentuk, warna, dan kesiapan presentasi.',
+    outcome: 'Lebih mudah dipakai sebagai referensi saat konsultasi order berikutnya.',
+  },
+] as const;
 
 type LightboxSlide = {
   alt: string;
@@ -308,14 +356,8 @@ const PublicSiteView: React.FC = () => {
     const main = document.querySelector('main');
     if (!main) return;
 
-    const parallaxNodes = Array.from(
-      main.querySelectorAll<HTMLElement>('section > div, section > article, .hero-benefits > article'),
-    ).filter(
-      (node) =>
-        node.offsetHeight > 80 &&
-        !node.closest('.hero-banner-stage') &&
-        !node.closest('.faq-answer') &&
-        !node.closest('.parallax-static-zone'),
+    const parallaxNodes = Array.from(main.querySelectorAll<HTMLElement>('.elegant-parallax-block')).filter(
+      (node) => node.offsetHeight > 80 && !node.closest('.parallax-static-zone'),
     );
 
     if (parallaxNodes.length === 0) return;
@@ -331,10 +373,10 @@ const PublicSiteView: React.FC = () => {
         const rect = node.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
         const distance = (center - viewportHeight * 0.52) / viewportHeight;
-        const offset = Math.max(-14, Math.min(14, distance * -14));
+        const offset = Math.max(-6, Math.min(6, distance * -6));
         node.style.setProperty('--parallax-offset', `${offset.toFixed(2)}px`);
 
-        if (rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.08) {
+        if (rect.top < viewportHeight * 0.94 && rect.bottom > viewportHeight * 0.12) {
           node.classList.add('is-visible');
         }
       });
@@ -445,6 +487,7 @@ const PublicSiteView: React.FC = () => {
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
   );
+  const activeClientProof = CLIENT_PROOF_ITEMS[activeClientSlide % CLIENT_PROOF_ITEMS.length];
 
   const currentProductionOrder = useMemo(
     () =>
@@ -497,7 +540,7 @@ const PublicSiteView: React.FC = () => {
         <h3 className="mt-2 text-base font-black tracking-tight text-[var(--text-primary)] sm:text-lg">{product.name}</h3>
         <p className="mt-1.5 text-xs leading-relaxed text-[var(--text-secondary)] sm:mt-2 sm:text-sm">{product.description}</p>
         <div className="mt-3 flex items-center justify-between gap-2 sm:mt-4">
-          <span className="text-xs font-semibold text-[var(--text-primary)] sm:text-sm">{product.soldCount.toLocaleString('id-ID')}+ order</span>
+          <span className="text-xs font-semibold text-[var(--text-primary)] sm:text-sm">{product.soldCount.toLocaleString('id-ID')}+ pesanan</span>
           <span className="rounded-full border border-[var(--border-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] sm:px-3 sm:text-[10px] sm:tracking-[0.18em]">
             Kustom
           </span>
@@ -513,13 +556,13 @@ const PublicSiteView: React.FC = () => {
       icon: <ShippingIcon />,
     },
     {
-      title: 'Editor desain dan follow up yang singkat',
-      copy: 'Ringkasan order dibuat lebih cepat dipahami supaya revisi, approval, dan konsultasi tidak berputar-putar.',
+      title: 'Editor desain dan tindak lanjut yang jelas',
+      copy: 'Ringkasan order dibuat lebih mudah dipahami agar revisi, persetujuan desain, dan konsultasi tidak berulang.',
       icon: <WorkflowIcon />,
     },
     {
       title: 'Workshop aktif di Tasikmalaya',
-      copy: 'Tim Bradwear menangani pengembangan sample, pengecekan detail, dan kontrol kualitas sebelum produksi jalan.',
+      copy: 'Tim Bradwear menangani pengembangan sampel, pengecekan detail, dan kontrol kualitas sebelum produksi dimulai.',
       icon: <WorkshopIcon />,
     },
   ];
@@ -549,7 +592,7 @@ const PublicSiteView: React.FC = () => {
   );
 
   const renderWorkshopHighlight = () => (
-    <article className="rounded-[30px] bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
+    <article className="elegant-parallax-block rounded-[30px] bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Alamat workshop</p>
       <h3 className="mt-3 text-2xl font-black tracking-tight">Karisma Residence, Mangunreja, Tasikmalaya</h3>
       <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
@@ -569,7 +612,7 @@ const PublicSiteView: React.FC = () => {
           onClick={() => setCurrentRoute(RouteKey.TEMUKAN_TOKO)}
           className="rounded-full border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
         >
-          Detail Toko
+          Lihat Lokasi
         </button>
       </div>
     </article>
@@ -582,14 +625,18 @@ const PublicSiteView: React.FC = () => {
           <article className="hero-panel">
             <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
             <div className="hero-badge-row">
-              <span className="hero-badge">Konveksi Seragam Custom</span>
-              <span className="hero-badge">Mobile Friendly</span>
+              <span className="hero-badge">Workshop Aktif</span>
               <span className="hero-badge">Kirim Seluruh Indonesia</span>
+              <span className="hero-badge">Alur Order Lebih Jelas</span>
             </div>
             <h1>
-              Konveksi <span className="hero-highlight">seragam custom</span> untuk instansi, perusahaan, dan tim
-              seragam team yang membutuhkan seragam kustom, rapi, dan cepat.
+              Seragam <span className="hero-highlight">custom yang lebih mudah</span> dipilih, dijelaskan, lalu
+              dilanjutkan ke produksi.
             </h1>
+            <p className="hero-lead">
+              Pilih model, rapikan brief desain, lalu lanjutkan konsultasi tanpa harus mengulang kebutuhan dari awal.
+              Halaman ini dibuat untuk membantu instansi, perusahaan, dan tim kerja mengambil keputusan lebih cepat.
+            </p>
             <div className="hero-actions">
               <button
                 type="button"
@@ -601,7 +648,7 @@ const PublicSiteView: React.FC = () => {
                 }}
                 className="hero-primary brand-cta"
               >
-                Jelajahi Katalog
+                Mulai Desain
               </button>
               <a
                 href={buildWhatsAppUrl(buildConsultationMessage('seragam custom untuk instansi atau perusahaan'))}
@@ -612,19 +659,17 @@ const PublicSiteView: React.FC = () => {
                 Konsultasi ke WhatsApp
               </a>
             </div>
+            <p className="hero-action-note">
+              Mulai dari katalog jika Anda belum memilih model. Langsung ke WhatsApp jika kebutuhan dan jumlah sudah
+              lebih jelas.
+            </p>
             <div className="hero-micro-stats">
-              <div>
-                <strong>Sample</strong>
-                <span>Bisa satuan untuk approval model</span>
-              </div>
-              <div>
-                <strong>14-21 hari</strong>
-                <span>Estimasi produksi normal</span>
-              </div>
-              <div>
-                <strong>AI + CS</strong>
-                <span>Cs berbasis Ai untuk melayani anda 24/7 atau CS staff yang aktif.</span>
-              </div>
+              {HERO_PROOF_ITEMS.map((item) => (
+                <article key={item.label} className="hero-proof-card">
+                  <span className="hero-proof-label">{item.label}</span>
+                  <strong className="hero-proof-value">{item.value}</strong>
+                </article>
+              ))}
             </div>
           </article>
 
@@ -666,7 +711,7 @@ const PublicSiteView: React.FC = () => {
           {heroBenefits.map((benefit) => (
             <article
               key={benefit.title}
-              className="group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+              className="elegant-parallax-block group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
             >
               <div className="mb-4 inline-flex h-11 w-11 animate-floating items-center justify-center rounded-2xl bg-[var(--brand-accent-soft)] text-[var(--brand-accent-strong)]">
                 {benefit.icon}
@@ -678,16 +723,16 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
-      <section className="px-6 pb-8 md:px-10">
+      <section className="home-section">
         <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-          <article className="rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f7fbee,#ffffff)] p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Custom Desain Bradwear</p>
+          <article className="elegant-parallax-block rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f7fbee,#ffffff)] p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Desain Seragam Bradwear</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">
-              Mulai desain kemeja custom lalu lanjutkan pemesanan tanpa alur yang berputar
+              Pilih model kemeja yang paling dekat, lalu lanjutkan ke editor
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-              Pilih model kemeja yang paling dekat dengan kebutuhan instansi Anda, masuk ke editor desain, lalu lanjutkan
-              konsultasi atau pemesanan saat konsep sudah siap.
+              Bagian ini dipakai untuk memulai desain dari model yang sudah paling relevan, sehingga konsultasi berikutnya
+              lebih singkat dan keputusan produksi lebih cepat diambil.
             </p>
             {shirtSpotlightProduct ? (
               <div className="mt-5 rounded-[24px] bg-[var(--surface-base)] p-4 shadow-[inset_0_0_0_1px_var(--border-soft)]">
@@ -708,7 +753,7 @@ const PublicSiteView: React.FC = () => {
                 }}
                 className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
               >
-                Custom Desain
+                Lanjutkan ke Editor
               </button>
               <a
                 href={buildWhatsAppUrl(buildConsultationMessage('pesan kemeja custom untuk instansi atau perusahaan'))}
@@ -716,23 +761,23 @@ const PublicSiteView: React.FC = () => {
                 rel="noreferrer"
                 className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Pesan Sekarang
+                Konsultasi Order
               </a>
             </div>
           </article>
 
-          <article className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
-            <div className="flex items-center justify-between gap-3 px-5 pt-5">
+          <article className="elegant-parallax-block middle-showcase-shell client-proof-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+            <div className="client-proof-header flex items-center justify-between gap-3 px-5 pt-5">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Our Client</p>
-                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Galeri hasil jadi client Bradwear</h3>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Galeri Klien</p>
+                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Bukti hasil jadi dari order klien Bradwear</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCurrentRoute(RouteKey.CLIENT)}
                 className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Client
+                Buka galeri lengkap
               </button>
             </div>
 
@@ -742,7 +787,7 @@ const PublicSiteView: React.FC = () => {
                   <img
                     key={`${slide}-${index}`}
                     src={slide}
-                    alt={`Our client Bradwear ${index + 1}`}
+                    alt={`Galeri klien Bradwear ${index + 1}`}
                     className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
                   />
                 ))}
@@ -752,19 +797,29 @@ const PublicSiteView: React.FC = () => {
                   onClick={() =>
                     setLightboxSlide({
                       src: CLIENT_GALLERY_SLIDES[activeClientSlide],
-                      alt: `Our client Bradwear ${activeClientSlide + 1}`,
+                      alt: `Galeri klien Bradwear ${activeClientSlide + 1}`,
                     })
                   }
                   className="slideshow-lightbox-trigger"
-                  aria-label="Buka gambar client penuh"
+                  aria-label="Buka gambar klien penuh"
                 />
+                <div className="client-proof-overlay">
+                  <div className="client-proof-topline">
+                    <span className="client-proof-kicker">{activeClientProof.sector}</span>
+                    <span className="client-proof-count">
+                      {String(activeClientSlide + 1).padStart(2, '0')} / {String(CLIENT_GALLERY_SLIDES.length).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <h4 className="client-proof-title">{activeClientProof.title}</h4>
+                  <p className="client-proof-copy">{activeClientProof.outcome}</p>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
                 className="hero-arrow hero-arrow-left"
-                aria-label="Slide client sebelumnya"
+                aria-label="Slide klien sebelumnya"
               >
                 &lt;
               </button>
@@ -772,24 +827,38 @@ const PublicSiteView: React.FC = () => {
                 type="button"
                 onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
                 className="hero-arrow hero-arrow-right"
-                aria-label="Slide client berikutnya"
+                aria-label="Slide klien berikutnya"
               >
                 &gt;
               </button>
             </article>
+            <div className="client-proof-points">
+              <article>
+                <span>Fokus pengerjaan</span>
+                <strong>{activeClientProof.focus}</strong>
+              </article>
+              <article>
+                <span>Nilai yang ditunjukkan</span>
+                <strong>Detail lebih jelas sebelum order lanjut ke produksi.</strong>
+              </article>
+              <article>
+                <span>Fungsi galeri</span>
+                <strong>Memudahkan tim Anda membandingkan kualitas visual sebelum konsultasi.</strong>
+              </article>
+            </div>
           </article>
         </div>
       </section>
 
-      <section className="px-6 pb-6 md:px-10">
+      <section className="home-section home-section-tight">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          {topProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Top Pick' : 'Best Seller'))}
+          {topProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Pilihan Utama' : 'Paling Dicari'))}
         </div>
       </section>
 
-      <section className="px-6 pb-8 md:px-10">
+      <section className="home-section">
         <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-          <article className="overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#09090b,#172554_48%,#111827)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
+          <article className="elegant-parallax-block overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#09090b,#172554_48%,#111827)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-2xl">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-200/85">TikTok Bradwear</p>
@@ -803,7 +872,7 @@ const PublicSiteView: React.FC = () => {
                 className="brand-cta inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white"
               >
                 <TikTokIcon />
-                Buka TikTok
+                Lihat TikTok
               </a>
             </div>
 
@@ -831,7 +900,7 @@ const PublicSiteView: React.FC = () => {
                         rel="noreferrer"
                         className="rounded-full border border-white/12 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/78 transition hover:border-emerald-300/40 hover:text-white"
                       >
-                        Buka
+                        Lihat Video
                       </a>
                     </div>
                   </article>
@@ -881,7 +950,7 @@ const PublicSiteView: React.FC = () => {
           </article>
 
           <div className="grid gap-4">
-            <article className="promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7fb,#ffffff)] p-5 shadow-sm">
+            <article className="elegant-parallax-block promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7fb,#ffffff)] p-5 shadow-sm">
               <div className="promo-story-showcase promo-story-showcase-instagram">
                 {INSTAGRAM_GALLERY_SLIDES.map((slide, index) => (
                   <img
@@ -898,10 +967,10 @@ const PublicSiteView: React.FC = () => {
               </div>
               <div className="mt-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Instagram Bradwear</p>
-                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Ikuti highlight produk, workshop, dan hasil jadi di Instagram</h3>
+                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Lihat update produk, workshop, dan hasil jadi di Instagram</h3>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-                Cocok untuk melihat update feed, detail hasil produksi, dan referensi visual seragam custom Bradwear Indonesia secara cepat.
+                Buka Instagram Bradwear untuk melihat update produk, detail hasil produksi, dan referensi visual seragam custom dengan cepat.
               </p>
               <a
                 href={INSTAGRAM_URL}
@@ -914,7 +983,7 @@ const PublicSiteView: React.FC = () => {
               </a>
             </article>
 
-            <article className="promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfccb,#ffffff_55%,#dcfce7)] p-5 shadow-sm">
+            <article className="elegant-parallax-block promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfccb,#ffffff_55%,#dcfce7)] p-5 shadow-sm">
               <div className="promo-story-showcase promo-story-showcase-google">
                 {GOOGLE_PLAY_GALLERY_SLIDES.map((slide, index) => (
                   <img
@@ -955,10 +1024,10 @@ const PublicSiteView: React.FC = () => {
               </div>
               <div className="mt-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Aplikasi resmi Bradwear</p>
-                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Download aplikasi Bradwear lewat Google Play</h3>
+                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Unduh aplikasi Bradwear di Google Play</h3>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-                Buka aplikasi resmi Bradwear untuk akses yang lebih cepat ke katalog, konsultasi, dan kebutuhan order seragam custom langsung dari perangkat Anda.
+                Akses katalog, konsultasi, dan kebutuhan order seragam custom Bradwear lebih cepat langsung dari perangkat Anda.
               </p>
               <a
                 href={GOOGLE_PLAY_URL}
@@ -967,15 +1036,15 @@ const PublicSiteView: React.FC = () => {
                 className="brand-cta mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
               >
                 <GooglePlayIcon />
-                Download di Google Play
+                Unduh di Google Play
               </a>
             </article>
           </div>
         </div>
       </section>
 
-      <section className="px-6 pb-8 md:px-10">
-        <div className="bg-[var(--surface-base)] px-1 py-2 md:px-0">
+      <section className="home-section home-section-tight">
+        <div className="elegant-parallax-block faq-panel bg-[var(--surface-base)] px-1 py-2 md:px-0">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">FAQ Ringkas</p>
@@ -986,15 +1055,15 @@ const PublicSiteView: React.FC = () => {
               onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
               className="border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]"
             >
-              Ke layanan pelanggan
+              Hubungi layanan pelanggan
             </button>
           </div>
           {renderFaqAccordion()}
         </div>
       </section>
 
-      <section className="px-6 pb-8 md:px-10">
-        <div className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+      <section className="home-section">
+        <div className="elegant-parallax-block middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
           <article className="hero-banner middle-showcase-banner">
             <div className="hero-banner-stage middle-showcase-stage">
               {middleContentSlides.map((slide, index) => (
@@ -1039,13 +1108,13 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
-      <section className="px-6 pb-12 md:px-10">
-        <div className="testimonial-marquee-shell -mx-6 bg-[var(--surface-base)] py-5 md:-mx-10">
+      <section className="home-section home-section-full">
+        <div className="elegant-parallax-block testimonial-marquee-shell -mx-6 bg-[var(--surface-base)] py-5 md:-mx-10">
           <div className="mb-4 px-4 md:px-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Testimonial client</p>
-            <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Kepercayaan terhadap kualitas Bradwear</h3>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Testimoni klien</p>
+            <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Kepercayaan klien terhadap kualitas Bradwear</h3>
           </div>
-          <div className="testimonial-marquee" aria-label="Testimonial client Bradwear">
+          <div className="testimonial-marquee" aria-label="Testimoni klien Bradwear">
             <div className="testimonial-track">
               {[...TESTIMONIALS, ...TESTIMONIALS].map((item, index) => (
                 <article key={`${item.name}-${index}`} className="testimonial-card">
@@ -1213,7 +1282,7 @@ const PublicSiteView: React.FC = () => {
         <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Panduan memilih bahan, model, dan proses order seragam</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
           Halaman artikel ini dibuat untuk membantu user dan mesin pencari memahami konteks layanan Bradwear Indonesia,
-          mulai dari bahan seragam, tipe model, alur approval, sampai checklist sebelum produksi.
+          mulai dari bahan seragam, tipe model, alur persetujuan, sampai checklist sebelum produksi.
         </p>
       </section>
 
@@ -1298,10 +1367,10 @@ const PublicSiteView: React.FC = () => {
       <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
         <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Layanan Pelanggan</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Bantuan cepat untuk konsultasi, revisi, dan follow up order</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Bantuan cepat untuk konsultasi, revisi, dan tindak lanjut order</h1>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
             Tim layanan pelanggan Bradwear membantu penjelasan model, bahan, estimasi, pengumpulan data ukuran,
-            konfirmasi revisi, hingga update pengiriman.
+            konfirmasi revisi, hingga pembaruan pengiriman.
           </p>
           <div className="mt-6 space-y-3">
             {CONTACT_CHANNELS.map((channel) => (
@@ -1481,7 +1550,7 @@ const PublicSiteView: React.FC = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Temukan Toko</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Workshop dan titik lokasi Bradwear Indonesia</h1>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Lokasi ini menjadi titik konsultasi, pengembangan sample, dan koordinasi order Bradwear Indonesia untuk
+            Lokasi ini menjadi titik konsultasi, pengembangan sampel, dan koordinasi order Bradwear Indonesia untuk
             kebutuhan seragam custom di Tasikmalaya dan sekitarnya.
           </p>
           <div className="mt-6 rounded-[24px] bg-[var(--surface-subtle)] p-5">
@@ -1526,10 +1595,10 @@ const PublicSiteView: React.FC = () => {
   const renderClientGallery = () => (
     <div className="px-6 py-8 md:px-10">
       <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#102b14_48%,#183153)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Client Gallery</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight">Dokumentasi visual hasil produksi dari folder client Bradwear</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Galeri Klien</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight">Dokumentasi visual hasil produksi dari folder klien Bradwear</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Halaman ini menampilkan galeri per folder client agar hasil jadi lebih mudah dipresentasikan. Setiap blok memakai identitas visual yang disesuaikan dengan nama folder sumber asetnya.
+          Halaman ini menampilkan galeri per folder klien agar hasil jadi lebih mudah dipresentasikan. Setiap blok memakai identitas visual yang disesuaikan dengan nama folder sumber asetnya.
         </p>
       </section>
 
@@ -1537,7 +1606,7 @@ const PublicSiteView: React.FC = () => {
         {clientGalleryGroups.map((group) => {
           const meta = CLIENT_GALLERY_META[group.slug] ?? {
             title: group.name,
-            subtitle: 'Dokumentasi hasil jadi client Bradwear Indonesia.',
+            subtitle: 'Dokumentasi hasil jadi klien Bradwear Indonesia.',
             gradient: 'linear-gradient(135deg,#166534,#1d4ed8)',
             icon: <GovernmentIcon />,
           };

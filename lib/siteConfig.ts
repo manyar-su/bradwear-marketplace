@@ -46,12 +46,12 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
 ]);
 
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
-  { label: 'Home', route: RouteKey.HOME, description: 'Landing page utama Bradwear Indonesia.' },
+  { label: 'Beranda', route: RouteKey.HOME, description: 'Halaman utama Bradwear Indonesia.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
-  { label: 'Client', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi client Bradwear Indonesia.' },
+  { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
-  { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN, description: 'Bantuan konsultasi, revisi, dan follow up order.' },
+  { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN, description: 'Bantuan konsultasi, revisi, dan tindak lanjut order.' },
   { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN, description: 'Pantau status produksi dan pengiriman order Anda.' },
   { label: 'Temukan Toko', route: RouteKey.TEMUKAN_TOKO, description: 'Alamat workshop dan titik konsultasi Bradwear Tasikmalaya.' },
   { label: 'Brodi', route: RouteKey.BRAD_AI, description: 'Asisten AI untuk menjawab pertanyaan seputar layanan Bradwear.' },
@@ -65,47 +65,47 @@ export const UTILITY_NAV_ITEMS: NavItem[] = [
 ];
 
 export const ROUTE_LABELS: Record<RouteKey, string> = {
-  [RouteKey.HOME]: 'Home / Beranda',
-  [RouteKey.KATALOG]: 'Home / Katalog',
-  [RouteKey.CLIENT]: 'Home / Client Gallery',
-  [RouteKey.PANTS]: 'Home / Pants',
-  [RouteKey.ARTIKEL]: 'Home / Artikel',
-  [RouteKey.CARA_ORDER]: 'Home / Cara Order',
-  [RouteKey.LAYANAN_PELANGGAN]: 'Home / Layanan Pelanggan',
-  [RouteKey.LACAK_PESANAN]: 'Home / Lacak Pesanan',
-  [RouteKey.TEMUKAN_TOKO]: 'Home / Temukan Toko',
-  [RouteKey.BRAD_AI]: 'Home / Brodi',
-  [RouteKey.EDITOR]: 'Home / Editor Desain',
-  [RouteKey.SUMMARY]: 'Home / Ringkasan Pesanan',
+  [RouteKey.HOME]: 'Beranda',
+  [RouteKey.KATALOG]: 'Beranda / Katalog',
+  [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
+  [RouteKey.PANTS]: 'Beranda / Celana',
+  [RouteKey.ARTIKEL]: 'Beranda / Artikel',
+  [RouteKey.CARA_ORDER]: 'Beranda / Cara Order',
+  [RouteKey.LAYANAN_PELANGGAN]: 'Beranda / Layanan Pelanggan',
+  [RouteKey.LACAK_PESANAN]: 'Beranda / Lacak Pesanan',
+  [RouteKey.TEMUKAN_TOKO]: 'Beranda / Temukan Toko',
+  [RouteKey.BRAD_AI]: 'Beranda / Brodi',
+  [RouteKey.EDITOR]: 'Beranda / Editor Desain',
+  [RouteKey.SUMMARY]: 'Beranda / Ringkasan Pesanan',
 };
 
 export const CONTACT_CHANNELS: ContactChannel[] = [
   { label: 'WhatsApp Konsultasi', value: '+62 877-3683-4454', note: 'Respon untuk konsultasi model, bahan, dan estimasi order.' },
   { label: 'Area Layanan', value: 'Seluruh Indonesia', note: 'Melayani pengiriman seragam custom ke instansi, perusahaan, dan komunitas.' },
-  { label: 'Workshop', value: 'Tasikmalaya, Jawa Barat', note: 'Titik konsultasi dan pengembangan sample berada di Karisma Residence.' },
+  { label: 'Workshop', value: 'Tasikmalaya, Jawa Barat', note: 'Titik konsultasi dan pengembangan sampel berada di Karisma Residence.' },
 ];
 
 export const CUSTOMER_SERVICE_HOURS = [
   'Senin - Jumat: 08.00 - 17.00 WIB',
   'Sabtu: 08.00 - 14.00 WIB',
-  'Minggu / hari libur: follow up via WhatsApp',
+  'Minggu / hari libur: tindak lanjut via WhatsApp',
 ];
 
 export const SITE_FAQS: SiteFaqItem[] = [
   {
     slug: 'minimal-order',
-    title: 'Minimal order bisa satuan untuk sample.',
-    answer: 'Bradwear bisa membantu pembuatan satuan khusus untuk sample, contoh ukuran, atau approval model sebelum produksi lebih banyak. Untuk produksi utama, jumlah ideal tetap disesuaikan dengan model, bahan, tingkat detail, dan kebutuhan instansi agar harga, timeline, serta kontrol kualitas lebih rapi sejak awal.',
+    title: 'Minimal order bisa satuan untuk sampel.',
+    answer: 'Bradwear dapat membantu pembuatan satuan untuk sampel, contoh ukuran, atau persetujuan model sebelum masuk ke produksi utama. Untuk produksi reguler, jumlah ideal tetap disesuaikan dengan model, bahan, tingkat detail, dan kebutuhan instansi agar harga, timeline, serta kontrol kualitas lebih rapi sejak awal.',
   },
   {
     slug: 'logo-custom',
     title: 'Logo instansi dan nama personel bisa dikustom.',
-    answer: 'Tim Bradwear membantu penempatan bordir, sablon, dan layout agar tetap rapi saat produksi.',
+    answer: 'Tim Bradwear membantu penempatan bordir, sablon, dan layout nama personel agar identitas instansi tetap rapi saat diproduksi dan saat dipakai.',
   },
   {
     slug: 'lead-time',
     title: 'Estimasi produksi normal 14-21 hari kerja.',
-    answer: 'Timeline dapat lebih cepat atau lebih panjang tergantung volume, revisi desain, dan antrean produksi.',
+    answer: 'Estimasi dapat lebih cepat atau lebih panjang tergantung jumlah order, revisi desain, ketersediaan bahan, dan antrean produksi saat pesanan masuk.',
   },
   {
     slug: 'tracking',
@@ -135,7 +135,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Jenis seragam yang terlihat mirip sering punya kebutuhan pola, bahan, dan detail finishing yang berbeda.',
     body: [
       'PDH biasanya dipakai untuk kebutuhan dinas harian sehingga tampilannya lebih rapi dan formal. PDL dan model lapangan umumnya membutuhkan potongan yang lebih fungsional dengan kantong, penguat jahitan, atau bahan yang lebih tangguh.',
-      'Kesalahan memilih tipe model di awal akan memengaruhi bahan, biaya, dan waktu approval desain. Karena itu, Bradwear menyiapkan katalog terstruktur agar pelanggan bisa membedakan fungsi tiap seri dengan lebih cepat.',
+      'Kesalahan memilih tipe model di awal akan memengaruhi bahan, biaya, dan waktu persetujuan desain. Karena itu, Bradwear menyiapkan katalog terstruktur agar pelanggan bisa membedakan fungsi tiap seri dengan lebih cepat.',
       'Saat konsultasi, jelaskan konteks penggunaan seragam: di kantor, perjalanan dinas, kegiatan teknis, atau operasional lapangan. Informasi ini akan mempermudah penentuan model terbaik.',
     ],
   },
@@ -144,7 +144,7 @@ export const ARTICLES: Article[] = [
     category: 'Pemesanan',
     readTime: '6 menit',
     title: 'Tips order seragam instansi agar proses revisi dan produksi lebih cepat',
-    excerpt: 'Kejelasan data ukuran, identitas instansi, jumlah item, dan target waktu akan sangat mempercepat approval.',
+    excerpt: 'Kejelasan data ukuran, identitas instansi, jumlah item, dan target waktu akan sangat mempercepat persetujuan.',
     body: [
       'Sebelum order, siapkan daftar ukuran, pembagian gender, kebutuhan lengan, dan target tanggal pemakaian. Langkah sederhana ini membantu tim CS dan produksi menyusun estimasi dengan lebih akurat.',
       'Untuk seragam yang membutuhkan bordir logo, file referensi berkualitas baik akan mempersingkat proses penyesuaian. Jika ada panduan warna resmi instansi, lampirkan sejak awal.',
@@ -337,9 +337,9 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   ),
   [RouteKey.CLIENT]: makeMeta(
     RouteKey.CLIENT,
-    'Client Gallery Bradwear Indonesia',
-    'Lihat dokumentasi hasil produksi dan galeri client Bradwear Indonesia untuk kebutuhan instansi, medis, kejaksaan, dan pemerintah daerah.',
-    ['client gallery', 'galeri client bradwear', 'hasil jadi seragam', 'portfolio seragam custom', 'dokumentasi client']
+    'Galeri Klien Bradwear Indonesia',
+    'Lihat dokumentasi hasil produksi dan galeri klien Bradwear Indonesia untuk kebutuhan instansi, medis, kejaksaan, dan pemerintah daerah.',
+    ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien']
   ),
   [RouteKey.PANTS]: makeMeta(
     RouteKey.PANTS,
@@ -362,8 +362,8 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.LAYANAN_PELANGGAN]: makeMeta(
     RouteKey.LAYANAN_PELANGGAN,
     'Layanan Pelanggan Bradwear Indonesia',
-    'Hubungi layanan pelanggan Bradwear Indonesia untuk konsultasi model, bahan, revisi desain, estimasi produksi, dan follow up pengiriman.',
-    ['customer service bradwear', 'whatsapp konveksi', 'konsultasi seragam', 'follow up order seragam', 'admin seragam custom']
+    'Hubungi layanan pelanggan Bradwear Indonesia untuk konsultasi model, bahan, revisi desain, estimasi produksi, dan tindak lanjut pengiriman.',
+    ['customer service bradwear', 'whatsapp konveksi', 'konsultasi seragam', 'tindak lanjut order seragam', 'admin seragam custom']
   ),
   [RouteKey.LACAK_PESANAN]: makeMeta(
     RouteKey.LACAK_PESANAN,
@@ -374,7 +374,7 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.TEMUKAN_TOKO]: makeMeta(
     RouteKey.TEMUKAN_TOKO,
     'Temukan Toko Bradwear Indonesia di Tasikmalaya',
-    'Kunjungi lokasi Bradwear Indonesia di Karisma Residence, Mangunreja, Kabupaten Tasikmalaya, Jawa Barat untuk konsultasi dan pengembangan sample.',
+    'Kunjungi lokasi Bradwear Indonesia di Karisma Residence, Mangunreja, Kabupaten Tasikmalaya, Jawa Barat untuk konsultasi dan pengembangan sampel.',
     ['alamat bradwear', 'konveksi tasikmalaya', 'workshop seragam jawa barat', 'lokasi workshop seragam', 'toko seragam tasikmalaya']
   ),
   [RouteKey.BRAD_AI]: makeMeta(

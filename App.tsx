@@ -13,6 +13,7 @@ import BradAiChat from './components/BradAiChat';
 const App: React.FC = () => {
   const { currentRoute, setCurrentRoute, theme, setTheme, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
+  const [showScrollTop, setShowScrollTop] = React.useState(false);
 
   useEffect(() => {
     preloadCriticalAssets();
@@ -32,6 +33,43 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.querySelector('main')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [currentRoute]);
+
+  useEffect(() => {
+    const main = document.querySelector('main');
+    const threshold = 140;
+
+    const updateScrollTopVisibility = () => {
+      const mainScrollable = main instanceof HTMLElement ? main : null;
+      const hasMainOverflow = mainScrollable
+        ? mainScrollable.scrollHeight - mainScrollable.clientHeight > threshold
+        : false;
+      const mainAtBottom = hasMainOverflow && mainScrollable
+        ? mainScrollable.scrollHeight - mainScrollable.scrollTop - mainScrollable.clientHeight <= threshold
+        : false;
+      const hasWindowOverflow = document.documentElement.scrollHeight - window.innerHeight > threshold;
+      const windowAtBottom =
+        hasWindowOverflow && document.documentElement.scrollHeight - window.scrollY - window.innerHeight <= threshold;
+
+      setShowScrollTop(mainAtBottom || windowAtBottom);
+    };
+
+    updateScrollTopVisibility();
+
+    window.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
+    window.addEventListener('resize', updateScrollTopVisibility);
+    main?.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updateScrollTopVisibility);
+      window.removeEventListener('resize', updateScrollTopVisibility);
+      main?.removeEventListener('scroll', updateScrollTopVisibility);
+    };
+  }, [currentRoute]);
+
+  const handleScrollTop = React.useCallback(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    document.querySelector('main')?.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-[var(--surface-subtle)] text-[var(--text-primary)]">
@@ -79,18 +117,35 @@ const App: React.FC = () => {
                   <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
                 </div>
               ) : null}
-              <button
-                type="button"
-                onClick={() => setShowBradAiWidget((current) => !current)}
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
-                  theme === 'dark'
-                    ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
-                    : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
-                }`}
-              >
-                <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
-                Brodi
-              </button>
+              <div className="flex items-center justify-end gap-2 sm:gap-3">
+                {showScrollTop ? (
+                  <button
+                    type="button"
+                    onClick={handleScrollTop}
+                    className={`animate-fade-in-up inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:px-4 sm:py-3 sm:text-sm ${
+                      theme === 'dark'
+                        ? 'border border-white/10 bg-[linear-gradient(135deg,#102235,#1e3a4d)] text-[#effff5]'
+                        : 'border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff,#ecfccb)] text-[var(--text-primary)]'
+                    }`}
+                    aria-label="Scroll ke atas"
+                  >
+                    <span className="text-sm sm:text-base">↑</span>
+                    Up
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setShowBradAiWidget((current) => !current)}
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
+                    theme === 'dark'
+                      ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
+                      : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
+                  }`}
+                >
+                  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
+                  Brodi
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

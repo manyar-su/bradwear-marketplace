@@ -1,7 +1,7 @@
 {
   "name": "bradermock-ui-ux-design",
   "private": false,
-  "version": "1.10.6",
+  "version": "1.10.8",
   "type": "module",
   "scripts": {
     "dev": "vite",

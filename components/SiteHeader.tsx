@@ -186,7 +186,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
               onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}
               className="design-cta"
             >
-              Mulai Design Custom
+              Mulai Desain
             </button>
           </div>
 
@@ -198,7 +198,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                   onClick={() => onNavigate(route)}
                   className={`flow-link ${currentRoute === route ? 'is-active' : ''}`}
                 >
-                  {route === RouteKey.HOME ? 'Home' : route === RouteKey.EDITOR ? 'Editor' : 'Summary'}
+                  {route === RouteKey.HOME ? 'Beranda' : route === RouteKey.EDITOR ? 'Editor' : 'Ringkasan'}
                 </button>
               </li>
             ))}
