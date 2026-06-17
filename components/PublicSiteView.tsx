@@ -213,7 +213,6 @@ const PublicSiteView: React.FC = () => {
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
-  const [activeShirtSlide, setActiveShirtSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
@@ -232,20 +231,6 @@ const PublicSiteView: React.FC = () => {
     () => (ASSETS.CONTENT.MIDDLE_SLIDES?.length ? ASSETS.CONTENT.MIDDLE_SLIDES : safeHeroSlides).filter(Boolean),
     [safeHeroSlides],
   );
-  const shirtShowcaseSlides = useMemo(
-    () =>
-      [
-        ASSETS.KEMEJA.BRAD_V3.FRONT,
-        ASSETS.KEMEJA.BRAD_V4.FRONT,
-        ASSETS.KEMEJA.PDH.FRONT,
-        ASSETS.KEMEJA.EXECUTIVE.FRONT,
-        ...(ASSETS.KEMEJA.BRAD_V3.GALLERY ?? []),
-      ]
-        .filter(Boolean)
-        .filter((slide, index, allSlides) => allSlides.indexOf(slide) === index),
-    [],
-  );
-
   useEffect(() => {
     if (safeHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
@@ -261,14 +246,6 @@ const PublicSiteView: React.FC = () => {
     }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [middleContentSlides]);
-
-  useEffect(() => {
-    if (shirtShowcaseSlides.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveShirtSlide((prev) => (prev + 1) % shirtShowcaseSlides.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, [shirtShowcaseSlides]);
 
   useEffect(() => {
     if (CLIENT_GALLERY_SLIDES.length < 2) return;
@@ -698,26 +675,26 @@ const PublicSiteView: React.FC = () => {
           <article className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
             <div className="flex items-center justify-between gap-3 px-5 pt-5">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Slider Kemeja</p>
-                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Preview model kemeja custom</h3>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Our Client</p>
+                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Galeri hasil jadi client Bradwear</h3>
               </div>
               <button
                 type="button"
-                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
                 className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Lihat katalog
+                Client
               </button>
             </div>
 
             <article className="hero-banner middle-showcase-banner mt-4">
-              <div className="hero-banner-stage middle-showcase-stage">
-                {shirtShowcaseSlides.map((slide, index) => (
+              <div className="hero-banner-stage middle-showcase-stage client-gallery-stage client-fullscreen-stage">
+                {CLIENT_GALLERY_SLIDES.map((slide, index) => (
                   <img
                     key={`${slide}-${index}`}
                     src={slide}
-                    alt={`Slider kemeja Bradwear ${index + 1}`}
-                    className={`hero-banner-image ${index === activeShirtSlide ? 'is-active' : ''}`}
+                    alt={`Our client Bradwear ${index + 1}`}
+                    className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
                   />
                 ))}
                 <div className="hero-banner-overlay middle-showcase-overlay" />
@@ -725,17 +702,17 @@ const PublicSiteView: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveShirtSlide((prev) => (prev - 1 + shirtShowcaseSlides.length) % shirtShowcaseSlides.length)}
+                onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
                 className="hero-arrow hero-arrow-left"
-                aria-label="Slide kemeja sebelumnya"
+                aria-label="Slide client sebelumnya"
               >
                 &lt;
               </button>
               <button
                 type="button"
-                onClick={() => setActiveShirtSlide((prev) => (prev + 1) % shirtShowcaseSlides.length)}
+                onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
                 className="hero-arrow hero-arrow-right"
-                aria-label="Slide kemeja berikutnya"
+                aria-label="Slide client berikutnya"
               >
                 &gt;
               </button>
@@ -903,54 +880,6 @@ const PublicSiteView: React.FC = () => {
             </button>
           </div>
           {renderFaqAccordion()}
-        </div>
-      </section>
-
-      <section className="px-6 pb-8 md:px-10">
-        <div className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-5">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Galeri client</p>
-              <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Dokumentasi hasil jadi Bradwear</h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setCurrentRoute(RouteKey.CLIENT)}
-              className="border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-            >
-              Lihat client
-            </button>
-          </div>
-          <article className="hero-banner middle-showcase-banner">
-            <div className="hero-banner-stage middle-showcase-stage client-gallery-stage">
-              {CLIENT_GALLERY_SLIDES.map((slide, index) => (
-                <img
-                  key={`${slide}-${index}`}
-                  src={slide}
-                  alt={`Galeri client Bradwear ${index + 1}`}
-                  className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
-                />
-              ))}
-              <div className="hero-banner-overlay middle-showcase-overlay" />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
-              className="hero-arrow hero-arrow-left"
-              aria-label="Slide galeri client sebelumnya"
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
-              className="hero-arrow hero-arrow-right"
-              aria-label="Slide galeri client berikutnya"
-            >
-              &gt;
-            </button>
-          </article>
         </div>
       </section>
 

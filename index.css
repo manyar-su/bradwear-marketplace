@@ -749,6 +749,10 @@ a {
   aspect-ratio: 16 / 8;
 }
 
+.client-fullscreen-stage .hero-banner-image {
+  object-fit: cover;
+}
+
 .middle-showcase-overlay {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.36));
 }
