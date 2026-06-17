@@ -1,5 +1,10 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS } from '../assets';
+import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
+import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
+import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (2).jpeg';
+import clientSlide4 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
+import clientSlide5 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.23.jpeg';
 import { useStore } from '../context/StoreContext';
 import {
   ARTICLES,
@@ -30,6 +35,35 @@ const TIKTOK_WORKSHOP_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/vid
 const TIKTOK_WORKSHOP_EMBED_ID = '7650752558176210197';
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bradwear.app';
+const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3, clientSlide4, clientSlide5].filter(Boolean);
+const SLIDESHOW_INTERVAL_MS = 5400;
+
+const TESTIMONIALS = [
+  {
+    name: 'Rizky Pratama',
+    institution: 'Dinas Operasional Lapangan',
+    avatar: 'RP',
+    comment: 'Bradwear bisa dipercaya untuk order seragam kantor. Kualitas jahitan bagus, bahan nyaman, dan hasilnya sesuai approval desain. Lain kali kami pesan lagi.',
+  },
+  {
+    name: 'Maya Lestari',
+    institution: 'Komunitas Kesehatan Indonesia',
+    avatar: 'ML',
+    comment: 'Timnya responsif, detail logo rapi, dan komunikasi order jelas dari awal. Kami puas dengan kualitas Bradwear dan akan repeat order untuk batch berikutnya.',
+  },
+  {
+    name: 'Andi Setiawan',
+    institution: 'PT Karya Mandiri Nusantara',
+    avatar: 'AS',
+    comment: 'Seragam custom dari Bradwear terlihat profesional. Ukuran, warna, dan finishing sesuai kebutuhan tim. Pelayanan membuat kami yakin untuk pesan lagi.',
+  },
+  {
+    name: 'Nadia Safitri',
+    institution: 'Event Organizer Bandung',
+    avatar: 'NS',
+    comment: 'Order sample dan produksi dibantu sampai jelas. Kualitas bagus, timeline transparan, dan hasil seragam membuat tim kami lebih percaya diri.',
+  },
+];
 
 const getHoverImage = (product: { image: string; images?: { back?: string }; gallery?: string[] }) => {
   const candidates = [product.images?.back, ...(product.gallery ?? [])].filter(Boolean) as string[];
@@ -180,6 +214,7 @@ const PublicSiteView: React.FC = () => {
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
   const [activeShirtSlide, setActiveShirtSlide] = useState(0);
+  const [activeClientSlide, setActiveClientSlide] = useState(0);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
@@ -215,7 +250,7 @@ const PublicSiteView: React.FC = () => {
     if (safeHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length);
-    }, 4200);
+    }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
 
@@ -223,7 +258,7 @@ const PublicSiteView: React.FC = () => {
     if (middleContentSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveMiddleSlide((prev) => (prev + 1) % middleContentSlides.length);
-    }, 3600);
+    }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [middleContentSlides]);
 
@@ -231,9 +266,17 @@ const PublicSiteView: React.FC = () => {
     if (shirtShowcaseSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveShirtSlide((prev) => (prev + 1) % shirtShowcaseSlides.length);
-    }, 3200);
+    }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [shirtShowcaseSlides]);
+
+  useEffect(() => {
+    if (CLIENT_GALLERY_SLIDES.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length);
+    }, SLIDESHOW_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -456,22 +499,22 @@ const PublicSiteView: React.FC = () => {
   ];
 
   const renderFaqAccordion = () => (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-3 md:grid-cols-2">
       {SITE_FAQS.map((faq) => {
         const isOpen = openFaqSlug === faq.slug;
 
         return (
-          <article key={faq.slug} className="rounded-[24px] bg-[var(--surface-subtle)] p-2">
+          <article key={faq.slug} className="faq-card bg-[var(--surface-subtle)] p-1.5">
             <button
               type="button"
               onClick={() => setOpenFaqSlug(isOpen ? null : faq.slug)}
-              className="flex w-full items-start justify-between gap-3 rounded-[18px] px-4 py-4 text-left transition hover:bg-[var(--surface-base)]"
+              className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition hover:bg-[var(--surface-base)]"
             >
-              <span className="text-base font-bold leading-relaxed text-[var(--text-primary)]">{faq.title}</span>
+              <span className="text-sm font-bold leading-snug text-[var(--text-primary)]">{faq.title}</span>
               <span className={`faq-chevron ${isOpen ? 'open' : ''}`}>+</span>
             </button>
             <div className={`faq-answer ${isOpen ? 'open' : ''}`}>
-              <p className="px-4 pb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
+              <p className="px-4 pb-3 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
             </div>
           </article>
         );
@@ -545,8 +588,8 @@ const PublicSiteView: React.FC = () => {
             </div>
             <div className="hero-micro-stats">
               <div>
-                <strong>12 pcs</strong>
-                <span>Minimal order per model</span>
+                <strong>Sample</strong>
+                <span>Bisa satuan untuk approval model</span>
               </div>
               <div>
                 <strong>14-21 hari</strong>
@@ -652,7 +695,7 @@ const PublicSiteView: React.FC = () => {
             </div>
           </article>
 
-          <article className="middle-showcase-shell overflow-hidden rounded-[34px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+          <article className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
             <div className="flex items-center justify-between gap-3 px-5 pt-5">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Slider Kemeja</p>
@@ -844,17 +887,17 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
-      <section className="px-6 pb-10 md:px-10">
-        <div className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <section className="px-6 pb-8 md:px-10">
+        <div className="border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm md:p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Ringkas</p>
-              <h3 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Informasi yang paling sering dicari</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">FAQ Ringkas</p>
+              <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Informasi yang paling sering dicari</h3>
             </div>
             <button
               type="button"
               onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
-              className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+              className="border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]"
             >
               Ke layanan pelanggan
             </button>
@@ -863,8 +906,56 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
-      <section className="px-6 pb-12 md:px-10">
-        <div className="middle-showcase-shell overflow-hidden rounded-[34px] border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+      <section className="px-6 pb-8 md:px-10">
+        <div className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-5">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Galeri client</p>
+              <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Dokumentasi hasil jadi Bradwear</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCurrentRoute(RouteKey.CLIENT)}
+              className="border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+            >
+              Lihat client
+            </button>
+          </div>
+          <article className="hero-banner middle-showcase-banner">
+            <div className="hero-banner-stage middle-showcase-stage client-gallery-stage">
+              {CLIENT_GALLERY_SLIDES.map((slide, index) => (
+                <img
+                  key={`${slide}-${index}`}
+                  src={slide}
+                  alt={`Galeri client Bradwear ${index + 1}`}
+                  className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
+                />
+              ))}
+              <div className="hero-banner-overlay middle-showcase-overlay" />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
+              className="hero-arrow hero-arrow-left"
+              aria-label="Slide galeri client sebelumnya"
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
+              className="hero-arrow hero-arrow-right"
+              aria-label="Slide galeri client berikutnya"
+            >
+              &gt;
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section className="px-6 pb-8 md:px-10">
+        <div className="middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
           <article className="hero-banner middle-showcase-banner">
             <div className="hero-banner-stage middle-showcase-stage">
               {middleContentSlides.map((slide, index) => (
@@ -895,6 +986,34 @@ const PublicSiteView: React.FC = () => {
               &gt;
             </button>
           </article>
+        </div>
+      </section>
+
+      <section className="px-6 pb-12 md:px-10">
+        <div className="testimonial-marquee-shell border border-[var(--border-soft)] bg-[var(--surface-base)] py-5 shadow-sm">
+          <div className="mb-4 px-4 md:px-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Testimonial client</p>
+            <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Kepercayaan terhadap kualitas Bradwear</h3>
+          </div>
+          <div className="testimonial-marquee" aria-label="Testimonial client Bradwear">
+            <div className="testimonial-track">
+              {[...TESTIMONIALS, ...TESTIMONIALS].map((item, index) => (
+                <article key={`${item.name}-${index}`} className="testimonial-card">
+                  <div className="flex items-center gap-3">
+                    <div className="testimonial-avatar">{item.avatar}</div>
+                    <div>
+                      <h4 className="text-sm font-black text-[var(--text-primary)]">{item.name}</h4>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{item.institution}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-sm font-black tracking-[0.14em] text-amber-500" aria-label="Rating 5 dari 5">
+                    ★★★★★
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{item.comment}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </>

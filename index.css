@@ -685,7 +685,7 @@ a {
 .hero-banner {
   position: relative;
   overflow: visible;
-  border-radius: 28px;
+  border-radius: 0;
   background: #0f172a;
   box-shadow: var(--shadow-md);
 }
@@ -696,7 +696,7 @@ a {
   height: auto;
   aspect-ratio: 3 / 2;
   overflow: hidden;
-  border-radius: inherit;
+  border-radius: 0;
 }
 
 .hero-banner-image {
@@ -707,8 +707,8 @@ a {
   object-fit: cover;
   object-position: center;
   opacity: 0;
-  transform: scale(1.04);
-  transition: opacity 500ms var(--ease-smooth), transform 1000ms var(--ease-smooth);
+  transform: scale(1.015);
+  transition: opacity 1100ms var(--ease-smooth), transform 1800ms var(--ease-smooth);
 }
 
 .hero-banner-image.is-active {
@@ -729,7 +729,7 @@ a {
 }
 
 .middle-showcase-banner {
-  border-radius: 34px;
+  border-radius: 0;
   overflow: visible;
   background: #08111e;
 }
@@ -745,12 +745,70 @@ a {
   transform: scale(1);
 }
 
+.client-gallery-stage {
+  aspect-ratio: 16 / 8;
+}
+
 .middle-showcase-overlay {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.36));
 }
 
 .middle-showcase-banner .hero-arrow {
   z-index: 6;
+}
+
+.faq-card,
+.testimonial-marquee-shell,
+.testimonial-card {
+  border-radius: 0;
+}
+
+.testimonial-marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
+.testimonial-track {
+  display: flex;
+  width: max-content;
+  gap: 14px;
+  padding-inline: 16px;
+  animation: testimonial-marquee 56s linear infinite;
+}
+
+.testimonial-marquee:hover .testimonial-track {
+  animation-play-state: paused;
+}
+
+.testimonial-card {
+  width: min(340px, 78vw);
+  flex: 0 0 auto;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-subtle);
+  padding: 18px;
+}
+
+.testimonial-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: linear-gradient(135deg, #0f172a, #16a34a);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@keyframes testimonial-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .home-hero {
@@ -937,13 +995,13 @@ a {
 }
 
 .hero-arrow-left {
-  left: 0;
-  transform: translate(-50%, -50%);
+  left: 10px;
+  transform: translateY(-50%);
 }
 
 .hero-arrow-right {
-  right: 0;
-  transform: translate(50%, -50%);
+  right: 10px;
+  transform: translateY(-50%);
 }
 
 .hero-dots {

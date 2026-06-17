@@ -94,8 +94,8 @@ export const CUSTOMER_SERVICE_HOURS = [
 export const SITE_FAQS: SiteFaqItem[] = [
   {
     slug: 'minimal-order',
-    title: 'Minimal order mulai dari 12 pcs per model.',
-    answer: 'Cocok untuk kebutuhan instansi, tim lapangan, komunitas, dan pengadaan perusahaan.',
+    title: 'Minimal order bisa satuan untuk sample.',
+    answer: 'Bradwear bisa membantu pembuatan satuan khusus untuk sample, contoh ukuran, atau approval model sebelum produksi lebih banyak. Untuk produksi utama, jumlah ideal tetap disesuaikan dengan model, bahan, tingkat detail, dan kebutuhan instansi agar harga, timeline, serta kontrol kualitas lebih rapi sejak awal.',
   },
   {
     slug: 'logo-custom',
