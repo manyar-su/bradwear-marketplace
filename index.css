@@ -185,11 +185,11 @@ a {
 }
 
 .site-utility-controls {
+  display: none;
   gap: 10px;
 }
 
-.site-utility-link,
-.locale-chip {
+.site-utility-link {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
@@ -207,12 +207,6 @@ a {
 
 .site-utility-link:hover {
   background: #e5e7eb;
-  color: #111827;
-}
-
-.locale-chip {
-  border: 0;
-  background: #f3f4f6;
   color: #111827;
 }
 
@@ -460,7 +454,7 @@ a {
 }
 
 .route-chip-mobile,
-.theme-toggle-mobile {
+.design-cta-mobile {
   display: none;
 }
 
@@ -479,31 +473,6 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid var(--border-soft);
-  border-radius: 999px;
-  background: var(--surface-soft);
-  padding: 4px;
-}
-
-.theme-toggle-option {
-  border-radius: 999px;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 800;
-  padding: 7px 10px;
-  transition: background 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
-}
-
-.theme-toggle-option.is-active {
-  background: var(--surface-base);
-  color: var(--text-primary);
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
 }
 
 .route-chip {
@@ -1797,14 +1766,14 @@ a {
   }
 
   .site-utility {
-    display: flex;
     gap: 8px;
-    min-height: 48px;
-    padding: 6px 10px;
+    min-height: 56px;
+    padding: 8px 10px;
   }
 
   .site-utility-leading {
     gap: 0;
+    flex: 0 0 auto;
   }
 
   .site-utility-links,
@@ -1813,27 +1782,15 @@ a {
   }
 
   .site-utility-controls {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
     gap: 6px;
   }
 
-  .theme-toggle {
-    gap: 2px;
-    padding: 3px;
-  }
-
-  .theme-toggle-option {
-    padding: 7px 9px;
-  }
-
-  .locale-chip {
-    padding: 8px 10px;
-  }
-
   .site-nav {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-    min-height: auto;
-    padding: 8px 10px 10px;
+    display: none;
   }
 
   .brand-mark {
@@ -1852,6 +1809,17 @@ a {
 
   .route-chip-mobile {
     display: inline-flex;
+    max-width: 92px;
+    overflow: hidden;
+    order: 2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .design-cta-mobile {
+    display: inline-flex;
+    order: 3;
+    flex: 0 0 auto;
   }
 
   .brand-mark-shell {
@@ -1865,19 +1833,10 @@ a {
     height: 30px;
   }
 
-  .market-nav,
-  .nav-actions {
-    width: 100%;
-  }
-
-  .market-nav {
-    order: 2;
-    border-top: 0;
-    padding-top: 0;
-  }
-
   .mobile-main-menu {
     display: block;
+    order: 1;
+    flex: 0 0 auto;
   }
 
   .market-nav-desktop {
@@ -1885,18 +1844,18 @@ a {
   }
 
   .mobile-main-menu-trigger {
-    width: 100%;
-    min-height: 44px;
-    justify-content: flex-start;
+    min-height: 40px;
+    justify-content: center;
     border-radius: 16px;
     border: 1px solid var(--border-soft);
     background: var(--surface-base);
-    padding: 10px 14px;
+    padding: 8px 12px;
   }
 
   .mobile-main-menu-panel {
-    left: 0;
+    left: auto;
     right: 0;
+    width: min(320px, calc(100vw - 20px));
   }
 
   .mobile-catalog-dropdown-menu {
@@ -1909,33 +1868,9 @@ a {
     text-align: left;
   }
 
-  .nav-actions {
-    order: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-  }
-
-  .nav-route-details {
-    order: 1;
-    width: auto;
-    min-width: 0;
-  }
-
   .route-chip {
-    max-width: 138px;
-    overflow: hidden;
     padding: 8px 11px;
     font-size: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .nav-action-row {
-    order: 2;
-    width: auto;
-    flex: 0 0 auto;
   }
 
   .design-cta {

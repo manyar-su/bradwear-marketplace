@@ -11,7 +11,7 @@ import SiteHeader from './components/SiteHeader';
 import BradAiChat from './components/BradAiChat';
 
 const App: React.FC = () => {
-  const { currentRoute, setCurrentRoute, theme, setTheme, selectedProduct, products, setPreferredCatalogCategory } = useStore();
+  const { currentRoute, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
 
@@ -77,9 +77,7 @@ const App: React.FC = () => {
         <div className="web-shell min-h-screen overflow-hidden">
           <SiteHeader
             currentRoute={currentRoute}
-            theme={theme}
             selectedProductName={selectedProduct?.name}
-            onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
             onSelectCatalogCategory={(category) => {
               setPreferredCatalogCategory(category);
               setCurrentRoute(category === 'Celana' ? RouteKey.PANTS : RouteKey.KATALOG);
@@ -122,27 +120,19 @@ const App: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleScrollTop}
-                    className={`animate-fade-in-up inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:px-4 sm:py-3 sm:text-sm ${
-                      theme === 'dark'
-                        ? 'border border-white/10 bg-[linear-gradient(135deg,#102235,#1e3a4d)] text-[#effff5]'
-                        : 'border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff,#ecfccb)] text-[var(--text-primary)]'
-                    }`}
+                    className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff,#ecfccb)] px-3 py-2 text-xs font-black tracking-tight text-[var(--text-primary)] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:px-4 sm:py-3 sm:text-sm"
                     aria-label="Scroll ke atas"
                   >
-                    <span className="text-sm sm:text-base">↑</span>
+                    <span className="text-sm sm:text-base">^</span>
                     Up
                   </button>
                 ) : null}
                 <button
                   type="button"
                   onClick={() => setShowBradAiWidget((current) => !current)}
-                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black tracking-tight shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm ${
-                    theme === 'dark'
-                      ? 'border border-[#8dfc35]/20 bg-[linear-gradient(135deg,#6cf30c,#224d0d)] text-[#041102]'
-                      : 'bg-[linear-gradient(135deg,#75f21a,#2c7a12)] text-[#071106]'
-                  }`}
+                  className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-3 py-2 text-xs font-black tracking-tight text-[#071106] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
                 >
-                  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base sm:h-10 sm:w-10 sm:text-lg ${theme === 'dark' ? 'bg-black/15 text-[#031001]' : 'bg-white/25 text-white'}`}>AI</span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-base text-white sm:h-10 sm:w-10 sm:text-lg">AI</span>
                   Brodi
                 </button>
               </div>

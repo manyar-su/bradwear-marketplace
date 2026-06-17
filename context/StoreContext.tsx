@@ -41,9 +41,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return pathToRoute(window.location.pathname) || persistedRoute || RouteKey.HOME;
   });
 
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('bradwear_theme') as 'light' | 'dark') || 'light';
-  });
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [preferredCatalogCategory, setPreferredCatalogCategory] = useState<Category>(() => {
@@ -115,10 +113,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // --- EFFECTS ---
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('bradwear_theme');
+    if (theme !== 'light') {
+      setTheme('light');
     }
   }, [theme]);
 
@@ -126,7 +124,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     localStorage.setItem('bradwear_products', JSON.stringify(products));
     localStorage.setItem('bradwear_production_orders', JSON.stringify(productionOrders));
 
-    localStorage.setItem('bradwear_theme', theme);
     localStorage.setItem('bradwear_current_route', currentRoute);
     localStorage.setItem('bradwear_catalog_category', preferredCatalogCategory);
     localStorage.setItem('bradwear_order_code', orderCode);
@@ -137,7 +134,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     } else {
       localStorage.removeItem('bradwear_selected_product');
     }
-  }, [products, productionOrders, currentRoute, theme, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
+  }, [products, productionOrders, currentRoute, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
 
   useEffect(() => {
     const handlePopState = () => {

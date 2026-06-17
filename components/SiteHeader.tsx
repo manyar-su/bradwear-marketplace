@@ -5,9 +5,7 @@ import { ASSETS } from '../assets';
 
 interface SiteHeaderProps {
   currentRoute: RouteKey;
-  theme: 'light' | 'dark';
   selectedProductName?: string | null;
-  onToggleTheme: () => void;
   onNavigate: (route: RouteKey) => void;
   onSelectCatalogCategory: (category: Category) => void;
 }
@@ -17,9 +15,7 @@ const catalogCategories: Category[] = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Po
 
 const SiteHeader: React.FC<SiteHeaderProps> = ({
   currentRoute,
-  theme,
   selectedProductName,
-  onToggleTheme,
   onNavigate,
   onSelectCatalogCategory,
 }) => {
@@ -52,27 +48,6 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
         </div>
 
         <div className="site-utility-controls">
-          <button
-            type="button"
-            onClick={onToggleTheme}
-            className="theme-toggle theme-toggle-utility"
-            aria-label={theme === 'dark' ? 'Aktifkan tema terang' : 'Aktifkan tema gelap'}
-          >
-            <span className={`theme-toggle-option ${theme === 'light' ? 'is-active' : ''}`}>Light</span>
-            <span className={`theme-toggle-option ${theme === 'dark' ? 'is-active' : ''}`}>Dark</span>
-          </button>
-          <span className="locale-chip">ID</span>
-        </div>
-      </div>
-
-      <div className="site-nav">
-        <button className="brand-mark brand-mark-mobile" onClick={() => onNavigate(RouteKey.HOME)} aria-label="Bradwear home">
-          <span className="brand-mark-shell">
-            <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
-          </span>
-        </button>
-
-        <nav aria-label="Menu marketplace" className="market-nav">
           <details className="mobile-main-menu">
             <summary className="market-link mobile-main-menu-trigger">Menu</summary>
             <div className="mobile-main-menu-panel">
@@ -118,7 +93,19 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
               )}
             </div>
           </details>
+          <span className="route-chip route-chip-mobile">{ROUTE_LABELS[currentRoute]}</span>
+          <button
+            type="button"
+            onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}
+            className="design-cta design-cta-mobile"
+          >
+            Mulai Desain
+          </button>
+        </div>
+      </div>
 
+      <div className="site-nav">
+        <nav aria-label="Menu marketplace" className="market-nav">
           <ul className="no-scrollbar market-nav-desktop flex items-center gap-1 overflow-x-auto">
             {PRIMARY_NAV_ITEMS.map((item) => (
               <li key={item.route}>
@@ -177,7 +164,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
 
         <div className="nav-actions">
           <div className="nav-route-details">
-            <span className="route-chip route-chip-mobile">{ROUTE_LABELS[currentRoute]}</span>
+            <span className="route-chip route-chip-desktop">{ROUTE_LABELS[currentRoute]}</span>
           </div>
 
           <div className="nav-action-row">
