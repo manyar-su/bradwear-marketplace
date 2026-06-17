@@ -74,7 +74,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
 
         <nav aria-label="Menu marketplace" className="market-nav">
           <details className="mobile-main-menu">
-            <summary className="market-link mobile-main-menu-trigger">Home</summary>
+            <summary className="market-link mobile-main-menu-trigger">Menu</summary>
             <div className="mobile-main-menu-panel">
               {PRIMARY_NAV_ITEMS.map((item) =>
                 item.route === RouteKey.KATALOG ? (

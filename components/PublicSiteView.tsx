@@ -5,6 +5,11 @@ import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 a
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (2).jpeg';
 import clientSlide4 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
 import clientSlide5 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.23.jpeg';
+import instagramShowcase from '../assets/Instagram/ChatGPT Image Jun 18, 2026, 04_11_18 AM.png';
+import googlePlaySlide1 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.54.jpeg';
+import googlePlaySlide2 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.55.jpeg';
+import googlePlaySlide3 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.55 (1).jpeg';
+import googlePlaySlide4 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.56.jpeg';
 import { useStore } from '../context/StoreContext';
 import {
   ARTICLES,
@@ -36,6 +41,8 @@ const TIKTOK_WORKSHOP_EMBED_ID = '7650752558176210197';
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bradwear.app';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3, clientSlide4, clientSlide5].filter(Boolean);
+const INSTAGRAM_GALLERY_SLIDES = [instagramShowcase].filter(Boolean);
+const GOOGLE_PLAY_GALLERY_SLIDES = [googlePlaySlide1, googlePlaySlide2, googlePlaySlide3, googlePlaySlide4].filter(Boolean);
 const SLIDESHOW_INTERVAL_MS = 5400;
 
 const TESTIMONIALS = [
@@ -219,6 +226,8 @@ const PublicSiteView: React.FC = () => {
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
+  const [activeInstagramSlide, setActiveInstagramSlide] = useState(0);
+  const [activeGooglePlaySlide, setActiveGooglePlaySlide] = useState(0);
   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
@@ -257,6 +266,22 @@ const PublicSiteView: React.FC = () => {
     if (CLIENT_GALLERY_SLIDES.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length);
+    }, SLIDESHOW_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (INSTAGRAM_GALLERY_SLIDES.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveInstagramSlide((prev) => (prev + 1) % INSTAGRAM_GALLERY_SLIDES.length);
+    }, SLIDESHOW_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (GOOGLE_PLAY_GALLERY_SLIDES.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveGooglePlaySlide((prev) => (prev + 1) % GOOGLE_PLAY_GALLERY_SLIDES.length);
     }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, []);
@@ -509,13 +534,13 @@ const PublicSiteView: React.FC = () => {
             <button
               type="button"
               onClick={() => setOpenFaqSlug(isOpen ? null : faq.slug)}
-              className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition hover:bg-[var(--surface-base)]"
+              className="flex w-full items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface-base)]"
             >
-              <span className="text-sm font-bold leading-snug text-[var(--text-primary)]">{faq.title}</span>
+              <span className="pr-3 text-sm font-bold leading-snug text-[var(--text-primary)]">{faq.title}</span>
               <span className={`faq-chevron ${isOpen ? 'open' : ''}`}>+</span>
             </button>
             <div className={`faq-answer ${isOpen ? 'open' : ''}`}>
-              <p className="px-4 pb-3 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
+              <p className="px-5 pb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
             </div>
           </article>
         );
@@ -856,40 +881,90 @@ const PublicSiteView: React.FC = () => {
           </article>
 
           <div className="grid gap-4">
-            <article className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7fb,#ffffff)] p-6 shadow-sm">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)] text-white shadow-[0_16px_32px_rgba(236,72,153,0.22)]">
-                <InstagramIcon />
+            <article className="promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7fb,#ffffff)] p-5 shadow-sm">
+              <div className="promo-story-showcase promo-story-showcase-instagram">
+                {INSTAGRAM_GALLERY_SLIDES.map((slide, index) => (
+                  <img
+                    key={`${slide}-${index}`}
+                    src={slide}
+                    alt={`Instagram Bradwear ${index + 1}`}
+                    className={`promo-story-image ${index === activeInstagramSlide ? 'is-active' : ''}`}
+                  />
+                ))}
+                <div className="promo-story-overlay" />
+                <div className="promo-story-badge promo-story-badge-instagram">
+                  <InstagramIcon />
+                </div>
               </div>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Instagram Bradwear</p>
-              <h3 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Ikuti highlight produk, workshop, dan hasil jadi di Instagram</h3>
-              <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+              <div className="mt-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Instagram Bradwear</p>
+                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Ikuti highlight produk, workshop, dan hasil jadi di Instagram</h3>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
                 Cocok untuk melihat update feed, detail hasil produksi, dan referensi visual seragam custom Bradwear Indonesia secara cepat.
               </p>
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)]"
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)]"
               >
                 <InstagramIcon />
                 Kunjungi Instagram
               </a>
             </article>
 
-            <article className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfccb,#ffffff_55%,#dcfce7)] p-6 shadow-sm">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-[0_16px_32px_rgba(15,23,42,0.2)]">
-                <GooglePlayIcon />
+            <article className="promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfccb,#ffffff_55%,#dcfce7)] p-5 shadow-sm">
+              <div className="promo-story-showcase promo-story-showcase-google">
+                {GOOGLE_PLAY_GALLERY_SLIDES.map((slide, index) => (
+                  <img
+                    key={`${slide}-${index}`}
+                    src={slide}
+                    alt={`Google Play Bradwear ${index + 1}`}
+                    className={`promo-story-image ${index === activeGooglePlaySlide ? 'is-active' : ''}`}
+                  />
+                ))}
+                <div className="promo-story-overlay" />
+                <div className="promo-story-badge promo-story-badge-google">
+                  <GooglePlayIcon />
+                </div>
+                {GOOGLE_PLAY_GALLERY_SLIDES.length > 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveGooglePlaySlide(
+                          (prev) => (prev - 1 + GOOGLE_PLAY_GALLERY_SLIDES.length) % GOOGLE_PLAY_GALLERY_SLIDES.length,
+                        )
+                      }
+                      className="promo-story-arrow promo-story-arrow-left"
+                      aria-label="Slide Google Play sebelumnya"
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveGooglePlaySlide((prev) => (prev + 1) % GOOGLE_PLAY_GALLERY_SLIDES.length)}
+                      className="promo-story-arrow promo-story-arrow-right"
+                      aria-label="Slide Google Play berikutnya"
+                    >
+                      &gt;
+                    </button>
+                  </>
+                ) : null}
               </div>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Aplikasi resmi Bradwear</p>
-              <h3 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Download aplikasi Bradwear lewat Google Play</h3>
-              <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+              <div className="mt-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Aplikasi resmi Bradwear</p>
+                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Download aplikasi Bradwear lewat Google Play</h3>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
                 Buka aplikasi resmi Bradwear untuk akses yang lebih cepat ke katalog, konsultasi, dan kebutuhan order seragam custom langsung dari perangkat Anda.
               </p>
               <a
                 href={GOOGLE_PLAY_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="brand-cta mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
+                className="brand-cta mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
               >
                 <GooglePlayIcon />
                 Download di Google Play
@@ -900,8 +975,8 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-8 md:px-10">
-        <div className="border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm md:p-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-[var(--surface-base)] px-1 py-2 md:px-0">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">FAQ Ringkas</p>
               <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Informasi yang paling sering dicari</h3>
@@ -965,7 +1040,7 @@ const PublicSiteView: React.FC = () => {
       </section>
 
       <section className="px-6 pb-12 md:px-10">
-        <div className="testimonial-marquee-shell border border-[var(--border-soft)] bg-[var(--surface-base)] py-5 shadow-sm">
+        <div className="testimonial-marquee-shell -mx-6 bg-[var(--surface-base)] py-5 md:-mx-10">
           <div className="mb-4 px-4 md:px-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Testimonial client</p>
             <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Kepercayaan terhadap kualitas Bradwear</h3>
