@@ -65,6 +65,11 @@ const TESTIMONIALS = [
   },
 ];
 
+type LightboxSlide = {
+  alt: string;
+  src: string;
+};
+
 const getHoverImage = (product: { image: string; images?: { back?: string }; gallery?: string[] }) => {
   const candidates = [product.images?.back, ...(product.gallery ?? [])].filter(Boolean) as string[];
   return candidates.find((image) => image !== product.image) ?? product.image;
@@ -214,6 +219,7 @@ const PublicSiteView: React.FC = () => {
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
+  const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
@@ -254,6 +260,24 @@ const PublicSiteView: React.FC = () => {
     }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!lightboxSlide) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setLightboxSlide(null);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [lightboxSlide]);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -698,6 +722,17 @@ const PublicSiteView: React.FC = () => {
                   />
                 ))}
                 <div className="hero-banner-overlay middle-showcase-overlay" />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLightboxSlide({
+                      src: CLIENT_GALLERY_SLIDES[activeClientSlide],
+                      alt: `Our client Bradwear ${activeClientSlide + 1}`,
+                    })
+                  }
+                  className="slideshow-lightbox-trigger"
+                  aria-label="Buka gambar client penuh"
+                />
               </div>
 
               <button
@@ -896,6 +931,17 @@ const PublicSiteView: React.FC = () => {
                 />
               ))}
               <div className="hero-banner-overlay middle-showcase-overlay" />
+              <button
+                type="button"
+                onClick={() =>
+                  setLightboxSlide({
+                    src: middleContentSlides[activeMiddleSlide],
+                    alt: `Bradwear middle content ${activeMiddleSlide + 1}`,
+                  })
+                }
+                className="slideshow-lightbox-trigger"
+                aria-label="Buka gambar slideshow penuh"
+              />
             </div>
 
             <button
@@ -945,6 +991,28 @@ const PublicSiteView: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {lightboxSlide ? (
+        <div
+          className="slideshow-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Preview gambar penuh"
+          onClick={() => setLightboxSlide(null)}
+        >
+          <div className="slideshow-lightbox-panel" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setLightboxSlide(null)}
+              className="slideshow-lightbox-close"
+              aria-label="Close image preview"
+            >
+              Close
+            </button>
+            <img src={lightboxSlide.src} alt={lightboxSlide.alt} className="slideshow-lightbox-image" />
+          </div>
+        </div>
+      ) : null}
     </>
   );
 
