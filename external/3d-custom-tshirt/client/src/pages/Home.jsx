@@ -29,14 +29,14 @@ const Home = () => {
                         </motion.div>
 
                         <motion.div {...headContentAnimation} className="flex flex-col gap-5">
-                            <p className="max-w-md text-base font-normal text-gray-700 ">
+                            <p className="max-w-md text-base font-normal text-white/80">
                                 Gunakan desain 3D ini sebagai rujukan visual sebelum lanjut ke halaman desain Bradwear.
                             </p>
                             <div className="flex flex-wrap items-center gap-3">
                                 <button
                                     type="button"
                                     onClick={() => navigateTopWindow("/")}
-                                    className="rounded-full border border-black/10 bg-white/85 px-4 py-2.5 text-sm font-bold text-black transition hover:-translate-y-0.5"
+                                    className="rounded-full border border-white/12 bg-white/92 px-4 py-2.5 text-sm font-bold text-black transition hover:-translate-y-0.5"
                                 >
                                     Beranda
                                 </button>

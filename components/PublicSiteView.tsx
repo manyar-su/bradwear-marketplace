@@ -466,22 +466,22 @@ const PublicSiteView: React.FC = () => {
   ];
 
   const renderFaqAccordion = () => (
-    <div className="grid gap-3 md:grid-cols-2">
+    <div className="faq-list">
       {SITE_FAQS.map((faq) => {
         const isOpen = openFaqSlug === faq.slug;
 
         return (
-          <article key={faq.slug} className="faq-card bg-[var(--surface-subtle)] p-1.5">
+          <article key={faq.slug} className="faq-card faq-card-clean">
             <button
               type="button"
               onClick={() => setOpenFaqSlug(isOpen ? null : faq.slug)}
-              className="flex w-full items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface-base)]"
+              className="faq-trigger"
             >
-              <span className="pr-3 text-sm font-bold leading-snug text-[var(--text-primary)]">{faq.title}</span>
+              <span className="faq-question">{faq.title}</span>
               <span className={`faq-chevron ${isOpen ? 'open' : ''}`}>+</span>
             </button>
             <div className={`faq-answer ${isOpen ? 'open' : ''}`}>
-              <p className="px-5 pb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
+              <p className="faq-answer-copy">{faq.answer}</p>
             </div>
           </article>
         );
@@ -792,16 +792,20 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         <section className="home-section home-section-tight" data-home-section="faq">
-          <div className="home-section-shell faq-panel bg-[var(--surface-base)] px-1 py-2 md:px-0">
-            <div className="section-header-stack mb-5">
+          <div className="home-section-shell faq-panel">
+            <div className="faq-heading-shell">
               <div className="home-section-heading">
                 <p className="home-section-kicker">FAQ Ringkas</p>
                 <h2 className="home-section-title">Jawaban yang paling sering dicari sebelum order berjalan</h2>
+                <p className="home-section-copy">
+                  Ringkasan ini dibuat agar user langsung menemukan jawaban utama tentang minimum order, kustom logo,
+                  estimasi produksi, dan pelacakan pesanan tanpa membuka terlalu banyak halaman.
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+                className="faq-heading-cta"
               >
                 Hubungi layanan pelanggan
               </button>
