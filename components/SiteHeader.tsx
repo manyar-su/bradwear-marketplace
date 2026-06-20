@@ -18,10 +18,10 @@ type HeaderNavItem = {
 const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
   { label: '3D', route: RouteKey.THREE_D },
-  { label: 'Klien', route: RouteKey.CLIENT, homeSection: 'client-gallery' },
-  { label: 'Cara Order', route: RouteKey.CARA_ORDER, homeSection: 'order-flow' },
-  { label: 'Model', route: RouteKey.KATALOG, homeSection: 'model-showcase' },
-  { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN, homeSection: 'faq' },
+  { label: 'Katalog', route: RouteKey.KATALOG },
+  { label: 'Galeri Klien', route: RouteKey.CLIENT },
+  { label: 'Cara Order', route: RouteKey.CARA_ORDER },
+  { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
 ];
 
 const SiteHeader: React.FC<SiteHeaderProps> = ({
