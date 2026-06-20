@@ -216,6 +216,44 @@ const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; gra
   },
 };
 
+const MATERIAL_GUIDE_ITEMS = [
+  {
+    name: 'American Drill',
+    note: 'Kuat dan serbaguna',
+    usage: 'PDH, PDL, pabrik, wearpack, dan seragam organisasi.',
+    description:
+      'American Drill memiliki pola tenunan garis miring dengan karakter kain yang kuat, tahan lama, dan tetap mudah dibentuk. Pilihan ini cocok untuk seragam kerja yang membutuhkan struktur rapi dengan daya pakai tinggi.',
+  },
+  {
+    name: 'Japan Drill',
+    note: 'Best seller kemeja dinas',
+    usage: 'Kemeja, celana, jaket, parka, dan seragam operasional.',
+    description:
+      'Japan Drill terasa kuat dan cenderung lebih tebal dibanding bahan kemeja ringan. Karakternya stabil, jatuhnya rapi, dan nyaman dipakai untuk kebutuhan dinas harian maupun aktivitas lapangan ringan.',
+  },
+  {
+    name: 'Oxford',
+    note: 'Rapi dan ringan',
+    usage: 'Kemeja event, organisasi, perusahaan, dan semi-formal.',
+    description:
+      'Oxford menghadirkan kombinasi tampilan klasik dan rasa pakai yang nyaman. Bahan ini cocok saat kebutuhan utamanya adalah visual bersih, ringan di badan, dan tetap terlihat formal saat dipakai tim atau instansi.',
+  },
+  {
+    name: 'Ripstop',
+    note: 'Tahan aktifitas berat',
+    usage: 'Outdoor shirt, cargo, rompi, dan kebutuhan lapangan.',
+    description:
+      'Ripstop dikenal dari tekstur kotak-kotaknya yang rapat dan fungsional. Bahan ini ringan tetapi punya ketahanan tinggi, sehingga sering dipilih untuk seragam lapangan yang membutuhkan durabilitas lebih baik.',
+  },
+  {
+    name: 'Taipan Tropical',
+    note: 'Nyaman untuk harian',
+    usage: 'Kemeja kasual, seragam komunitas, dan kebutuhan harian.',
+    description:
+      'Taipan Tropical berada di jalur bahan yang terasa lebih adem dan nyaman untuk pemakaian panjang. Teksturnya tetap rapi saat dilihat, tetapi lebih ringan di badan sehingga cocok untuk aktivitas rutin dan mobilitas tinggi.',
+  },
+] as const;
+
 const PublicSiteView: React.FC = () => {
   const {
     currentRoute,
@@ -878,19 +916,6 @@ const PublicSiteView: React.FC = () => {
 
   const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
     <div className="px-6 py-8 md:px-10">
-      {ASSETS.CONTENT.SIZE_GUIDE ? (
-        <section className="mb-6 overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff,#eef6ff)] p-4 shadow-sm md:p-5">
-          <p className="px-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Size Guide</p>
-          <div className="mt-3 overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)]">
-            <img
-              src={ASSETS.CONTENT.SIZE_GUIDE}
-              alt="Bradwear size guide"
-              className="h-auto w-full object-cover"
-            />
-          </div>
-        </section>
-      ) : null}
-
       <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
         <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff,#fee2e2)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Katalog Editorial</p>
@@ -987,6 +1012,59 @@ const PublicSiteView: React.FC = () => {
 
       <section className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
+      </section>
+
+      {ASSETS.CONTENT.SIZE_GUIDE ? (
+        <section className="mt-10 grid gap-5 lg:grid-cols-[0.86fr_1.14fr]">
+          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f8fafc,#ffffff)] p-5 shadow-sm md:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Size Guide</p>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
+              Gunakan panduan ini untuk membaca ukuran dasar sebelum masuk ke editor atau saat menyiapkan data tim. Jika ada kebutuhan ukuran khusus, detailnya tetap bisa dilanjutkan saat konsultasi.
+            </p>
+          </article>
+
+          <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm md:p-5">
+            <div className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-white p-3 md:p-4">
+              <img
+                src={ASSETS.CONTENT.SIZE_GUIDE}
+                alt="Bradwear size guide"
+                className="mx-auto max-h-[360px] w-auto max-w-full object-contain"
+              />
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      <section className="mt-10 rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm md:p-7">
+        <div className="max-w-3xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan agar pemilihan model lebih jelas sejak awal</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+            Setiap bahan punya karakter yang berbeda. Bagian ini dibuat supaya user lebih cepat membedakan bahan yang cocok untuk tampilan formal, mobilitas lapangan, atau kebutuhan harian yang lebih ringan.
+          </p>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {MATERIAL_GUIDE_ITEMS.map((material) => (
+            <article
+              key={material.name}
+              className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-[0_12px_30px_rgba(15,23,42,0.06)]"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+                  {material.note}
+                </span>
+              </div>
+              <h3 className="mt-4 font-mono text-[1.8rem] font-bold leading-tight text-[#4eb8b8]">{material.name}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{material.description}</p>
+              <div className="mt-4 rounded-[20px] bg-[var(--surface-subtle)] px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Cocok untuk</p>
+                <p className="mt-2 text-sm font-medium leading-relaxed text-[var(--text-primary)]">{material.usage}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );
