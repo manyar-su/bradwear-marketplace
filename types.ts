@@ -1,6 +1,7 @@
 
 export enum RouteKey {
   HOME = 'HOME',
+  THREE_D = 'THREE_D',
   KATALOG = 'KATALOG',
   CLIENT = 'CLIENT',
   PANTS = 'PANTS',
@@ -133,6 +134,16 @@ export interface OrderItem {
   quantity: number;
   gender: 'L' | 'P' | 'Pria' | 'Wanita';
   sleeve?: 'Panjang' | 'Pendek';
+  name?: string;
+  color?: string;
+  colorCode?: string;
+  catalogMaterial?: string;
+  customDetail?: string;
+  productId?: string;
+  productName?: string;
+  productCategory?: Category;
+  productImage?: string;
+  colorCodeImage?: string;
 }
 
 

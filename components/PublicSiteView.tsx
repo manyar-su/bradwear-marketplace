@@ -5,11 +5,6 @@ import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 a
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (2).jpeg';
 import clientSlide4 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
 import clientSlide5 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.23.jpeg';
-import instagramShowcase from '../assets/Instagram/ChatGPT Image Jun 18, 2026, 04_11_18 AM.png';
-import googlePlaySlide1 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.54.jpeg';
-import googlePlaySlide2 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.55.jpeg';
-import googlePlaySlide3 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.55 (1).jpeg';
-import googlePlaySlide4 from '../assets/Google play/WhatsApp Image 2026-06-16 at 17.32.56.jpeg';
 import { useStore } from '../context/StoreContext';
 import {
   ARTICLES,
@@ -31,59 +26,21 @@ import SiteFooter from './SiteFooter';
 
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
 const ALL_MODELS = 'Semua Model';
-const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
-const TIKTOK_FEATURED_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7633289301333134612';
-const TIKTOK_FEATURED_EMBED_ID = '7633289301333134612';
-const TIKTOK_DETAIL_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7635951960125869332';
-const TIKTOK_DETAIL_EMBED_ID = '7635951960125869332';
-const TIKTOK_WORKSHOP_VIDEO_URL = 'https://www.tiktok.com/@bradwearindonesia/video/7650752558176210197';
-const TIKTOK_WORKSHOP_EMBED_ID = '7650752558176210197';
-const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
-const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bradwear.app';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3, clientSlide4, clientSlide5].filter(Boolean);
-const INSTAGRAM_GALLERY_SLIDES = [instagramShowcase].filter(Boolean);
-const GOOGLE_PLAY_GALLERY_SLIDES = [googlePlaySlide1, googlePlaySlide2, googlePlaySlide3, googlePlaySlide4].filter(Boolean);
 const SLIDESHOW_INTERVAL_MS = 5400;
-
-const TESTIMONIALS = [
-  {
-    name: 'Rizky Pratama',
-    institution: 'Dinas Operasional Lapangan',
-    avatar: 'RP',
-    comment: 'Bradwear bisa dipercaya untuk order seragam kantor. Kualitas jahitan bagus, bahan nyaman, dan hasilnya sesuai persetujuan desain. Kami siap pesan lagi untuk kebutuhan berikutnya.',
-  },
-  {
-    name: 'Maya Lestari',
-    institution: 'Komunitas Kesehatan Indonesia',
-    avatar: 'ML',
-    comment: 'Timnya responsif, detail logo rapi, dan komunikasi order jelas dari awal. Kami puas dengan kualitas Bradwear dan siap pesan lagi untuk batch berikutnya.',
-  },
-  {
-    name: 'Andi Setiawan',
-    institution: 'PT Karya Mandiri Nusantara',
-    avatar: 'AS',
-    comment: 'Seragam custom dari Bradwear terlihat profesional. Ukuran, warna, dan finishing sesuai kebutuhan tim. Pelayanannya membuat kami yakin untuk pesan lagi.',
-  },
-  {
-    name: 'Nadia Safitri',
-    institution: 'Event Organizer Bandung',
-    avatar: 'NS',
-    comment: 'Order sampel dan produksi dibantu sampai jelas sejak awal. Kualitas bagus, timeline transparan, dan hasil seragam membuat tim kami lebih percaya diri.',
-  },
-];
 
 const HERO_PROOF_ITEMS = [
   {
     label: 'Sampel awal',
-    value: 'Bisa mulai dari 1 pcs untuk cek model, bahan, dan arah desain.',
+    value: 'Mulai dari 1 pcs desain,bordir 3D dan bahan.',
   },
   {
-    label: 'Estimasi normal',
-    value: 'Produksi berjalan 14-21 hari kerja setelah detail disetujui.',
+    label: 'Estimasi produksi',
+    value: 'Normal 14-21 hari kerja setelah detail disetujui.',
   },
   {
-    label: 'Respons awal',
-    value: 'Brodi AI dan tim CS membantu menjawab kebutuhan awal dengan cepat.',
+    label: 'Tindak lanjut',
+    value: 'Ringkasan order langsung diteruskan ke WhatsApp tim Bradwear.',
   },
 ] as const;
 
@@ -92,7 +49,7 @@ const CLIENT_PROOF_ITEMS = [
     sector: 'Instansi lapangan',
     title: 'Hasil jadi tetap rapi untuk kebutuhan kerja aktif',
     focus: 'Penempatan identitas, kekuatan jahitan, dan kesiapan dipakai harian.',
-    outcome: 'Cocok untuk order yang butuh tampilan profesional tanpa mengganggu mobilitas tim.',
+    outcome: 'Sangat cocok unntuk seragam dinas yang kuat, nyaman dan awet.',
   },
   {
     sector: 'Seragam kegiatan resmi',
@@ -272,10 +229,7 @@ const PublicSiteView: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<typeof CATEGORIES[number]>('Kemeja');
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
-  const [activeMiddleSlide, setActiveMiddleSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
-  const [activeInstagramSlide, setActiveInstagramSlide] = useState(0);
-  const [activeGooglePlaySlide, setActiveGooglePlaySlide] = useState(0);
   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
@@ -290,10 +244,6 @@ const PublicSiteView: React.FC = () => {
     [],
   );
   const safeHeroSlides = heroSlides.length > 0 ? heroSlides : [ASSETS.KEMEJA.BRAD_V3.FRONT];
-  const middleContentSlides = useMemo(
-    () => (ASSETS.CONTENT.MIDDLE_SLIDES?.length ? ASSETS.CONTENT.MIDDLE_SLIDES : safeHeroSlides).filter(Boolean),
-    [safeHeroSlides],
-  );
   useEffect(() => {
     if (safeHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
@@ -303,14 +253,6 @@ const PublicSiteView: React.FC = () => {
   }, [safeHeroSlides]);
 
   useEffect(() => {
-    if (middleContentSlides.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveMiddleSlide((prev) => (prev + 1) % middleContentSlides.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, [middleContentSlides]);
-
-  useEffect(() => {
     if (CLIENT_GALLERY_SLIDES.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length);
@@ -318,21 +260,6 @@ const PublicSiteView: React.FC = () => {
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (INSTAGRAM_GALLERY_SLIDES.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveInstagramSlide((prev) => (prev + 1) % INSTAGRAM_GALLERY_SLIDES.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    if (GOOGLE_PLAY_GALLERY_SLIDES.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveGooglePlaySlide((prev) => (prev + 1) % GOOGLE_PLAY_GALLERY_SLIDES.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!lightboxSlide) return;
@@ -454,35 +381,6 @@ const PublicSiteView: React.FC = () => {
   );
   const shirtSpotlightProduct = kemejaProducts[0] ?? featured.find((product) => product.category === 'Kemeja') ?? null;
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
-  const socialVideoCards = useMemo(
-    () => [
-      {
-        title: 'Video unggulan',
-        tag: 'Featured',
-        duration: '00:31',
-        poster: safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
-        href: TIKTOK_FEATURED_VIDEO_URL,
-        embedId: TIKTOK_FEATURED_EMBED_ID,
-      },
-      {
-        title: 'Detail bordir',
-        tag: 'Detail',
-        duration: '00:18',
-        poster: safeHeroSlides[1] ?? safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
-        href: TIKTOK_DETAIL_VIDEO_URL,
-        embedId: TIKTOK_DETAIL_EMBED_ID,
-      },
-      {
-        title: 'Suasana workshop',
-        tag: 'Workshop',
-        duration: '00:24',
-        poster: safeHeroSlides[2] ?? safeHeroSlides[0] ?? ASSETS.BRAND.HERO,
-        href: TIKTOK_WORKSHOP_VIDEO_URL,
-        embedId: TIKTOK_WORKSHOP_EMBED_ID,
-      },
-    ],
-    [safeHeroSlides],
-  );
   const clientGalleryGroups = useMemo(
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
@@ -596,7 +494,7 @@ const PublicSiteView: React.FC = () => {
       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Alamat workshop</p>
       <h3 className="mt-3 text-2xl font-black tracking-tight">Karisma Residence, Mangunreja, Tasikmalaya</h3>
       <p className="mt-4 text-sm leading-relaxed text-white/85">{STORE_ADDRESS}</p>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="section-action-stack mt-6">
         <a
           href={STORE_MAP_URL}
           target="_blank"
@@ -618,547 +516,361 @@ const PublicSiteView: React.FC = () => {
     </article>
   );
 
-  const renderHome = () => (
-    <>
-      <section className="home-hero">
-        <div className="hero-split">
-          <article className="hero-panel">
-            <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
-            <div className="hero-badge-row">
-              <span className="hero-badge">Workshop Aktif</span>
-              <span className="hero-badge">Kirim Seluruh Indonesia</span>
-              <span className="hero-badge">Alur Order Lebih Jelas</span>
+  const renderHome = () => {
+    const homeFeaturedProducts = (shirtSpotlightProduct
+      ? [shirtSpotlightProduct, ...topProducts.filter((product) => product.id !== shirtSpotlightProduct.id)]
+      : topProducts
+    ).slice(0, 3);
+
+    return (
+      <>
+        <section className="home-hero editorial-home-hero" data-home-section="hero">
+          <div className="hero-split hero-split-editorial">
+            <article className="hero-panel hero-panel-editorial">
+              <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
+              <div className="hero-badge-row">
+                <span className="hero-badge">Workshop Aktif</span>
+                <span className="hero-badge">Kirim Seluruh Indonesia</span>
+                <span className="hero-badge">Bisa mulai sample</span>
+              </div>
+              <h1>
+                Seragam custom untuk <span className="hero-highlight">tim dan instansi</span> yang ingin order lebih
+                jelas sejak awal.
+              </h1>
+              <p className="hero-lead">
+                Pilih model yang paling dekat dengan kebutuhan Anda, rapikan arahan desain, lalu lanjutkan konsultasi
+                tanpa penjelasan berulang.
+              </p>
+              <div className="hero-actions">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (spotlightProduct) {
+                      handleSelectProduct(spotlightProduct);
+                      return;
+                    }
+                    setCurrentRoute(RouteKey.KATALOG);
+                  }}
+                  className="hero-primary brand-cta"
+                >
+                  Mulai Desain
+                </button>
+                <a
+                  href={buildWhatsAppUrl(buildConsultationMessage('konsultasi order seragam custom untuk tim atau instansi'))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hero-secondary"
+                >
+                  Tanya via WhatsApp
+                </a>
+              </div>
+              <div className="hero-micro-stats hero-micro-stats-editorial">
+                {HERO_PROOF_ITEMS.map((item) => (
+                  <article key={item.label} className="hero-proof-card">
+                    <span className="hero-proof-label">{item.label}</span>
+                    <strong className="hero-proof-value">{item.value}</strong>
+                  </article>
+                ))}
+              </div>
+            </article>
+
+            <article className="hero-banner hero-banner-editorial">
+              <div className="hero-banner-stage hero-banner-stage-editorial">
+                {safeHeroSlides.map((slide, index) => (
+                  <img
+                    key={`${slide}-${index}`}
+                    src={slide}
+                    alt={`Hero Bradwear ${index + 1}`}
+                    className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
+                  />
+                ))}
+                <div className="hero-banner-overlay" />
+                <div className="hero-visual-note">
+                  <span className="hero-visual-note-label">Referensi visual utama</span>
+                  <strong className="hero-visual-note-title">
+                    Tampilan seragam dan suasana workshop sebagai gambaran hasil order
+                  </strong>
+                </div>
+              </div>
+
+              {safeHeroSlides.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
+                    className="hero-arrow hero-arrow-left"
+                    aria-label="Banner sebelumnya"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
+                    className="hero-arrow hero-arrow-right"
+                    aria-label="Banner berikutnya"
+                  >
+                    &gt;
+                  </button>
+                </>
+              ) : null}
+            </article>
+          </div>
+        </section>
+
+        <section className="home-section" data-home-section="client-gallery">
+          <div className="home-section-shell home-section-grid">
+            <div className="home-section-heading">
+              <p className="home-section-kicker">Galeri Klien</p>
+              <h2 className="home-section-title">Bukti hasil jadi yang memudahkan approval sebelum order dilanjutkan</h2>
+              <p className="home-section-copy">
+                Galeri ini membantu tim Anda melihat kerapian hasil, penempatan identitas, dan kecocokan model sebelum
+                masuk ke pembahasan produksi.
+              </p>
             </div>
-            <h1>
-              Seragam <span className="hero-highlight">custom yang lebih mudah</span> dipilih, dijelaskan, lalu
-              dilanjutkan ke produksi.
-            </h1>
-            <p className="hero-lead">
-              Pilih model, rapikan brief desain, lalu lanjutkan konsultasi tanpa harus mengulang kebutuhan dari awal.
-              Halaman ini dibuat untuk membantu instansi, perusahaan, dan tim kerja mengambil keputusan lebih cepat.
-            </p>
-            <div className="hero-actions">
+
+            <div className="client-gallery-grid">
+              <article className="elegant-parallax-block middle-showcase-shell client-proof-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+                <article className="hero-banner middle-showcase-banner">
+                  <div className="hero-banner-stage middle-showcase-stage client-gallery-stage client-fullscreen-stage">
+                    {CLIENT_GALLERY_SLIDES.map((slide, index) => (
+                      <img
+                        key={`${slide}-${index}`}
+                        src={slide}
+                        alt={`Galeri klien Bradwear ${index + 1}`}
+                        className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
+                      />
+                    ))}
+                    <div className="hero-banner-overlay middle-showcase-overlay" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setLightboxSlide({
+                          src: CLIENT_GALLERY_SLIDES[activeClientSlide],
+                          alt: `Galeri klien Bradwear ${activeClientSlide + 1}`,
+                        })
+                      }
+                      className="slideshow-lightbox-trigger"
+                      aria-label="Buka gambar klien penuh"
+                    />
+                    <div className="client-proof-overlay">
+                      <div className="client-proof-topline">
+                        <span className="client-proof-kicker">{activeClientProof.sector}</span>
+                        <span className="client-proof-count">
+                          {String(activeClientSlide + 1).padStart(2, '0')} / {String(CLIENT_GALLERY_SLIDES.length).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h4 className="client-proof-title">{activeClientProof.title}</h4>
+                      <p className="client-proof-copy">{activeClientProof.outcome}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
+                    className="hero-arrow hero-arrow-left"
+                    aria-label="Slide klien sebelumnya"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
+                    className="hero-arrow hero-arrow-right"
+                    aria-label="Slide klien berikutnya"
+                  >
+                    &gt;
+                  </button>
+                </article>
+              </article>
+
+              <div className="client-proof-points client-proof-points-compact">
+                <article>
+                  <span>Yang dicek klien</span>
+                  <strong>{activeClientProof.focus}</strong>
+                </article>
+                <article>
+                  <span>Fungsi galeri</span>
+                  <strong>Memudahkan perbandingan hasil visual sebelum konsultasi, revisi, atau approval internal.</strong>
+                </article>
+                <article>
+                  <span>Workshop aktif</span>
+                  <strong>{STORE_ADDRESS}</strong>
+                </article>
+                <article>
+                  <span>Langkah berikutnya</span>
+                  <strong>Buka galeri penuh atau lanjutkan konsultasi saat model yang dicari sudah ketemu.</strong>
+                </article>
+              </div>
+            </div>
+
+            <div className="section-action-stack">
               <button
                 type="button"
-                onClick={() => {
-                  setCurrentRoute(RouteKey.KATALOG);
-                  window.setTimeout(() => {
-                    catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 120);
-                }}
-                className="hero-primary brand-cta"
+                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Mulai Desain
+                Menuju Galeri Klien
               </button>
               <a
-                href={buildWhatsAppUrl(buildConsultationMessage('seragam custom untuk instansi atau perusahaan'))}
+                href={buildWhatsAppUrl(buildConsultationMessage('minta referensi hasil jadi seragam custom Bradwear'))}
                 target="_blank"
                 rel="noreferrer"
                 className="hero-secondary"
               >
-                Konsultasi ke WhatsApp
+                Minta referensi via WhatsApp
               </a>
             </div>
-            <p className="hero-action-note">
-              Mulai dari katalog jika Anda belum memilih model. Langsung ke WhatsApp jika kebutuhan dan jumlah sudah
-              lebih jelas.
-            </p>
-            <div className="hero-micro-stats">
-              {HERO_PROOF_ITEMS.map((item) => (
-                <article key={item.label} className="hero-proof-card">
-                  <span className="hero-proof-label">{item.label}</span>
-                  <strong className="hero-proof-value">{item.value}</strong>
-                </article>
-              ))}
-            </div>
-          </article>
+          </div>
+        </section>
 
-          <article className="hero-banner">
-            <div className="hero-banner-stage">
-              {safeHeroSlides.map((slide, index) => (
-                <img
-                  key={`${slide}-${index}`}
-                  src={slide}
-                  alt={`Bradwear banner ${index + 1}`}
-                  className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-                />
-              ))}
-              <div className="hero-banner-overlay" />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
-              className="hero-arrow hero-arrow-left"
-              aria-label="Banner sebelumnya"
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
-              className="hero-arrow hero-arrow-right"
-              aria-label="Banner berikutnya"
-            >
-              &gt;
-            </button>
-          </article>
-        </div>
-
-        <div className="mt-4">{renderWorkshopHighlight()}</div>
-
-        <div className="hero-benefits">
-          {heroBenefits.map((benefit) => (
-            <article
-              key={benefit.title}
-              className="elegant-parallax-block group rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
-            >
-              <div className="mb-4 inline-flex h-11 w-11 animate-floating items-center justify-center rounded-2xl bg-[var(--brand-accent-soft)] text-[var(--brand-accent-strong)]">
-                {benefit.icon}
-              </div>
-              <strong className="block text-base font-black text-[var(--text-primary)]">{benefit.title}</strong>
-              <span className="mt-2 block text-sm leading-relaxed text-[var(--text-secondary)]">{benefit.copy}</span>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="home-section">
-        <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-          <article className="elegant-parallax-block rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f7fbee,#ffffff)] p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Desain Seragam Bradwear</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">
-              Pilih model kemeja yang paling dekat, lalu lanjutkan ke editor
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-              Bagian ini dipakai untuk memulai desain dari model yang sudah paling relevan, sehingga konsultasi berikutnya
-              lebih singkat dan keputusan produksi lebih cepat diambil.
-            </p>
-            {shirtSpotlightProduct ? (
-              <div className="mt-5 rounded-[24px] bg-[var(--surface-base)] p-4 shadow-[inset_0_0_0_1px_var(--border-soft)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Model kemeja unggulan</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">{shirtSpotlightProduct.name}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{shirtSpotlightProduct.description}</p>
-              </div>
-            ) : null}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  if (shirtSpotlightProduct) {
-                    handleSelectProduct(shirtSpotlightProduct);
-                    return;
-                  }
-                  setCurrentRoute(RouteKey.KATALOG);
-                }}
-                className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
-              >
-                Lanjutkan ke Editor
-              </button>
-              <a
-                href={buildWhatsAppUrl(buildConsultationMessage('pesan kemeja custom untuk instansi atau perusahaan'))}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-              >
-                Konsultasi Order
-              </a>
-            </div>
-          </article>
-
-          <article className="elegant-parallax-block middle-showcase-shell client-proof-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
-            <div className="client-proof-header flex items-center justify-between gap-3 px-5 pt-5">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Galeri Klien</p>
-                <h3 className="mt-1 text-xl font-black tracking-tight text-[var(--text-primary)]">Bukti hasil jadi dari order klien Bradwear</h3>
+        <section className="home-section" data-home-section="order-flow">
+          <div className="home-section-shell">
+            <div className="section-header-stack mb-5">
+              <div className="home-section-heading">
+                <p className="home-section-kicker">Cara Order</p>
+                <h2 className="home-section-title">Alur singkat dari pilih model sampai data order siap dikirim</h2>
               </div>
               <button
                 type="button"
-                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
-                className="rounded-full border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+                onClick={() => setCurrentRoute(RouteKey.CARA_ORDER)}
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Buka galeri lengkap
+                Lihat panduan lengkap
               </button>
             </div>
+          </div>
+        </section>
 
-            <article className="hero-banner middle-showcase-banner mt-4">
-              <div className="hero-banner-stage middle-showcase-stage client-gallery-stage client-fullscreen-stage">
-                {CLIENT_GALLERY_SLIDES.map((slide, index) => (
-                  <img
-                    key={`${slide}-${index}`}
-                    src={slide}
-                    alt={`Galeri klien Bradwear ${index + 1}`}
-                    className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
-                  />
-                ))}
-                <div className="hero-banner-overlay middle-showcase-overlay" />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setLightboxSlide({
-                      src: CLIENT_GALLERY_SLIDES[activeClientSlide],
-                      alt: `Galeri klien Bradwear ${activeClientSlide + 1}`,
-                    })
-                  }
-                  className="slideshow-lightbox-trigger"
-                  aria-label="Buka gambar klien penuh"
-                />
-                <div className="client-proof-overlay">
-                  <div className="client-proof-topline">
-                    <span className="client-proof-kicker">{activeClientProof.sector}</span>
-                    <span className="client-proof-count">
-                      {String(activeClientSlide + 1).padStart(2, '0')} / {String(CLIENT_GALLERY_SLIDES.length).padStart(2, '0')}
-                    </span>
-                  </div>
-                  <h4 className="client-proof-title">{activeClientProof.title}</h4>
-                  <p className="client-proof-copy">{activeClientProof.outcome}</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
-                className="hero-arrow hero-arrow-left"
-                aria-label="Slide klien sebelumnya"
-              >
-                &lt;
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
-                className="hero-arrow hero-arrow-right"
-                aria-label="Slide klien berikutnya"
-              >
-                &gt;
-              </button>
-            </article>
-            <div className="client-proof-points">
-              <article>
-                <span>Fokus pengerjaan</span>
-                <strong>{activeClientProof.focus}</strong>
-              </article>
-              <article>
-                <span>Nilai yang ditunjukkan</span>
-                <strong>Detail lebih jelas sebelum order lanjut ke produksi.</strong>
-              </article>
-              <article>
-                <span>Fungsi galeri</span>
-                <strong>Memudahkan tim Anda membandingkan kualitas visual sebelum konsultasi.</strong>
-              </article>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section className="home-section home-section-tight">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          {topProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Pilihan Utama' : 'Paling Dicari'))}
-        </div>
-      </section>
-
-      <section className="home-section">
-        <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-          <article className="elegant-parallax-block overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#09090b,#172554_48%,#111827)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-200/85">TikTok Bradwear</p>
-                <h3 className="mt-3 text-3xl font-black tracking-tight text-white">Lihat referensi workshop dan hasil produksi dalam format portrait</h3>
-              </div>
-
-              <a
-                href={TIKTOK_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="brand-cta inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white"
-              >
-                <TikTokIcon />
-                Lihat TikTok
-              </a>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {socialVideoCards.map((video) =>
-                video.embedId ? (
-                  <article
-                    key={video.title}
-                    className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 shadow-[0_18px_42px_rgba(0,0,0,0.25)]"
-                  >
-                    <iframe
-                      src={`https://www.tiktok.com/player/v1/${video.embedId}?controls=1&progress_bar=1&play_button=1&volume_control=1&description=0&music_info=0`}
-                      title={`${video.title} TikTok`}
-                      allow="fullscreen"
-                      className="aspect-[9/16] w-full border-0 bg-slate-950"
-                    />
-                    <div className="flex items-center justify-between gap-3 px-4 py-3 text-white">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">{video.tag}</p>
-                        <h4 className="mt-1 text-base font-black tracking-tight">{video.title}</h4>
-                      </div>
-                      <a
-                        href={video.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-full border border-white/12 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/78 transition hover:border-emerald-300/40 hover:text-white"
-                      >
-                        Lihat Video
-                      </a>
-                    </div>
-                  </article>
-                ) : (
-                  <a
-                    key={video.title}
-                    href={video.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group relative isolate aspect-[9/16] overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 p-4 text-left transition hover:-translate-y-1 hover:border-emerald-300/35"
-                  >
-                    <img
-                      src={video.poster}
-                      alt={video.title}
-                      className="absolute inset-0 h-full w-full object-cover opacity-72 transition duration-500 group-hover:scale-[1.05]"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,12,0.08),rgba(8,8,12,0.52)_42%,rgba(8,8,12,0.92))]" />
-                    <div className="relative flex h-full flex-col justify-between">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
-                          <TikTokIcon />
-                          {video.tag}
-                        </span>
-                        <span className="rounded-full border border-white/12 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
-                          {video.duration}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-center py-6">
-                        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/14 shadow-[0_16px_36px_rgba(0,0,0,0.25)] backdrop-blur">
-                          <span className="ml-0.5 h-0 w-0 border-y-[10px] border-y-transparent border-l-[15px] border-l-white" />
-                        </span>
-                      </div>
-
-                      <div>
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
-                          <div className="h-full w-[56%] rounded-full bg-[linear-gradient(90deg,#7cff2b,#166534)]" />
-                        </div>
-                        <h4 className="mt-4 text-xl font-black tracking-tight text-white">{video.title}</h4>
-                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200/78">Bradwear Indonesia</p>
-                      </div>
-                    </div>
-                  </a>
-                ),
-              )}
-            </div>
-          </article>
-
-          <div className="grid gap-4">
-            <article className="elegant-parallax-block promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7fb,#ffffff)] p-5 shadow-sm">
-              <div className="promo-story-showcase promo-story-showcase-instagram">
-                {INSTAGRAM_GALLERY_SLIDES.map((slide, index) => (
-                  <img
-                    key={`${slide}-${index}`}
-                    src={slide}
-                    alt={`Instagram Bradwear ${index + 1}`}
-                    className={`promo-story-image ${index === activeInstagramSlide ? 'is-active' : ''}`}
-                  />
-                ))}
-                <div className="promo-story-overlay" />
-                <div className="promo-story-badge promo-story-badge-instagram">
-                  <InstagramIcon />
-                </div>
-              </div>
-              <div className="mt-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Instagram Bradwear</p>
-                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Lihat update produk, workshop, dan hasil jadi di Instagram</h3>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-                Buka Instagram Bradwear untuk melihat update produk, detail hasil produksi, dan referensi visual seragam custom dengan cepat.
+        <section className="home-section" data-home-section="model-showcase">
+          <div className="home-section-shell model-showcase-shell">
+            <div className="home-section-heading">
+              <p className="home-section-kicker">Model Unggulan</p>
+              <h2 className="home-section-title">Pilih model yang paling dekat dengan kebutuhan agar proses desain lebih cepat</h2>
+              <p className="home-section-copy">
+                Gunakan model ini sebagai titik mulai. Setelah itu detail bahan, warna, bordir, dan identitas bisa
+                dirapikan di editor atau dibahas lewat WhatsApp.
               </p>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:-translate-y-0.5 hover:border-[var(--brand-accent)]"
-              >
-                <InstagramIcon />
-                Kunjungi Instagram
-              </a>
-            </article>
+            </div>
 
-            <article className="elegant-parallax-block promo-story-card rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfccb,#ffffff_55%,#dcfce7)] p-5 shadow-sm">
-              <div className="promo-story-showcase promo-story-showcase-google">
-                {GOOGLE_PLAY_GALLERY_SLIDES.map((slide, index) => (
-                  <img
-                    key={`${slide}-${index}`}
-                    src={slide}
-                    alt={`Google Play Bradwear ${index + 1}`}
-                    className={`promo-story-image ${index === activeGooglePlaySlide ? 'is-active' : ''}`}
-                  />
-                ))}
-                <div className="promo-story-overlay" />
-                <div className="promo-story-badge promo-story-badge-google">
-                  <GooglePlayIcon />
-                </div>
-                {GOOGLE_PLAY_GALLERY_SLIDES.length > 1 ? (
+            <div className="model-showcase-grid">
+              <article className="model-showcase-feature">
+                {spotlightProduct ? (
                   <>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActiveGooglePlaySlide(
-                          (prev) => (prev - 1 + GOOGLE_PLAY_GALLERY_SLIDES.length) % GOOGLE_PLAY_GALLERY_SLIDES.length,
-                        )
-                      }
-                      className="promo-story-arrow promo-story-arrow-left"
-                      aria-label="Slide Google Play sebelumnya"
-                    >
-                      &lt;
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveGooglePlaySlide((prev) => (prev + 1) % GOOGLE_PLAY_GALLERY_SLIDES.length)}
-                      className="promo-story-arrow promo-story-arrow-right"
-                      aria-label="Slide Google Play berikutnya"
-                    >
-                      &gt;
-                    </button>
+                    <div className="model-showcase-feature-media">
+                      <img src={spotlightProduct.image} alt={spotlightProduct.name} className="model-showcase-feature-image" />
+                    </div>
+                    <div className="model-showcase-feature-copy">
+                      <p className="home-section-kicker">Rekomendasi awal</p>
+                      <h3 className="model-showcase-feature-title">{spotlightProduct.name}</h3>
+                      <p className="model-showcase-feature-description">{spotlightProduct.description}</p>
+                      <div className="section-action-stack mt-5">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectProduct(spotlightProduct)}
+                          className="hero-primary brand-cta"
+                        >
+                          Desain model ini
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                          className="hero-secondary"
+                        >
+                          Lihat semua model
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : null}
-              </div>
-              <div className="mt-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Aplikasi resmi Bradwear</p>
-                <h3 className="mt-2 text-[clamp(1.7rem,3.1vw,2rem)] font-black tracking-tight text-[var(--text-primary)]">Unduh aplikasi Bradwear di Google Play</h3>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-                Akses katalog, konsultasi, dan kebutuhan order seragam custom Bradwear lebih cepat langsung dari perangkat Anda.
-              </p>
-              <a
-                href={GOOGLE_PLAY_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="brand-cta mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
-              >
-                <GooglePlayIcon />
-                Unduh di Google Play
-              </a>
-            </article>
-          </div>
-        </div>
-      </section>
+              </article>
 
-      <section className="home-section home-section-tight">
-        <div className="elegant-parallax-block faq-panel bg-[var(--surface-base)] px-1 py-2 md:px-0">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">FAQ Ringkas</p>
-              <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Informasi yang paling sering dicari</h3>
+              <div className="model-showcase-cards">
+                {homeFeaturedProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Pilihan utama' : 'Siap dibahas'))}
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
-              className="border border-[var(--border-soft)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]"
-            >
-              Hubungi layanan pelanggan
-            </button>
           </div>
-          {renderFaqAccordion()}
-        </div>
-      </section>
+        </section>
 
-      <section className="home-section">
-        <div className="elegant-parallax-block middle-showcase-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
-          <article className="hero-banner middle-showcase-banner">
-            <div className="hero-banner-stage middle-showcase-stage">
-              {middleContentSlides.map((slide, index) => (
-                <img
-                  key={`${slide}-${index}`}
-                  src={slide}
-                  alt={`Bradwear middle content ${index + 1}`}
-                  className={`hero-banner-image ${index === activeMiddleSlide ? 'is-active' : ''}`}
-                />
-              ))}
-              <div className="hero-banner-overlay middle-showcase-overlay" />
+        <section className="home-section home-section-tight" data-home-section="faq">
+          <div className="home-section-shell faq-panel bg-[var(--surface-base)] px-1 py-2 md:px-0">
+            <div className="section-header-stack mb-5">
+              <div className="home-section-heading">
+                <p className="home-section-kicker">FAQ Ringkas</p>
+                <h2 className="home-section-title">Jawaban yang paling sering dicari sebelum order berjalan</h2>
+              </div>
               <button
                 type="button"
-                onClick={() =>
-                  setLightboxSlide({
-                    src: middleContentSlides[activeMiddleSlide],
-                    alt: `Bradwear middle content ${activeMiddleSlide + 1}`,
-                  })
-                }
-                className="slideshow-lightbox-trigger"
-                aria-label="Buka gambar slideshow penuh"
-              />
+                onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+              >
+                Hubungi layanan pelanggan
+              </button>
             </div>
+            {renderFaqAccordion()}
+          </div>
+        </section>
 
-            <button
-              type="button"
-              onClick={() => setActiveMiddleSlide((prev) => (prev - 1 + middleContentSlides.length) % middleContentSlides.length)}
-              className="hero-arrow hero-arrow-left"
-              aria-label="Slide middle content sebelumnya"
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveMiddleSlide((prev) => (prev + 1) % middleContentSlides.length)}
-              className="hero-arrow hero-arrow-right"
-              aria-label="Slide middle content berikutnya"
-            >
-              &gt;
-            </button>
+        <section className="home-section home-section-full">
+          <article className="footer-cta-panel">
+            <div>
+              <p className="home-section-kicker">Footer CTA</p>
+              <h2 className="home-section-title">Siap lanjut konsultasi atau mulai desain dari model yang sudah dipilih?</h2>
+              <p className="home-section-copy">
+                Jika kebutuhan sudah cukup jelas, lanjutkan ke editor atau kirim pesan WhatsApp agar tim Bradwear bisa
+                membantu langkah order berikutnya.
+              </p>
+            </div>
+            <div className="section-action-stack">
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                className="hero-primary brand-cta"
+              >
+                Order sekarang
+              </button>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('lanjut konsultasi order seragam custom Bradwear'))}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-secondary"
+              >
+                Kirim pesan WhatsApp
+              </a>
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.THREE_D)}
+                className="hero-secondary"
+              >
+                Buka Studio 3D
+              </button>
+            </div>
           </article>
-        </div>
-      </section>
+        </section>
 
-      <section className="home-section home-section-full">
-        <div className="elegant-parallax-block testimonial-marquee-shell -mx-6 bg-[var(--surface-base)] py-5 md:-mx-10">
-          <div className="mb-4 px-4 md:px-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Testimoni klien</p>
-            <h3 className="text-xl font-black tracking-tight text-[var(--text-primary)]">Kepercayaan klien terhadap kualitas Bradwear</h3>
-          </div>
-          <div className="testimonial-marquee" aria-label="Testimoni klien Bradwear">
-            <div className="testimonial-track">
-              {[...TESTIMONIALS, ...TESTIMONIALS].map((item, index) => (
-                <article key={`${item.name}-${index}`} className="testimonial-card">
-                  <div className="flex items-center gap-3">
-                    <div className="testimonial-avatar">{item.avatar}</div>
-                    <div>
-                      <h4 className="text-sm font-black text-[var(--text-primary)]">{item.name}</h4>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{item.institution}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-sm font-black tracking-[0.14em] text-amber-500" aria-label="Rating 5 dari 5">
-                    ★★★★★
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{item.comment}</p>
-                </article>
-              ))}
+        {lightboxSlide ? (
+          <div
+            className="slideshow-lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Preview gambar penuh"
+            onClick={() => setLightboxSlide(null)}
+          >
+            <div className="slideshow-lightbox-panel" onClick={(event) => event.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => setLightboxSlide(null)}
+                className="slideshow-lightbox-close"
+                aria-label="Close image preview"
+              >
+                Close
+              </button>
+              <img src={lightboxSlide.src} alt={lightboxSlide.alt} className="slideshow-lightbox-image" />
             </div>
           </div>
-        </div>
-      </section>
-
-      {lightboxSlide ? (
-        <div
-          className="slideshow-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Preview gambar penuh"
-          onClick={() => setLightboxSlide(null)}
-        >
-          <div className="slideshow-lightbox-panel" onClick={(event) => event.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setLightboxSlide(null)}
-              className="slideshow-lightbox-close"
-              aria-label="Close image preview"
-            >
-              Close
-            </button>
-            <img src={lightboxSlide.src} alt={lightboxSlide.alt} className="slideshow-lightbox-image" />
-          </div>
-        </div>
-      ) : null}
-    </>
-  );
+        ) : null}
+      </>
+    );
+  };
 
   const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
     <div className="px-6 py-8 md:px-10">
@@ -1679,8 +1391,24 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
+  const renderThreeDPage = () => (
+    <div className="three-d-page-shell">
+      <div className="three-d-frame-shell">
+        <iframe
+          src="/three-d/index.html"
+          title="Bradwear Studio 3D"
+          className="three-d-frame"
+          loading="eager"
+          allow="camera; microphone; fullscreen"
+        />
+      </div>
+    </div>
+  );
+
   const content = (() => {
     switch (currentRoute) {
+      case RouteKey.THREE_D:
+        return renderThreeDPage();
       case RouteKey.KATALOG:
         return renderCatalog(
           featured,
@@ -1713,10 +1441,12 @@ const PublicSiteView: React.FC = () => {
     }
   })();
 
+  const isThreeDRoute = currentRoute === RouteKey.THREE_D;
+
   return (
-    <main className="overflow-y-auto pb-0">
+    <main className={isThreeDRoute ? 'three-d-page-main' : 'overflow-y-auto pb-0'}>
       {content}
-      <SiteFooter onNavigate={setCurrentRoute} />
+      {!isThreeDRoute ? <SiteFooter onNavigate={setCurrentRoute} /> : null}
     </main>
   );
 };

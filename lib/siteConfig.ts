@@ -19,6 +19,7 @@ export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${
 
 export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.HOME]: '/',
+  [RouteKey.THREE_D]: '/3d',
   [RouteKey.KATALOG]: '/katalog',
   [RouteKey.CLIENT]: '/client',
   [RouteKey.PANTS]: '/pants',
@@ -34,6 +35,7 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
 
 export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.HOME,
+  RouteKey.THREE_D,
   RouteKey.KATALOG,
   RouteKey.CLIENT,
   RouteKey.PANTS,
@@ -47,6 +49,7 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
 
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, description: 'Halaman utama Bradwear Indonesia.' },
+  { label: 'Studio 3D', route: RouteKey.THREE_D, description: 'Halaman khusus preview dan custom seragam 3D Bradwear.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
   { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
@@ -66,6 +69,7 @@ export const UTILITY_NAV_ITEMS: NavItem[] = [
 
 export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.HOME]: 'Beranda',
+  [RouteKey.THREE_D]: 'Beranda / Studio 3D',
   [RouteKey.KATALOG]: 'Beranda / Katalog',
   [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
   [RouteKey.PANTS]: 'Beranda / Celana',
@@ -328,6 +332,12 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
     'Bradwear Indonesia | Konveksi Seragam Custom Tasikmalaya',
     'Bradwear Indonesia melayani pembuatan seragam custom untuk instansi, perusahaan, dan komunitas. Berbasis di Tasikmalaya dengan pengiriman ke seluruh Indonesia.',
     ['seragam instansi', 'konveksi seragam tasikmalaya', 'custom seragam perusahaan', 'vendor seragam indonesia', 'seragam kerja kantor']
+  ),
+  [RouteKey.THREE_D]: makeMeta(
+    RouteKey.THREE_D,
+    'Studio 3D Seragam | Bradwear Indonesia',
+    'Buka halaman khusus 3D Bradwear untuk melihat preview seragam secara terpisah dan fokus pada pengalaman visual custom.',
+    ['studio 3d seragam', 'preview seragam 3d', 'custom seragam 3d', '3d uniform viewer']
   ),
   [RouteKey.KATALOG]: makeMeta(
     RouteKey.KATALOG,

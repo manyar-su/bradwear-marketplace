@@ -4,14 +4,16 @@ const API_KEY = process.env.SUMOPOD_API_KEY;
 
 const OCR_PROMPT = [
   'Anda membaca gambar katalog warna kain.',
-  'Ekstrak hanya kode warna atau label katalog yang paling jelas berada di area scan.',
+  'Gambar yang diberikan adalah hasil crop area scan.',
+  'Ekstrak hanya kode warna atau label katalog yang paling jelas berada di tengah area scan.',
+  'Abaikan garis dekoratif, ikon, overlay, atau teks lain di luar label utama.',
   'Prioritaskan kode seperti 003, 59-M, 118, atau kombinasi huruf-angka yang serupa.',
   'Balas hanya dengan satu kode terbaik tanpa kalimat tambahan.',
 ].join(' ');
 
 const extractBestCode = (rawText: string) => {
   const normalized = rawText.toUpperCase().replace(/\s+/g, ' ').trim();
-  const matches = normalized.match(/[A-Z0-9]{2,}(?:-[A-Z0-9]+)*/g) || [];
+  const matches: string[] = normalized.match(/[A-Z0-9]{2,}(?:-[A-Z0-9]+)*/g) ?? [];
 
   const prioritized = matches.find((token) => /\d/.test(token) && token.length <= 12);
   if (prioritized) {

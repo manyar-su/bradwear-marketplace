@@ -100,7 +100,7 @@ const DesignEditorView: React.FC = () => {
   );
 
   // --- STATE LIST PESANAN (CART SYSTEM) ---
-  interface OrderItem {
+interface OrderItem {
     id: string;
     model: Product;
     color: string;
@@ -115,19 +115,30 @@ const DesignEditorView: React.FC = () => {
     catalogMaterial?: string; // Menyimpan jenis kain dari katalog
   }
 
+  interface DraftOrderItem {
+    name: string;
+    colorCode: string;
+    size: string;
+    gender: 'Pria' | 'Wanita';
+    sleeve: 'Panjang' | 'Pendek';
+    qty: number;
+    colorCodeImage?: string;
+  }
+
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
 
   // State untuk Form "Tambah Item"
   const [activeFormModel, setActiveFormModel] = useState<Product>(product);
   const [activeFormColor, setActiveFormColor] = useState<string>(designData.color);
 
-  const [newItem, setNewItem] = useState({
+  const [newItem, setNewItem] = useState<DraftOrderItem>({
     name: '',
     colorCode: '',
     size: 'L',
     gender: 'Pria' as 'Pria' | 'Wanita',
     sleeve: 'Panjang' as 'Panjang' | 'Pendek',
-    qty: 1
+    qty: 1,
+    colorCodeImage: undefined,
   });
 
   const [activeCatalogType, setActiveCatalogType] = useState<string | null>('Tropical (Best Seller)');
@@ -167,6 +178,7 @@ const DesignEditorView: React.FC = () => {
   const zoomContainerRef = useRef<HTMLDivElement>(null);
   const roiRef = useRef<HTMLDivElement>(null);
   const colorCodeRef = useRef<HTMLDivElement>(null);
+  const zoomedCatalogImageRef = useRef<HTMLImageElement>(null);
 
 
   // Efek untuk sinkronisasi model & warna dari desain ke form isian pesanan
@@ -210,6 +222,7 @@ const DesignEditorView: React.FC = () => {
       sleeve: newItem.sleeve,
       qty: newItem.qty,
       customDetail: customDetailStr,
+      colorCodeImage: newItem.colorCodeImage,
       catalogMaterial: activeCatalogType || 'Unspecified'
     };
 
@@ -220,8 +233,7 @@ const DesignEditorView: React.FC = () => {
       ...newItem,
       name: '',
       qty: 1,
-      // colorCode: newItem.colorCode, // Keep current
-      // colorCodeImage: newItem.colorCodeImage // Keep current
+      colorCodeImage: newItem.colorCodeImage,
     });
 
     // Show success feedback
@@ -253,6 +265,69 @@ const DesignEditorView: React.FC = () => {
   // Hapus item dari cart
   const handleRemoveFromCart = (id: string) => {
     setCartItems(cartItems.filter(i => i.id !== id));
+  };
+
+  const normalizeColorCode = (value: string) =>
+    value
+      .toUpperCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[|]/g, 'I')
+      .trim();
+
+  const captureCatalogScanBox = async () => {
+    const imageEl = zoomedCatalogImageRef.current;
+    const roiEl = roiRef.current;
+
+    if (!imageEl || !roiEl) {
+      throw new Error('Area scan belum siap.');
+    }
+
+    if (!imageEl.complete || !imageEl.naturalWidth || !imageEl.naturalHeight) {
+      throw new Error('Gambar katalog belum siap dipindai.');
+    }
+
+    const imageRect = imageEl.getBoundingClientRect();
+    const roiRect = roiEl.getBoundingClientRect();
+
+    const overlapLeft = Math.max(roiRect.left, imageRect.left);
+    const overlapTop = Math.max(roiRect.top, imageRect.top);
+    const overlapRight = Math.min(roiRect.right, imageRect.right);
+    const overlapBottom = Math.min(roiRect.bottom, imageRect.bottom);
+
+    if (overlapRight <= overlapLeft || overlapBottom <= overlapTop) {
+      throw new Error('Posisikan box scan tepat di atas kode warna katalog.');
+    }
+
+    const sourceX = ((overlapLeft - imageRect.left) / imageRect.width) * imageEl.naturalWidth;
+    const sourceY = ((overlapTop - imageRect.top) / imageRect.height) * imageEl.naturalHeight;
+    const sourceWidth = ((overlapRight - overlapLeft) / imageRect.width) * imageEl.naturalWidth;
+    const sourceHeight = ((overlapBottom - overlapTop) / imageRect.height) * imageEl.naturalHeight;
+
+    const canvas = document.createElement('canvas');
+    const outputScale = Math.max(1.4, Math.min(2.2, 1200 / Math.max(sourceWidth, 1)));
+    canvas.width = Math.max(1, Math.round(sourceWidth * outputScale));
+    canvas.height = Math.max(1, Math.round(sourceHeight * outputScale));
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas scan warna tidak tersedia.');
+    }
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(
+      imageEl,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    return canvas.toDataURL('image/jpeg', 0.96);
   };
 
   // --- KONFIGURASI POSISI DEFAULT ELEMEN (EDIT DISINI) ---
@@ -950,7 +1025,17 @@ const DesignEditorView: React.FC = () => {
       size: item.size,
       quantity: item.qty,
       gender: item.gender,
-      sleeve: item.sleeve
+      sleeve: item.model.category === 'Rompi' ? undefined : item.sleeve,
+      name: item.name,
+      color: item.color,
+      colorCode: item.colorCode,
+      catalogMaterial: item.catalogMaterial,
+      customDetail: item.customDetail,
+      productId: item.model.id,
+      productName: item.model.name,
+      productCategory: item.model.category,
+      productImage: item.model.image,
+      colorCodeImage: item.colorCodeImage,
     }));
     setOrderItems(simpleItems);
     setCurrentRoute(RouteKey.SUMMARY);
@@ -2367,8 +2452,14 @@ const DesignEditorView: React.FC = () => {
                 </>
               ) : (
                 // Fields kustom standar (Kemeja/Lainnya)
-                ['Tinggi Badan', 'Lebar Dada', 'Lebar Bahu', 'Panjang Lengan', 'Lingkar Kerah', 'Lingkar Manset'].map((label, idx) => {
-                  const key = ['tinggi', 'lebarDada', 'lebarBahu', 'panjangLengan', 'kerah', 'manset'][idx] as keyof typeof customMeasures;
+                ([
+                  ['Tinggi Badan', 'tinggi'],
+                  ['Lebar Dada', 'lebarDada'],
+                  ['Lebar Bahu', 'lebarBahu'],
+                  ['Panjang Lengan', 'panjangLengan'],
+                  ['Lingkar Kerah', 'kerah'],
+                  ['Lingkar Manset', 'manset'],
+                ] as const).map(([label, key]) => {
                   return (
                     <div key={key}>
                       <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 block">{label} (cm)</label>
@@ -2522,6 +2613,7 @@ const DesignEditorView: React.FC = () => {
                     <div className="w-full h-full flex items-center justify-center pointer-events-none">
                       <img
                         src={activeCatalogImage || ''}
+                        ref={zoomedCatalogImageRef}
                         draggable={false}
                         className={`max-w-none w-[300%] h-auto origin-top-left pointer-events-auto`}
                         style={{
@@ -2650,49 +2742,26 @@ const DesignEditorView: React.FC = () => {
                       let capturedText = "";
                       let capturedImage = "";
                       try {
-                        if (zoomContainerRef.current && roiRef.current) {
-                          // Canvas Logic...
-                          const fullCanvas = await html2canvas(zoomContainerRef.current, {
-                            useCORS: true,
-                            backgroundColor: null,
-                            scale: 2
+                        capturedImage = await captureCatalogScanBox();
+
+                        // AUTO SAVE TO GALLERY (Android 10+ MediaStore)
+                        try {
+                          await Media.savePhoto({
+                            path: capturedImage,
+                            albumIdentifier: 'Bradwear Scans'
                           });
-                          const containerRect = zoomContainerRef.current.getBoundingClientRect();
-                          const roiRect = roiRef.current.getBoundingClientRect();
-                          const cropX = (roiRect.left - containerRect.left) * 2;
-                          const cropY = (roiRect.top - containerRect.top) * 2;
-                          const cropWidth = roiRect.width * 2;
-                          const cropHeight = roiRect.height * 2;
-
-                          const croppedCanvas = document.createElement('canvas');
-                          croppedCanvas.width = cropWidth;
-                          croppedCanvas.height = cropHeight;
-                          const ctx = croppedCanvas.getContext('2d');
-
-                          if (ctx) {
-                            ctx.drawImage(fullCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-                            capturedImage = croppedCanvas.toDataURL('image/jpeg', 0.9);
-
-                            // AUTO SAVE TO GALLERY (Android 10+ MediaStore)
-                            try {
-                              await Media.savePhoto({
-                                path: capturedImage,
-                                albumIdentifier: 'Bradwear Scans'
-                              });
-                            } catch (mediaErr) {
-                              console.warn("Auto save scan failed", mediaErr);
-                              // Fallback download browser
-                              const link = document.createElement('a');
-                              link.href = capturedImage;
-                              link.download = `scan_color_${Date.now()}.jpg`;
-                              document.body.appendChild(link);
-                              link.click();
-                              document.body.removeChild(link);
-                            }
-
-                            capturedText = await analyzeImageWithGemini(capturedImage);
-                          }
+                        } catch (mediaErr) {
+                          console.warn("Auto save scan failed", mediaErr);
+                          // Fallback download browser
+                          const link = document.createElement('a');
+                          link.href = capturedImage;
+                          link.download = `scan_color_${Date.now()}.jpg`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
                         }
+
+                        capturedText = await analyzeImageWithGemini(capturedImage);
                       } catch (err) {
                         console.error("Capture Error:", err);
                       }
@@ -2700,7 +2769,7 @@ const DesignEditorView: React.FC = () => {
                       await new Promise(r => setTimeout(r, 1800));
 
                       const finalCode = capturedText && capturedText !== "No text detected" && capturedText !== "Error scanning"
-                        ? capturedText.toUpperCase().replace(/\n/g, ' ')
+                        ? normalizeColorCode(capturedText)
                         : ""; // Set to empty to trigger validation and show placeholder
 
                       setDetectedCode(finalCode);
