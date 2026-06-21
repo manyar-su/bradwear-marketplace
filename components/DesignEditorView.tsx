@@ -1438,8 +1438,8 @@ interface OrderItem {
 
         {/* Panel Header - hanya step indicator */}
         <div className={`px-5 py-3 md:px-8 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex gap-1.5">
+          <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+            <div className="flex shrink-0 gap-1.5">
               {['materials', 'details', 'finish'].map((s, i) => (
                 <div
                   key={s}
@@ -1450,13 +1450,13 @@ interface OrderItem {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <div className={`flex gap-2 rounded-2xl border p-1 ${theme === 'dark' ? 'border-white/10 bg-zinc-900' : 'border-zinc-200 bg-white shadow-sm'}`}>
+            <div className="flex min-w-0 shrink-0 items-center justify-end gap-2 whitespace-nowrap">
+              <div className={`flex shrink-0 gap-1 rounded-2xl border p-1 ${theme === 'dark' ? 'border-white/10 bg-zinc-900' : 'border-zinc-200 bg-white shadow-sm'}`}>
                 {availableViews.map(v => (
                   <button
                     key={v}
                     onClick={() => onUpdate({ view: v as any })}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
+                    className={`rounded-xl px-3 py-2 text-[9px] font-black uppercase tracking-wider transition-all sm:px-4 sm:text-[10px] ${designData.view === v ? (theme === 'dark' ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (theme === 'dark' ? 'text-zinc-500 hover:text-white' : 'text-zinc-400 hover:text-black')}`}
                   >
                     {v}
                   </button>
@@ -1465,7 +1465,7 @@ interface OrderItem {
 
               <button
                 onClick={handleBackCustom}
-                className={`flex items-center gap-2 rounded-2xl border px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${theme === 'dark' ? 'border-white/10 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-800 shadow-sm'}`}
+                className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2 text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 sm:px-4 sm:text-[10px] ${theme === 'dark' ? 'border-white/10 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-800 shadow-sm'}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
                 Kembali
@@ -1474,7 +1474,7 @@ interface OrderItem {
               {editorStep !== 'finish' ? (
                 <button
                   onClick={handleNextStep}
-                  className="flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                  className="flex shrink-0 items-center gap-2 rounded-2xl bg-emerald-500 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95 sm:px-4 sm:text-[10px]"
                 >
                   Lanjut
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>

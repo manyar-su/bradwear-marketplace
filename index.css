@@ -1384,6 +1384,10 @@ a {
   min-height: clamp(240px, 38vw, 420px);
 }
 
+.hero-display-strip-top .hero-display-strip-image {
+  object-position: center top;
+}
+
 .hero-display-strip-bottom {
   min-height: clamp(220px, 34vw, 400px);
 }
@@ -1536,7 +1540,7 @@ a {
 
 .hero-banner-editorial .hero-banner-image {
   object-fit: contain;
-  object-position: center center;
+  object-position: center top;
   transform: scale(1);
   background: #08111e;
 }
@@ -2440,62 +2444,6 @@ a {
   background: linear-gradient(90deg, #75f21a, #2c7a12);
 }
 
-.brand-profile-shell {
-  gap: 22px;
-}
-
-.brand-profile-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.brand-profile-card {
-  display: grid;
-  gap: 12px;
-  padding: 20px;
-  border: 1px solid var(--border-soft);
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 242, 0.96));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.brand-profile-kicker {
-  margin: 0;
-  color: var(--brand-accent-strong);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.brand-profile-title {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
-}
-
-.brand-profile-copy {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.brand-profile-points {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding-left: 18px;
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.65;
-}
-
 .footer-cta-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3133,6 +3081,16 @@ a {
     order: 2;
   }
 
+  .hero-panel-editorial,
+  .hero-banner-editorial {
+    min-height: auto;
+  }
+
+  .hero-banner-stage-editorial {
+    aspect-ratio: 4 / 4.8;
+    min-height: auto;
+  }
+
   .hero-panel {
     padding: 16px;
     border-radius: 22px;
@@ -3229,26 +3187,6 @@ a {
 
   .home-image-carousel-arrow {
     bottom: 60px;
-  }
-
-  .brand-profile-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .brand-profile-card {
-    gap: 10px;
-    padding: 16px;
-    border-radius: 20px;
-  }
-
-  .brand-profile-title {
-    font-size: 18px;
-  }
-
-  .brand-profile-copy,
-  .brand-profile-points {
-    font-size: 12px;
   }
 
   .hero-benefits {

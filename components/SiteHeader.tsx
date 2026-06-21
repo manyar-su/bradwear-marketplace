@@ -44,11 +44,11 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
   {
     title: 'Profil Bradwear',
     items: [
-      { label: 'Tentang Kami', route: RouteKey.HOME, homeSection: 'about-overview' },
-      { label: 'Visi & Misi', route: RouteKey.HOME, homeSection: 'vision-mission' },
-      { label: 'Produk & Jasa', route: RouteKey.HOME, homeSection: 'products-services' },
-      { label: 'Keunggulan', route: RouteKey.HOME, homeSection: 'competitive-advantage' },
-      { label: 'Klien & Jangkauan', route: RouteKey.HOME, homeSection: 'client-reach' },
+      { label: 'Tentang Kami', route: RouteKey.ABOUT },
+      { label: 'Visi & Misi', route: RouteKey.VISION_MISSION },
+      { label: 'Produk & Jasa', route: RouteKey.PRODUCTS_SERVICES },
+      { label: 'Keunggulan', route: RouteKey.COMPETITIVE_ADVANTAGE },
+      { label: 'Klien & Jangkauan', route: RouteKey.CLIENT_REACH },
     ],
   },
   {
@@ -57,8 +57,8 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
       { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN },
       { label: 'Temukan Toko', route: RouteKey.TEMUKAN_TOKO },
       { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN },
-      { label: 'Syarat & Ketentuan', route: RouteKey.HOME, homeSection: 'legal-license' },
-      { label: 'Lisensi Hukum', route: RouteKey.HOME, homeSection: 'legal-license' },
+      { label: 'Syarat & Ketentuan', route: RouteKey.LEGAL_LICENSE },
+      { label: 'Lisensi Hukum', route: RouteKey.LEGAL_LICENSE },
     ],
   },
 ];

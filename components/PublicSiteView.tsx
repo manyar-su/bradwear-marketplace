@@ -46,7 +46,7 @@ const HERO_PROOF_ITEMS = [
 
 const BRAND_PROFILE_ITEMS = [
   {
-    sectionId: 'about-overview',
+    route: RouteKey.ABOUT,
     kicker: 'Tentang Kami',
     title: 'Bradwear menghadirkan seragam custom untuk instansi, perusahaan, dan kebutuhan operasional.',
     body:
@@ -54,7 +54,7 @@ const BRAND_PROFILE_ITEMS = [
     points: ['Workshop aktif di Tasikmalaya', 'Fokus pada seragam custom dan bordir identitas', 'Melayani kebutuhan institusi, swasta, sekolah, dan komunitas'],
   },
   {
-    sectionId: 'vision-mission',
+    route: RouteKey.VISION_MISSION,
     kicker: 'Visi & Misi',
     title: 'Membangun proses order yang rapi, hasil yang presisi, dan hubungan kerja jangka panjang.',
     body:
@@ -62,7 +62,7 @@ const BRAND_PROFILE_ITEMS = [
     points: ['Menjaga kualitas bahan dan finishing', 'Memberi layanan profesional dan tepat waktu', 'Terus menyempurnakan desain, produksi, dan kontrol detail'],
   },
   {
-    sectionId: 'products-services',
+    route: RouteKey.PRODUCTS_SERVICES,
     kicker: 'Produk & Jasa',
     title: 'Kategori dibuat untuk memudahkan pemilihan model sesuai fungsi lapangan atau kebutuhan formal.',
     body:
@@ -70,7 +70,7 @@ const BRAND_PROFILE_ITEMS = [
     points: ['Seragam dinas pemerintahan dan operasional', 'Seragam perusahaan, komunitas, dan sekolah', 'Bordir logo, nama personel, dan detail custom'],
   },
   {
-    sectionId: 'competitive-advantage',
+    route: RouteKey.COMPETITIVE_ADVANTAGE,
     kicker: 'Keunggulan',
     title: 'Nilai utama Bradwear ada pada bahan yang tepat, jahitan rapi, dan tindak lanjut order yang tidak berputar-putar.',
     body:
@@ -78,7 +78,7 @@ const BRAND_PROFILE_ITEMS = [
     points: ['Bahan dipilih sesuai fungsi seragam', 'Presisi jahit dan kontrol visual sebelum produksi', 'Konsultasi langsung dilanjutkan ke WhatsApp tim'],
   },
   {
-    sectionId: 'client-reach',
+    route: RouteKey.CLIENT_REACH,
     kicker: 'Klien & Jangkauan',
     title: 'Bradwear melayani pengiriman seluruh Indonesia dengan basis workshop di Tasikmalaya.',
     body:
@@ -86,7 +86,7 @@ const BRAND_PROFILE_ITEMS = [
     points: ['Workshop dan sample development di Tasikmalaya', 'Pengiriman ke seluruh Indonesia', 'Referensi hasil jadi tersedia untuk kebutuhan approval'],
   },
   {
-    sectionId: 'legal-license',
+    route: RouteKey.LEGAL_LICENSE,
     kicker: 'Legal & Lisensi',
     title: 'Identitas usaha dan kebutuhan administrasi pengadaan dapat ditindaklanjuti saat konsultasi resmi.',
     body:
@@ -438,17 +438,28 @@ const PublicSiteView: React.FC = () => {
   );
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
   const homeCarouselProducts = useMemo(() => {
-    return CATEGORIES.map((category) =>
-      [...visibleProducts]
-        .filter((product) => product.category === category)
-        .sort((left, right) => right.soldCount - left.soldCount)[0] ?? null,
-    ).filter(Boolean) as Product[];
+    const shirtModels = [...visibleProducts]
+      .filter((product) => product.category === 'Kemeja')
+      .sort((left, right) => right.soldCount - left.soldCount);
+    const otherCategoryRepresentatives = CATEGORIES.filter((category) => category !== 'Kemeja')
+      .map((category) =>
+        [...visibleProducts]
+          .filter((product) => product.category === category)
+          .sort((left, right) => right.soldCount - left.soldCount)[0] ?? null,
+      )
+      .filter(Boolean) as Product[];
+
+    return [...shirtModels, ...otherCategoryRepresentatives];
   }, [visibleProducts]);
   const clientGalleryGroups = useMemo(
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
   );
   const activeHowToOrderStep = HOW_TO_ORDER_STEPS[activeHowToOrderStepIndex] ?? HOW_TO_ORDER_STEPS[0];
+  const activeBrandProfilePage = useMemo(
+    () => BRAND_PROFILE_ITEMS.find((item) => item.route === currentRoute) ?? null,
+    [currentRoute],
+  );
 
   const currentProductionOrder = useMemo(
     () =>
@@ -832,6 +843,16 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         <section className="home-section" data-home-section="category-showcase">
+          <div className="home-section-shell">
+            <div className="home-section-heading">
+              <p className="home-section-kicker">Kategori & Model</p>
+              <h2 className="home-section-title">Tampilkan kategori utama sekaligus semua model kemeja yang paling sering dipilih</h2>
+              <p className="home-section-copy">
+                Slide ini menggabungkan model kemeja seperti Brad V1, V2, V3, dan seri lain, lalu dilanjutkan kategori
+                jaket, rompi, celana, dan polo agar pilihan awal lebih lengkap.
+              </p>
+            </div>
+
           <div
             className="home-image-carousel-shell"
             onTouchStart={handleHomeCarouselTouchStart}
@@ -907,6 +928,7 @@ const PublicSiteView: React.FC = () => {
               ))}
             </div>
           </div>
+          </div>
         </section>
 
         <section className="home-section home-section-tight" data-home-section="faq">
@@ -929,34 +951,6 @@ const PublicSiteView: React.FC = () => {
               </button>
             </div>
             {renderFaqAccordion()}
-          </div>
-        </section>
-
-        <section className="home-section" data-home-section="about-bradwear">
-          <div className="home-section-shell brand-profile-shell">
-            <div className="home-section-heading">
-              <p className="home-section-kicker">Profil Bradwear</p>
-              <h2 className="home-section-title">Tentang usaha, visi kerja, layanan, dan legalitas ditampilkan lebih ringkas dalam satu bagian</h2>
-              <p className="home-section-copy">
-                Menu mobile sekarang mengarah ke bagian yang lebih jelas, sehingga informasi company profile, layanan,
-                jangkauan, dan kebutuhan legal tidak hilang dari alur website.
-              </p>
-            </div>
-
-            <div className="brand-profile-grid">
-              {BRAND_PROFILE_ITEMS.map((item) => (
-                <article key={item.sectionId} className="brand-profile-card" data-home-section={item.sectionId}>
-                  <p className="brand-profile-kicker">{item.kicker}</p>
-                  <h3 className="brand-profile-title">{item.title}</h3>
-                  <p className="brand-profile-copy">{item.body}</p>
-                  <ul className="brand-profile-points">
-                    {item.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -1518,6 +1512,62 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
+  const renderBrandProfilePage = () => {
+    if (!activeBrandProfilePage) return null;
+
+    return (
+      <div className="px-6 py-8 md:px-10">
+        <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#112717_48%,#1b3246)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">{activeBrandProfilePage.kicker}</p>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">{activeBrandProfilePage.title}</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.body}</p>
+        </section>
+
+        <section className="mt-8 grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">
+              {activeBrandProfilePage.kicker}
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">{activeBrandProfilePage.title}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">{activeBrandProfilePage.body}</p>
+
+            <div className="section-action-stack mt-6">
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.HOME)}
+                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+              >
+                Kembali ke beranda
+              </button>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage(`informasi ${activeBrandProfilePage.kicker.toLowerCase()} Bradwear`))}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-secondary"
+              >
+                Tanya via WhatsApp
+              </a>
+            </div>
+          </article>
+
+          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Poin Utama</p>
+            <div className="mt-5 grid gap-3">
+              {activeBrandProfilePage.points.map((point, index) => (
+                <article key={point} className="rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-accent-strong)]">
+                    {String(index + 1).padStart(2, '0')}
+                  </p>
+                  <p className="mt-2 text-sm font-semibold leading-relaxed text-[var(--text-primary)]">{point}</p>
+                </article>
+              ))}
+            </div>
+          </article>
+        </section>
+      </div>
+    );
+  };
+
   const renderClientGallery = () => (
     <div className="px-6 py-8 md:px-10">
       <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#102b14_48%,#183153)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
@@ -1631,6 +1681,13 @@ const PublicSiteView: React.FC = () => {
         );
       case RouteKey.CLIENT:
         return renderClientGallery();
+      case RouteKey.ABOUT:
+      case RouteKey.VISION_MISSION:
+      case RouteKey.PRODUCTS_SERVICES:
+      case RouteKey.COMPETITIVE_ADVANTAGE:
+      case RouteKey.CLIENT_REACH:
+      case RouteKey.LEGAL_LICENSE:
+        return renderBrandProfilePage();
       case RouteKey.PANTS:
         return renderCatalog(
           pantsProducts,

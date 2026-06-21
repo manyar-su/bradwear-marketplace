@@ -22,6 +22,12 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.THREE_D]: '/3d',
   [RouteKey.KATALOG]: '/katalog',
   [RouteKey.CLIENT]: '/client',
+  [RouteKey.ABOUT]: '/tentang-kami',
+  [RouteKey.VISION_MISSION]: '/visi-misi',
+  [RouteKey.PRODUCTS_SERVICES]: '/produk-dan-jasa',
+  [RouteKey.COMPETITIVE_ADVANTAGE]: '/keunggulan',
+  [RouteKey.CLIENT_REACH]: '/klien-dan-jangkauan',
+  [RouteKey.LEGAL_LICENSE]: '/legal-dan-lisensi',
   [RouteKey.PANTS]: '/pants',
   [RouteKey.ARTIKEL]: '/artikel',
   [RouteKey.CARA_ORDER]: '/cara-order',
@@ -38,6 +44,12 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.THREE_D,
   RouteKey.KATALOG,
   RouteKey.CLIENT,
+  RouteKey.ABOUT,
+  RouteKey.VISION_MISSION,
+  RouteKey.PRODUCTS_SERVICES,
+  RouteKey.COMPETITIVE_ADVANTAGE,
+  RouteKey.CLIENT_REACH,
+  RouteKey.LEGAL_LICENSE,
   RouteKey.PANTS,
   RouteKey.ARTIKEL,
   RouteKey.CARA_ORDER,
@@ -72,6 +84,12 @@ export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.THREE_D]: 'Beranda / Studio 3D',
   [RouteKey.KATALOG]: 'Beranda / Katalog',
   [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
+  [RouteKey.ABOUT]: 'Beranda / Tentang Kami',
+  [RouteKey.VISION_MISSION]: 'Beranda / Visi dan Misi',
+  [RouteKey.PRODUCTS_SERVICES]: 'Beranda / Produk dan Jasa',
+  [RouteKey.COMPETITIVE_ADVANTAGE]: 'Beranda / Keunggulan',
+  [RouteKey.CLIENT_REACH]: 'Beranda / Klien dan Jangkauan',
+  [RouteKey.LEGAL_LICENSE]: 'Beranda / Legal dan Lisensi',
   [RouteKey.PANTS]: 'Beranda / Celana',
   [RouteKey.ARTIKEL]: 'Beranda / Artikel',
   [RouteKey.CARA_ORDER]: 'Beranda / Cara Order',
@@ -382,6 +400,42 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
     'Galeri Klien Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
     'Lihat dokumentasi hasil produksi kemeja custom, kemeja dinas, dan seragam kerja Bradwear Indonesia untuk kebutuhan instansi, medis, operasional, kejaksaan, dan pemerintah daerah.',
     ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien', 'hasil jadi kemeja dinas', 'galeri kemeja custom']
+  ),
+  [RouteKey.ABOUT]: makeMeta(
+    RouteKey.ABOUT,
+    'Tentang Bradwear Indonesia | Konveksi Kemeja Custom dan Seragam Dinas',
+    'Kenali profil Bradwear Indonesia sebagai konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, sekolah, dan komunitas di seluruh Indonesia.',
+    ['tentang bradwear', 'profil bradwear indonesia', 'konveksi kemeja custom indonesia', 'vendor seragam instansi', 'tentang konveksi seragam']
+  ),
+  [RouteKey.VISION_MISSION]: makeMeta(
+    RouteKey.VISION_MISSION,
+    'Visi dan Misi Bradwear Indonesia | Kualitas, Ketepatan, dan Layanan',
+    'Lihat visi dan misi Bradwear Indonesia dalam membangun kualitas seragam custom, ketepatan produksi, dan layanan konsultasi yang lebih jelas untuk pelanggan.',
+    ['visi misi bradwear', 'visi konveksi seragam', 'misi vendor kemeja custom', 'kualitas seragam kerja']
+  ),
+  [RouteKey.PRODUCTS_SERVICES]: makeMeta(
+    RouteKey.PRODUCTS_SERVICES,
+    'Produk dan Jasa Bradwear | Kemeja Dinas, Jaket, Rompi, Polo, dan Celana Custom',
+    'Pelajari produk dan jasa Bradwear Indonesia mulai dari kemeja dinas, jaket, rompi, polo shirt, celana tactical, sampai layanan custom bordir dan identitas personel.',
+    ['produk bradwear', 'jasa konveksi seragam', 'kemeja dinas custom', 'jasa bordir logo instansi', 'produk seragam kerja']
+  ),
+  [RouteKey.COMPETITIVE_ADVANTAGE]: makeMeta(
+    RouteKey.COMPETITIVE_ADVANTAGE,
+    'Keunggulan Bradwear Indonesia | Bahan Tepat, Jahitan Rapi, dan Alur Order Jelas',
+    'Keunggulan Bradwear Indonesia ada pada pemilihan bahan yang sesuai fungsi, jahitan rapi, kontrol detail, dan alur order yang membantu approval lebih cepat.',
+    ['keunggulan bradwear', 'kualitas kemeja custom', 'jahitan seragam rapi', 'vendor seragam berkualitas']
+  ),
+  [RouteKey.CLIENT_REACH]: makeMeta(
+    RouteKey.CLIENT_REACH,
+    'Klien dan Jangkauan Bradwear | Workshop Tasikmalaya dan Pengiriman Seluruh Indonesia',
+    'Bradwear Indonesia melayani berbagai instansi, perusahaan, dan komunitas dengan basis workshop di Tasikmalaya serta pengiriman seragam custom ke seluruh Indonesia.',
+    ['klien bradwear', 'jangkauan pengiriman seragam', 'workshop tasikmalaya', 'vendor seragam seluruh indonesia']
+  ),
+  [RouteKey.LEGAL_LICENSE]: makeMeta(
+    RouteKey.LEGAL_LICENSE,
+    'Legalitas dan Lisensi Bradwear Indonesia | Informasi Administrasi dan Kerja Sama',
+    'Informasi legalitas, lisensi, dan kebutuhan administrasi pengadaan Bradwear Indonesia untuk kerja sama seragam custom instansi dan perusahaan.',
+    ['legalitas bradwear', 'lisensi hukum konveksi', 'administrasi pengadaan seragam', 'syarat kerja sama seragam']
   ),
   [RouteKey.PANTS]: makeMeta(
     RouteKey.PANTS,
