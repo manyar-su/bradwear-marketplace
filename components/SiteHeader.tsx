@@ -30,6 +30,8 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
   onNavigate,
   onSelectCatalogCategory: _onSelectCatalogCategory,
 }) => {
+  const mobileMenuRef = React.useRef<HTMLDetailsElement | null>(null);
+
   const isActiveNavItem = (route: RouteKey, homeSection?: string) => {
     if (currentRoute === RouteKey.HOME) {
       return homeSection === 'hero';
@@ -60,22 +62,27 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
     window.setTimeout(scrollToSection, 180);
   };
 
+  const handleHeaderNavigation = (route: RouteKey, homeSection?: string) => {
+    mobileMenuRef.current?.removeAttribute('open');
+    navigateToHomeSection(route, homeSection);
+  };
+
   return (
     <header className="site-header site-header-dark">
       <div className="site-nav site-nav-single">
-        <button className="brand-mark brand-mark-single" onClick={() => navigateToHomeSection(RouteKey.HOME, 'hero')} aria-label="Bradwear home">
+        <button className="brand-mark brand-mark-single" onClick={() => handleHeaderNavigation(RouteKey.HOME, 'hero')} aria-label="Bradwear home">
           <span className="brand-mark-shell">
             <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
           </span>
         </button>
 
-        <nav aria-label="Menu marketplace" className="market-nav">
+        <nav aria-label="Menu marketplace" className="market-nav market-nav-desktop">
           <ul className="no-scrollbar header-nav-list">
             {HEADER_NAV_ITEMS.map((item) => (
               <li key={item.route}>
                 <button
                   type="button"
-                  onClick={() => navigateToHomeSection(item.route, item.homeSection)}
+                  onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
                   className={`market-link header-nav-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
                 >
                   {item.label}
@@ -85,12 +92,32 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
           </ul>
         </nav>
 
+        <details ref={mobileMenuRef} className="mobile-main-menu">
+          <summary className="mobile-main-menu-trigger">Menu</summary>
+          <div className="mobile-main-menu-panel">
+            <ul className="mobile-main-menu-list">
+              {HEADER_NAV_ITEMS.map((item) => (
+                <li key={item.route}>
+                  <button
+                    type="button"
+                    onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
+                    className={`mobile-main-menu-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
+
         <button
           type="button"
           onClick={() => onNavigate(selectedProductName ? RouteKey.EDITOR : RouteKey.KATALOG)}
           className="design-cta header-primary-cta"
         >
-          Mulai Desain
+          <span className="header-primary-cta-label-full">Mulai Desain</span>
+          <span className="header-primary-cta-label-compact">Desain</span>
         </button>
       </div>
     </header>
