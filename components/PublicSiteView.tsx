@@ -1,5 +1,7 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS } from '../assets';
+import heroTopImage from '../assets/Hero/atas.webp';
+import heroBottomImage from '../assets/Hero/bawah.webp';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (2).jpeg';
@@ -242,6 +244,7 @@ const PublicSiteView: React.FC = () => {
   const [trackingLookup, setTrackingLookup] = useState('');
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
+  const [openMaterialGuide, setOpenMaterialGuide] = useState<string | null>(MATERIAL_GUIDE_ITEMS[0]?.name ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const catalogRef = useRef<HTMLElement | null>(null);
 
@@ -534,6 +537,14 @@ const PublicSiteView: React.FC = () => {
 
     return (
       <>
+        <section className="hero-display-strip hero-display-strip-top" data-home-section="hero-intro">
+          <img src={heroTopImage} alt="Seragam Bradwear sebagai identitas perusahaan" className="hero-display-strip-image" />
+          <div className="hero-display-strip-overlay">
+            <p className="hero-display-strip-kicker">Visual Pembuka</p>
+            <h2 className="hero-display-strip-title">Seragam merupakan identitas perusahaan</h2>
+          </div>
+        </section>
+
         <section className="home-hero editorial-home-hero" data-home-section="hero">
           <div className="hero-split hero-split-editorial">
             <article className="hero-panel hero-panel-editorial">
@@ -625,6 +636,10 @@ const PublicSiteView: React.FC = () => {
               ) : null}
             </article>
           </div>
+        </section>
+
+        <section className="hero-display-strip hero-display-strip-bottom" data-home-section="hero-outro">
+          <img src={heroBottomImage} alt="Referensi hasil seragam custom Bradwear" className="hero-display-strip-image" />
         </section>
 
         <section className="home-section" data-home-section="client-gallery">
@@ -952,25 +967,37 @@ const PublicSiteView: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          {MATERIAL_GUIDE_ITEMS.map((material) => (
-            <article
-              key={material.name}
-              className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-[0_12px_30px_rgba(15,23,42,0.06)]"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
-                  {material.note}
-                </span>
-              </div>
-              <h3 className="mt-4 font-mono text-[1.8rem] font-bold leading-tight text-[#4eb8b8]">{material.name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{material.description}</p>
-              <div className="mt-4 rounded-[20px] bg-[var(--surface-subtle)] px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Cocok untuk</p>
-                <p className="mt-2 text-sm font-medium leading-relaxed text-[var(--text-primary)]">{material.usage}</p>
-              </div>
-            </article>
-          ))}
+        <div className="material-guide-list mt-6">
+          {MATERIAL_GUIDE_ITEMS.map((material) => {
+            const isOpen = openMaterialGuide === material.name;
+
+            return (
+              <article key={material.name} className="material-guide-item">
+                <button
+                  type="button"
+                  className="material-guide-trigger"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpenMaterialGuide((current) => (current === material.name ? null : material.name))}
+                >
+                  <div className="material-guide-summary">
+                    <span className="material-guide-note">{material.note}</span>
+                    <h3 className="material-guide-title">{material.name}</h3>
+                  </div>
+                  <span className={`material-guide-chevron${isOpen ? ' open' : ''}`} aria-hidden="true">
+                    +
+                  </span>
+                </button>
+
+                <div className={`material-guide-answer${isOpen ? ' open' : ''}`}>
+                  <p className="material-guide-copy">{material.description}</p>
+                  <div className="material-guide-usage">
+                    <p className="material-guide-usage-label">Cocok untuk</p>
+                    <p className="material-guide-usage-copy">{material.usage}</p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>
