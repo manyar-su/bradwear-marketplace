@@ -178,12 +178,12 @@ a {
 
 @media (max-width: 767px) {
   .web-shell {
-    --site-header-offset: 72px;
-    padding-top: 72px;
+    --site-header-offset: 78px;
+    padding-top: 78px;
   }
 
   .hero-display-strip-top {
-    margin-top: calc(var(--site-header-offset) * -1 - 2px);
+    margin-top: calc(var(--site-header-offset) * -1);
   }
 
   .brodi-page-shell::before,
@@ -1380,7 +1380,7 @@ a {
 }
 
 .hero-display-strip-top {
-  margin-top: calc(var(--site-header-offset) * -1 - 2px);
+  margin-top: calc(var(--site-header-offset) * -1);
   min-height: clamp(240px, 38vw, 420px);
 }
 
@@ -1530,7 +1530,7 @@ a {
 .hero-banner-stage-editorial {
   flex: 1 1 auto;
   min-height: 100%;
-  aspect-ratio: auto;
+  aspect-ratio: 4 / 5.1;
   background: #08111e;
 }
 
@@ -1539,10 +1539,10 @@ a {
 }
 
 .hero-banner-editorial .hero-banner-image {
-  object-fit: contain;
+  object-fit: cover;
   object-position: center top;
-  transform: scale(1);
-  background: #08111e;
+  transform: scale(1.01);
+  background: transparent;
 }
 
 .hero-copy {
@@ -2364,7 +2364,7 @@ a {
 .home-image-carousel-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   display: block;
 }
@@ -3087,7 +3087,7 @@ a {
   }
 
   .hero-banner-stage-editorial {
-    aspect-ratio: 4 / 4.8;
+    aspect-ratio: 4 / 5.15;
     min-height: auto;
   }
 
@@ -3109,7 +3109,7 @@ a {
   }
 
   .hero-banner-stage-editorial {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 5.25;
   }
 
   .hero-display-strip-top {

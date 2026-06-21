@@ -1262,7 +1262,7 @@ interface OrderItem {
         }
         @media (min-width: 768px) {
           .step-transition-container { height: 100%; }
-          .step-panel { height: 100%; }
+          .step-panel { height: 100%; min-height: 0; }
         }
         .material-rating-dot {
           width: 4px;
@@ -1434,7 +1434,7 @@ interface OrderItem {
       </div>
 
       {/* RIGHT PANEL: EDITOR */}
-      <div className={`w-full md:w-[40%] lg:w-[35%] flex-shrink-0 md:h-full flex flex-col border-t md:border-t-0 md:border-l relative z-10 shadow-2xl transition-colors duration-500 overflow-visible md:overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`}>
+      <div className={`w-full md:w-[40%] lg:w-[35%] flex-shrink-0 md:h-full min-h-0 flex flex-col border-t md:border-t-0 md:border-l relative z-10 shadow-2xl transition-colors duration-500 overflow-visible md:overflow-hidden ${theme === 'dark' ? 'bg-zinc-950 border-white/5' : 'bg-white border-zinc-200'}`}>
 
         {/* Panel Header - hanya step indicator */}
         <div className={`px-5 py-3 md:px-8 border-b shrink-0 transition-colors duration-500 ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'bg-zinc-50 border-zinc-100'}`}>
@@ -1485,7 +1485,7 @@ interface OrderItem {
         </div>
 
         {/* Sliding Step Container */}
-        <div className="flex-1 relative overflow-hidden h-auto md:h-full">
+        <div className="flex-1 relative min-h-0 overflow-hidden h-auto md:h-full">
           <div
             className="step-transition-container"
             style={{
