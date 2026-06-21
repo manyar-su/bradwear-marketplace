@@ -12,7 +12,7 @@ import {
 
 export const SITE_URL = 'https://bradwear.store';
 export const SITE_NAME = 'Bradwear Indonesia';
-export const SITE_TAGLINE = 'Konveksi seragam custom untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
+export const SITE_TAGLINE = 'Konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
 export const WHATSAPP_NUMBER = '6287736834454';
 export const STORE_ADDRESS = 'Karisma Residence, Blok C.46, RT.008/RW.003, Margajaya, Kec. Mangunreja, Kabupaten Tasikmalaya, Jawa Barat 46462';
 export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STORE_ADDRESS)}`;
@@ -289,6 +289,28 @@ export const BASE_KEYWORDS = [
   'bradwear store',
   'konveksi tasikmalaya',
   'seragam custom instansi',
+  'kemeja custom',
+  'kemeja dinas',
+  'kemeja kerja custom',
+  'kemeja lapangan',
+  'kemeja tactical',
+  'kemeja pdh',
+  'kemeja pdl',
+  'seragam kerja',
+  'seragam kantor',
+  'seragam perusahaan',
+  'seragam dinas',
+  'seragam operasional',
+  'seragam lapangan',
+  'baju dinas custom',
+  'bikin kemeja custom',
+  'vendor kemeja custom',
+  'konveksi kemeja dinas',
+  'konveksi seragam kerja',
+  'konveksi seragam kantor',
+  'konveksi seragam perusahaan',
+  'bordir logo kemeja',
+  'bordir nama seragam',
   'kemeja dinas custom',
   'celana tactical custom',
   'rompi lapangan custom',
@@ -313,25 +335,35 @@ export const BASE_KEYWORDS = [
   'seragam lapangan custom',
   'seragam dinas instansi',
   'pengadaan seragam perusahaan',
+  'pengadaan kemeja dinas',
+  'seragam security custom',
+  'seragam event custom',
+  'seragam komunitas',
+  'kemeja bordir custom',
+  'vendor seragam dinas',
+  'vendor kemeja dinas',
+  'workshirt custom indonesia',
   'custom uniform manufacturer indonesia',
   'brodi bradwear',
   'bradwear ai assistant',
 ];
 
+const dedupeKeywords = (keywords: string[]) => Array.from(new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)));
+
 const makeMeta = (route: RouteKey, title: string, description: string, extraKeywords: string[] = []): SeoMeta => ({
   title,
   description,
   path: ROUTE_PATHS[route],
-  keywords: [...BASE_KEYWORDS, ...extraKeywords],
+  keywords: dedupeKeywords([...BASE_KEYWORDS, ...extraKeywords]),
   schema: [],
 });
 
 export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.HOME]: makeMeta(
     RouteKey.HOME,
-    'Bradwear Indonesia | Konveksi Seragam Custom Tasikmalaya',
-    'Bradwear Indonesia melayani pembuatan seragam custom untuk instansi, perusahaan, dan komunitas. Berbasis di Tasikmalaya dengan pengiriman ke seluruh Indonesia.',
-    ['seragam instansi', 'konveksi seragam tasikmalaya', 'custom seragam perusahaan', 'vendor seragam indonesia', 'seragam kerja kantor']
+    'Bradwear Indonesia | Kemeja Custom, Kemeja Dinas, dan Seragam Kerja Tasikmalaya',
+    'Bradwear Indonesia melayani pembuatan kemeja custom, kemeja dinas, seragam kerja, PDH, PDL, rompi, jaket, dan bordir logo untuk instansi, perusahaan, serta komunitas. Berbasis di Tasikmalaya dengan pengiriman ke seluruh Indonesia.',
+    ['seragam instansi', 'konveksi seragam tasikmalaya', 'custom seragam perusahaan', 'vendor seragam indonesia', 'seragam kerja kantor', 'kemeja custom tasikmalaya', 'kemeja dinas custom', 'seragam kerja custom', 'vendor pdh pdl']
   ),
   [RouteKey.THREE_D]: makeMeta(
     RouteKey.THREE_D,
@@ -341,51 +373,51 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   ),
   [RouteKey.KATALOG]: makeMeta(
     RouteKey.KATALOG,
-    'Katalog Seragam Custom Bradwear Indonesia',
-    'Lihat katalog kemeja, jaket, rompi, polo, dan model seragam custom Bradwear Indonesia untuk kebutuhan dinas, lapangan, dan perusahaan.',
-    ['katalog seragam custom', 'kemeja dinas', 'jaket bomber custom', 'rompi lapangan', 'polo custom', 'pants tactical']
+    'Katalog Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
+    'Lihat katalog kemeja custom, kemeja dinas, PDH, PDL, jaket, rompi, polo, dan celana kerja Bradwear Indonesia untuk kebutuhan kantor, lapangan, operasional, dan pengadaan instansi.',
+    ['katalog seragam custom', 'kemeja dinas', 'jaket bomber custom', 'rompi lapangan', 'polo custom', 'pants tactical', 'katalog kemeja custom', 'katalog kemeja dinas', 'seragam kantor custom', 'seragam kerja lapangan']
   ),
   [RouteKey.CLIENT]: makeMeta(
     RouteKey.CLIENT,
-    'Galeri Klien Bradwear Indonesia',
-    'Lihat dokumentasi hasil produksi dan galeri klien Bradwear Indonesia untuk kebutuhan instansi, medis, kejaksaan, dan pemerintah daerah.',
-    ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien']
+    'Galeri Klien Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
+    'Lihat dokumentasi hasil produksi kemeja custom, kemeja dinas, dan seragam kerja Bradwear Indonesia untuk kebutuhan instansi, medis, operasional, kejaksaan, dan pemerintah daerah.',
+    ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien', 'hasil jadi kemeja dinas', 'galeri kemeja custom']
   ),
   [RouteKey.PANTS]: makeMeta(
     RouteKey.PANTS,
-    'Pants dan Celana Tactical Custom | Bradwear Indonesia',
-    'Halaman khusus pants Bradwear Indonesia berisi pilihan celana tactical, celana kerja, dan celana lapangan custom untuk kebutuhan tim operasional.',
-    ['pants custom', 'celana tactical', 'celana kerja custom', 'celana lapangan pria', 'celana operasional instansi']
+    'Celana Tactical dan Celana Kerja Custom | Bradwear Indonesia',
+    'Halaman khusus celana Bradwear Indonesia berisi pilihan celana tactical, celana kerja, dan celana lapangan custom untuk kebutuhan tim operasional, seragam dinas, dan aktivitas lapangan.',
+    ['pants custom', 'celana tactical', 'celana kerja custom', 'celana lapangan pria', 'celana operasional instansi', 'celana dinas custom', 'celana seragam kerja']
   ),
   [RouteKey.ARTIKEL]: makeMeta(
     RouteKey.ARTIKEL,
-    'Artikel Bradwear | Panduan Bahan, Model, dan Order Seragam',
-    'Baca artikel Bradwear seputar pemilihan bahan, model seragam, checklist produksi, dan tips order seragam instansi agar proses lebih efisien.',
-    ['artikel seragam', 'tips order seragam', 'panduan bahan seragam', 'edukasi seragam kerja', 'faq konveksi seragam']
+    'Artikel Bradwear | Panduan Bahan, Kemeja Dinas, dan Order Seragam',
+    'Baca artikel Bradwear seputar pemilihan bahan, model kemeja dinas, checklist produksi, dan tips order seragam kerja agar proses approval dan produksi lebih efisien.',
+    ['artikel seragam', 'tips order seragam', 'panduan bahan seragam', 'edukasi seragam kerja', 'faq konveksi seragam', 'panduan kemeja dinas', 'tips order kemeja custom']
   ),
   [RouteKey.CARA_ORDER]: makeMeta(
     RouteKey.CARA_ORDER,
-    'Cara Order Seragam Custom Bradwear Indonesia',
-    'Pelajari cara order seragam custom di Bradwear mulai dari pilih katalog, atur desain, isi ukuran, hingga konsultasi dengan layanan pelanggan.',
-    ['cara order seragam', 'tutorial order custom', 'alur pemesanan seragam', 'cara pesan seragam instansi', 'workflow order seragam']
+    'Cara Order Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
+    'Pelajari cara order kemeja custom dan seragam dinas di Bradwear mulai dari pilih katalog, atur desain, isi ukuran, sampai konsultasi dengan layanan pelanggan.',
+    ['cara order seragam', 'tutorial order custom', 'alur pemesanan seragam', 'cara pesan seragam instansi', 'workflow order seragam', 'cara order kemeja custom', 'cara pesan kemeja dinas']
   ),
   [RouteKey.LAYANAN_PELANGGAN]: makeMeta(
     RouteKey.LAYANAN_PELANGGAN,
-    'Layanan Pelanggan Bradwear Indonesia',
-    'Hubungi layanan pelanggan Bradwear Indonesia untuk konsultasi model, bahan, revisi desain, estimasi produksi, dan tindak lanjut pengiriman.',
-    ['customer service bradwear', 'whatsapp konveksi', 'konsultasi seragam', 'tindak lanjut order seragam', 'admin seragam custom']
+    'Layanan Pelanggan Kemeja Custom Bradwear Indonesia',
+    'Hubungi layanan pelanggan Bradwear Indonesia untuk konsultasi kemeja custom, bahan, bordir logo, revisi desain, estimasi produksi, dan tindak lanjut pengiriman.',
+    ['customer service bradwear', 'whatsapp konveksi', 'konsultasi seragam', 'tindak lanjut order seragam', 'admin seragam custom', 'whatsapp kemeja custom', 'cs kemeja dinas']
   ),
   [RouteKey.LACAK_PESANAN]: makeMeta(
     RouteKey.LACAK_PESANAN,
     'Lacak Pesanan Bradwear dan Resi Ekspedisi Indonesia',
-    'Pantau status order Bradwear dan lanjutkan cek resi resmi JNE, J&T Express, SiCepat, TIKI, Pos Indonesia, AnterAja, Ninja Xpress, dan ID Express.',
-    ['lacak pesanan', 'cek resi jne', 'cek resi j&t', 'tracking kurir indonesia', 'status produksi seragam', 'tracking order bradwear']
+    'Pantau status order kemeja custom dan lanjutkan cek resi resmi JNE, J&T Express, SiCepat, TIKI, Pos Indonesia, AnterAja, Ninja Xpress, dan ID Express.',
+    ['lacak pesanan', 'cek resi jne', 'cek resi j&t', 'tracking kurir indonesia', 'status produksi seragam', 'tracking order bradwear', 'lacak order kemeja custom']
   ),
   [RouteKey.TEMUKAN_TOKO]: makeMeta(
     RouteKey.TEMUKAN_TOKO,
-    'Temukan Toko Bradwear Indonesia di Tasikmalaya',
-    'Kunjungi lokasi Bradwear Indonesia di Karisma Residence, Mangunreja, Kabupaten Tasikmalaya, Jawa Barat untuk konsultasi dan pengembangan sampel.',
-    ['alamat bradwear', 'konveksi tasikmalaya', 'workshop seragam jawa barat', 'lokasi workshop seragam', 'toko seragam tasikmalaya']
+    'Workshop Kemeja Custom Bradwear Indonesia di Tasikmalaya',
+    'Kunjungi workshop Bradwear Indonesia di Karisma Residence, Mangunreja, Kabupaten Tasikmalaya, Jawa Barat untuk konsultasi kemeja custom, seragam dinas, dan pengembangan sampel.',
+    ['alamat bradwear', 'konveksi tasikmalaya', 'workshop seragam jawa barat', 'lokasi workshop seragam', 'toko seragam tasikmalaya', 'workshop kemeja custom', 'konveksi kemeja dinas tasikmalaya']
   ),
   [RouteKey.BRAD_AI]: makeMeta(
     RouteKey.BRAD_AI,
@@ -395,15 +427,15 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   ),
   [RouteKey.EDITOR]: makeMeta(
     RouteKey.EDITOR,
-    'Editor Desain Seragam | Bradwear Indonesia',
-    'Atur warna, bahan, posisi atribut, dan detail desain seragam custom langsung dari editor Bradwear Indonesia.',
-    ['editor desain seragam', 'custom uniform editor', 'simulasi seragam custom', 'desain kemeja custom']
+    'Editor Desain Kemeja Custom | Bradwear Indonesia',
+    'Atur warna, bahan, posisi atribut, dan detail desain kemeja custom atau seragam dinas langsung dari editor Bradwear Indonesia.',
+    ['editor desain seragam', 'custom uniform editor', 'simulasi seragam custom', 'desain kemeja custom', 'editor kemeja dinas']
   ),
   [RouteKey.SUMMARY]: makeMeta(
     RouteKey.SUMMARY,
-    'Ringkasan Pesanan Seragam | Bradwear Indonesia',
-    'Periksa ukuran, jumlah item, dan ringkasan akhir sebelum mengirim order seragam custom ke layanan pelanggan Bradwear.',
-    ['ringkasan order seragam', 'checkout seragam custom', 'form pesanan seragam', 'order summary uniform']
+    'Ringkasan Pesanan Kemeja Custom | Bradwear Indonesia',
+    'Periksa ukuran, jumlah item, dan ringkasan akhir sebelum mengirim order kemeja custom atau seragam dinas ke layanan pelanggan Bradwear.',
+    ['ringkasan order seragam', 'checkout seragam custom', 'form pesanan seragam', 'order summary uniform', 'ringkasan order kemeja custom']
   ),
 };
 

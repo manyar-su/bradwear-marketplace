@@ -246,7 +246,10 @@ const PublicSiteView: React.FC = () => {
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const [openMaterialGuide, setOpenMaterialGuide] = useState<string | null>(MATERIAL_GUIDE_ITEMS[0]?.name ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
+  const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
   const catalogRef = useRef<HTMLElement | null>(null);
+  const homeCarouselTouchStartX = useRef<number | null>(null);
+  const homeCarouselTouchDeltaX = useRef(0);
 
   const heroSlides = useMemo(
     () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
@@ -390,6 +393,10 @@ const PublicSiteView: React.FC = () => {
   );
   const shirtSpotlightProduct = kemejaProducts[0] ?? featured.find((product) => product.category === 'Kemeja') ?? null;
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
+  const homeCarouselProducts = useMemo(() => {
+    const seededProducts = [shirtSpotlightProduct, ...topProducts].filter(Boolean) as Product[];
+    return seededProducts.filter((product, index, collection) => collection.findIndex((entry) => entry.id === product.id) === index).slice(0, 5);
+  }, [shirtSpotlightProduct, topProducts]);
   const clientGalleryGroups = useMemo(
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
@@ -425,6 +432,58 @@ const PublicSiteView: React.FC = () => {
   const lookupTracking = (event: FormEvent) => {
     event.preventDefault();
     setTrackingLookup(trackingCodeInput.trim());
+  };
+
+  useEffect(() => {
+    if (homeCarouselProducts.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveHomeCarouselSlide((prev) => (prev + 1) % homeCarouselProducts.length);
+    }, 4200);
+
+    return () => window.clearInterval(timer);
+  }, [homeCarouselProducts]);
+
+  useEffect(() => {
+    if (!homeCarouselProducts.length) {
+      setActiveHomeCarouselSlide(0);
+      return;
+    }
+
+    setActiveHomeCarouselSlide((prev) => Math.min(prev, homeCarouselProducts.length - 1));
+  }, [homeCarouselProducts]);
+
+  const showPreviousHomeCarouselSlide = () => {
+    if (homeCarouselProducts.length < 2) return;
+    setActiveHomeCarouselSlide((prev) => (prev - 1 + homeCarouselProducts.length) % homeCarouselProducts.length);
+  };
+
+  const showNextHomeCarouselSlide = () => {
+    if (homeCarouselProducts.length < 2) return;
+    setActiveHomeCarouselSlide((prev) => (prev + 1) % homeCarouselProducts.length);
+  };
+
+  const handleHomeCarouselTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    homeCarouselTouchStartX.current = event.touches[0]?.clientX ?? null;
+    homeCarouselTouchDeltaX.current = 0;
+  };
+
+  const handleHomeCarouselTouchMove = (event: React.TouchEvent<HTMLElement>) => {
+    const touchStartX = homeCarouselTouchStartX.current;
+    if (touchStartX === null) return;
+    homeCarouselTouchDeltaX.current = (event.touches[0]?.clientX ?? touchStartX) - touchStartX;
+  };
+
+  const handleHomeCarouselTouchEnd = () => {
+    const deltaX = homeCarouselTouchDeltaX.current;
+
+    if (deltaX <= -42) {
+      showNextHomeCarouselSlide();
+    } else if (deltaX >= 42) {
+      showPreviousHomeCarouselSlide();
+    }
+
+    homeCarouselTouchStartX.current = null;
+    homeCarouselTouchDeltaX.current = 0;
   };
 
   const renderProductCard = (product: Product, badge?: string) => (
@@ -530,17 +589,11 @@ const PublicSiteView: React.FC = () => {
   );
 
   const renderHome = () => {
-    const homeFeaturedProducts = (shirtSpotlightProduct
-      ? [shirtSpotlightProduct, ...topProducts.filter((product) => product.id !== shirtSpotlightProduct.id)]
-      : topProducts
-    ).slice(0, 3);
-
     return (
       <>
         <section className="hero-display-strip hero-display-strip-top" data-home-section="hero-intro">
           <img src={heroTopImage} alt="Seragam Bradwear sebagai identitas perusahaan" className="hero-display-strip-image" />
           <div className="hero-display-strip-overlay">
-            <p className="hero-display-strip-kicker">Visual Pembuka</p>
             <h2 className="hero-display-strip-title">Seragam merupakan identitas perusahaan</h2>
           </div>
         </section>
@@ -606,12 +659,6 @@ const PublicSiteView: React.FC = () => {
                   />
                 ))}
                 <div className="hero-banner-overlay" />
-                <div className="hero-visual-note">
-                  <span className="hero-visual-note-label">Referensi visual utama</span>
-                  <strong className="hero-visual-note-title">
-                    Tampilan seragam dan suasana workshop sebagai gambaran hasil order
-                  </strong>
-                </div>
               </div>
 
               {safeHeroSlides.length > 1 ? (
@@ -738,51 +785,72 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         <section className="home-section" data-home-section="model-showcase">
-          <div className="home-section-shell model-showcase-shell">
-            <div className="home-section-heading">
-              <p className="home-section-kicker">Model Unggulan</p>
-              <h2 className="home-section-title">Pilih model yang paling dekat dengan kebutuhan agar proses desain lebih cepat</h2>
-              <p className="home-section-copy">
-                Gunakan model ini sebagai titik mulai. Setelah itu detail bahan, warna, bordir, dan identitas bisa
-                dirapikan di editor atau dibahas lewat WhatsApp.
-              </p>
+          <div
+            className="home-image-carousel-shell"
+            onTouchStart={handleHomeCarouselTouchStart}
+            onTouchMove={handleHomeCarouselTouchMove}
+            onTouchEnd={handleHomeCarouselTouchEnd}
+          >
+            <div className="home-image-carousel-stage">
+              {homeCarouselProducts.map((product, index) => {
+                const offset = index - activeHomeCarouselSlide;
+                const distance = Math.abs(offset);
+                const positionClass =
+                  offset === 0
+                    ? 'is-active'
+                    : offset === -1
+                      ? 'is-left'
+                      : offset === 1
+                        ? 'is-right'
+                        : distance > 2
+                          ? 'is-hidden'
+                          : offset < 0
+                            ? 'is-far-left'
+                            : 'is-far-right';
+
+                return (
+                  <button
+                    key={product.id}
+                    type="button"
+                    className={`home-image-carousel-card ${positionClass}`}
+                    style={{ ['--carousel-offset' as string]: String(offset) }}
+                    onClick={() => (offset === 0 ? handleSelectProduct(product) : setActiveHomeCarouselSlide(index))}
+                    aria-label={offset === 0 ? `Buka desain ${product.name}` : `Tampilkan ${product.name}`}
+                  >
+                    <img src={product.image} alt={product.name} className="home-image-carousel-image" />
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="model-showcase-grid">
-              <article className="model-showcase-feature">
-                {spotlightProduct ? (
-                  <>
-                    <div className="model-showcase-feature-media">
-                      <img src={spotlightProduct.image} alt={spotlightProduct.name} className="model-showcase-feature-image" />
-                    </div>
-                    <div className="model-showcase-feature-copy">
-                      <p className="home-section-kicker">Rekomendasi awal</p>
-                      <h3 className="model-showcase-feature-title">{spotlightProduct.name}</h3>
-                      <p className="model-showcase-feature-description">{spotlightProduct.description}</p>
-                      <div className="section-action-stack mt-5">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectProduct(spotlightProduct)}
-                          className="hero-primary brand-cta"
-                        >
-                          Desain model ini
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCurrentRoute(RouteKey.KATALOG)}
-                          className="hero-secondary"
-                        >
-                          Lihat semua model
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                ) : null}
-              </article>
+            {homeCarouselProducts.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={showPreviousHomeCarouselSlide}
+                  className="hero-arrow hero-arrow-left home-image-carousel-arrow"
+                  aria-label="Slide model sebelumnya"
+                >
+                  &lt;
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextHomeCarouselSlide}
+                  className="hero-arrow hero-arrow-right home-image-carousel-arrow"
+                  aria-label="Slide model berikutnya"
+                >
+                  &gt;
+                </button>
+              </>
+            ) : null}
 
-              <div className="model-showcase-cards">
-                {homeFeaturedProducts.map((product, index) => renderProductCard(product, index === 0 ? 'Pilihan utama' : 'Siap dibahas'))}
-              </div>
+            <div className="home-image-carousel-dots" aria-hidden="true">
+              {homeCarouselProducts.map((product, index) => (
+                <span
+                  key={product.id}
+                  className={`home-image-carousel-dot ${index === activeHomeCarouselSlide ? 'is-active' : ''}`}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -813,7 +881,6 @@ const PublicSiteView: React.FC = () => {
         <section className="home-section home-section-full">
           <article className="footer-cta-panel">
             <div>
-              <p className="home-section-kicker">Footer CTA</p>
               <h2 className="home-section-title">Siap lanjut konsultasi atau mulai desain dari model yang sudah dipilih?</h2>
               <p className="home-section-copy">
                 Jika kebutuhan sudah cukup jelas, lanjutkan ke editor atau kirim pesan WhatsApp agar tim Bradwear bisa
