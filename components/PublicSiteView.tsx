@@ -1,7 +1,6 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS } from '../assets';
 import heroTopImage from '../assets/Hero/atas.webp';
-import heroBottomImage from '../assets/Hero/bawah.webp';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
@@ -27,22 +26,9 @@ import SiteFooter from './SiteFooter';
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
 const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
-const SLIDESHOW_INTERVAL_MS = 5400;
-
-const HERO_PROOF_ITEMS = [
-  {
-    label: 'Sampel awal',
-    value: 'Mulai dari 1 pcs desain,bordir 3D dan bahan.',
-  },
-  {
-    label: 'Estimasi produksi',
-    value: 'Normal 14-21 hari kerja setelah detail disetujui.',
-  },
-  {
-    label: 'Tindak lanjut',
-    value: 'Ringkasan order langsung diteruskan ke WhatsApp tim Bradwear.',
-  },
-] as const;
+const SLIDESHOW_INTERVAL_MS = 5000;
+const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
+const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
 
 const BRAND_PROFILE_ITEMS = [
   {
@@ -52,6 +38,7 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'CV. ASTHAJAYA BRADERINDO adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.',
     points: ['Beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM', 'Fokus pada kualitas tinggi untuk seragam dinas dan kerja custom', 'Melayani instansi pemerintah, perusahaan, sekolah, dan organisasi'],
+    emphasis: 'Bradwear hadir sebagai wajah layanan seragam dinas yang rapi, jelas, dan siap dipresentasikan sejak tahap konsultasi awal.',
   },
   {
     route: RouteKey.VISION_MISSION,
@@ -60,6 +47,7 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'Arah kerja Bradwear adalah menjaga kualitas jahit, ketepatan produksi, dan komunikasi yang mudah dipahami agar keputusan internal klien lebih cepat.',
     points: ['Menjaga kualitas bahan dan finishing', 'Memberi layanan profesional dan tepat waktu', 'Terus menyempurnakan desain, produksi, dan kontrol detail'],
+    emphasis: 'Halaman ini menekankan standar kerja dan orientasi layanan, bukan sekadar profil perusahaan.',
   },
   {
     route: RouteKey.PRODUCTS_SERVICES,
@@ -68,6 +56,7 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'Pilihan utama meliputi kemeja dinas, jaket, rompi, polo, celana tactical, serta layanan custom desain dengan penyesuaian bordir dan identitas personel.',
     points: ['Seragam dinas pemerintahan dan operasional', 'Seragam perusahaan, komunitas, dan sekolah', 'Bordir logo, nama personel, dan detail custom'],
+    emphasis: 'Fokus utama halaman ini adalah memperjelas cakupan produk serta layanan custom yang benar-benar dikerjakan Bradwear.',
   },
   {
     route: RouteKey.COMPETITIVE_ADVANTAGE,
@@ -76,6 +65,7 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'Halaman ini disusun supaya klien bisa memilih model, melihat referensi hasil jadi, lalu masuk ke diskusi produksi dengan data yang lebih siap.',
     points: ['Bahan dipilih sesuai fungsi seragam', 'Presisi jahit dan kontrol visual sebelum produksi', 'Konsultasi langsung dilanjutkan ke WhatsApp tim'],
+    emphasis: 'Keunggulan Bradwear ditempatkan pada keputusan bahan yang tepat, produksi yang rapi, dan alur order yang tidak berputar-putar.',
   },
   {
     route: RouteKey.CLIENT_REACH,
@@ -84,6 +74,7 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'Portofolio dan layanan disiapkan untuk instansi daerah, perusahaan nasional, organisasi, sekolah, serta kebutuhan tim yang memerlukan approval visual lebih dulu.',
     points: ['Workshop dan sample development di Tasikmalaya', 'Pengiriman ke seluruh Indonesia', 'Referensi hasil jadi tersedia untuk kebutuhan approval'],
+    emphasis: 'Konten halaman ini menyorot jangkauan pengiriman dan kesiapan Bradwear melayani kebutuhan order dari berbagai wilayah Indonesia.',
   },
   {
     route: RouteKey.LEGAL_LICENSE,
@@ -92,12 +83,16 @@ const BRAND_PROFILE_ITEMS = [
     body:
       'Bradwear berjalan di bawah entitas usaha resmi dan menyiapkan tindak lanjut dokumen, kebutuhan legal, serta syarat kerja sama sesuai konteks instansi atau perusahaan.',
     points: ['Informasi legal dibuka saat proses konsultasi resmi', 'Kebutuhan administrasi pengadaan dapat dibahas lanjut', 'Syarat dan alur kerja dibuat menyesuaikan tipe order'],
+    emphasis: 'Informasi legal diposisikan sebagai penegas kredibilitas dan kesiapan administrasi kerja sama, bukan pengulangan profil perusahaan.',
   },
 ] as const;
 
 type LightboxSlide = {
   alt: string;
+  description?: string;
   src: string;
+  title?: string;
+  variant?: 'default' | 'size-guide';
 };
 
 const getHoverImage = (product: { image: string; images?: { back?: string }; gallery?: string[] }) => {
@@ -236,39 +231,70 @@ const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; gra
 
 const MATERIAL_GUIDE_ITEMS = [
   {
-    name: 'American Drill',
-    note: 'Kuat dan serbaguna',
-    usage: 'PDH, PDL, pabrik, wearpack, dan seragam organisasi.',
-    description:
-      'American Drill memiliki pola tenunan garis miring dengan karakter kain yang kuat, tahan lama, dan tetap mudah dibentuk. Pilihan ini cocok untuk seragam kerja yang membutuhkan struktur rapi dengan daya pakai tinggi.',
-  },
-  {
     name: 'Japan Drill',
     note: 'Best seller kemeja dinas',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.JAPAN_DRILL,
+    specification: 'Tekstur drill rapat, handfeel padat, jatuh rapi, dan stabil untuk kemeja dinas maupun lapangan ringan.',
     usage: 'Kemeja, celana, jaket, parka, dan seragam operasional.',
     description:
       'Japan Drill terasa kuat dan cenderung lebih tebal dibanding bahan kemeja ringan. Karakternya stabil, jatuhnya rapi, dan nyaman dipakai untuk kebutuhan dinas harian maupun aktivitas lapangan ringan.',
-  },
-  {
-    name: 'Oxford',
-    note: 'Rapi dan ringan',
-    usage: 'Kemeja event, organisasi, perusahaan, dan semi-formal.',
-    description:
-      'Oxford menghadirkan kombinasi tampilan klasik dan rasa pakai yang nyaman. Bahan ini cocok saat kebutuhan utamanya adalah visual bersih, ringan di badan, dan tetap terlihat formal saat dipakai tim atau instansi.',
+    advantages: ['Tampilan rapi dan profesional', 'Lebih kokoh untuk pemakaian rutin', 'Nyaman untuk seragam dinas harian'],
+    disadvantages: ['Terasa lebih padat dibanding bahan ringan', 'Kurang ideal bila targetnya seragam super ringan'],
   },
   {
     name: 'Ripstop',
-    note: 'Tahan aktifitas berat',
+    note: 'Tahan aktivitas berat',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.RIPSTOP,
+    specification: 'Anyaman kotak-kotak penguat, ringan, tahan sobek, dan cocok untuk kebutuhan mobilitas tinggi.',
     usage: 'Outdoor shirt, cargo, rompi, dan kebutuhan lapangan.',
     description:
       'Ripstop dikenal dari tekstur kotak-kotaknya yang rapat dan fungsional. Bahan ini ringan tetapi punya ketahanan tinggi, sehingga sering dipilih untuk seragam lapangan yang membutuhkan durabilitas lebih baik.',
+    advantages: ['Ringan namun kuat', 'Tahan untuk aktivitas lapangan', 'Cepat memberi kesan tactical dan fungsional'],
+    disadvantages: ['Permukaan lebih teknis daripada formal', 'Kurang cocok untuk kebutuhan visual yang sangat halus'],
   },
   {
-    name: 'Taipan Tropical',
+    name: 'Tropical',
     note: 'Nyaman untuk harian',
-    usage: 'Kemeja kasual, seragam komunitas, dan kebutuhan harian.',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.TROPICAL,
+    specification: 'Bobot ringan, adem, serat halus, dan relatif nyaman untuk pemakaian panjang di iklim panas.',
+    usage: 'Kemeja harian, seragam kantor, komunitas, dan kebutuhan mobilitas tinggi.',
     description:
-      'Taipan Tropical berada di jalur bahan yang terasa lebih adem dan nyaman untuk pemakaian panjang. Teksturnya tetap rapi saat dilihat, tetapi lebih ringan di badan sehingga cocok untuk aktivitas rutin dan mobilitas tinggi.',
+      'Bahan tropical berada di jalur kain yang lebih ringan dan adem. Permukaannya tetap rapi untuk kebutuhan formal, tetapi terasa lebih nyaman saat dipakai lama sepanjang hari.',
+    advantages: ['Ringan dan adem', 'Cocok untuk iklim panas', 'Tetap terlihat bersih untuk kebutuhan kantor'],
+    disadvantages: ['Kurang pas bila dibutuhkan struktur kain yang sangat tegas', 'Tidak sekuat bahan lapangan yang lebih padat'],
+  },
+  {
+    name: 'Twill',
+    note: 'Struktur tegas',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.TWILL,
+    specification: 'Tenunan diagonal yang tampak jelas, karakter medium hingga padat, dan cocok untuk tampilan seragam yang lebih berisi.',
+    usage: 'Seragam kerja formal, workshop, dan kebutuhan visual yang ingin lebih tegas.',
+    description:
+      'Twill memberi struktur kain yang lebih terbaca secara visual. Kesan akhirnya lebih kokoh dan berisi, sehingga sering dipilih ketika seragam perlu terlihat solid dan profesional.',
+    advantages: ['Tampilan lebih tegas', 'Lebih berisi secara visual', 'Cocok untuk citra profesional yang kuat'],
+    disadvantages: ['Bisa terasa lebih hangat dari kain ringan', 'Kurang ringan untuk pemakaian luar ruang yang sangat panas'],
+  },
+  {
+    name: 'Nagata Drill',
+    note: 'Padat dan rapi',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.NAGATA_DRILL,
+    specification: 'Serat drill yang padat, visual rapi, dan cocok untuk seragam dinas maupun lapangan menengah.',
+    usage: 'Kemeja dinas, celana kerja, jaket ringan, dan kebutuhan instansi.',
+    description:
+      'Nagata Drill dikenal sebagai pilihan yang cukup aman saat dibutuhkan keseimbangan antara tampilan formal, ketahanan pakai, dan kesan premium untuk seragam institusi.',
+    advantages: ['Rapi untuk tampilan instansi', 'Lebih stabil untuk dipakai rutin', 'Sering dipilih untuk kebutuhan dinas'],
+    disadvantages: ['Lebih berat dari bahan ringan', 'Kurang cocok bila target utama adalah flow kain yang lembut'],
+  },
+  {
+    name: 'Stanford',
+    note: 'Premium formal',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.STANFORD,
+    specification: 'Permukaan lebih halus, tampilan lebih bersih, dan cocok untuk kebutuhan seragam formal yang ingin terlihat eksklusif.',
+    usage: 'Seragam kantor premium, presentasi instansi, dan kebutuhan formal elegan.',
+    description:
+      'Stanford mengarah ke tampilan yang lebih refined dan bersih. Pilihan ini cocok ketika seragam tidak hanya harus fungsional, tetapi juga membawa citra profesional yang lebih premium.',
+    advantages: ['Kesan premium dan bersih', 'Cocok untuk tampilan formal', 'Meningkatkan citra visual seragam'],
+    disadvantages: ['Biasanya perlu perawatan lebih rapi', 'Kurang cocok untuk medan kerja yang sangat berat'],
   },
 ] as const;
 
@@ -293,7 +319,6 @@ const PublicSiteView: React.FC = () => {
   const [trackingLookup, setTrackingLookup] = useState('');
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
-  const [openMaterialGuide, setOpenMaterialGuide] = useState<string | null>(MATERIAL_GUIDE_ITEMS[0]?.name ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
   const catalogRef = useRef<HTMLElement | null>(null);
@@ -649,117 +674,117 @@ const PublicSiteView: React.FC = () => {
   const renderHome = () => {
     return (
       <>
+        <section className="home-utility-strip" data-home-section="hero-utility">
+          <a href={STORE_MAP_URL} target="_blank" rel="noreferrer" className="home-utility-link">
+            <GoogleMapsIcon />
+            <span>Tasikmalaya</span>
+          </a>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="home-utility-link" aria-label="Instagram Bradwear">
+            <InstagramIcon />
+          </a>
+          <a href={TIKTOK_URL} target="_blank" rel="noreferrer" className="home-utility-link" aria-label="TikTok Bradwear">
+            <TikTokIcon />
+          </a>
+          <div className="home-utility-marquee" aria-label="Pesan sekarang">
+            <span>Pesan Sekarang</span>
+            <span>Pesan Sekarang</span>
+            <span>Pesan Sekarang</span>
+          </div>
+          <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="home-utility-cta">
+            Menuju katalog
+          </button>
+        </section>
+
         <section className="hero-display-strip hero-display-strip-top" data-home-section="hero-intro">
           <img src={heroTopImage} alt="Seragam Bradwear sebagai identitas perusahaan" className="hero-display-strip-image" />
           <div className="hero-display-strip-overlay">
-            <h2 className="hero-display-strip-title">Seragam merupakan identitas perusahaan</h2>
+            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Seragam merupakan identitas perusahaan</h2>
           </div>
         </section>
 
         <section className="home-hero editorial-home-hero" data-home-section="hero">
-          <div className="hero-split hero-split-editorial">
-            <article className="hero-panel hero-panel-editorial">
-              <p className="hero-kicker">Bradwear Indonesia · Tasikmalaya</p>
-              <div className="hero-badge-row">
-                <span className="hero-badge">Workshop Aktif</span>
-                <span className="hero-badge">Kirim Seluruh Indonesia</span>
-                <span className="hero-badge">Bisa mulai sample</span>
-              </div>
-              <h1>
-                Seragam custom untuk <span className="hero-highlight">tim dan instansi</span> yang ingin order lebih
-                jelas sejak awal.
-              </h1>
-              <p className="hero-lead">
-                Pilih model yang paling dekat dengan kebutuhan Anda, rapikan arahan desain, lalu lanjutkan konsultasi
-                tanpa penjelasan berulang.
-              </p>
-              <div className="hero-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (spotlightProduct) {
-                      handleSelectProduct(spotlightProduct);
-                      return;
-                    }
-                    setCurrentRoute(RouteKey.KATALOG);
-                  }}
-                  className="hero-primary brand-cta"
-                >
-                  Mulai Desain
-                </button>
-                <a
-                  href={buildWhatsAppUrl(buildConsultationMessage('konsultasi order seragam custom untuk tim atau instansi'))}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-secondary"
-                >
-                  Tanya via WhatsApp
-                </a>
-              </div>
-              <div className="hero-micro-stats hero-micro-stats-editorial">
-                {HERO_PROOF_ITEMS.map((item) => (
-                  <article key={item.label} className="hero-proof-card">
-                    <span className="hero-proof-label">{item.label}</span>
-                    <strong className="hero-proof-value">{item.value}</strong>
-                  </article>
-                ))}
-              </div>
-            </article>
-
-            <article className="hero-banner hero-banner-editorial">
-              <div className="hero-banner-stage hero-banner-stage-editorial">
-                {safeHeroSlides.map((slide, index) => (
-                  <img
-                    key={`${slide}-${index}`}
-                    src={slide}
-                    alt={`Hero Bradwear ${index + 1}`}
-                    className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-                  />
-                ))}
-                <div className="hero-banner-overlay" />
-              </div>
-
-              {safeHeroSlides.length > 1 ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
-                    className="hero-arrow hero-arrow-left"
-                    aria-label="Banner sebelumnya"
-                  >
-                    &lt;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
-                    className="hero-arrow hero-arrow-right"
-                    aria-label="Banner berikutnya"
-                  >
-                    &gt;
-                  </button>
-                </>
-              ) : null}
-            </article>
-          </div>
+          <article className="hero-panel hero-panel-editorial hero-panel-clean">
+            <p className="hero-kicker">Bradwear Indonesia</p>
+            <h1>Seragam Dinas Berkualitas untuk Citra Profesional Perusahaan Anda.</h1>
+            <p className="hero-lead">
+              Diproduksi dengan standar jahitan rapi, bahan premium, dan desain yang dapat disesuaikan dengan identitas
+              instansi maupun perusahaan.
+            </p>
+            <div className="hero-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  if (spotlightProduct) {
+                    handleSelectProduct(spotlightProduct);
+                    return;
+                  }
+                  setCurrentRoute(RouteKey.KATALOG);
+                }}
+                className="hero-primary brand-cta"
+              >
+                Mulai desain
+              </button>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('konsultasi order seragam custom untuk tim atau instansi'))}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-secondary"
+              >
+                Tanya via whatspp
+              </a>
+            </div>
+          </article>
         </section>
 
-        <section className="hero-display-strip hero-display-strip-bottom" data-home-section="hero-outro">
-          <img src={heroBottomImage} alt="Referensi hasil seragam custom Bradwear" className="hero-display-strip-image" />
+        <section className="hero-image-runway" data-home-section="hero-slider">
+          <article className="hero-banner hero-banner-editorial hero-banner-edge">
+            <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
+              {safeHeroSlides.map((slide, index) => (
+                <img
+                  key={`${slide}-${index}`}
+                  src={slide}
+                  alt={`Hero Bradwear ${index + 1}`}
+                  className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
+                />
+              ))}
+              <div className="hero-banner-overlay hero-banner-overlay-soft" />
+            </div>
+
+            {safeHeroSlides.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
+                  className="hero-arrow hero-arrow-left"
+                  aria-label="Banner sebelumnya"
+                >
+                  &lt;
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
+                  className="hero-arrow hero-arrow-right"
+                  aria-label="Banner berikutnya"
+                >
+                  &gt;
+                </button>
+              </>
+            ) : null}
+          </article>
         </section>
 
         <section className="home-section" data-home-section="client-gallery">
-          <div className="home-section-shell home-section-grid">
+          <div className="home-section-shell home-section-shell-bleed home-section-grid">
             <div className="home-section-heading">
               <p className="home-section-kicker">Galeri Klien</p>
-              <h2 className="home-section-title">Bukti hasil jadi yang memudahkan approval sebelum order dilanjutkan</h2>
+              <h2 className="home-section-title">Dipilih oleh Berbagai Instansi &amp; Perusahaan</h2>
               <p className="home-section-copy">
-                Galeri ini membantu tim Anda melihat kerapian hasil, penempatan identitas, dan kecocokan model sebelum
-                masuk ke pembahasan produksi.
+                Bukti nyata kualitas produksi dan kepercayaan yang telah kami bangun bersama klien.
               </p>
             </div>
 
             <div className="client-gallery-grid">
-              <article className="elegant-parallax-block middle-showcase-shell client-proof-shell border border-[var(--border-soft)] bg-[var(--surface-base)] shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+              <article className="elegant-parallax-block middle-showcase-shell client-proof-shell client-proof-shell-open">
                 <article className="hero-banner middle-showcase-banner">
                   <div className="hero-banner-stage middle-showcase-stage client-gallery-stage client-fullscreen-stage">
                     {CLIENT_GALLERY_SLIDES.map((slide, index) => (
@@ -777,6 +802,7 @@ const PublicSiteView: React.FC = () => {
                         setLightboxSlide({
                           src: CLIENT_GALLERY_SLIDES[activeClientSlide],
                           alt: `Galeri klien Bradwear ${activeClientSlide + 1}`,
+                          title: `Galeri klien Bradwear ${activeClientSlide + 1}`,
                         })
                       }
                       className="slideshow-lightbox-trigger"
@@ -825,34 +851,26 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         <section className="home-section" data-home-section="order-flow">
-          <div className="home-section-shell">
-            <div className="section-header-stack mb-5">
-              <div className="home-section-heading">
-                <p className="home-section-kicker">Cara Order</p>
-                <h2 className="home-section-title">Alur singkat dari pilih model sampai data order siap dikirim</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCurrentRoute(RouteKey.CARA_ORDER)}
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-              >
-                Lihat panduan lengkap
-              </button>
+          <div className="home-section-shell home-section-shell-bleed order-flow-preview">
+            <div className="home-section-heading">
+              <p className="home-section-kicker">Cara Order</p>
+              <h2 className="home-section-title">Proses Pemesanan yang Mudah dan Terstruktur</h2>
+              <p className="home-section-copy">
+                Mulai dari konsultasi, pemilihan model, hingga produksi dan pengiriman dalam satu alur yang jelas.
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={() => setCurrentRoute(RouteKey.CARA_ORDER)}
+              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
+            >
+              Lihat Alur Pemesanan
+            </button>
           </div>
         </section>
 
         <section className="home-section" data-home-section="category-showcase">
-          <div className="home-section-shell">
-            <div className="home-section-heading">
-              <p className="home-section-kicker">Kategori & Model</p>
-              <h2 className="home-section-title">Tampilkan kategori utama sekaligus semua model kemeja yang paling sering dipilih</h2>
-              <p className="home-section-copy">
-                Slide ini menggabungkan model kemeja seperti Brad V1, V2, V3, dan seri lain, lalu dilanjutkan kategori
-                jaket, rompi, celana, dan polo agar pilihan awal lebih lengkap.
-              </p>
-            </div>
-
+          <div className="home-section-shell home-section-shell-bleed home-carousel-only">
           <div
             className="home-image-carousel-shell"
             onTouchStart={handleHomeCarouselTouchStart}
@@ -990,35 +1008,21 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
-        {lightboxSlide ? (
-          <div
-            className="slideshow-lightbox"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Preview gambar penuh"
-            onClick={() => setLightboxSlide(null)}
-          >
-            <div className="slideshow-lightbox-panel" onClick={(event) => event.stopPropagation()}>
-              <button
-                type="button"
-                onClick={() => setLightboxSlide(null)}
-                className="slideshow-lightbox-close"
-                aria-label="Close image preview"
-              >
-                Close
-              </button>
-              <img src={lightboxSlide.src} alt={lightboxSlide.alt} className="slideshow-lightbox-image" />
-            </div>
-          </div>
-        ) : null}
       </>
     );
   };
 
-  const renderCatalog = (catalogProducts: Product[], _title: string, _description: string, showCategoryTabs = true) => (
-    <div className="px-6 py-8 md:px-10">
+  const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
+    <div className="catalog-page-shell px-0 py-8">
+      <section className="catalog-page-hero">
+        <p className="home-section-kicker">Katalog Bradwear</p>
+        <h1 className="home-section-title">{title}</h1>
+        <p className="home-section-copy">{description}</p>
+      </section>
+
       {showCategoryTabs ? (
-        <section ref={catalogRef}>
+        <section ref={catalogRef} className="catalog-filter-band">
+          <p className="catalog-filter-band-title">Pilih kategori utama</p>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((category) => (
               <button
@@ -1044,6 +1048,7 @@ const PublicSiteView: React.FC = () => {
               </button>
             ))}
           </div>
+          <p className="catalog-filter-band-subtitle">Pilih model yang ingin dibandingkan</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {categoryModelOptions.map((modelName) => (
               <button
@@ -1063,13 +1068,13 @@ const PublicSiteView: React.FC = () => {
         </section>
       ) : null}
 
-      <section className="mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
+      <section className="catalog-product-grid mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
         {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
       </section>
 
       {ASSETS.CONTENT.SIZE_GUIDE ? (
-        <section className="mt-10 grid gap-5 lg:grid-cols-[0.86fr_1.14fr]">
-          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f8fafc,#ffffff)] p-5 shadow-sm md:p-6">
+        <section className="catalog-size-guide-shell mt-12 grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
+          <article className="catalog-copy-band">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Size Guide</p>
             <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
@@ -1077,31 +1082,32 @@ const PublicSiteView: React.FC = () => {
             </p>
           </article>
 
-          <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm md:p-5">
-            <div className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-white p-3 md:p-4">
-              <button
-                type="button"
-                onClick={() =>
-                  setLightboxSlide({
-                    src: ASSETS.CONTENT.SIZE_GUIDE,
-                    alt: 'Bradwear size guide',
-                  })
-                }
-                className="block w-full cursor-zoom-in"
-                aria-label="Buka size guide penuh"
-              >
-                <img
-                  src={ASSETS.CONTENT.SIZE_GUIDE}
-                  alt="Bradwear size guide"
-                  className="mx-auto max-h-[360px] w-auto max-w-full object-contain transition duration-300 hover:scale-[1.02]"
-                />
-              </button>
-            </div>
+          <article className="catalog-size-guide-stage">
+            <button
+              type="button"
+              onClick={() =>
+                setLightboxSlide({
+                  src: ASSETS.CONTENT.SIZE_GUIDE,
+                  alt: 'Bradwear size guide',
+                  title: 'Panduan Ukuran Bradwear',
+                  description: 'Tampilan size guide penuh untuk membaca detail ukuran dengan lebih jelas.',
+                  variant: 'size-guide',
+                })
+              }
+              className="block w-full cursor-zoom-in"
+              aria-label="Buka size guide penuh"
+            >
+              <img
+                src={ASSETS.CONTENT.SIZE_GUIDE}
+                alt="Bradwear size guide"
+                className="catalog-size-guide-image"
+              />
+            </button>
           </article>
         </section>
       ) : null}
 
-      <section className="mt-10 rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm md:p-7">
+      <section className="mt-12 material-guide-shell">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan</h2>
@@ -1111,36 +1117,48 @@ const PublicSiteView: React.FC = () => {
         </div>
 
         <div className="material-guide-list mt-6">
-          {MATERIAL_GUIDE_ITEMS.map((material) => {
-            const isOpen = openMaterialGuide === material.name;
-
-            return (
-              <article key={material.name} className="material-guide-item">
-                <button
-                  type="button"
-                  className="material-guide-trigger"
-                  aria-expanded={isOpen}
-                  onClick={() => setOpenMaterialGuide((current) => (current === material.name ? null : material.name))}
-                >
-                  <div className="material-guide-summary">
-                    <span className="material-guide-note">{material.note}</span>
-                    <h3 className="material-guide-title">{material.name}</h3>
+          {MATERIAL_GUIDE_ITEMS.map((material) => (
+            <article key={material.name} className="material-guide-card">
+              <div className="material-guide-visual">
+                {material.image ? (
+                  <img src={material.image} alt={`Contoh kain ${material.name}`} className="material-guide-image" />
+                ) : (
+                  <div className="material-guide-image material-guide-image-fallback" aria-hidden="true" />
+                )}
+              </div>
+              <div className="material-guide-body">
+                <span className="material-guide-note">{material.note}</span>
+                <h3 className="material-guide-title">{material.name}</h3>
+                <p className="material-guide-copy">{material.description}</p>
+                <div className="material-guide-meta-grid">
+                  <div className="material-guide-meta-block">
+                    <p className="material-guide-usage-label">Spesifikasi</p>
+                    <p className="material-guide-usage-copy">{material.specification}</p>
                   </div>
-                  <span className={`material-guide-chevron${isOpen ? ' open' : ''}`} aria-hidden="true">
-                    +
-                  </span>
-                </button>
-
-                <div className={`material-guide-answer${isOpen ? ' open' : ''}`}>
-                  <p className="material-guide-copy">{material.description}</p>
-                  <div className="material-guide-usage">
+                  <div className="material-guide-meta-block">
                     <p className="material-guide-usage-label">Cocok untuk</p>
                     <p className="material-guide-usage-copy">{material.usage}</p>
                   </div>
+                  <div className="material-guide-meta-block">
+                    <p className="material-guide-usage-label">Kelebihan</p>
+                    <ul className="material-guide-list-points">
+                      {material.advantages.map((point) => (
+                        <li key={`${material.name}-adv-${point}`}>{point}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="material-guide-meta-block">
+                    <p className="material-guide-usage-label">Kekurangan</p>
+                    <ul className="material-guide-list-points">
+                      {material.disadvantages.map((point) => (
+                        <li key={`${material.name}-dis-${point}`}>{point}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </article>
-            );
-          })}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </div>
@@ -1186,9 +1204,9 @@ const PublicSiteView: React.FC = () => {
       <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-6 shadow-sm md:p-8">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Cara Order</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Pilih tahap order, lalu baca keterangannya secara bertahap</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Proses Pemesanan yang Mudah dan Terstruktur</h1>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Gunakan tombol tahap 1 sampai selesai untuk mengikuti alur pemesanan secara lebih ringkas. Setiap tahap menampilkan keterangan inti yang dibutuhkan sebelum lanjut ke tahap berikutnya.
+            Mulai dari konsultasi, pemilihan model, hingga produksi dan pengiriman dalam satu alur yang jelas.
           </p>
         </div>
 
@@ -1283,18 +1301,21 @@ const PublicSiteView: React.FC = () => {
   );
 
   const renderCustomerService = () => (
-    <div className="px-6 py-8 md:px-10">
-      <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Layanan Pelanggan</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Bantuan cepat untuk konsultasi, revisi, dan tindak lanjut order</h1>
-          <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Tim layanan pelanggan Bradwear membantu penjelasan model, bahan, estimasi, pengumpulan data ukuran,
-            konfirmasi revisi, hingga pembaruan pengiriman.
-          </p>
-          <div className="mt-6 space-y-3">
+    <div className="service-page-shell px-0 py-8">
+      <section className="service-page-hero">
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Layanan Pelanggan</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Bantuan cepat untuk konsultasi, revisi, dan tindak lanjut order</h1>
+        <p className="mt-4 text-sm leading-relaxed text-white/80">
+          Tim layanan pelanggan Bradwear membantu penjelasan model, bahan, estimasi, pengumpulan data ukuran,
+          konfirmasi revisi, hingga pembaruan pengiriman.
+        </p>
+      </section>
+
+      <section className="service-page-grid mt-8">
+        <article className="service-page-column">
+          <div className="mt-1 space-y-3">
             {CONTACT_CHANNELS.map((channel) => (
-              <div key={channel.label} className="rounded-[22px] bg-[var(--surface-subtle)] px-4 py-4">
+              <div key={channel.label} className="service-page-item">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{channel.label}</p>
                 <p className="mt-1 text-base font-bold text-[var(--text-primary)]">{channel.value}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{channel.note}</p>
@@ -1303,11 +1324,11 @@ const PublicSiteView: React.FC = () => {
           </div>
         </article>
 
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#eff6ff,#ffffff)] p-6 shadow-sm">
+        <article className="service-page-column service-page-column-alt">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Jam Operasional</p>
           <div className="mt-4 space-y-3">
             {CUSTOMER_SERVICE_HOURS.map((hour) => (
-              <div key={hour} className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-4 text-sm font-semibold text-[var(--text-secondary)]">
+              <div key={hour} className="service-page-item text-sm font-semibold text-[var(--text-secondary)]">
                 {hour}
               </div>
             ))}
@@ -1332,11 +1353,11 @@ const PublicSiteView: React.FC = () => {
         </article>
       </section>
 
-      <section className="mt-8 rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+      <section className="service-page-faq mt-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Layanan</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {SITE_FAQS.map((faq) => (
-            <article key={faq.slug} className="rounded-[24px] bg-[var(--surface-subtle)] p-5">
+            <article key={faq.slug} className="service-page-item">
               <h3 className="text-base font-bold text-[var(--text-primary)]">{faq.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
             </article>
@@ -1347,11 +1368,19 @@ const PublicSiteView: React.FC = () => {
   );
 
   const renderTracking = () => (
-    <div className="px-6 py-8 md:px-10">
-      <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Lacak pesanan Bradwear</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Cek status produksi internal dengan order code atau nomor resi</h1>
+    <div className="tracking-page-shell px-0 py-8">
+      <section className="tracking-page-hero">
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Lacak Pesanan</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Cek status produksi internal dengan order code atau nomor resi</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
+          Halaman ini memisahkan tracking internal Bradwear dan tracking resmi ekspedisi agar pelanggan bisa langsung memilih jalur pengecekan yang paling relevan.
+        </p>
+      </section>
+
+      <section className="tracking-page-grid">
+        <article className="tracking-page-panel">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Status produksi internal</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Cari order aktif atau order selesai dari kode Bradwear</h2>
           <form onSubmit={lookupTracking} className="mt-6 space-y-4">
             <input
               type="text"
@@ -1371,13 +1400,13 @@ const PublicSiteView: React.FC = () => {
           {trackingLookup ? (
             <div className="mt-6">
               {currentProductionOrder ? (
-                <div className="rounded-[26px] bg-[var(--surface-subtle)] p-5">
+                <div className="tracking-page-card">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Order aktif #{currentProductionOrder.orderCode}</p>
                   <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">{currentProductionOrder.productName}</h2>
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">Pelanggan: {currentProductionOrder.customerName} · Qty {currentProductionOrder.totalQty} pcs</p>
                   <div className="mt-5 space-y-3">
                     {currentProductionOrder.stages.map((stage) => (
-                      <div key={stage.id} className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3">
+                      <div key={stage.id} className="tracking-page-status-card">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-bold text-[var(--text-primary)]">{stage.label}</p>
                           <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
@@ -1396,7 +1425,7 @@ const PublicSiteView: React.FC = () => {
                   </div>
                 </div>
               ) : completedProductionOrder ? (
-                <div className="rounded-[26px] bg-[var(--surface-subtle)] p-5">
+                <div className="tracking-page-card">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Order selesai #{completedProductionOrder.code}</p>
                   <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">{completedProductionOrder.productName}</h2>
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">Selesai pada {completedProductionOrder.completedAt}</p>
@@ -1406,7 +1435,7 @@ const PublicSiteView: React.FC = () => {
                   ) : null}
                 </div>
               ) : (
-                <div className="rounded-[26px] bg-[var(--surface-subtle)] p-5 text-sm leading-relaxed text-[var(--text-secondary)]">
+                <div className="tracking-page-card text-sm leading-relaxed text-[var(--text-secondary)]">
                   Data order belum ditemukan di penyimpanan lokal ini. Jika Anda sudah menerima resi, lanjutkan cek di kurir resmi di panel sebelah.
                 </div>
               )}
@@ -1414,7 +1443,7 @@ const PublicSiteView: React.FC = () => {
           ) : null}
         </article>
 
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f8fafc,#ffffff)] p-6 shadow-sm">
+        <article className="tracking-page-panel tracking-page-panel-alt">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Kurir resmi Indonesia</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Lanjutkan tracking ke situs resmi ekspedisi</h2>
           <form onSubmit={openCourierTracking} className="mt-6 space-y-4">
@@ -1445,14 +1474,14 @@ const PublicSiteView: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-6 grid gap-3">
+          <div className="tracking-provider-grid mt-6 grid gap-3">
             {COURIER_PROVIDERS.map((provider) => (
               <a
                 key={provider.id}
                 href={provider.trackingUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--surface-base)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)]"
+                className="tracking-provider-link"
               >
                 {provider.name}
               </a>
@@ -1464,16 +1493,25 @@ const PublicSiteView: React.FC = () => {
   );
 
   const renderStoreLocator = () => (
-    <div className="px-6 py-8 md:px-10">
-      <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Temukan Toko</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Workshop dan titik lokasi Bradwear Indonesia</h1>
+    <div className="store-page-shell px-0 py-8">
+      <section className="store-page-hero">
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Temukan Toko</p>
+        <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Workshop dan titik lokasi Bradwear Indonesia</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
+          Lokasi ini menjadi titik konsultasi, pengembangan sampel, dan koordinasi order Bradwear Indonesia untuk
+          kebutuhan seragam custom di Tasikmalaya dan sekitarnya.
+        </p>
+      </section>
+
+      <section className="store-page-grid">
+        <article className="store-page-panel">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Alamat workshop</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Titik konsultasi, sample, dan koordinasi produksi</h2>
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
             Lokasi ini menjadi titik konsultasi, pengembangan sampel, dan koordinasi order Bradwear Indonesia untuk
             kebutuhan seragam custom di Tasikmalaya dan sekitarnya.
           </p>
-          <div className="mt-6 rounded-[24px] bg-[var(--surface-subtle)] p-5">
+          <div className="store-address-band mt-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Alamat lengkap</p>
             <p className="mt-3 text-base font-bold leading-relaxed text-[var(--text-primary)]">{STORE_ADDRESS}</p>
           </div>
@@ -1497,8 +1535,8 @@ const PublicSiteView: React.FC = () => {
           </div>
         </article>
 
-        <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ecfeff,#ffffff)] p-6 shadow-sm">
-          <div className="aspect-[4/4.4] overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-base)]">
+        <article className="store-map-shell">
+          <div className="store-map-stage">
             <iframe
               title="Google Maps Bradwear Indonesia"
               src={`https://www.google.com/maps?q=${encodeURIComponent(STORE_ADDRESS)}&z=15&output=embed`}
@@ -1516,19 +1554,20 @@ const PublicSiteView: React.FC = () => {
     if (!activeBrandProfilePage) return null;
 
     return (
-      <div className="brand-profile-page px-6 py-8 md:px-10">
-        <section className="brand-profile-hero rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#112717_48%,#1b3246)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
+      <div className="brand-profile-page px-0 py-8">
+        <section className="brand-profile-hero brand-profile-hero-flat px-6 py-8 text-white md:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">{activeBrandProfilePage.kicker}</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">{activeBrandProfilePage.title}</h1>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.body}</p>
         </section>
 
-        <section className="brand-profile-grid mt-8 grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-          <article className="brand-profile-card rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+        <section className="brand-profile-grid mt-8 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
+          <article className="brand-profile-card brand-profile-card-flat p-0 shadow-none">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">
-              {activeBrandProfilePage.kicker}
+              Fokus halaman
             </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">{activeBrandProfilePage.title}</h2>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">{activeBrandProfilePage.kicker}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">{activeBrandProfilePage.emphasis}</p>
             <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">{activeBrandProfilePage.body}</p>
 
             <div className="section-action-stack mt-6">
@@ -1550,11 +1589,11 @@ const PublicSiteView: React.FC = () => {
             </div>
           </article>
 
-          <article className="brand-profile-card rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm">
+          <article className="brand-profile-card brand-profile-card-flat p-0 shadow-none">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Poin Utama</p>
             <div className="mt-5 grid gap-3">
               {activeBrandProfilePage.points.map((point, index) => (
-                <article key={point} className="brand-profile-point rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                <article key={point} className="brand-profile-point brand-profile-point-flat px-0 py-4">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-accent-strong)]">
                     {String(index + 1).padStart(2, '0')}
                   </p>
@@ -1569,16 +1608,16 @@ const PublicSiteView: React.FC = () => {
   };
 
   const renderClientGallery = () => (
-    <div className="px-6 py-8 md:px-10">
-      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#102b14_48%,#183153)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
+    <div className="client-gallery-page-shell px-0 py-8">
+      <section className="client-gallery-page-hero px-6 py-8 text-white md:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Galeri Klien</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight">Dokumentasi visual hasil produksi dari folder klien Bradwear</h1>
+        <h1 className="mt-3 text-4xl font-black tracking-tight">Dipercaya Berbagai Perusahaan di Indonesia</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Halaman ini menampilkan galeri per folder klien agar hasil jadi lebih mudah dipresentasikan. Setiap blok memakai identitas visual yang disesuaikan dengan nama folder sumber asetnya.
+          Setiap proyek mencerminkan komitmen Bradwear dalam menghadirkan seragam berkualitas dengan detail yang presisi dan hasil yang profesional.
         </p>
       </section>
 
-      <section className="parallax-static-zone mt-8 grid gap-6">
+      <section className="parallax-static-zone mt-8 grid gap-0">
         {clientGalleryGroups.map((group) => {
           const meta = CLIENT_GALLERY_META[group.slug] ?? {
             title: group.name,
@@ -1587,49 +1626,41 @@ const PublicSiteView: React.FC = () => {
             icon: <GovernmentIcon />,
           };
           const [featuredImage, ...otherImages] = group.images;
+          const gallerySlides = [...(featuredImage ? [featuredImage] : []), ...otherImages];
 
           return (
-            <article key={group.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm md:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
+            <article key={group.slug} className="client-gallery-band">
+              <div className="client-gallery-band-copy px-6 py-7 md:px-10">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Folder {group.slug}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-4">
                   <div
-                    className="flex h-16 w-16 items-center justify-center rounded-[22px] text-white shadow-[0_16px_36px_rgba(15,23,42,0.16)]"
+                    className="client-gallery-band-icon"
                     style={{ background: meta.gradient }}
                   >
                     {meta.icon}
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Folder {group.slug}</p>
-                    <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
+                    <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
+                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
                   </div>
-                </div>
-                <div className="rounded-full bg-[var(--surface-subtle)] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                  {group.images.length} gambar
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-                {featuredImage ? (
-                  <div className="overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-subtle)]">
+              <div className="hero-banner client-gallery-band-slider">
+                <div className="hero-banner-stage client-gallery-band-stage">
+                  {gallerySlides.map((image, index) => (
                     <img
-                      src={featuredImage}
-                      alt={`${meta.title} featured`}
-                      className="h-full w-full object-cover transition duration-500 hover:scale-[1.02]"
+                      key={`${group.slug}-${index}-${image}`}
+                      src={image}
+                      alt={`${meta.title} gallery ${index + 1}`}
+                      className={`hero-banner-image hero-banner-image-ambient ${index === 0 ? 'is-active' : ''}`}
+                      style={{
+                        animationDelay: `${index * 5}s`,
+                        animationDuration: `${Math.max(gallerySlides.length, 1) * 5}s`,
+                      }}
                     />
-                  </div>
-                ) : null}
-
-                <div className={`grid gap-4 ${otherImages.length > 1 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
-                  {(otherImages.length > 0 ? otherImages : featuredImage ? [featuredImage] : []).map((image, index) => (
-                    <div key={`${group.slug}-${index}-${image}`} className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-subtle)]">
-                      <img
-                        src={image}
-                        alt={`${meta.title} gallery ${index + 1}`}
-                        className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                      />
-                    </div>
                   ))}
+                  <div className="hero-banner-overlay hero-banner-overlay-soft" />
                 </div>
               </div>
             </article>
@@ -1717,6 +1748,47 @@ const PublicSiteView: React.FC = () => {
   return (
     <main className={isThreeDRoute ? 'three-d-page-main' : 'overflow-y-auto pb-0'}>
       {content}
+      {lightboxSlide ? (
+        <div
+          className="slideshow-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Preview gambar penuh"
+          onClick={() => setLightboxSlide(null)}
+        >
+          <div
+            className={`slideshow-lightbox-panel ${lightboxSlide.variant === 'size-guide' ? 'is-size-guide' : ''}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="slideshow-lightbox-header">
+              <div className="slideshow-lightbox-copy">
+                <p className="slideshow-lightbox-kicker">
+                  {lightboxSlide.variant === 'size-guide' ? 'Size Guide' : 'Preview Gambar'}
+                </p>
+                <h2 className="slideshow-lightbox-title">{lightboxSlide.title ?? lightboxSlide.alt}</h2>
+                <p className="slideshow-lightbox-description">
+                  {lightboxSlide.description ?? 'Klik area luar popup atau tombol close untuk menutup preview.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxSlide(null)}
+                className="slideshow-lightbox-close"
+                aria-label="Close image preview"
+              >
+                Close
+              </button>
+            </div>
+            <div className="slideshow-lightbox-body">
+              <img
+                src={lightboxSlide.src}
+                alt={lightboxSlide.alt}
+                className={`slideshow-lightbox-image ${lightboxSlide.variant === 'size-guide' ? 'is-size-guide' : ''}`}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
       {!isThreeDRoute ? <SiteFooter onNavigate={setCurrentRoute} /> : null}
     </main>
   );

@@ -44,6 +44,21 @@ const MIDDLE_CONTENT_SLIDES = Object.keys(allImagesGlob)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   .map((key) => resolveAsset(key));
 const SIZE_GUIDE = resolveAsset('./assets/size guide.webp');
+const MATERIAL_GUIDE_SOURCE = Object.keys(allImagesGlob)
+  .filter((key) => key.toLowerCase().includes('/jenis bahan/'))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+const findMaterialGuideImage = (pattern: string) =>
+  resolveAsset(MATERIAL_GUIDE_SOURCE.find((key) => key.toLowerCase().includes(pattern)) ?? '');
+
+const MATERIAL_GUIDE_IMAGES = {
+  JAPAN_DRILL: findMaterialGuideImage('japan'),
+  RIPSTOP: findMaterialGuideImage('ripstop'),
+  TROPICAL: findMaterialGuideImage('tropical'),
+  TWILL: findMaterialGuideImage('twill.webp') || findMaterialGuideImage('twill'),
+  NAGATA_DRILL: findMaterialGuideImage('nagata'),
+  STANFORD: findMaterialGuideImage('stanford'),
+};
 
 const CLIENT_GALLERY_ORDER = ['dinsos', 'kejagung', 'medis', 'pemkab'] as const;
 const formatFolderLabel = (value: string) =>
@@ -537,6 +552,7 @@ export const ASSETS = {
   CONTENT: {
     MIDDLE_SLIDES: MIDDLE_CONTENT_SLIDES,
     SIZE_GUIDE,
+    MATERIAL_GUIDE_IMAGES,
   },
 
   CLIENT_GALLERY: CLIENT_GALLERY_GROUPS,

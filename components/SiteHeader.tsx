@@ -57,8 +57,7 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
       { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN },
       { label: 'Temukan Toko', route: RouteKey.TEMUKAN_TOKO },
       { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN },
-      { label: 'Syarat & Ketentuan', route: RouteKey.LEGAL_LICENSE },
-      { label: 'Lisensi Hukum', route: RouteKey.LEGAL_LICENSE },
+      { label: 'Legal & Lisensi', route: RouteKey.LEGAL_LICENSE },
     ],
   },
 ];
