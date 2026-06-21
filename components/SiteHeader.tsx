@@ -15,6 +15,11 @@ type HeaderNavItem = {
   homeSection?: string;
 };
 
+type HeaderMenuSection = {
+  title: string;
+  items: HeaderNavItem[];
+};
+
 const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
   { label: '3D', route: RouteKey.THREE_D },
@@ -22,6 +27,40 @@ const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Galeri Klien', route: RouteKey.CLIENT },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER },
   { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
+];
+
+const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
+  {
+    title: 'Navigasi Utama',
+    items: [
+      { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
+      { label: 'Studio 3D', route: RouteKey.THREE_D },
+      { label: 'Katalog', route: RouteKey.KATALOG },
+      { label: 'Galeri Klien', route: RouteKey.CLIENT },
+      { label: 'Cara Order', route: RouteKey.CARA_ORDER },
+      { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
+    ],
+  },
+  {
+    title: 'Profil Bradwear',
+    items: [
+      { label: 'Tentang Kami', route: RouteKey.HOME, homeSection: 'about-overview' },
+      { label: 'Visi & Misi', route: RouteKey.HOME, homeSection: 'vision-mission' },
+      { label: 'Produk & Jasa', route: RouteKey.HOME, homeSection: 'products-services' },
+      { label: 'Keunggulan', route: RouteKey.HOME, homeSection: 'competitive-advantage' },
+      { label: 'Klien & Jangkauan', route: RouteKey.HOME, homeSection: 'client-reach' },
+    ],
+  },
+  {
+    title: 'Bantuan & Legal',
+    items: [
+      { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN },
+      { label: 'Temukan Toko', route: RouteKey.TEMUKAN_TOKO },
+      { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN },
+      { label: 'Syarat & Ketentuan', route: RouteKey.HOME, homeSection: 'legal-license' },
+      { label: 'Lisensi Hukum', route: RouteKey.HOME, homeSection: 'legal-license' },
+    ],
+  },
 ];
 
 const SiteHeader: React.FC<SiteHeaderProps> = ({
@@ -95,19 +134,26 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
         <details ref={mobileMenuRef} className="mobile-main-menu">
           <summary className="mobile-main-menu-trigger">Menu</summary>
           <div className="mobile-main-menu-panel">
-            <ul className="mobile-main-menu-list">
-              {HEADER_NAV_ITEMS.map((item) => (
-                <li key={item.route}>
-                  <button
-                    type="button"
-                    onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
-                    className={`mobile-main-menu-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
-                  >
-                    {item.label}
-                  </button>
-                </li>
+            <div className="mobile-main-menu-groups">
+              {MOBILE_MENU_SECTIONS.map((section) => (
+                <div key={section.title} className="mobile-main-menu-group">
+                  <p className="mobile-main-menu-heading">{section.title}</p>
+                  <ul className="mobile-main-menu-list">
+                    {section.items.map((item) => (
+                      <li key={`${item.label}-${item.route}-${item.homeSection ?? 'route'}`}>
+                        <button
+                          type="button"
+                          onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
+                          className={`mobile-main-menu-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
+                        >
+                          {item.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </details>
 

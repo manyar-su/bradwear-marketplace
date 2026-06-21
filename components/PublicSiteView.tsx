@@ -4,9 +4,7 @@ import heroTopImage from '../assets/Hero/atas.webp';
 import heroBottomImage from '../assets/Hero/bawah.webp';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
-import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (2).jpeg';
-import clientSlide4 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
-import clientSlide5 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.23.jpeg';
+import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
 import { useStore } from '../context/StoreContext';
 import {
   ARTICLES,
@@ -28,7 +26,7 @@ import SiteFooter from './SiteFooter';
 
 const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
 const ALL_MODELS = 'Semua Model';
-const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3, clientSlide4, clientSlide5].filter(Boolean);
+const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const SLIDESHOW_INTERVAL_MS = 5400;
 
 const HERO_PROOF_ITEMS = [
@@ -43,6 +41,57 @@ const HERO_PROOF_ITEMS = [
   {
     label: 'Tindak lanjut',
     value: 'Ringkasan order langsung diteruskan ke WhatsApp tim Bradwear.',
+  },
+] as const;
+
+const BRAND_PROFILE_ITEMS = [
+  {
+    sectionId: 'about-overview',
+    kicker: 'Tentang Kami',
+    title: 'Bradwear menghadirkan seragam custom untuk instansi, perusahaan, dan kebutuhan operasional.',
+    body:
+      'Bradwear dikelola sebagai lini konveksi resmi yang fokus pada kemeja dinas, seragam kerja, dan kebutuhan identitas tim dengan alur konsultasi yang lebih jelas sejak awal.',
+    points: ['Workshop aktif di Tasikmalaya', 'Fokus pada seragam custom dan bordir identitas', 'Melayani kebutuhan institusi, swasta, sekolah, dan komunitas'],
+  },
+  {
+    sectionId: 'vision-mission',
+    kicker: 'Visi & Misi',
+    title: 'Membangun proses order yang rapi, hasil yang presisi, dan hubungan kerja jangka panjang.',
+    body:
+      'Arah kerja Bradwear adalah menjaga kualitas jahit, ketepatan produksi, dan komunikasi yang mudah dipahami agar keputusan internal klien lebih cepat.',
+    points: ['Menjaga kualitas bahan dan finishing', 'Memberi layanan profesional dan tepat waktu', 'Terus menyempurnakan desain, produksi, dan kontrol detail'],
+  },
+  {
+    sectionId: 'products-services',
+    kicker: 'Produk & Jasa',
+    title: 'Kategori dibuat untuk memudahkan pemilihan model sesuai fungsi lapangan atau kebutuhan formal.',
+    body:
+      'Pilihan utama meliputi kemeja dinas, jaket, rompi, polo, celana tactical, serta layanan custom desain dengan penyesuaian bordir dan identitas personel.',
+    points: ['Seragam dinas pemerintahan dan operasional', 'Seragam perusahaan, komunitas, dan sekolah', 'Bordir logo, nama personel, dan detail custom'],
+  },
+  {
+    sectionId: 'competitive-advantage',
+    kicker: 'Keunggulan',
+    title: 'Nilai utama Bradwear ada pada bahan yang tepat, jahitan rapi, dan tindak lanjut order yang tidak berputar-putar.',
+    body:
+      'Halaman ini disusun supaya klien bisa memilih model, melihat referensi hasil jadi, lalu masuk ke diskusi produksi dengan data yang lebih siap.',
+    points: ['Bahan dipilih sesuai fungsi seragam', 'Presisi jahit dan kontrol visual sebelum produksi', 'Konsultasi langsung dilanjutkan ke WhatsApp tim'],
+  },
+  {
+    sectionId: 'client-reach',
+    kicker: 'Klien & Jangkauan',
+    title: 'Bradwear melayani pengiriman seluruh Indonesia dengan basis workshop di Tasikmalaya.',
+    body:
+      'Portofolio dan layanan disiapkan untuk instansi daerah, perusahaan nasional, organisasi, sekolah, serta kebutuhan tim yang memerlukan approval visual lebih dulu.',
+    points: ['Workshop dan sample development di Tasikmalaya', 'Pengiriman ke seluruh Indonesia', 'Referensi hasil jadi tersedia untuk kebutuhan approval'],
+  },
+  {
+    sectionId: 'legal-license',
+    kicker: 'Legal & Lisensi',
+    title: 'Identitas usaha dan kebutuhan administrasi pengadaan dapat ditindaklanjuti saat konsultasi resmi.',
+    body:
+      'Bradwear berjalan di bawah entitas usaha resmi dan menyiapkan tindak lanjut dokumen, kebutuhan legal, serta syarat kerja sama sesuai konteks instansi atau perusahaan.',
+    points: ['Informasi legal dibuka saat proses konsultasi resmi', 'Kebutuhan administrasi pengadaan dapat dibahas lanjut', 'Syarat dan alur kerja dibuat menyesuaikan tipe order'],
   },
 ] as const;
 
@@ -387,16 +436,14 @@ const PublicSiteView: React.FC = () => {
     () => visibleProducts.filter((product) => product.category === 'Kemeja'),
     [visibleProducts],
   );
-  const topProducts = useMemo(
-    () => [...visibleProducts].sort((a, b) => b.soldCount - a.soldCount).slice(0, 4),
-    [visibleProducts],
-  );
-  const shirtSpotlightProduct = kemejaProducts[0] ?? featured.find((product) => product.category === 'Kemeja') ?? null;
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
   const homeCarouselProducts = useMemo(() => {
-    const seededProducts = [shirtSpotlightProduct, ...topProducts].filter(Boolean) as Product[];
-    return seededProducts.filter((product, index, collection) => collection.findIndex((entry) => entry.id === product.id) === index).slice(0, 5);
-  }, [shirtSpotlightProduct, topProducts]);
+    return CATEGORIES.map((category) =>
+      [...visibleProducts]
+        .filter((product) => product.category === category)
+        .sort((left, right) => right.soldCount - left.soldCount)[0] ?? null,
+    ).filter(Boolean) as Product[];
+  }, [visibleProducts]);
   const clientGalleryGroups = useMemo(
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
@@ -784,7 +831,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
-        <section className="home-section" data-home-section="model-showcase">
+        <section className="home-section" data-home-section="category-showcase">
           <div
             className="home-image-carousel-shell"
             onTouchStart={handleHomeCarouselTouchStart}
@@ -818,6 +865,13 @@ const PublicSiteView: React.FC = () => {
                     aria-label={offset === 0 ? `Buka desain ${product.name}` : `Tampilkan ${product.name}`}
                   >
                     <img src={product.image} alt={product.name} className="home-image-carousel-image" />
+                    <div className="home-image-carousel-card-copy">
+                      <span className="home-image-carousel-category">{product.category}</span>
+                      <strong className="home-image-carousel-name">{product.name}</strong>
+                      <span className="home-image-carousel-hint">
+                        {offset === 0 ? 'Buka model ini' : 'Tampilkan kategori'}
+                      </span>
+                    </div>
                   </button>
                 );
               })}
@@ -875,6 +929,34 @@ const PublicSiteView: React.FC = () => {
               </button>
             </div>
             {renderFaqAccordion()}
+          </div>
+        </section>
+
+        <section className="home-section" data-home-section="about-bradwear">
+          <div className="home-section-shell brand-profile-shell">
+            <div className="home-section-heading">
+              <p className="home-section-kicker">Profil Bradwear</p>
+              <h2 className="home-section-title">Tentang usaha, visi kerja, layanan, dan legalitas ditampilkan lebih ringkas dalam satu bagian</h2>
+              <p className="home-section-copy">
+                Menu mobile sekarang mengarah ke bagian yang lebih jelas, sehingga informasi company profile, layanan,
+                jangkauan, dan kebutuhan legal tidak hilang dari alur website.
+              </p>
+            </div>
+
+            <div className="brand-profile-grid">
+              {BRAND_PROFILE_ITEMS.map((item) => (
+                <article key={item.sectionId} className="brand-profile-card" data-home-section={item.sectionId}>
+                  <p className="brand-profile-kicker">{item.kicker}</p>
+                  <h3 className="brand-profile-title">{item.title}</h3>
+                  <p className="brand-profile-copy">{item.body}</p>
+                  <ul className="brand-profile-points">
+                    {item.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
