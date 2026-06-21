@@ -48,10 +48,10 @@ const BRAND_PROFILE_ITEMS = [
   {
     route: RouteKey.ABOUT,
     kicker: 'Tentang Kami',
-    title: 'Bradwear menghadirkan seragam custom untuk instansi, perusahaan, dan kebutuhan operasional.',
+    title: 'CV. ASTHAJAYA BRADERINDO adalah konveksi resmi penyedia seragam dinas di Indonesia.',
     body:
-      'Bradwear dikelola sebagai lini konveksi resmi yang fokus pada kemeja dinas, seragam kerja, dan kebutuhan identitas tim dengan alur konsultasi yang lebih jelas sejak awal.',
-    points: ['Workshop aktif di Tasikmalaya', 'Fokus pada seragam custom dan bordir identitas', 'Melayani kebutuhan institusi, swasta, sekolah, dan komunitas'],
+      'CV. ASTHAJAYA BRADERINDO adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.',
+    points: ['Beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM', 'Fokus pada kualitas tinggi untuk seragam dinas dan kerja custom', 'Melayani instansi pemerintah, perusahaan, sekolah, dan organisasi'],
   },
   {
     route: RouteKey.VISION_MISSION,
@@ -1516,15 +1516,15 @@ const PublicSiteView: React.FC = () => {
     if (!activeBrandProfilePage) return null;
 
     return (
-      <div className="px-6 py-8 md:px-10">
-        <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#112717_48%,#1b3246)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
+      <div className="brand-profile-page px-6 py-8 md:px-10">
+        <section className="brand-profile-hero rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#081006,#112717_48%,#1b3246)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">{activeBrandProfilePage.kicker}</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">{activeBrandProfilePage.title}</h1>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.body}</p>
         </section>
 
-        <section className="mt-8 grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+        <section className="brand-profile-grid mt-8 grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+          <article className="brand-profile-card rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">
               {activeBrandProfilePage.kicker}
             </p>
@@ -1550,11 +1550,11 @@ const PublicSiteView: React.FC = () => {
             </div>
           </article>
 
-          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm">
+          <article className="brand-profile-card rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Poin Utama</p>
             <div className="mt-5 grid gap-3">
               {activeBrandProfilePage.points.map((point, index) => (
-                <article key={point} className="rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                <article key={point} className="brand-profile-point rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-accent-strong)]">
                     {String(index + 1).padStart(2, '0')}
                   </p>
