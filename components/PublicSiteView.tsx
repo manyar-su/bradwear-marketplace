@@ -44,39 +44,6 @@ const HERO_PROOF_ITEMS = [
   },
 ] as const;
 
-const CLIENT_PROOF_ITEMS = [
-  {
-    sector: 'Instansi lapangan',
-    title: 'Hasil jadi tetap rapi untuk kebutuhan kerja aktif',
-    focus: 'Penempatan identitas, kekuatan jahitan, dan kesiapan dipakai harian.',
-    outcome: 'Sangat cocok unntuk seragam dinas yang kuat, nyaman dan awet.',
-  },
-  {
-    sector: 'Seragam kegiatan resmi',
-    title: 'Visual lebih tegas saat dipakai untuk acara dan operasional',
-    focus: 'Warna, bordir, dan detail panel dibuat konsisten antar-item.',
-    outcome: 'Memberi kesan seragam yang lebih tertata saat dipresentasikan ke internal instansi.',
-  },
-  {
-    sector: 'Tim perusahaan',
-    title: 'Finishing lebih bersih agar nyaman dipakai dalam batch besar',
-    focus: 'Kontrol kualitas dilakukan sebelum produksi penuh berjalan.',
-    outcome: 'Memudahkan approval sebelum masuk ke pengadaan jumlah lebih banyak.',
-  },
-  {
-    sector: 'Order custom',
-    title: 'Detail desain tetap terbaca saat masuk ke produksi',
-    focus: 'Layout logo, nama, dan proporsi model disesuaikan sejak tahap brief.',
-    outcome: 'Mengurangi revisi berulang karena hasil visual sudah lebih jelas sejak awal.',
-  },
-  {
-    sector: 'Kebutuhan institusi',
-    title: 'Order terlihat siap kirim dengan tampilan yang lebih meyakinkan',
-    focus: 'Seragam dirapikan dari sisi bentuk, warna, dan kesiapan presentasi.',
-    outcome: 'Lebih mudah dipakai sebagai referensi saat konsultasi order berikutnya.',
-  },
-] as const;
-
 type LightboxSlide = {
   alt: string;
   src: string;
@@ -275,6 +242,7 @@ const PublicSiteView: React.FC = () => {
   const [trackingLookup, setTrackingLookup] = useState('');
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
+  const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const catalogRef = useRef<HTMLElement | null>(null);
 
   const heroSlides = useMemo(
@@ -423,7 +391,7 @@ const PublicSiteView: React.FC = () => {
     () => ASSETS.CLIENT_GALLERY.filter((group) => group.images.length > 0),
     [],
   );
-  const activeClientProof = CLIENT_PROOF_ITEMS[activeClientSlide % CLIENT_PROOF_ITEMS.length];
+  const activeHowToOrderStep = HOW_TO_ORDER_STEPS[activeHowToOrderStepIndex] ?? HOW_TO_ORDER_STEPS[0];
 
   const currentProductionOrder = useMemo(
     () =>
@@ -475,13 +443,17 @@ const PublicSiteView: React.FC = () => {
         </div>
         <h3 className="mt-2 text-base font-black tracking-tight text-[var(--text-primary)] sm:text-lg">{product.name}</h3>
         <p className="mt-1.5 text-xs leading-relaxed text-[var(--text-secondary)] sm:mt-2 sm:text-sm">{product.description}</p>
-        <div className="mt-3 flex items-center justify-between gap-2 sm:mt-4">
-          <span className="text-xs font-semibold text-[var(--text-primary)] sm:text-sm">{product.soldCount.toLocaleString('id-ID')}+ pesanan</span>
-          <span className="rounded-full border border-[var(--border-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] sm:px-3 sm:text-[10px] sm:tracking-[0.18em]">
-            Kustom
-          </span>
-        </div>
       </button>
+      <div className="mt-3 grid gap-3 sm:mt-4">
+        <span className="text-xs font-semibold text-[var(--text-primary)] sm:text-sm">{product.soldCount.toLocaleString('id-ID')}+ pesanan</span>
+        <button
+          type="button"
+          onClick={() => handleSelectProduct(product)}
+          className="product-card-cta"
+        >
+          Pesan sekarang
+        </button>
+      </div>
     </article>
   );
 
@@ -690,16 +662,6 @@ const PublicSiteView: React.FC = () => {
                       className="slideshow-lightbox-trigger"
                       aria-label="Buka gambar klien penuh"
                     />
-                    <div className="client-proof-overlay">
-                      <div className="client-proof-topline">
-                        <span className="client-proof-kicker">{activeClientProof.sector}</span>
-                        <span className="client-proof-count">
-                          {String(activeClientSlide + 1).padStart(2, '0')} / {String(CLIENT_GALLERY_SLIDES.length).padStart(2, '0')}
-                        </span>
-                      </div>
-                      <h4 className="client-proof-title">{activeClientProof.title}</h4>
-                      <p className="client-proof-copy">{activeClientProof.outcome}</p>
-                    </div>
                   </div>
 
                   <button
@@ -720,25 +682,6 @@ const PublicSiteView: React.FC = () => {
                   </button>
                 </article>
               </article>
-
-              <div className="client-proof-points client-proof-points-compact">
-                <article>
-                  <span>Yang dicek klien</span>
-                  <strong>{activeClientProof.focus}</strong>
-                </article>
-                <article>
-                  <span>Fungsi galeri</span>
-                  <strong>Memudahkan perbandingan hasil visual sebelum konsultasi, revisi, atau approval internal.</strong>
-                </article>
-                <article>
-                  <span>Workshop aktif</span>
-                  <strong>{STORE_ADDRESS}</strong>
-                </article>
-                <article>
-                  <span>Langkah berikutnya</span>
-                  <strong>Buka galeri penuh atau lanjutkan konsultasi saat model yang dicari sudah ketemu.</strong>
-                </article>
-              </div>
             </div>
 
             <div className="section-action-stack">
@@ -914,58 +857,10 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
-  const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
+  const renderCatalog = (catalogProducts: Product[], _title: string, _description: string, showCategoryTabs = true) => (
     <div className="px-6 py-8 md:px-10">
-      <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-        <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff,#fee2e2)] p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Katalog Editorial</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">{title}</h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">{description}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="brand-cta rounded-full px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
-            >
-              Lihat Semua Model
-            </button>
-            <a
-              href={buildWhatsAppUrl(buildConsultationMessage('model seragam yang paling cocok untuk kebutuhan saya'))}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
-            >
-              Konsultasi model
-            </a>
-          </div>
-        </article>
-
-        {spotlightProduct ? (
-          <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-5 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Spotlight Model</p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-[0.8fr_1fr]">
-              <div className="aspect-[4/5] overflow-hidden rounded-[26px] bg-[var(--surface-soft)]">
-                <ProductCardImage product={spotlightProduct} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{spotlightProduct.name}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{spotlightProduct.description}</p>
-                <p className="mt-4 text-sm font-semibold text-[var(--text-primary)]">{spotlightProduct.soldCount.toLocaleString('id-ID')}+ order</p>
-                <button
-                  type="button"
-                  onClick={() => handleSelectProduct(spotlightProduct)}
-                  className="mt-5 rounded-full bg-slate-900 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white"
-                >
-                  Mulai desain model ini
-                </button>
-              </div>
-            </div>
-          </article>
-        ) : null}
-      </section>
-
       {showCategoryTabs ? (
-        <section ref={catalogRef} className="mt-8">
+        <section ref={catalogRef}>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((category) => (
               <button
@@ -1010,7 +905,7 @@ const PublicSiteView: React.FC = () => {
         </section>
       ) : null}
 
-      <section className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <section className="mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
         {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
       </section>
 
@@ -1026,11 +921,23 @@ const PublicSiteView: React.FC = () => {
 
           <article className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm md:p-5">
             <div className="overflow-hidden rounded-[24px] border border-[var(--border-soft)] bg-white p-3 md:p-4">
-              <img
-                src={ASSETS.CONTENT.SIZE_GUIDE}
-                alt="Bradwear size guide"
-                className="mx-auto max-h-[360px] w-auto max-w-full object-contain"
-              />
+              <button
+                type="button"
+                onClick={() =>
+                  setLightboxSlide({
+                    src: ASSETS.CONTENT.SIZE_GUIDE,
+                    alt: 'Bradwear size guide',
+                  })
+                }
+                className="block w-full cursor-zoom-in"
+                aria-label="Buka size guide penuh"
+              >
+                <img
+                  src={ASSETS.CONTENT.SIZE_GUIDE}
+                  alt="Bradwear size guide"
+                  className="mx-auto max-h-[360px] w-auto max-w-full object-contain transition duration-300 hover:scale-[1.02]"
+                />
+              </button>
             </div>
           </article>
         </section>
@@ -1039,13 +946,13 @@ const PublicSiteView: React.FC = () => {
       <section className="mt-10 rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f9fffb,#ffffff)] p-6 shadow-sm md:p-7">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan agar pemilihan model lebih jelas sejak awal</h2>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan</h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
             Setiap bahan punya karakter yang berbeda. Bagian ini dibuat supaya user lebih cepat membedakan bahan yang cocok untuk tampilan formal, mobilitas lapangan, atau kebutuhan harian yang lebih ringan.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4">
           {MATERIAL_GUIDE_ITEMS.map((material) => (
             <article
               key={material.name}
@@ -1106,52 +1013,101 @@ const PublicSiteView: React.FC = () => {
 
   const renderHowToOrder = () => (
     <div className="px-6 py-8 md:px-10">
-      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#111827,#1e293b)] px-6 py-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] md:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Cara Order</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight">Panduan pemesanan yang dibuat agar proses konsultasi dan produksi mudah diikuti</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Halaman ini merangkum alur dari pemilihan model, penyesuaian desain, hingga konfirmasi data pesanan secara
-          bertahap agar kebutuhan tim Anda dapat diproses lebih jelas.
-        </p>
-      </section>
+      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-6 shadow-sm md:p-8">
+        <div className="max-w-3xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Cara Order</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Pilih tahap order, lalu baca keterangannya secara bertahap</h1>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+            Gunakan tombol tahap 1 sampai selesai untuk mengikuti alur pemesanan secara lebih ringkas. Setiap tahap menampilkan keterangan inti yang dibutuhkan sebelum lanjut ke tahap berikutnya.
+          </p>
+        </div>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="lg:sticky lg:top-[120px] lg:self-start">
-          <div className="overflow-hidden rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-4 shadow-sm">
-            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-              {[ASSETS.KEMEJA.BRAD_V3.FRONT, ASSETS.CELANA.WARRIOR, ASSETS.JAKET.BOMBER].map((image, index) => (
-                <div
-                  key={`${image}-${index}`}
-                  className={`overflow-hidden rounded-[24px] ${index === 0 ? 'sm:col-span-2 lg:col-span-1' : ''}`}
-                >
-                  <img
-                    src={image}
-                    alt={`Tutorial order Bradwear ${index + 1}`}
-                    className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                  />
-                </div>
+        <div className="order-step-selector mt-6">
+          {HOW_TO_ORDER_STEPS.map((step, index) => {
+            const isActive = index === activeHowToOrderStepIndex;
+
+            return (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => setActiveHowToOrderStepIndex(index)}
+                className={`order-step-pill ${isActive ? 'is-active' : ''}`}
+                aria-pressed={isActive}
+              >
+                <span className="order-step-pill-number">{index + 1}</span>
+                <span className="order-step-pill-label">Tahap {index + 1}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <article key={activeHowToOrderStep.id} className="order-step-panel mt-6">
+          <div className="order-step-panel-head">
+            <div className="order-step-panel-index">Tahap {activeHowToOrderStepIndex + 1}</div>
+            <div className="order-step-panel-progress">
+              {HOW_TO_ORDER_STEPS.map((step, index) => (
+                <span
+                  key={step.id}
+                  className={`order-step-progress-dot ${index <= activeHowToOrderStepIndex ? 'is-done' : ''}`}
+                />
               ))}
             </div>
           </div>
-        </div>
+          <h2 className="order-step-panel-title">{activeHowToOrderStep.title}</h2>
+          <p className="order-step-panel-copy">{activeHowToOrderStep.description}</p>
+          <p className="order-step-panel-detail">{activeHowToOrderStep.detail}</p>
 
-        <div className="space-y-5">
-          {HOW_TO_ORDER_STEPS.map((step, index) => (
-            <article key={step.id} className="rounded-[30px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--brand-accent)] text-sm font-black text-white">
-                  {index + 1}
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Tahap {index + 1}</p>
-                  <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--text-primary)]">{step.title}</h2>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{step.description}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{step.detail}</p>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+          <div className="order-step-panel-actions">
+            {activeHowToOrderStep.id === 'discover' ? (
+              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                Buka katalog
+              </button>
+            ) : null}
+            {activeHowToOrderStep.id === 'customize' ? (
+              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                Pilih model lalu desain
+              </button>
+            ) : null}
+            {activeHowToOrderStep.id === 'summary' ? (
+              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                Lanjut siapkan data order
+              </button>
+            ) : null}
+            {activeHowToOrderStep.id === 'consult' ? (
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('kirim detail order seragam custom untuk ditindaklanjuti'))}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-primary brand-cta"
+              >
+                Kirim ke WhatsApp
+              </a>
+            ) : null}
+            {activeHowToOrderStep.id === 'track' ? (
+              <button type="button" onClick={() => setCurrentRoute(RouteKey.LACAK_PESANAN)} className="hero-primary brand-cta">
+                Cek status order
+              </button>
+            ) : null}
+
+            {activeHowToOrderStepIndex < HOW_TO_ORDER_STEPS.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setActiveHowToOrderStepIndex((prev) => Math.min(prev + 1, HOW_TO_ORDER_STEPS.length - 1))}
+                className="hero-secondary"
+              >
+                Lanjut ke tahap {activeHowToOrderStepIndex + 2}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setActiveHowToOrderStepIndex(0)}
+                className="hero-secondary"
+              >
+                Ulang dari tahap 1
+              </button>
+            )}
+          </div>
+        </article>
       </section>
     </div>
   );

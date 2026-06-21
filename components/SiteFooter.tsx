@@ -52,7 +52,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
 
         <div className="site-footer-panel">
           <p className="site-footer-heading">Navigasi</p>
-          <div className="site-footer-links">
+          <div className="site-footer-links site-footer-nav-links">
             {footerRoutes.map((item) => (
               <button key={item.route} type="button" onClick={() => onNavigate(item.route)} className="site-footer-link">
                 {item.label}
@@ -71,7 +71,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
 
         <div className="site-footer-panel">
           <p className="site-footer-heading">Kontak Cepat</p>
-          <div className="site-footer-links">
+          <div className="site-footer-links site-footer-contact-list">
             {CONTACT_CHANNELS.map((channel) => (
               <div key={channel.label} className="site-footer-contact-card">
                 <p className="site-footer-contact-label">{channel.label}</p>
