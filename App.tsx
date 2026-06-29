@@ -7,15 +7,18 @@ import { preloadCriticalAssets } from './assets';
 import { useStore } from './context/StoreContext';
 import { SITE_FAQS } from './lib/siteConfig';
 import { applySeoMeta } from './lib/seo';
+import { CUSTOMER_SERVICE_DIALOG_EVENT, CustomerServiceDialogDetail } from './lib/customerServiceDialog';
 import SiteHeader from './components/SiteHeader';
 import BradAiChat from './components/BradAiChat';
 import CustomerServiceDock from './components/CustomerServiceDock';
+import CustomerServicePickerModal from './components/CustomerServicePickerModal';
 
 const App: React.FC = () => {
   const { currentRoute, currentPathname, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
   const [showCustomerServiceDock, setShowCustomerServiceDock] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
+  const [customerServiceRequest, setCustomerServiceRequest] = React.useState<CustomerServiceDialogDetail | null>(null);
 
   useEffect(() => {
     preloadCriticalAssets();
@@ -39,7 +42,47 @@ const App: React.FC = () => {
   useEffect(() => {
     setShowBradAiWidget(false);
     setShowCustomerServiceDock(false);
+    setCustomerServiceRequest(null);
   }, [currentPathname]);
+
+  useEffect(() => {
+    const openDialog = (event: Event) => {
+      const customEvent = event as CustomEvent<CustomerServiceDialogDetail>;
+      if (!customEvent.detail?.message) return;
+      setShowBradAiWidget(false);
+      setShowCustomerServiceDock(false);
+      setCustomerServiceRequest(customEvent.detail);
+    };
+
+    window.addEventListener(CUSTOMER_SERVICE_DIALOG_EVENT, openDialog as EventListener);
+    return () => window.removeEventListener(CUSTOMER_SERVICE_DIALOG_EVENT, openDialog as EventListener);
+  }, []);
+
+  useEffect(() => {
+    const interceptWhatsAppLinks = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!link || link.dataset.directWhatsapp === 'true') return;
+
+      const href = link.href;
+      if (!href || (!href.includes('wa.me/') && !href.includes('api.whatsapp.com/send'))) return;
+
+      const parsed = new URL(href);
+      const message = parsed.searchParams.get('text');
+      if (!message) return;
+
+      event.preventDefault();
+      setShowBradAiWidget(false);
+      setShowCustomerServiceDock(false);
+      setCustomerServiceRequest({
+        message,
+        title: 'Pilih costumer service yang kamu inginkan',
+      });
+    };
+
+    document.addEventListener('click', interceptWhatsAppLinks);
+    return () => document.removeEventListener('click', interceptWhatsAppLinks);
+  }, []);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -170,6 +213,11 @@ const App: React.FC = () => {
               </div>
             </div>
           ) : null}
+
+          <CustomerServicePickerModal
+            request={customerServiceRequest}
+            onClose={() => setCustomerServiceRequest(null)}
+          />
         </div>
       </div>
     </div>

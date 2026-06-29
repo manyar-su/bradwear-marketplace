@@ -52,6 +52,7 @@ const CustomerServiceDock: React.FC<CustomerServiceDockProps> = ({
             href={buildWhatsAppUrlForPhone(contact.phone, buildCustomerServiceMessage(topic))}
             target="_blank"
             rel="noreferrer"
+            data-direct-whatsapp="true"
             className="group grid min-h-[72px] grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[18px] border border-[var(--border-soft)] bg-white/94 px-2.5 py-2 shadow-sm transition hover:-translate-y-0.5 hover:border-[rgba(117,242,26,0.32)] hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)]"
           >
             <div className="relative shrink-0">

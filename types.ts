@@ -35,6 +35,10 @@ export interface Article {
   title: string;
   excerpt: string;
   category: string;
+  highlight: string;
+  highlights: string[];
+  coverImage: string;
+  coverAlt: string;
   readTime: string;
   author: string;
   authorRole: string;

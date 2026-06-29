@@ -35,28 +35,6 @@ const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(
 const SLIDESHOW_INTERVAL_MS = 5000;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
-const CATEGORY_COPY: Record<(typeof CATEGORIES)[number], { useCase: string; focus: string }> = {
-  Kemeja: {
-    useCase: 'PDH, seragam dinas, komunitas, dan kemeja kerja custom.',
-    focus: 'Fokus pada approval visual, identitas bordir, dan kebutuhan formal harian.',
-  },
-  Jaket: {
-    useCase: 'Outer tim, safety ringan, dan kebutuhan branding lapangan.',
-    focus: 'Cocok untuk tim operasional yang perlu layering dan perlindungan tambahan.',
-  },
-  Celana: {
-    useCase: 'Celana tactical, kerja aktif, dan mobilitas lapangan.',
-    focus: 'Masuk ke halaman pants untuk membandingkan model khusus kategori celana.',
-  },
-  Rompi: {
-    useCase: 'Survey lapangan, dokumentasi, dan identitas tim lapangan.',
-    focus: 'Memudahkan pembagian fungsi tim lewat desain ringan dan banyak kompartemen.',
-  },
-  Polo: {
-    useCase: 'Event, promosi, gathering, dan seragam semi-formal.',
-    focus: 'Pilihan ringkas ketika tim membutuhkan tampilan santai namun tetap branded.',
-  },
-};
 const DOWNLOAD_HIGHLIGHTS = [
   {
     title: 'Akses cepat katalog',
@@ -71,6 +49,54 @@ const DOWNLOAD_HIGHLIGHTS = [
     body: 'Halaman ini disiapkan sebagai landing page download saat listing Play Store Bradwear diperbarui.',
   },
 ];
+
+const TIKTOK_VIDEO_ITEMS = [
+  {
+    title: 'Seragam kemeja, celana tactical, rompi, polo, dan jaket custom Bradwear',
+    note: 'Video TikTok resmi Bradwear',
+    url: 'https://www.tiktok.com/@bradwearindonesia/video/7523038151565217029',
+    image: clientSlide1,
+  },
+  {
+    title: 'Custom bordir seragam kerja Bradwear sesuai kebutuhan tim',
+    note: 'Video TikTok resmi Bradwear',
+    url: 'https://www.tiktok.com/@bradwearindonesia/video/7649596708904586517',
+    image: clientSlide2,
+  },
+  {
+    title: 'Rekomendasi seragam dokter dan kebutuhan medis dari Bradwear',
+    note: 'Video TikTok resmi Bradwear',
+    url: 'https://www.tiktok.com/@bradwearindonesia/video/7649676561225977108',
+    image: clientSlide3,
+  },
+] as const;
+
+const INSTAGRAM_ARTICLE_ITEMS = [
+  {
+    title: 'Testimoni 2026 dari akun Instagram Bradwear',
+    note: 'Sorotan Instagram resmi',
+    url: 'https://www.instagram.com/bradwear_indonesia/',
+    image: clientSlide1,
+  },
+  {
+    title: 'Detail bahan seragam dan panduan visual di Instagram',
+    note: 'Sorotan Instagram resmi',
+    url: 'https://www.instagram.com/bradwear_indonesia/',
+    image: heroTopImage,
+  },
+  {
+    title: 'Celana tactical, vest, dan mockup desain terbaru Bradwear',
+    note: 'Sorotan Instagram resmi',
+    url: 'https://www.instagram.com/bradwear_indonesia/',
+    image: clientSlide2,
+  },
+  {
+    title: 'Update produksi dan konten seragam dinas dari Instagram Bradwear',
+    note: 'Sorotan Instagram resmi',
+    url: 'https://www.instagram.com/bradwear_indonesia/',
+    image: clientSlide3,
+  },
+] as const;
 
 type BrandProfileItem = {
   route: RouteKey;
@@ -453,6 +479,7 @@ const PublicSiteView: React.FC = () => {
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
+  const [articleHighlightIndex, setArticleHighlightIndex] = useState(0);
   const [articleCommentName, setArticleCommentName] = useState('');
   const [articleCommentBody, setArticleCommentBody] = useState('');
   const [articleCommentStatus, setArticleCommentStatus] = useState('');
@@ -509,10 +536,12 @@ const PublicSiteView: React.FC = () => {
     const parallaxNodes = Array.from(main.querySelectorAll<HTMLElement>('.elegant-parallax-block')).filter(
       (node) => node.offsetHeight > 80 && !node.closest('.parallax-static-zone'),
     );
+    const revealNodes = Array.from(main.querySelectorAll<HTMLElement>('.scroll-reveal-block')).filter((node) => node.offsetHeight > 32);
 
-    if (parallaxNodes.length === 0) return;
+    if (parallaxNodes.length === 0 && revealNodes.length === 0) return;
 
     parallaxNodes.forEach((node) => node.classList.add('scroll-parallax'));
+    revealNodes.forEach((node) => node.classList.remove('is-visible'));
 
     let frame = 0;
     const updateParallax = () => {
@@ -527,6 +556,13 @@ const PublicSiteView: React.FC = () => {
         node.style.setProperty('--parallax-offset', `${offset.toFixed(2)}px`);
 
         if (rect.top < viewportHeight * 0.94 && rect.bottom > viewportHeight * 0.12) {
+          node.classList.add('is-visible');
+        }
+      });
+
+      revealNodes.forEach((node) => {
+        const rect = node.getBoundingClientRect();
+        if (rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.08) {
           node.classList.add('is-visible');
         }
       });
@@ -553,6 +589,7 @@ const PublicSiteView: React.FC = () => {
         node.classList.remove('scroll-parallax', 'is-visible');
         node.style.removeProperty('--parallax-offset');
       });
+      revealNodes.forEach((node) => node.classList.remove('is-visible'));
     };
   }, [currentRoute]);
 
@@ -643,16 +680,30 @@ const PublicSiteView: React.FC = () => {
   );
   const articleSpotlight = articleFeed[0] ?? null;
   const articleLatest = articleFeed.slice(1, 4);
+  const articleHeadlineItems = articleFeed.slice(0, 5);
+  const activeArticleHeadline = articleHeadlineItems[articleHighlightIndex % Math.max(articleHeadlineItems.length, 1)] ?? articleSpotlight;
   const categorySummaryRows = useMemo(
     () =>
       CATEGORIES.map((category) => ({
         category,
         modelCount: visibleProducts.filter((product) => product.category === category).length,
-        useCase: CATEGORY_COPY[category].useCase,
-        focus: CATEGORY_COPY[category].focus,
       })),
     [visibleProducts],
   );
+
+  useEffect(() => {
+    setArticleHighlightIndex(0);
+  }, [currentRoute, activeArticleSlug]);
+
+  useEffect(() => {
+    if (currentRoute !== RouteKey.ARTIKEL || activeArticle || articleHeadlineItems.length < 2) return;
+
+    const timer = window.setInterval(() => {
+      setArticleHighlightIndex((prev) => (prev + 1) % articleHeadlineItems.length);
+    }, 3800);
+
+    return () => window.clearInterval(timer);
+  }, [activeArticle, articleHeadlineItems.length, currentRoute]);
 
   const currentProductionOrder = useMemo(
     () =>
@@ -1230,7 +1281,7 @@ const PublicSiteView: React.FC = () => {
   const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
     <div className="catalog-page-shell px-0 py-8">
       {/* Hero katalog: judul dan deskripsi dikirim dari argumen renderCatalog. */}
-      <section className="catalog-page-hero">
+      <section className="catalog-page-hero scroll-reveal-block">
         <p className="home-section-kicker">Katalog Bradwear</p>
         <h1 className="home-section-title">{title}</h1>
         <p className="home-section-copy">{description}</p>
@@ -1238,16 +1289,16 @@ const PublicSiteView: React.FC = () => {
 
       {/* Filter kategori dan model katalog. */}
       {showCategoryTabs ? (
-        <section ref={catalogRef} className="catalog-filter-band">
-          <p className="catalog-filter-band-title">Pilih kategori utama</p>
+        <section ref={catalogRef} className="catalog-filter-band scroll-reveal-block">
+          <div className="catalog-filter-band-heading">
+            <p className="catalog-filter-band-title">Pilih kategori</p>
+            <p className="catalog-filter-band-caption">Pilih kategori utama lalu lanjutkan ke daftar model di bawahnya.</p>
+          </div>
           <div className="catalog-category-table-shell">
             <table className="catalog-category-table">
               <thead>
                 <tr>
                   <th>Kategori</th>
-                  <th>Model</th>
-                  <th>Cocok untuk</th>
-                  <th>Fokus</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -1258,12 +1309,12 @@ const PublicSiteView: React.FC = () => {
                   return (
                     <tr key={row.category} className={isActive ? 'is-active' : ''}>
                       <td data-label="Kategori">
-                        <strong>{row.category}</strong>
+                        <div className="catalog-category-cell">
+                          <strong>{row.category}</strong>
+                          <span className="catalog-category-badge">{row.modelCount} model</span>
+                        </div>
                       </td>
-                      <td data-label="Model">{row.modelCount} model</td>
-                      <td data-label="Cocok untuk">{row.useCase}</td>
-                      <td data-label="Fokus">{row.focus}</td>
-                      <td data-label="Aksi">
+                      <td data-label="Aksi" className="catalog-category-action-cell">
                         <button
                           type="button"
                           onClick={() => handleCatalogCategorySelect(row.category)}
@@ -1298,13 +1349,13 @@ const PublicSiteView: React.FC = () => {
         </section>
       ) : null}
 
-      <section className="catalog-product-grid mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
+      <section className="catalog-product-grid scroll-reveal-block mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
         {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
       </section>
 
       {/* Copy size guide dan tombol pembuka popup gambar penuh. */}
       {ASSETS.CONTENT.SIZE_GUIDE ? (
-        <section className="catalog-size-guide-shell mt-12 grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
+      <section className="catalog-size-guide-shell scroll-reveal-block mt-12 grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
           <article className="catalog-copy-band">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Size Guide</p>
             <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
@@ -1339,7 +1390,7 @@ const PublicSiteView: React.FC = () => {
       ) : null}
 
       {/* Copy panduan bahan; isi bahan per item ada di MATERIAL_GUIDE_ITEMS. */}
-      <section className="mt-12 material-guide-shell">
+      <section className="mt-12 material-guide-shell scroll-reveal-block">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan</h2>
@@ -1402,116 +1453,79 @@ const PublicSiteView: React.FC = () => {
 
       return (
         <div className="article-page-shell px-6 py-8 md:px-10">
-          <section className="article-detail-hero rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
-            <button
-              type="button"
-              onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--text-primary)] shadow-sm"
-            >
-              Kembali ke Artikel
-            </button>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
-                {activeArticle.category}
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(activeArticle.publishedAt)}</span>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.readTime}</span>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.comments.length} komentar</span>
+          <section className="article-detail-hero article-detail-hero-grid scroll-reveal-block rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm md:p-8">
+            <div className="grid content-start gap-5">
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--text-primary)] shadow-sm"
+              >
+                Kembali ke Artikel
+              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+                  {activeArticle.category}
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(activeArticle.publishedAt)}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.readTime}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.comments.length} komentar</span>
+              </div>
+              <h1 className="max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">{activeArticle.title}</h1>
+              <p className="max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.seoDescription}</p>
+              <div className="article-title-highlight">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Sorotan artikel</p>
+                <p className="mt-3 text-base font-semibold leading-7 text-[var(--text-primary)]">{activeArticle.highlight}</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+                <span className="rounded-full bg-white px-3 py-2 font-semibold">Oleh {activeArticle.author}</span>
+                <span>{activeArticle.authorRole}</span>
+              </div>
             </div>
-            <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">{activeArticle.title}</h1>
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.seoDescription}</p>
-            <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
-              <span className="rounded-full bg-white px-3 py-2 font-semibold">Oleh {activeArticle.author}</span>
-              <span>{activeArticle.authorRole}</span>
+
+            <div className="article-cover-stage">
+              <img src={activeArticle.coverImage} alt={activeArticle.coverAlt} className="article-cover-image" />
             </div>
           </section>
 
-          <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="grid gap-6">
-              <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.excerpt}</p>
-                <div className="mt-6 grid gap-5">
-                  {activeArticle.body.map((paragraph, index) => (
-                    <p key={`${activeArticle.slug}-${index}`} className="text-base leading-8 text-[var(--text-secondary)]">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentRoute(RouteKey.KATALOG)}
-                    className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
-                  >
-                    Lihat katalog model
-                  </button>
-                  <a
-                    href={buildWhatsAppUrl(buildConsultationMessage(`artikel ${activeArticle.title.toLowerCase()}`))}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hero-secondary"
-                  >
-                    Diskusikan artikel ini
-                  </a>
-                </div>
-              </article>
-
-              <section className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Komentar pembaca</p>
-                    <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--text-primary)]">Tanggapan pada artikel ini</h2>
+          <section className="article-detail-layout mt-8">
+            <article className="article-detail-story scroll-reveal-block rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+              <p className="text-base leading-8 text-[var(--text-secondary)]">{activeArticle.excerpt}</p>
+              <div className="article-detail-highlight-list mt-6">
+                {activeArticle.highlights.map((point) => (
+                  <div key={`${activeArticle.slug}-${point}`} className="article-detail-highlight-item">
+                    <span />
+                    <p>{point}</p>
                   </div>
-                  <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-2 text-[11px] font-semibold text-[var(--text-secondary)]">
-                    Moderasi editorial aktif
-                  </span>
-                </div>
+                ))}
+              </div>
+              <div className="article-detail-body-copy mt-8 grid gap-5">
+                {activeArticle.body.map((paragraph, index) => (
+                  <p key={`${activeArticle.slug}-${index}`} className="text-base leading-8 text-[var(--text-secondary)]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                  className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                >
+                  Lihat katalog model
+                </button>
+                <a
+                  href={buildWhatsAppUrl(buildConsultationMessage(`artikel ${activeArticle.title.toLowerCase()}`))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hero-secondary"
+                >
+                  Diskusikan artikel ini
+                </a>
+              </div>
+            </article>
 
-                <div className="mt-6 grid gap-4">
-                  {activeArticle.comments.map((comment) => (
-                    <article key={comment.id} className="rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] p-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{comment.author}</p>
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{comment.role}</span>
-                        <span className="text-[11px] text-[var(--text-muted)]">{formatArticleDate(comment.publishedAt)}</span>
-                      </div>
-                      <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{comment.body}</p>
-                    </article>
-                  ))}
-                </div>
-
-                <form onSubmit={handleArticleCommentSubmit} className="article-comment-form mt-6 grid gap-3">
-                  <div className="grid gap-3 md:grid-cols-[220px_minmax(0,1fr)]">
-                    <input
-                      type="text"
-                      value={articleCommentName}
-                      onChange={(event) => setArticleCommentName(event.target.value)}
-                      placeholder="Nama Anda"
-                      className="article-comment-input"
-                    />
-                    <textarea
-                      value={articleCommentBody}
-                      onChange={(event) => setArticleCommentBody(event.target.value)}
-                      placeholder="Tulis tanggapan atau pertanyaan singkat seputar artikel ini."
-                      rows={3}
-                      className="article-comment-input article-comment-textarea"
-                    />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <button
-                      type="submit"
-                      className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
-                    >
-                      Kirim komentar
-                    </button>
-                    <p className="text-sm text-[var(--text-secondary)]">{articleCommentStatus || 'Komentar baru akan ditinjau dulu sebelum ditampilkan publik.'}</p>
-                  </div>
-                </form>
-              </section>
-            </div>
-
-            <aside className="grid gap-5 self-start">
-              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+            <aside className="article-detail-aside">
+              <section className="scroll-reveal-block rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Tentang penulis</p>
                 <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--text-primary)]">{activeArticle.author}</h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">{activeArticle.authorRole}</p>
@@ -1520,7 +1534,7 @@ const PublicSiteView: React.FC = () => {
                 </p>
               </section>
 
-              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+              <section className="scroll-reveal-block rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Topik SEO</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {activeArticle.keywords.map((keyword) => (
@@ -1534,116 +1548,319 @@ const PublicSiteView: React.FC = () => {
                 </div>
               </section>
 
-              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel terbaru</p>
+              <section className="scroll-reveal-block rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Baca juga artikel lain</p>
                 <div className="mt-4 grid gap-3">
                   {relatedArticles.map((article) => (
                     <button
                       key={article.slug}
                       type="button"
                       onClick={() => navigateToArticle(article.slug)}
-                      className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-left transition hover:-translate-y-0.5"
+                      className="article-related-card"
                     >
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
-                      <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
-                      <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                      <img src={article.coverImage} alt={article.coverAlt} className="article-related-thumb" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
+                        <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)] underline decoration-[rgba(117,242,26,0.4)] underline-offset-4">{article.title}</p>
+                        <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                      </div>
                     </button>
                   ))}
                 </div>
               </section>
             </aside>
           </section>
+
+          <section className="article-comment-panel scroll-reveal-block mt-8 rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Komentar pembaca</p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--text-primary)]">Tanggapan pada artikel ini</h2>
+              </div>
+              <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-2 text-[11px] font-semibold text-[var(--text-secondary)]">
+                Moderasi editorial aktif
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              {activeArticle.comments.map((comment) => (
+                <article key={comment.id} className="rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{comment.author}</p>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{comment.role}</span>
+                    <span className="text-[11px] text-[var(--text-muted)]">{formatArticleDate(comment.publishedAt)}</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{comment.body}</p>
+                </article>
+              ))}
+            </div>
+
+            <form onSubmit={handleArticleCommentSubmit} className="article-comment-form mt-6 grid gap-3">
+              <div className="grid gap-3 md:grid-cols-[220px_minmax(0,1fr)]">
+                <input
+                  type="text"
+                  value={articleCommentName}
+                  onChange={(event) => setArticleCommentName(event.target.value)}
+                  placeholder="Nama Anda"
+                  className="article-comment-input"
+                />
+                <textarea
+                  value={articleCommentBody}
+                  onChange={(event) => setArticleCommentBody(event.target.value)}
+                  placeholder="Tulis tanggapan atau pertanyaan singkat seputar artikel ini."
+                  rows={3}
+                  className="article-comment-input article-comment-textarea"
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="submit"
+                  className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                >
+                  Kirim komentar
+                </button>
+                <p className="text-sm text-[var(--text-secondary)]">{articleCommentStatus || 'Komentar baru akan ditinjau dulu sebelum ditampilkan publik.'}</p>
+              </div>
+            </form>
+          </section>
         </div>
       );
     }
 
+    const articleMagazineFeed = articleFeed.slice(1);
+
     return (
       <div className="article-page-shell px-6 py-8 md:px-10">
-        <section className="article-news-grid">
-          <div className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+        <section className="article-masthead-grid scroll-reveal-block">
+          <div className="article-masthead-copy rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
             <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">Halaman artikel bergaya news untuk keyword seragam, kemeja custom, dan pengadaan</h1>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
               Setiap artikel dibuat sebagai landing page yang bisa dibaca user, diindeks Google, dan dipahami mesin AI untuk konteks kemeja custom, seragam dinas, komunitas, serta proses order Bradwear Indonesia.
             </p>
+            {activeArticleHeadline ? (
+              <div className="article-title-highlight mt-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Headline bergerak</p>
+                <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">{activeArticleHeadline.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">{activeArticleHeadline.highlight}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                  <span>{activeArticleHeadline.category}</span>
+                  <span>{formatArticleDate(activeArticleHeadline.publishedAt)}</span>
+                  <span>{activeArticleHeadline.readTime}</span>
+                </div>
+              </div>
+            ) : null}
           </div>
 
-          {articleSpotlight ? (
-            <article className="article-spotlight-card rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] p-6 text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Sorotan utama</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-tight">{articleSpotlight.title}</h2>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/78">{articleSpotlight.excerpt}</p>
-              <div className="mt-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-white/74">
-                <span>{articleSpotlight.category}</span>
-                <span>{formatArticleDate(articleSpotlight.publishedAt)}</span>
-                <span>{articleSpotlight.readTime}</span>
+          {activeArticleHeadline ? (
+            <article className="article-spotlight-stage rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] p-4 text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
+              <div className="article-spotlight-stage-image-shell">
+                <img src={activeArticleHeadline.coverImage} alt={activeArticleHeadline.coverAlt} className="article-cover-image" />
               </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => navigateToArticle(articleSpotlight.slug)}
-                  className="rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
-                >
-                  Baca artikel utama
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentRoute(RouteKey.KATALOG)}
-                  className="rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5"
-                >
-                  Lihat katalog
-                </button>
+              <div className="p-2 sm:p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Visual utama</p>
+                <p className="mt-3 text-sm leading-relaxed text-white/78">{activeArticleHeadline.excerpt}</p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigateToArticle(activeArticleHeadline.slug)}
+                    className="rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
+                  >
+                    Baca artikel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                    className="rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5"
+                  >
+                    Lihat katalog
+                  </button>
+                </div>
               </div>
             </article>
           ) : null}
 
-          <aside className="article-latest-stack rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Terbaru</p>
+          <aside className="article-headline-rail rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Headline</p>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Auto update</span>
+            </div>
             <div className="mt-4 grid gap-3">
-              {articleLatest.map((article) => (
+              {articleHeadlineItems.map((article, index) => (
                 <button
                   key={article.slug}
                   type="button"
-                  onClick={() => navigateToArticle(article.slug)}
-                  className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-left transition hover:-translate-y-0.5"
+                  onClick={() => setArticleHighlightIndex(index)}
+                  className={`article-headline-rail-item ${activeArticleHeadline?.slug === article.slug ? 'is-active' : ''}`}
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
-                  <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
-                  <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                  <span className="article-headline-rail-index">{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
+                    <div className="article-title-highlight mt-2">
+                      <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
           </aside>
         </section>
 
-        <section className="mt-8 article-card-grid">
-          {articleFeed.map((article) => (
-            <article key={article.slug} className="article-feed-card rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
-                  {article.category}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(article.publishedAt)}</span>
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
+        {articleSpotlight ? (
+          <section className="article-editorial-grid mt-8 scroll-reveal-block">
+            <article className="article-feature-band rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
+              <div className="article-feature-band-visual">
+                <img src={articleSpotlight.coverImage} alt={articleSpotlight.coverAlt} className="article-cover-image" />
               </div>
-              <h2 className="mt-4 text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                {article.body.slice(0, 2).map((paragraph, index) => (
-                  <p key={`${article.slug}-${index}`} className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                    {paragraph}
-                  </p>
+              <div className="article-feature-band-copy">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Sorotan utama</p>
+                <div className="article-title-highlight article-title-highlight-dark mt-4">
+                  <h2 className="text-3xl font-black tracking-tight">{articleSpotlight.title}</h2>
+                </div>
+                <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/78">{articleSpotlight.excerpt}</p>
+                <div className="mt-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-white/74">
+                  <span>{articleSpotlight.category}</span>
+                  <span>{formatArticleDate(articleSpotlight.publishedAt)}</span>
+                  <span>{articleSpotlight.readTime}</span>
+                </div>
+                <div className="mt-6 grid gap-3 md:grid-cols-3">
+                  {articleSpotlight.highlights.map((point) => (
+                    <div key={`${articleSpotlight.slug}-${point}`} className="rounded-[22px] border border-white/12 bg-white/6 px-4 py-4 text-sm leading-6 text-white/82">
+                      {point}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigateToArticle(articleSpotlight.slug)}
+                    className="rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
+                  >
+                    Baca artikel utama
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                    className="rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5"
+                  >
+                    Lihat katalog
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <aside className="article-latest-stack rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Terbaru</p>
+              <div className="mt-4 grid gap-3">
+                {articleLatest.map((article) => (
+                  <button
+                    key={article.slug}
+                    type="button"
+                    onClick={() => navigateToArticle(article.slug)}
+                    className="article-related-card"
+                  >
+                    <img src={article.coverImage} alt={article.coverAlt} className="article-related-thumb" />
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
+                      <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                    </div>
+                  </button>
                 ))}
               </div>
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs text-[var(--text-muted)]">{article.comments.length} komentar · {article.author}</p>
-                <button
-                  type="button"
-                  onClick={() => navigateToArticle(article.slug)}
-                  className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
-                >
-                  Baca Artikel
-                </button>
+            </aside>
+          </section>
+        ) : null}
+
+        <section className="article-social-shell mt-8 scroll-reveal-block">
+          <div className="article-social-band">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Video TikTok Bradwear</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Video singkat dari akun TikTok resmi Bradwear Indonesia</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                Bagian ini menampilkan jalur cepat ke video resmi TikTok Bradwear untuk referensi produk, custom bordir, dan kebutuhan seragam medis atau operasional.
+              </p>
+            </div>
+            <div className="article-social-grid mt-6">
+              {TIKTOK_VIDEO_ITEMS.map((item) => (
+                <a key={item.url} href={item.url} target="_blank" rel="noreferrer" className="article-social-card">
+                  <img src={item.image} alt={item.title} className="article-social-image" />
+                  <div className="article-social-copy">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">{item.note}</p>
+                    <div className="article-title-highlight mt-3">
+                      <p className="text-base font-black tracking-tight text-[var(--text-primary)]">{item.title}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="article-social-band">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Instagram Bradwear</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Sorotan konten dari akun Instagram resmi Bradwear</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                Sorotan ini mengarahkan pengunjung ke akun Instagram resmi Bradwear untuk melihat testimoni, detail bahan, mockup desain, dan update visual produksi lainnya.
+              </p>
+            </div>
+            <div className="article-social-grid mt-6">
+              {INSTAGRAM_ARTICLE_ITEMS.map((item) => (
+                <a key={`${item.url}-${item.title}`} href={item.url} target="_blank" rel="noreferrer" className="article-social-card">
+                  <img src={item.image} alt={item.title} className="article-social-image" />
+                  <div className="article-social-copy">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">{item.note}</p>
+                    <div className="article-title-highlight mt-3">
+                      <p className="text-base font-black tracking-tight text-[var(--text-primary)]">{item.title}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 article-card-grid">
+          {articleMagazineFeed.map((article, index) => (
+            <article
+              key={article.slug}
+              className={`article-story-card scroll-reveal-block ${
+                index === 0 ? 'article-story-card-feature' : index < 3 ? 'article-story-card-standard' : 'article-story-card-compact'
+              }`}
+            >
+              <div className="article-story-visual">
+                <img src={article.coverImage} alt={article.coverAlt} className="article-cover-image" />
+              </div>
+              <div className="article-story-body">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+                    {article.category}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(article.publishedAt)}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
+                </div>
+                <div className="article-title-highlight mt-4">
+                  <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                <div className="mt-4 grid gap-3">
+                  {article.highlights.slice(0, index < 2 ? 2 : 1).map((point) => (
+                    <div key={`${article.slug}-highlight-${point}`} className="article-inline-point">
+                      <span />
+                      <p>{point}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-[var(--text-muted)]">{article.comments.length} komentar · {article.author}</p>
+                  <button
+                    type="button"
+                    onClick={() => navigateToArticle(article.slug)}
+                    className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                  >
+                    Baca artikel
+                  </button>
+                </div>
               </div>
             </article>
           ))}
@@ -1654,7 +1871,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderDownloadPage = () => (
     <div className="download-page-shell px-6 py-8 md:px-10">
-      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(140deg,#0f172a,#14380c)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] md:p-8">
+      <section className="scroll-reveal-block rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(140deg,#0f172a,#14380c)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] md:p-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#d4f9af]">Download Bradwear</p>
         <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">Halaman download aplikasi Bradwear Indonesia untuk Android</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
@@ -1688,7 +1905,7 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <section className="scroll-reveal-block mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid gap-5 md:grid-cols-3">
           {DOWNLOAD_HIGHLIGHTS.map((item) => (
             <article key={item.title} className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">

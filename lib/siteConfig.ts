@@ -26,7 +26,7 @@ export const SITE_URL = 'https://www.bradwearindonesia.com';
 export const SITE_NAME = 'Bradwear Indonesia';
 export const SITE_TAGLINE = 'Konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
 export const WHATSAPP_NUMBER = '6287736834454';
-export const GOOGLE_PLAY_URL = '';
+export const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bradwear.app';
 export const STORE_ADDRESS = 'Karisma Residence, Blok C.46, RT.008/RW.003, Margajaya, Kec. Mangunreja, Kabupaten Tasikmalaya, Jawa Barat 46462';
 export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STORE_ADDRESS)}`;
 
@@ -159,11 +159,27 @@ export const SITE_FAQS: SiteFaqItem[] = [
   },
 ];
 
+// Folder `assets/artikel` disiapkan untuk penggantian asset lokal.
+// Selama folder itu belum diisi gambar final, artikel memakai fallback foto online gratis yang relevan.
+const ARTICLE_IMAGE_FALLBACKS = {
+  fabric: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80',
+  garmentRack: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1600&q=80',
+  procurementDesk: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=80',
+  productionFloor: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1600&q=80',
+  customShirt: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80',
+  formalUniform: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80',
+  communityEvent: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80',
+} as const;
+
 // Sumber teks halaman artikel publik.
 export const ARTICLES: Article[] = [
   {
     slug: 'panduan-memilih-bahan-seragam',
     category: 'Bahan',
+    highlight: 'Tentukan bahan dari ritme kerja, suhu lapangan, dan target tampilan akhir.',
+    highlights: ['Bandingkan Tropical, Oxford, Ripstop, dan Nagata Drill.', 'Pilih bahan yang seimbang antara adem, rapi, dan tahan gesek.', 'Finalkan bahan sebelum mockup dan bordir masuk approval.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.fabric,
+    coverAlt: 'Foto kain dan pakaian gantung untuk panduan bahan seragam Bradwear',
     readTime: '5 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset bahan dan produksi',
@@ -192,6 +208,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'beda-pdh-pdl-dan-lapangan',
     category: 'Model',
+    highlight: 'PDH, PDL, dan model lapangan terlihat mirip, tetapi fungsi dan detail produksinya berbeda.',
+    highlights: ['PDH cocok untuk kebutuhan dinas harian yang lebih formal.', 'PDL dan model lapangan menuntut bahan serta detail yang lebih tangguh.', 'Pemilihan tipe model di awal mempercepat approval visual.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.garmentRack,
+    coverAlt: 'Rak pakaian kerja untuk artikel perbedaan PDH, PDL, dan seragam lapangan',
     readTime: '4 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset model seragam',
@@ -219,6 +239,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'tips-order-seragam-instansi',
     category: 'Pemesanan',
+    highlight: 'Order lebih cepat jika data ukuran, logo, PIC, dan target pemakaian sudah siap dari awal.',
+    highlights: ['Siapkan jumlah item, ukuran, gender, dan target tanggal pakai.', 'Lampirkan file logo yang jelas supaya bordir lebih cepat disesuaikan.', 'Gunakan satu PIC internal agar revisi tidak bercabang.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.procurementDesk,
+    coverAlt: 'Meja kerja dengan dokumen untuk artikel tips order seragam instansi',
     readTime: '6 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset alur order',
@@ -247,6 +271,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'checklist-sebelum-produksi',
     category: 'Checklist',
+    highlight: 'Checklist akhir membantu tim produksi bergerak tanpa revisi mendadak saat jahit dimulai.',
+    highlights: ['Kunci model, warna, bahan, dan bordir sebelum cutting.', 'Validasi ulang nama personel, jabatan, dan detail pengiriman.', 'Pastikan PIC penerima dan preferensi kurir sudah final.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.productionFloor,
+    coverAlt: 'Area produksi garmen untuk artikel checklist sebelum produksi seragam custom',
     readTime: '4 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Kontrol kualitas',
@@ -274,6 +302,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'kemeja-custom-untuk-perusahaan-dan-komunitas',
     category: 'Kemeja Custom',
+    highlight: 'Brief desain yang jelas membuat kemeja custom lebih cepat masuk mockup dan produksi.',
+    highlights: ['Tentukan fungsi pemakaian: formal, promosi, teknis, atau event.', 'Kunci warna utama, posisi logo, dan pembagian item per divisi.', 'Susun brief agar tim desain dan CS bekerja di jalur yang sama.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.customShirt,
+    coverAlt: 'Foto kemeja fashion untuk artikel kemeja custom perusahaan dan komunitas',
     readTime: '7 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Strategi produk custom',
@@ -302,6 +334,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'seragam-dinas-dan-komunitas-pilih-model-yang-tepat',
     category: 'Seragam Dinas',
+    highlight: 'Model seragam yang tepat harus menjawab kebutuhan kantor, lapangan, dan citra tim sekaligus.',
+    highlights: ['Potongan formal lebih cocok untuk ritme kerja kantor harian.', 'Seragam lapangan memerlukan detail kantong dan material yang tangguh.', 'Bordir, kerah, dan panjang lengan ikut memengaruhi persepsi profesional.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.formalUniform,
+    coverAlt: 'Busana formal untuk artikel pemilihan model seragam dinas dan komunitas',
     readTime: '6 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset seragam dinas',
@@ -329,6 +365,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'vendor-seragam-dinas-untuk-pengadaan-instansi',
     category: 'Pengadaan',
+    highlight: 'Vendor bisa memberi estimasi lebih akurat saat brief pengadaan sudah lengkap sejak kontak pertama.',
+    highlights: ['Gabungkan fungsi seragam, volume item, dan timeline pemakaian.', 'Jangan hanya membandingkan harga, cek juga kesiapan proses approval dan produksi.', 'Pusatkan brief dalam satu dokumen agar komunikasi vendor lebih efisien.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.procurementDesk,
+    coverAlt: 'Dokumen kerja untuk artikel memilih vendor seragam dinas pengadaan instansi',
     readTime: '6 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset pengadaan dan vendor',
@@ -356,6 +396,10 @@ export const ARTICLES: Article[] = [
   {
     slug: 'seragam-komunitas-dan-event-agar-branding-lebih-rapi',
     category: 'Komunitas',
+    highlight: 'Branding event akan lebih kuat jika model, warna, dan kenyamanan dipikirkan sebagai satu paket.',
+    highlights: ['Bedakan item untuk panitia inti, peserta, dan divisi pendukung.', 'Sesuaikan kain dengan durasi pemakaian dan lokasi acara.', 'Pastikan logo dan warna utama tetap terbaca kuat di foto lapangan.'],
+    coverImage: ARTICLE_IMAGE_FALLBACKS.communityEvent,
+    coverAlt: 'Foto fashion komunitas untuk artikel seragam komunitas dan event Bradwear',
     readTime: '5 menit',
     author: 'Tim Editorial Bradwear',
     authorRole: 'Riset komunitas dan event',

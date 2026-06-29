@@ -11,7 +11,7 @@ import { uploadImageToSupabase } from '../utils/supabaseService';
 import { getModelColorImage, getItemSpecificColors, COLOR_CATALOGS, ASSETS } from '../assets';
 import { analyzeImageWithGemini } from '../utils/geminiService';
 import { useStore } from '../context/StoreContext';
-import { buildWhatsAppUrl } from '../lib/siteConfig';
+import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
 
 const STEP_GUIDE_CONTENT = {
   1: {
@@ -1232,7 +1232,11 @@ interface OrderItem {
         'Mohon bantuannya untuk estimasi harga, timeline produksi, dan langkah approval berikutnya. Terima kasih.',
       ].join('\n');
 
-      window.open(buildWhatsAppUrl(waMessage), '_blank');
+      openCustomerServiceDialog({
+        message: waMessage,
+        title: 'Pilih costumer service yang kamu inginkan',
+        description: 'Pilih customer service tujuan untuk meneruskan hasil preview desain dan data pemesanan Anda.',
+      });
       alert(`✅ Berhasil! Link gambar telah disematkan di WhatsApp.`);
       handleBackCustom();
 

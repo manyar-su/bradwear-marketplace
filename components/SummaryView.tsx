@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { OrderItem, CustomMeasurements } from '../types';
 import { SIZES, COLORS } from '../constants';
 import { useStore } from '../context/StoreContext';
-import { buildWhatsAppUrl } from '../lib/siteConfig';
+import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
 
 const SummaryView: React.FC = () => {
   const {
@@ -123,7 +123,11 @@ const SummaryView: React.FC = () => {
         `TOTAL\n- ${totalQty} pcs\n\n` +
         `Mohon bantuannya untuk estimasi produksi, konfirmasi detail, dan langkah order berikutnya. Terima kasih.`;
 
-      window.open(buildWhatsAppUrl(waMessage), '_blank');
+      openCustomerServiceDialog({
+        message: waMessage,
+        title: 'Pilih costumer service yang kamu inginkan',
+        description: 'Pilih customer service tujuan untuk mengirim ringkasan desain, jumlah, warna, bahan, dan detail pesanan otomatis.',
+      });
       setIsSending(false);
     }, 1200);
   };
