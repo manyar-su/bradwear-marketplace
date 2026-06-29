@@ -4437,6 +4437,95 @@ a {
   box-shadow: none;
 }
 
+.brand-profile-reading-card,
+.brand-profile-side-stack {
+  display: grid;
+  gap: 24px;
+}
+
+.brand-profile-side-panel {
+  display: grid;
+  gap: 0;
+}
+
+.brand-profile-section-label {
+  margin: 0;
+  color: var(--brand-accent-strong);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.brand-profile-section-title {
+  margin: 14px 0 0;
+  max-width: 22ch;
+  color: var(--text-primary);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.brand-profile-reading-flow {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  max-width: 72ch;
+}
+
+.brand-profile-reading-flow p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.88;
+  text-wrap: pretty;
+}
+
+.brand-profile-note {
+  margin-top: 6px;
+  max-width: 70ch;
+  border-left: 3px solid rgba(117, 242, 26, 0.46);
+  padding: 14px 0 14px 16px;
+  background: linear-gradient(90deg, rgba(117, 242, 26, 0.08), transparent 72%);
+}
+
+.brand-profile-note p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.brand-profile-fact-list {
+  display: grid;
+  gap: 0;
+}
+
+.brand-profile-fact-item {
+  padding: 15px 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.brand-profile-fact-label {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.brand-profile-fact-value {
+  margin: 8px 0 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
 .client-gallery-page-shell {
   display: grid;
   gap: 2rem;

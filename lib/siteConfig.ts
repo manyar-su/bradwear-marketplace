@@ -637,8 +637,8 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.ABOUT]: makeMeta(
     RouteKey.ABOUT,
     'Tentang Bradwear Indonesia | Konveksi Kemeja Custom dan Seragam Dinas',
-    'Kenali profil Bradwear Indonesia sebagai konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, sekolah, dan komunitas di seluruh Indonesia.',
-    ['tentang bradwear', 'profil bradwear indonesia', 'konveksi kemeja custom indonesia', 'vendor seragam instansi', 'tentang konveksi seragam']
+    'Kenali profil resmi CV. ASTHAJAYA BRADERINDO sebagai perusahaan konveksi seragam dinas berizin resmi dengan brand BRADWEAR yang terdaftar di DJKI KEMENKUMHAM.',
+    ['tentang bradwear', 'profil cv asthajaya braderindo', 'brand bradwear', 'vendor seragam instansi', 'konveksi seragam dinas resmi']
   ),
   [RouteKey.VISION_MISSION]: makeMeta(
     RouteKey.VISION_MISSION,
@@ -649,26 +649,26 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.PRODUCTS_SERVICES]: makeMeta(
     RouteKey.PRODUCTS_SERVICES,
     'Produk dan Jasa Bradwear | Kemeja Dinas, Jaket, Rompi, Polo, dan Celana Custom',
-    'Pelajari produk dan jasa Bradwear Indonesia mulai dari kemeja dinas, jaket, rompi, polo shirt, celana tactical, sampai layanan custom bordir dan identitas personel.',
-    ['produk bradwear', 'jasa konveksi seragam', 'kemeja dinas custom', 'jasa bordir logo instansi', 'produk seragam kerja']
+    'Pelajari produk dan jasa resmi Bradwear mulai dari seragam dinas pemerintah, seragam kerja perusahaan, seragam medis, seragam sekolah kedinasan, organisasi, komunitas, wearpack, hingga custom bordir logo.',
+    ['produk bradwear', 'jasa konveksi seragam', 'seragam dinas pemerintah', 'jasa bordir logo instansi', 'wearpack custom']
   ),
   [RouteKey.COMPETITIVE_ADVANTAGE]: makeMeta(
     RouteKey.COMPETITIVE_ADVANTAGE,
     'Keunggulan Bradwear Indonesia | Bahan Tepat, Jahitan Rapi, dan Alur Order Jelas',
-    'Keunggulan Bradwear Indonesia ada pada pemilihan bahan yang sesuai fungsi, jahitan rapi, kontrol detail, dan alur order yang membantu approval lebih cepat.',
-    ['keunggulan bradwear', 'kualitas kemeja custom', 'jahitan seragam rapi', 'vendor seragam berkualitas']
+    'Keunggulan Bradwear Indonesia terletak pada kualitas bahan terbaik, jahitan presisi, harga kompetitif, dan layanan custom desain untuk kebutuhan instansi maupun perusahaan.',
+    ['keunggulan bradwear', 'kualitas bahan seragam', 'jahitan seragam rapi', 'vendor seragam berkualitas']
   ),
   [RouteKey.CLIENT_REACH]: makeMeta(
     RouteKey.CLIENT_REACH,
     'Klien dan Jangkauan Bradwear | Workshop Tasikmalaya dan Pengiriman Seluruh Indonesia',
-    'Bradwear Indonesia melayani berbagai instansi, perusahaan, dan komunitas dengan basis workshop di Tasikmalaya serta pengiriman seragam custom ke seluruh Indonesia.',
+    'Bradwear Indonesia telah dipercaya oleh instansi pemerintah daerah, perusahaan swasta nasional, rumah sakit, sekolah, universitas, dan organisasi kemasyarakatan dengan jangkauan layanan ke seluruh Indonesia.',
     ['klien bradwear', 'jangkauan pengiriman seragam', 'workshop tasikmalaya', 'vendor seragam seluruh indonesia']
   ),
   [RouteKey.LEGAL_LICENSE]: makeMeta(
     RouteKey.LEGAL_LICENSE,
     'Legalitas dan Lisensi Bradwear Indonesia | Informasi Administrasi dan Kerja Sama',
-    'Informasi legalitas, lisensi, dan kebutuhan administrasi pengadaan Bradwear Indonesia untuk kerja sama seragam custom instansi dan perusahaan.',
-    ['legalitas bradwear', 'lisensi hukum konveksi', 'administrasi pengadaan seragam', 'syarat kerja sama seragam']
+    'Informasi legalitas resmi CV. ASTHAJAYA BRADERINDO, status brand BRADWEAR yang terdaftar di DJKI KEMENKUMHAM, serta kontak perusahaan untuk kebutuhan administrasi dan kerja sama.',
+    ['legalitas bradwear', 'cv asthajaya braderindo', 'administrasi pengadaan seragam', 'djkikemenkumham bradwear']
   ),
   [RouteKey.PANTS]: makeMeta(
     RouteKey.PANTS,

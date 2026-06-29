@@ -19,8 +19,6 @@ const CustomerServiceDock: React.FC<CustomerServiceDockProps> = ({
   onClose,
 }) => {
   const topic = getConsultationTopicForPath(currentRoute, currentPathname);
-  const compactTopic = topic.length > 44 ? `${topic.slice(0, 44)}...` : topic;
-  const formatPhone = (phone: string) => `0${phone.slice(2)}`;
 
   return (
     <section className="customer-service-dock-panel rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.18)] sm:p-4">
@@ -28,10 +26,13 @@ const CustomerServiceDock: React.FC<CustomerServiceDockProps> = ({
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Customer Service</p>
           <h3 className="mt-1 text-base font-black tracking-tight text-[var(--text-primary)] sm:text-lg">
-            {CUSTOMER_SERVICE_CONTACTS.length} CS aktif
+            Daftar costumer service
           </h3>
-          <p className="mt-1 max-w-[28ch] text-xs leading-relaxed text-[var(--text-secondary)]">
-            Klik kontak untuk chat otomatis tentang <strong>{compactTopic}</strong>.
+          <p className="mt-1 max-w-[30ch] text-xs leading-relaxed text-[var(--text-secondary)]">
+            <strong>Pilih kontak untuk konsultasi</strong>
+          </p>
+          <p className="mt-1 max-w-[30ch] text-xs leading-relaxed text-[var(--text-secondary)]">
+            Tanya seputar pemesanan dan jenis bahan yang tersedia.
           </p>
         </div>
         <button
@@ -68,8 +69,7 @@ const CustomerServiceDock: React.FC<CustomerServiceDockProps> = ({
                   {contact.statusLabel}
                 </span>
               </div>
-              <p className="mt-1 truncate text-[11px] text-[var(--text-secondary)]">{formatPhone(contact.phone)}</p>
-              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Klik untuk WhatsApp</p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Kirim pesan</p>
             </div>
           </a>
         ))}

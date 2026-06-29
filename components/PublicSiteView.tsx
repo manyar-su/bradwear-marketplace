@@ -72,63 +72,150 @@ const DOWNLOAD_HIGHLIGHTS = [
   },
 ];
 
-// Sumber copy untuk seluruh halaman profil publik.
-const BRAND_PROFILE_ITEMS = [
+type BrandProfileItem = {
+  route: RouteKey;
+  kicker: string;
+  title: string;
+  intro: string;
+  paragraphs: string[];
+  points: string[];
+  facts?: Array<{ label: string; value: string }>;
+  note?: string;
+};
+
+// Sumber copy untuk seluruh halaman profil publik berdasarkan company profile resmi.
+const BRAND_PROFILE_ITEMS: BrandProfileItem[] = [
   {
     route: RouteKey.ABOUT,
     kicker: 'Tentang Kami',
-    title: 'CV. ASTHAJAYA BRADERINDO adalah konveksi resmi penyedia seragam dinas di Indonesia.',
-    body:
-      'CV. ASTHAJAYA BRADERINDO adalah konveksi resmi penyedia seragam dinas di Indonesia, beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM. Perusahaan ini berkomitmen kuat dalam menyajikan produk berkualitas tinggi dan melayani berbagai kebutuhan seragam dinas untuk instansi pemerintah, perusahaan swasta, sekolah, dan organisasi lainnya.',
-    points: ['Beroperasi di bawah merek Bradwear yang terdaftar di DJKI KEMENKUMHAM', 'Fokus pada kualitas tinggi untuk seragam dinas dan kerja custom', 'Melayani instansi pemerintah, perusahaan, sekolah, dan organisasi'],
-    emphasis: 'Bradwear hadir sebagai wajah layanan seragam dinas yang rapi, jelas, dan siap dipresentasikan sejak tahap konsultasi awal.',
+    title: 'CV. ASTHAJAYA BRADERINDO adalah perusahaan konveksi seragam dinas berizin resmi dengan brand BRADWEAR.',
+    intro:
+      'CV. ASTHAJAYA BRADERINDO bergerak di bidang konveksi seragam dinas berizin resmi dan menggunakan brand BRADWEAR yang telah terdaftar di DJKI KEMENKUMHAM.',
+    paragraphs: [
+      'Perusahaan ini memiliki komitmen tinggi dalam menyediakan produk berkualitas terbaik untuk berbagai kebutuhan seragam dinas. Layanan utamanya mencakup pembuatan seragam bagi instansi pemerintahan, perusahaan swasta, sekolah, dan berbagai organisasi lainnya.',
+      'Berdasarkan company profile resmi, Bradwear terus berkembang dengan bertumpu pada pengalaman bertahun-tahun di industri konveksi agar dapat memberikan hasil produksi yang rapi, layanan yang jelas, dan tindak lanjut yang profesional kepada pelanggan.',
+    ],
+    points: [
+      'Nama usaha resmi: CV. ASTHAJAYA BRADERINDO',
+      'Brand operasional: BRADWEAR',
+      'Status brand: terdaftar di DJKI KEMENKUMHAM',
+      'Melayani instansi pemerintah, perusahaan swasta, sekolah, dan organisasi',
+    ],
+    facts: [
+      { label: 'Bentuk usaha', value: 'CV. ASTHAJAYA BRADERINDO' },
+      { label: 'Brand', value: 'BRADWEAR' },
+      { label: 'Bidang', value: 'Konveksi seragam dinas' },
+    ],
+    note: 'Profil ini disusun dari company profile resmi Bradwear agar informasi yang tampil di website konsisten dengan identitas perusahaan.',
   },
   {
     route: RouteKey.VISION_MISSION,
     kicker: 'Visi & Misi',
-    title: 'Membangun proses order yang rapi, hasil yang presisi, dan hubungan kerja jangka panjang.',
-    body:
-      'Arah kerja Bradwear adalah menjaga kualitas jahit, ketepatan produksi, dan komunikasi yang mudah dipahami agar keputusan internal klien lebih cepat.',
-    points: ['Menjaga kualitas bahan dan finishing', 'Memberi layanan profesional dan tepat waktu', 'Terus menyempurnakan desain, produksi, dan kontrol detail'],
-    emphasis: 'Halaman ini menekankan standar kerja dan orientasi layanan, bukan sekadar profil perusahaan.',
+    title: 'Menjadi perusahaan konveksi seragam dinas terdepan di Indonesia dengan kualitas, inovasi, dan ketepatan waktu.',
+    intro:
+      'Visi resmi Bradwear adalah menjadi perusahaan konveksi seragam dinas terdepan di Indonesia dengan mengedepankan kualitas, inovasi, ketepatan waktu, dan kepuasan pelanggan.',
+    paragraphs: [
+      'Arah kerja ini menempatkan kualitas hasil dan kepuasan pelanggan sebagai standar utama, bukan sekadar target produksi. Karena itu, ritme kerja Bradwear dibangun di atas kontrol detail, disiplin timeline, dan komunikasi yang profesional.',
+      'Misi perusahaan menegaskan bahwa setiap pesanan harus ditangani dengan bahan baku terbaik, layanan yang tepat waktu, inovasi desain dan teknologi produksi, serta hubungan jangka panjang yang dibangun dari kepercayaan pelanggan.',
+    ],
+    points: [
+      'Menyediakan seragam dinas dengan standar kualitas tinggi',
+      'Menggunakan bahan baku terbaik yang nyaman dan tahan lama',
+      'Memberikan pelayanan yang profesional dan tepat waktu',
+      'Terus berinovasi dalam desain dan teknologi produksi',
+      'Menjalin hubungan jangka panjang dengan klien berdasarkan kepercayaan dan kepuasan',
+    ],
+    note: 'Visi dan misi ini mengikuti naskah resmi yang tercantum pada dokumen company profile Bradwear.',
   },
   {
     route: RouteKey.PRODUCTS_SERVICES,
-    kicker: 'Produk & Jasa',
-    title: 'Kategori dibuat untuk memudahkan pemilihan model sesuai fungsi lapangan atau kebutuhan formal.',
-    body:
-      'Pilihan utama meliputi kemeja dinas, jaket, rompi, polo, celana tactical, serta layanan custom desain dengan penyesuaian bordir dan identitas personel.',
-    points: ['Seragam dinas pemerintahan dan operasional', 'Seragam perusahaan, komunitas, dan sekolah', 'Bordir logo, nama personel, dan detail custom'],
-    emphasis: 'Fokus utama halaman ini adalah memperjelas cakupan produk serta layanan custom yang benar-benar dikerjakan Bradwear.',
+    kicker: 'Produk & Layanan',
+    title: 'Bradwear menyediakan berbagai jenis seragam dinas sesuai kebutuhan klien dan layanan custom desain.',
+    intro:
+      'Menurut company profile resmi, Bradwear melayani pembuatan berbagai jenis seragam dinas sesuai kebutuhan instansi, perusahaan, sekolah, fasilitas medis, hingga organisasi dan komunitas.',
+    paragraphs: [
+      'Cakupan produk utamanya mencakup seragam dinas pemerintah seperti PNS, TNI, POLRI, dan Satpol PP; seragam kerja perusahaan untuk BUMN, swasta, dan startup; seragam medis; seragam sekolah kedinasan; seragam organisasi dan komunitas; serta wearpack.',
+      'Selain produk jadi, Bradwear juga menawarkan layanan custom desain berikut bordir logo sesuai permintaan pelanggan. Ini membuat proses pengadaan dan penyesuaian identitas visual bisa dikerjakan dalam satu jalur yang lebih terstruktur.',
+    ],
+    points: [
+      'Seragam dinas pemerintah',
+      'Seragam kerja perusahaan',
+      'Seragam medis',
+      'Seragam sekolah kedinasan',
+      'Seragam organisasi dan komunitas',
+      'Wearpack',
+      'Custom desain dan bordir logo sesuai permintaan',
+    ],
+    facts: [
+      { label: 'Layanan tambahan', value: 'Custom desain' },
+      { label: 'Identitas visual', value: 'Bordir logo sesuai permintaan' },
+    ],
   },
   {
     route: RouteKey.COMPETITIVE_ADVANTAGE,
-    kicker: 'Keunggulan',
-    title: 'Nilai utama Bradwear ada pada bahan yang tepat, jahitan rapi, dan tindak lanjut order yang tidak berputar-putar.',
-    body:
-      'Halaman ini disusun supaya klien bisa memilih model, melihat referensi hasil jadi, lalu masuk ke diskusi produksi dengan data yang lebih siap.',
-    points: ['Bahan dipilih sesuai fungsi seragam', 'Presisi jahit dan kontrol visual sebelum produksi', 'Konsultasi langsung dilanjutkan ke WhatsApp tim'],
-    emphasis: 'Keunggulan Bradwear ditempatkan pada keputusan bahan yang tepat, produksi yang rapi, dan alur order yang tidak berputar-putar.',
+    kicker: 'Keunggulan Kami',
+    title: 'Keunggulan utama Bradwear ada pada kualitas bahan, jahitan presisi, harga kompetitif, dan desain custom.',
+    intro:
+      'Company profile resmi Bradwear menempatkan empat keunggulan utama sebagai pembeda layanan: kualitas bahan terbaik, jahitan rapi dan presisi, harga kompetitif, serta kemampuan custom desain.',
+    paragraphs: [
+      'Kualitas bahan dipilih untuk menghasilkan seragam yang nyaman dan tahan lama, sementara proses jahit dikerjakan oleh tenaga profesional dengan standar kerja yang tinggi agar hasil akhir lebih presisi.',
+      'Di sisi penawaran, Bradwear menjaga harga tetap kompetitif tanpa mengorbankan mutu. Pelanggan juga dapat menyesuaikan model, warna, dan logo sesuai kebutuhan instansi atau perusahaan.',
+    ],
+    points: [
+      'Menggunakan bahan berkualitas tinggi yang nyaman dan tahan lama',
+      'Dikerjakan oleh tenaga profesional dengan standar jahitan yang tinggi',
+      'Menawarkan harga terbaik dengan kualitas maksimal',
+      'Bisa custom model, warna, dan logo sesuai permintaan klien',
+    ],
   },
   {
     route: RouteKey.CLIENT_REACH,
     kicker: 'Klien & Jangkauan',
-    title: 'Bradwear melayani pengiriman seluruh Indonesia dengan basis workshop di Tasikmalaya.',
-    body:
-      'Portofolio dan layanan disiapkan untuk instansi daerah, perusahaan nasional, organisasi, sekolah, serta kebutuhan tim yang memerlukan approval visual lebih dulu.',
-    points: ['Workshop dan sample development di Tasikmalaya', 'Pengiriman ke seluruh Indonesia', 'Referensi hasil jadi tersedia untuk kebutuhan approval'],
-    emphasis: 'Konten halaman ini menyorot jangkauan pengiriman dan kesiapan Bradwear melayani kebutuhan order dari berbagai wilayah Indonesia.',
+    title: 'Bradwear telah dipercaya berbagai instansi, perusahaan, rumah sakit, dan organisasi di seluruh Indonesia.',
+    intro:
+      'Dokumen company profile menyebut bahwa Bradwear telah dipercaya oleh berbagai instansi pemerintahan, perusahaan swasta, rumah sakit, dan organisasi lainnya di seluruh Indonesia.',
+    paragraphs: [
+      'Ragam klien ini menunjukkan bahwa kapasitas layanan Bradwear tidak terbatas pada satu sektor saja. Kebutuhan seragam formal, operasional, medis, pendidikan, hingga organisasi masyarakat sudah menjadi bagian dari cakupan kerja perusahaan.',
+      'Daftar kategori klien yang ditampilkan dalam dokumen resmi meliputi instansi pemerintah daerah, perusahaan swasta nasional, rumah sakit dan klinik kesehatan, sekolah dan universitas, serta organisasi kemasyarakatan.',
+    ],
+    points: [
+      'Instansi pemerintah daerah',
+      'Perusahaan swasta nasional',
+      'Rumah sakit dan klinik kesehatan',
+      'Sekolah dan universitas',
+      'Organisasi kemasyarakatan',
+    ],
+    facts: [
+      { label: 'Cakupan layanan', value: 'Seluruh Indonesia' },
+      { label: 'Basis operasional', value: 'Tasikmalaya, Jawa Barat' },
+    ],
   },
   {
     route: RouteKey.LEGAL_LICENSE,
     kicker: 'Legal & Lisensi',
-    title: 'Identitas usaha dan kebutuhan administrasi pengadaan dapat ditindaklanjuti saat konsultasi resmi.',
-    body:
-      'Bradwear berjalan di bawah entitas usaha resmi dan menyiapkan tindak lanjut dokumen, kebutuhan legal, serta syarat kerja sama sesuai konteks instansi atau perusahaan.',
-    points: ['Informasi legal dibuka saat proses konsultasi resmi', 'Kebutuhan administrasi pengadaan dapat dibahas lanjut', 'Syarat dan alur kerja dibuat menyesuaikan tipe order'],
-    emphasis: 'Informasi legal diposisikan sebagai penegas kredibilitas dan kesiapan administrasi kerja sama, bukan pengulangan profil perusahaan.',
+    title: 'Identitas usaha, brand, dan kontak resmi Bradwear ditampilkan berdasarkan company profile perusahaan.',
+    intro:
+      'Halaman ini merangkum identitas resmi yang tercantum pada company profile Bradwear, termasuk nama usaha, status brand, alamat, dan kanal kontak perusahaan.',
+    paragraphs: [
+      'Dalam dokumen company profile, CV. ASTHAJAYA BRADERINDO dinyatakan sebagai perusahaan konveksi seragam dinas berizin resmi yang menggunakan brand BRADWEAR dan telah terdaftar di DJKI KEMENKUMHAM.',
+      'Dokumen juga menampilkan alamat operasional di Karisma Residence, Blok C.46, RT.008/RW.003, Margajaya, Kecamatan Mangunreja, Kabupaten Tasikmalaya, Jawa Barat 46462, beserta nomor kontak, email perusahaan, dan akun media sosial yang digunakan.',
+    ],
+    points: [
+      'Nama usaha resmi: CV. ASTHAJAYA BRADERINDO',
+      'Brand: BRADWEAR',
+      'Status brand: terdaftar di DJKI KEMENKUMHAM',
+      'Alamat operasional resmi tercantum pada company profile',
+      'Kontak perusahaan meliputi telepon, email, dan akun media sosial',
+    ],
+    facts: [
+      { label: 'Nomor telepon', value: '0823-1922-6530' },
+      { label: 'Email', value: 'asthajayabraderindo@gmail.com' },
+      { label: 'Instagram', value: '@gilangsetianugraha_bradwear' },
+      { label: 'Alamat', value: 'Karisma Residence Blok C.46, Margajaya, Mangunreja, Tasikmalaya, Jawa Barat 46462' },
+    ],
+    note: 'Isi halaman ini mengikuti data yang tercetak pada company profile PDF yang Anda lampirkan.',
   },
-] as const;
+];
 
 type LightboxSlide = {
   alt: string;
@@ -2001,18 +2088,25 @@ const PublicSiteView: React.FC = () => {
         <section className="brand-profile-hero brand-profile-hero-flat px-6 py-8 text-white md:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">{activeBrandProfilePage.kicker}</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">{activeBrandProfilePage.title}</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.body}</p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.intro}</p>
         </section>
 
-        {/* Fokus halaman dan poin utama profil. */}
+        {/* Ringkasan resmi dan poin utama profil perusahaan. */}
         <section className="brand-profile-grid mt-8 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
-          <article className="brand-profile-card brand-profile-card-flat p-0 shadow-none">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">
-              Fokus halaman
-            </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">{activeBrandProfilePage.kicker}</h2>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">{activeBrandProfilePage.emphasis}</p>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">{activeBrandProfilePage.body}</p>
+          <article className="brand-profile-card brand-profile-card-flat brand-profile-reading-card">
+            <p className="brand-profile-section-label">Ringkasan resmi</p>
+            <h2 className="brand-profile-section-title">{activeBrandProfilePage.kicker}</h2>
+            <div className="brand-profile-reading-flow">
+              {activeBrandProfilePage.paragraphs.map((paragraph, index) => (
+                <p key={`${activeBrandProfilePage.route}-paragraph-${index}`}>{paragraph}</p>
+              ))}
+            </div>
+
+            {activeBrandProfilePage.note ? (
+              <aside className="brand-profile-note">
+                <p>{activeBrandProfilePage.note}</p>
+              </aside>
+            ) : null}
 
             <div className="section-action-stack mt-6">
               <button
@@ -2022,29 +2116,37 @@ const PublicSiteView: React.FC = () => {
               >
                 Kembali ke beranda
               </button>
-              <a
-                href={buildWhatsAppUrl(buildConsultationMessage(`informasi ${activeBrandProfilePage.kicker.toLowerCase()} Bradwear`))}
-                target="_blank"
-                rel="noreferrer"
-                className="hero-secondary"
-              >
-                Tanya via WhatsApp
-              </a>
             </div>
           </article>
 
-          <article className="brand-profile-card brand-profile-card-flat p-0 shadow-none">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Poin Utama</p>
-            <div className="mt-5 grid gap-3">
-              {activeBrandProfilePage.points.map((point, index) => (
-                <article key={point} className="brand-profile-point brand-profile-point-flat px-0 py-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-accent-strong)]">
-                    {String(index + 1).padStart(2, '0')}
-                  </p>
-                  <p className="mt-2 text-sm font-semibold leading-relaxed text-[var(--text-primary)]">{point}</p>
-                </article>
-              ))}
-            </div>
+          <article className="brand-profile-card brand-profile-card-flat brand-profile-side-stack">
+            <section className="brand-profile-side-panel">
+              <p className="brand-profile-section-label">Poin utama</p>
+              <div className="mt-5 grid gap-3">
+                {activeBrandProfilePage.points.map((point, index) => (
+                  <article key={point} className="brand-profile-point brand-profile-point-flat px-0 py-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-accent-strong)]">
+                      {String(index + 1).padStart(2, '0')}
+                    </p>
+                    <p className="mt-2 text-sm font-semibold leading-relaxed text-[var(--text-primary)]">{point}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {activeBrandProfilePage.facts?.length ? (
+              <section className="brand-profile-side-panel">
+                <p className="brand-profile-section-label">Data perusahaan</p>
+                <div className="brand-profile-fact-list mt-5">
+                  {activeBrandProfilePage.facts.map((fact) => (
+                    <article key={`${activeBrandProfilePage.route}-${fact.label}`} className="brand-profile-fact-item">
+                      <p className="brand-profile-fact-label">{fact.label}</p>
+                      <p className="brand-profile-fact-value">{fact.value}</p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </article>
         </section>
       </div>
