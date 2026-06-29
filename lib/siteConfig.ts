@@ -3,6 +3,7 @@ import {
   BradAiContextSection,
   ContactChannel,
   CourierProvider,
+  CustomerServiceContact,
   HowToOrderStep,
   NavItem,
   RouteKey,
@@ -10,7 +11,7 @@ import {
   SiteFaqItem,
 } from '../types';
 
-export const SITE_URL = 'https://bradwear.store';
+export const SITE_URL = 'https://www.bradwearindonesia.com';
 export const SITE_NAME = 'Bradwear Indonesia';
 export const SITE_TAGLINE = 'Konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
 export const WHATSAPP_NUMBER = '6287736834454';
@@ -59,6 +60,7 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.BRAD_AI,
 ]);
 
+// Label navigasi utama yang tampil di permukaan publik website.
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, description: 'Halaman utama Bradwear Indonesia.' },
   { label: 'Studio 3D', route: RouteKey.THREE_D, description: 'Halaman khusus preview dan custom seragam 3D Bradwear.' },
@@ -72,6 +74,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Brodi', route: RouteKey.BRAD_AI, description: 'Asisten AI untuk menjawab pertanyaan seputar layanan Bradwear.' },
 ];
 
+// Label shortcut utilitas untuk area publik.
 export const UTILITY_NAV_ITEMS: NavItem[] = [
   { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN },
   { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN },
@@ -79,6 +82,7 @@ export const UTILITY_NAV_ITEMS: NavItem[] = [
   { label: 'Brodi', route: RouteKey.BRAD_AI },
 ];
 
+// Label route/breadcrumb yang dipakai di beberapa konteks UI publik.
 export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.HOME]: 'Beranda',
   [RouteKey.THREE_D]: 'Beranda / Studio 3D',
@@ -101,18 +105,21 @@ export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.SUMMARY]: 'Beranda / Ringkasan Pesanan',
 };
 
+// Teks kontak utama untuk halaman bantuan/layanan pelanggan.
 export const CONTACT_CHANNELS: ContactChannel[] = [
   { label: 'WhatsApp Konsultasi', value: '+62 877-3683-4454', note: 'Respon untuk konsultasi model, bahan, dan estimasi order.' },
   { label: 'Area Layanan', value: 'Seluruh Indonesia', note: 'Melayani pengiriman seragam custom ke instansi, perusahaan, dan komunitas.' },
   { label: 'Workshop', value: 'Tasikmalaya, Jawa Barat', note: 'Titik konsultasi dan pengembangan sampel berada di Karisma Residence.' },
 ];
 
+// Teks jam operasional yang tampil di halaman layanan pelanggan.
 export const CUSTOMER_SERVICE_HOURS = [
   'Senin - Jumat: 08.00 - 17.00 WIB',
   'Sabtu: 08.00 - 14.00 WIB',
   'Minggu / hari libur: tindak lanjut via WhatsApp',
 ];
 
+// FAQ utama website; dipakai ulang di home, layanan pelanggan, dan konteks AI.
 export const SITE_FAQS: SiteFaqItem[] = [
   {
     slug: 'minimal-order',
@@ -136,6 +143,7 @@ export const SITE_FAQS: SiteFaqItem[] = [
   },
 ];
 
+// Sumber teks halaman artikel publik.
 export const ARTICLES: Article[] = [
   {
     slug: 'panduan-memilih-bahan-seragam',
@@ -143,6 +151,9 @@ export const ARTICLES: Article[] = [
     readTime: '5 menit',
     title: 'Panduan memilih bahan seragam agar nyaman dipakai dan tetap rapi',
     excerpt: 'Perbedaan material seperti Tropical, Nagata Drill, Ripstop, dan Oxford perlu disesuaikan dengan ritme kerja, lokasi lapangan, dan tampilan yang diinginkan.',
+    seoTitle: 'Panduan Memilih Bahan Seragam Kerja dan Kemeja Dinas | Bradwear Indonesia',
+    seoDescription: 'Pelajari cara memilih bahan seragam kerja, kemeja dinas, dan kemeja custom seperti Tropical, Oxford, Ripstop, dan Nagata Drill sesuai fungsi lapangan maupun kantor.',
+    keywords: ['panduan bahan seragam', 'bahan kemeja dinas', 'bahan seragam kerja', 'bahan kemeja custom', 'tropical oxford ripstop nagata drill'],
     body: [
       'Seragam yang baik tidak hanya terlihat formal, tetapi juga mendukung mobilitas pemakainya. Untuk kebutuhan kantor dengan pemakaian harian, bahan yang ringan dan tidak panas seperti Tropical atau Oxford sering menjadi pilihan aman.',
       'Jika kebutuhan lebih berat, misalnya untuk lapangan atau operasional yang aktif, bahan seperti Ripstop dan Nagata Drill memberi struktur yang lebih kokoh serta ketahanan lebih baik terhadap gesekan.',
@@ -155,6 +166,9 @@ export const ARTICLES: Article[] = [
     readTime: '4 menit',
     title: 'Memahami beda PDH, PDL, dan seragam lapangan sebelum order produksi',
     excerpt: 'Jenis seragam yang terlihat mirip sering punya kebutuhan pola, bahan, dan detail finishing yang berbeda.',
+    seoTitle: 'Beda PDH, PDL, dan Seragam Lapangan untuk Instansi | Bradwear Indonesia',
+    seoDescription: 'Pahami perbedaan model PDH, PDL, dan seragam lapangan agar instansi, perusahaan, dan komunitas lebih tepat memilih potongan, bahan, dan detail custom.',
+    keywords: ['beda pdh pdl', 'seragam lapangan instansi', 'model kemeja dinas', 'seragam dinas lapangan', 'pdh pdl custom'],
     body: [
       'PDH biasanya dipakai untuk kebutuhan dinas harian sehingga tampilannya lebih rapi dan formal. PDL dan model lapangan umumnya membutuhkan potongan yang lebih fungsional dengan kantong, penguat jahitan, atau bahan yang lebih tangguh.',
       'Kesalahan memilih tipe model di awal akan memengaruhi bahan, biaya, dan waktu persetujuan desain. Karena itu, Bradwear menyiapkan katalog terstruktur agar pelanggan bisa membedakan fungsi tiap seri dengan lebih cepat.',
@@ -167,6 +181,9 @@ export const ARTICLES: Article[] = [
     readTime: '6 menit',
     title: 'Tips order seragam instansi agar proses revisi dan produksi lebih cepat',
     excerpt: 'Kejelasan data ukuran, identitas instansi, jumlah item, dan target waktu akan sangat mempercepat persetujuan.',
+    seoTitle: 'Tips Order Seragam Instansi dan Perusahaan | Bradwear Indonesia',
+    seoDescription: 'Simak tips order seragam instansi, perusahaan, dan komunitas agar approval desain, pengumpulan ukuran, bordir logo, dan produksi berjalan lebih cepat.',
+    keywords: ['tips order seragam instansi', 'order kemeja dinas', 'pengadaan seragam perusahaan', 'order seragam komunitas', 'konsultasi seragam custom'],
     body: [
       'Sebelum order, siapkan daftar ukuran, pembagian gender, kebutuhan lengan, dan target tanggal pemakaian. Langkah sederhana ini membantu tim CS dan produksi menyusun estimasi dengan lebih akurat.',
       'Untuk seragam yang membutuhkan bordir logo, file referensi berkualitas baik akan mempersingkat proses penyesuaian. Jika ada panduan warna resmi instansi, lampirkan sejak awal.',
@@ -179,14 +196,61 @@ export const ARTICLES: Article[] = [
     readTime: '4 menit',
     title: 'Checklist sebelum produksi seragam custom dimulai',
     excerpt: 'Approval akhir sebaiknya mencakup model, ukuran, material, warna, logo, nama, dan alamat pengiriman.',
+    seoTitle: 'Checklist Sebelum Produksi Seragam Custom Dimulai | Bradwear Indonesia',
+    seoDescription: 'Gunakan checklist produksi seragam custom untuk memastikan model, bahan, warna, bordir logo, nama personel, dan alamat pengiriman sudah final sebelum jahit dimulai.',
+    keywords: ['checklist seragam custom', 'produksi kemeja custom', 'approval seragam dinas', 'bordir nama personel', 'persiapan produksi seragam'],
     body: [
       'Pastikan kode model, warna kain, serta jenis bahan yang dipilih sudah final. Perubahan setelah proses cutting biasanya memengaruhi waktu produksi.',
       'Cek ulang penulisan nama personel, jabatan, atau divisi yang akan dibordir. Kesalahan data kecil justru sering menyebabkan penundaan produksi di tahap akhir.',
       'Konfirmasi alamat kirim, PIC penerima, dan kurir yang diinginkan jika ada preferensi tertentu. Bradwear lalu dapat menyiapkan update tracking yang lebih rapi sampai barang diterima.',
     ],
   },
+  {
+    slug: 'kemeja-custom-untuk-perusahaan-dan-komunitas',
+    category: 'Kemeja Custom',
+    readTime: '7 menit',
+    title: 'Kemeja custom untuk perusahaan dan komunitas: hal yang perlu disiapkan sebelum produksi',
+    excerpt: 'Kemeja custom untuk perusahaan, organisasi, dan komunitas akan lebih cepat diproduksi jika brief desain, fungsi pemakaian, dan identitas visual sudah jelas sejak awal.',
+    seoTitle: 'Kemeja Custom untuk Perusahaan dan Komunitas | Bradwear Indonesia',
+    seoDescription: 'Panduan menyiapkan kemeja custom untuk perusahaan, komunitas, organisasi, dan event agar desain, bahan, bordir, serta approval produksi lebih rapi.',
+    keywords: ['kemeja custom perusahaan', 'kemeja custom komunitas', 'vendor kemeja custom', 'kemeja kostum custom', 'kemeja event custom'],
+    body: [
+      'Kemeja custom sering dipakai untuk kebutuhan branding internal, event, operasional lapangan, sampai identitas komunitas. Karena itu, poin paling awal yang harus jelas adalah konteks pemakaian: formal, santai, teknis, atau promosi.',
+      'Untuk perusahaan dan komunitas, referensi warna utama, posisi logo, jenis identitas personel, dan jumlah item per divisi perlu dikunci lebih cepat. Langkah ini mempercepat diskusi desain dan mencegah revisi berulang di tengah proses approval.',
+      'Bradwear membantu pelanggan menyusun kebutuhan kemeja custom agar lebih mudah diterjemahkan ke mockup, pilihan bahan, dan estimasi produksi. Dengan data yang rapi sejak awal, hasil akhirnya lebih konsisten dan proses order lebih efisien.',
+    ],
+  },
+  {
+    slug: 'seragam-dinas-dan-komunitas-pilih-model-yang-tepat',
+    category: 'Seragam Dinas',
+    readTime: '6 menit',
+    title: 'Seragam dinas dan komunitas: cara memilih model yang tepat untuk kerja formal dan lapangan',
+    excerpt: 'Pemilihan model seragam dinas dan komunitas perlu disesuaikan dengan ritme kerja, kebutuhan identitas, serta citra yang ingin ditampilkan di lapangan maupun kantor.',
+    seoTitle: 'Seragam Dinas dan Seragam Komunitas: Pilih Model yang Tepat | Bradwear Indonesia',
+    seoDescription: 'Cari model seragam dinas, seragam komunitas, dan kemeja kerja custom yang sesuai kebutuhan kantor, lapangan, operasional, dan event organisasi.',
+    keywords: ['seragam dinas', 'seragam komunitas', 'kemeja kerja custom', 'vendor seragam dinas', 'seragam kantor custom'],
+    body: [
+      'Seragam dinas yang dipakai harian biasanya membutuhkan tampilan lebih formal dengan potongan rapi dan bahan yang nyaman untuk durasi panjang. Sebaliknya, seragam komunitas atau lapangan cenderung memerlukan fleksibilitas gerak, detail kantong, dan material yang lebih tangguh.',
+      'Model yang tepat bukan hanya soal tampilan. Bentuk kerah, komposisi warna, bahan, bordir logo, dan panjang lengan akan memengaruhi kenyamanan pemakai sekaligus kesan profesional saat dipresentasikan ke pimpinan atau anggota tim.',
+      'Bradwear memudahkan proses pemilihan model lewat katalog visual dan konsultasi WhatsApp sehingga user bisa membandingkan opsi untuk dinas, perusahaan, komunitas, dan kebutuhan custom lainnya sebelum produksi dimulai.',
+    ],
+  },
 ];
 
+export const CUSTOMER_SERVICE_CONTACTS: CustomerServiceContact[] = [
+  { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: '/cs-avatars/gilang.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: '/cs-avatars/elsha.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'bayu', name: 'Bayu', phone: '6287736834454', avatar: '/cs-avatars/bayu.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'nadhifa', name: 'Nadhifa', phone: '6282316067692', avatar: '/cs-avatars/nadhifa.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: '/cs-avatars/risma.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'ede', name: 'Ede', phone: '6285317159575', avatar: '/cs-avatars/ede.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: '/cs-avatars/fikri.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'aris', name: 'Aris', phone: '6281295395823', avatar: '/cs-avatars/aris.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: '/cs-avatars/ayang.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'ucu', name: 'Ucu', phone: '6281462327318', avatar: '/cs-avatars/ucu.svg', statusLabel: 'Aktif sekarang' },
+];
+
+// Sumber teks tahapan halaman Cara Order.
 export const HOW_TO_ORDER_STEPS: HowToOrderStep[] = [
   {
     id: 'discover',
@@ -304,7 +368,7 @@ export const BRAD_AI_CONTEXT: BradAiContextSection[] = [
 
 export const BASE_KEYWORDS = [
   'bradwear indonesia',
-  'bradwear store',
+  'bradwearindonesia.com',
   'konveksi tasikmalaya',
   'seragam custom instansi',
   'kemeja custom',
@@ -364,6 +428,24 @@ export const BASE_KEYWORDS = [
   'custom uniform manufacturer indonesia',
   'brodi bradwear',
   'bradwear ai assistant',
+  'vendor kemeja kerja',
+  'vendor seragam komunitas',
+  'konveksi kemeja custom indonesia',
+  'konveksi seragam dinas indonesia',
+  'kemeja kostum custom',
+  'kemeja komunitas custom',
+  'seragam komunitas lapangan',
+  'seragam kantor bordir logo',
+  'seragam kerja perusahaan custom',
+  'vendor baju dinas custom',
+  'kemeja event perusahaan',
+  'vendor seragam event komunitas',
+  'konveksi seragam operasional',
+  'seragam kantor tasikmalaya',
+  'jasa bikin kemeja custom',
+  'jasa bikin seragam dinas',
+  'konveksi kemeja komunitas',
+  'seragam custom jawa barat',
 ];
 
 const dedupeKeywords = (keywords: string[]) => Array.from(new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)));
@@ -494,11 +576,19 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
 };
 
 export const buildWhatsAppUrl = (message: string) =>
-  `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+export const buildWhatsAppUrlForPhone = (phone: string, message: string) =>
+  `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
 export const buildConsultationMessage = (subject?: string) => {
   const topic = subject?.trim() ? subject.trim() : 'kebutuhan seragam custom';
   return `Halo tim Bradwear Indonesia, saya konsumen dari website Bradwear dan ingin berkonsultasi mengenai ${topic}. Mohon bantuannya untuk informasi model, bahan, estimasi produksi, dan langkah order berikutnya. Terima kasih.`;
+};
+
+export const buildCustomerServiceMessage = (subject?: string) => {
+  const topic = subject?.trim() ? subject.trim() : 'kebutuhan seragam custom';
+  return `hallo saya pengunjung website bradwear mau tanya seputar ${topic}`;
 };
 
 export const getTrackingProviderById = (id: string) =>
@@ -522,10 +612,56 @@ export const normalizePathname = (pathname: string) => {
   return pathname;
 };
 
+export const getArticlePath = (slug: string) => `${ROUTE_PATHS[RouteKey.ARTIKEL]}/${slug}`;
+
+export const getArticleSlugFromPathname = (pathname: string) => {
+  const normalized = normalizePathname(pathname.toLowerCase());
+  if (!normalized.startsWith(`${ROUTE_PATHS[RouteKey.ARTIKEL]}/`)) return null;
+  const slug = normalized.slice(`${ROUTE_PATHS[RouteKey.ARTIKEL]}/`.length).trim();
+  return slug || null;
+};
+
+export const getArticleBySlug = (slug?: string | null) =>
+  ARTICLES.find((article) => article.slug.toLowerCase() === (slug ?? '').toLowerCase()) ?? null;
+
 export const pathToRoute = (pathname: string): RouteKey => {
   const normalized = normalizePathname(pathname.toLowerCase());
+  if (normalized.startsWith(`${ROUTE_PATHS[RouteKey.ARTIKEL]}/`)) {
+    return RouteKey.ARTIKEL;
+  }
   const match = Object.entries(ROUTE_PATHS).find(([, routePath]) => routePath.toLowerCase() === normalized);
   return (match?.[0] as RouteKey) ?? RouteKey.HOME;
+};
+
+export const getConsultationTopicForPath = (route: RouteKey, pathname: string) => {
+  const article = getArticleBySlug(getArticleSlugFromPathname(pathname));
+  if (article) {
+    return `artikel ${article.title.toLowerCase()}`;
+  }
+
+  const routeTopics: Record<RouteKey, string> = {
+    [RouteKey.HOME]: 'kemeja custom dan seragam kerja',
+    [RouteKey.THREE_D]: 'preview desain 3d seragam custom',
+    [RouteKey.KATALOG]: 'katalog kemeja custom dan seragam dinas',
+    [RouteKey.CLIENT]: 'hasil jadi seragam dan referensi klien',
+    [RouteKey.ABOUT]: 'profil dan layanan bradwear indonesia',
+    [RouteKey.VISION_MISSION]: 'standar layanan dan kualitas bradwear',
+    [RouteKey.PRODUCTS_SERVICES]: 'produk dan jasa seragam custom',
+    [RouteKey.COMPETITIVE_ADVANTAGE]: 'keunggulan bahan dan jahitan seragam',
+    [RouteKey.CLIENT_REACH]: 'jangkauan pengiriman seragam seluruh indonesia',
+    [RouteKey.LEGAL_LICENSE]: 'legalitas dan kerja sama pengadaan',
+    [RouteKey.PANTS]: 'celana tactical dan celana kerja custom',
+    [RouteKey.ARTIKEL]: 'panduan bahan dan order seragam',
+    [RouteKey.CARA_ORDER]: 'cara order seragam custom',
+    [RouteKey.LAYANAN_PELANGGAN]: 'layanan pelanggan dan konsultasi order',
+    [RouteKey.LACAK_PESANAN]: 'status order dan tracking pengiriman',
+    [RouteKey.TEMUKAN_TOKO]: 'alamat workshop dan konsultasi lokasi',
+    [RouteKey.BRAD_AI]: 'konsultasi awal bersama brodi',
+    [RouteKey.EDITOR]: 'desain seragam custom',
+    [RouteKey.SUMMARY]: 'ringkasan pesanan seragam',
+  };
+
+  return routeTopics[route] ?? 'kebutuhan seragam custom';
 };
 
 export const isPublicRoute = (route: RouteKey) => PUBLIC_ROUTES.has(route);

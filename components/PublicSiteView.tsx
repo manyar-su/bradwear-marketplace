@@ -11,9 +11,13 @@ import {
   COURIER_PROVIDERS,
   CUSTOMER_SERVICE_HOURS,
   HOW_TO_ORDER_STEPS,
+  ROUTE_PATHS,
   SITE_FAQS,
   STORE_ADDRESS,
   STORE_MAP_URL,
+  getArticleBySlug,
+  getArticlePath,
+  getArticleSlugFromPathname,
   buildConsultationMessage,
   buildTrackingUrl,
   buildWhatsAppUrl,
@@ -30,6 +34,7 @@ const SLIDESHOW_INTERVAL_MS = 5000;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
 
+// Sumber copy untuk seluruh halaman profil publik.
 const BRAND_PROFILE_ITEMS = [
   {
     route: RouteKey.ABOUT,
@@ -229,6 +234,7 @@ const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; gra
   },
 };
 
+// Sumber copy panduan bahan pada halaman katalog.
 const MATERIAL_GUIDE_ITEMS = [
   {
     name: 'Japan Drill',
@@ -301,6 +307,7 @@ const MATERIAL_GUIDE_ITEMS = [
 const PublicSiteView: React.FC = () => {
   const {
     currentRoute,
+    currentPathname,
     setCurrentRoute,
     products,
     handleSelectProduct,
@@ -324,6 +331,8 @@ const PublicSiteView: React.FC = () => {
   const catalogRef = useRef<HTMLElement | null>(null);
   const homeCarouselTouchStartX = useRef<number | null>(null);
   const homeCarouselTouchDeltaX = useRef(0);
+  const activeArticleSlug = getArticleSlugFromPathname(currentPathname);
+  const activeArticle = getArticleBySlug(activeArticleSlug);
 
   const heroSlides = useMemo(
     () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
@@ -440,6 +449,12 @@ const PublicSiteView: React.FC = () => {
       setCompletedOrders([]);
     }
   }, []);
+
+  useEffect(() => {
+    if (currentRoute === RouteKey.ARTIKEL && activeArticleSlug && !activeArticle) {
+      setCurrentRoute(RouteKey.ARTIKEL, { path: ROUTE_PATHS[RouteKey.ARTIKEL], replace: true });
+    }
+  }, [activeArticle, activeArticleSlug, currentRoute, setCurrentRoute]);
 
   const visibleProducts = useMemo(() => products.filter((product) => !product.isHidden), [products]);
   const categoryModelOptions = useMemo(() => {
@@ -569,6 +584,10 @@ const PublicSiteView: React.FC = () => {
     homeCarouselTouchDeltaX.current = 0;
   };
 
+  const navigateToArticle = (slug: string) => {
+    setCurrentRoute(RouteKey.ARTIKEL, { path: getArticlePath(slug) });
+  };
+
   const renderProductCard = (product: Product, badge?: string) => (
     <article
       key={product.id}
@@ -622,6 +641,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderFaqAccordion = () => (
     <div className="faq-list">
+      {/* FAQ publik yang tampil di home dan layanan pelanggan. */}
       {SITE_FAQS.map((faq) => {
         const isOpen = openFaqSlug === faq.slug;
 
@@ -674,8 +694,9 @@ const PublicSiteView: React.FC = () => {
   const renderHome = () => {
     return (
       <>
+        {/* Utility strip home: lokasi, sosial media, marquee, dan CTA katalog. */}
         <section className="home-utility-strip" data-home-section="hero-utility">
-          <a href={STORE_MAP_URL} target="_blank" rel="noreferrer" className="home-utility-link">
+          <a href={STORE_MAP_URL} target="_blank" rel="noreferrer" className="home-utility-link home-utility-link-maps">
             <GoogleMapsIcon />
             <span>Tasikmalaya</span>
           </a>
@@ -695,6 +716,7 @@ const PublicSiteView: React.FC = () => {
           </button>
         </section>
 
+        {/* Intro hero gambar pertama home. */}
         <section className="hero-display-strip hero-display-strip-top" data-home-section="hero-intro">
           <img src={heroTopImage} alt="Seragam Bradwear sebagai identitas perusahaan" className="hero-display-strip-image" />
           <div className="hero-display-strip-overlay">
@@ -702,6 +724,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* Headline utama home beserta CTA utama. */}
         <section className="home-hero editorial-home-hero" data-home-section="hero">
           <article className="hero-panel hero-panel-editorial hero-panel-clean">
             <p className="hero-kicker">Bradwear Indonesia</p>
@@ -736,6 +759,7 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
+        {/* Slideshow hero home dan label tombol navigasinya. */}
         <section className="hero-image-runway" data-home-section="hero-slider">
           <article className="hero-banner hero-banner-editorial hero-banner-edge">
             <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
@@ -773,6 +797,7 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
+        {/* Preview Galeri Klien di home. */}
         <section className="home-section" data-home-section="client-gallery">
           <div className="home-section-shell home-section-shell-bleed home-section-grid">
             <div className="home-section-heading">
@@ -850,6 +875,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* Preview Cara Order di home. */}
         <section className="home-section" data-home-section="order-flow">
           <div className="home-section-shell home-section-shell-bleed order-flow-preview">
             <div className="home-section-heading">
@@ -869,6 +895,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* Slider kategori/model pada home. */}
         <section className="home-section" data-home-section="category-showcase">
           <div className="home-section-shell home-section-shell-bleed home-carousel-only">
           <div
@@ -949,6 +976,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* FAQ ringkas home. */}
         <section className="home-section home-section-tight" data-home-section="faq">
           <div className="home-section-shell faq-panel">
             <div className="faq-heading-shell">
@@ -972,6 +1000,7 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* CTA penutup home. */}
         <section className="home-section home-section-full">
           <article className="footer-cta-panel">
             <div>
@@ -1014,12 +1043,14 @@ const PublicSiteView: React.FC = () => {
 
   const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
     <div className="catalog-page-shell px-0 py-8">
+      {/* Hero katalog: judul dan deskripsi dikirim dari argumen renderCatalog. */}
       <section className="catalog-page-hero">
         <p className="home-section-kicker">Katalog Bradwear</p>
         <h1 className="home-section-title">{title}</h1>
         <p className="home-section-copy">{description}</p>
       </section>
 
+      {/* Filter kategori dan model katalog. */}
       {showCategoryTabs ? (
         <section ref={catalogRef} className="catalog-filter-band">
           <p className="catalog-filter-band-title">Pilih kategori utama</p>
@@ -1072,6 +1103,7 @@ const PublicSiteView: React.FC = () => {
         {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
       </section>
 
+      {/* Copy size guide dan tombol pembuka popup gambar penuh. */}
       {ASSETS.CONTENT.SIZE_GUIDE ? (
         <section className="catalog-size-guide-shell mt-12 grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
           <article className="catalog-copy-band">
@@ -1107,6 +1139,7 @@ const PublicSiteView: React.FC = () => {
         </section>
       ) : null}
 
+      {/* Copy panduan bahan; isi bahan per item ada di MATERIAL_GUIDE_ITEMS. */}
       <section className="mt-12 material-guide-shell">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
@@ -1164,43 +1197,129 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
-  const renderArticles = () => (
-    <div className="px-6 py-8 md:px-10">
-      <section className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Panduan memilih bahan, model, dan proses order seragam</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-          Halaman artikel ini dibuat untuk membantu user dan mesin pencari memahami konteks layanan Bradwear Indonesia,
-          mulai dari bahan seragam, tipe model, alur persetujuan, sampai checklist sebelum produksi.
-        </p>
-      </section>
+  const renderArticles = () => {
+    if (activeArticle) {
+      const relatedArticles = ARTICLES.filter((article) => article.slug !== activeArticle.slug).slice(0, 3);
 
-      <section className="mt-8 grid gap-6">
-        {ARTICLES.map((article) => (
-          <article key={article.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-            <div className="flex flex-wrap items-center gap-3">
+      return (
+        <div className="px-6 py-8 md:px-10">
+          <section className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--text-primary)] shadow-sm"
+            >
+              Kembali ke Artikel
+            </button>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
-                {article.category}
+                {activeArticle.category}
               </span>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.readTime}</span>
             </div>
-            <h2 className="mt-4 text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              {article.body.map((paragraph, index) => (
-                <p key={`${article.slug}-${index}`} className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          </article>
-        ))}
-      </section>
-    </div>
-  );
+            <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">{activeArticle.title}</h1>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.seoDescription}</p>
+          </section>
+
+          <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.excerpt}</p>
+              <div className="mt-6 grid gap-5">
+                {activeArticle.body.map((paragraph, index) => (
+                  <p key={`${activeArticle.slug}-${index}`} className="text-base leading-8 text-[var(--text-secondary)]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </article>
+
+            <aside className="grid gap-5 self-start">
+              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Topik SEO</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {activeArticle.keywords.map((keyword) => (
+                    <span
+                      key={`${activeArticle.slug}-${keyword}`}
+                      className="rounded-full bg-[var(--surface-subtle)] px-3 py-2 text-[11px] font-semibold text-[var(--text-secondary)]"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel Lainnya</p>
+                <div className="mt-4 grid gap-3">
+                  {relatedArticles.map((article) => (
+                    <button
+                      key={article.slug}
+                      type="button"
+                      onClick={() => navigateToArticle(article.slug)}
+                      className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-left transition hover:-translate-y-0.5"
+                    >
+                      <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </aside>
+          </section>
+        </div>
+      );
+    }
+
+    return (
+      <div className="px-6 py-8 md:px-10">
+        {/* Hero halaman artikel. */}
+        <section className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Panduan memilih bahan, model, dan proses order seragam</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
+            Halaman artikel ini dibuat untuk membantu user dan mesin pencari memahami konteks layanan Bradwear Indonesia,
+            mulai dari bahan seragam, tipe model, alur persetujuan, sampai checklist sebelum produksi.
+          </p>
+        </section>
+
+        {/* Daftar artikel publik; judul, excerpt, dan isi berasal dari ARTICLES. */}
+        <section className="mt-8 grid gap-6">
+          {ARTICLES.map((article) => (
+            <article key={article.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
+                  {article.category}
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
+              </div>
+              <h2 className="mt-4 text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+              <div className="mt-5 grid gap-4 md:grid-cols-3">
+                {article.body.map((paragraph, index) => (
+                  <p key={`${article.slug}-${index}`} className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={() => navigateToArticle(article.slug)}
+                  className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                >
+                  Baca Artikel
+                </button>
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
+    );
+  };
 
   const renderHowToOrder = () => (
     <div className="px-6 py-8 md:px-10">
+      {/* Hero halaman Cara Order. */}
       <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-6 shadow-sm md:p-8">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Cara Order</p>
@@ -1210,6 +1329,7 @@ const PublicSiteView: React.FC = () => {
           </p>
         </div>
 
+        {/* Tahapan order mengambil title, description, dan detail dari HOW_TO_ORDER_STEPS. */}
         <div className="order-step-selector mt-6">
           {HOW_TO_ORDER_STEPS.map((step, index) => {
             const isActive = index === activeHowToOrderStepIndex;
@@ -1302,6 +1422,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderCustomerService = () => (
     <div className="service-page-shell px-0 py-8">
+      {/* Hero halaman layanan pelanggan. */}
       <section className="service-page-hero">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Layanan Pelanggan</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Bantuan cepat untuk konsultasi, revisi, dan tindak lanjut order</h1>
@@ -1311,6 +1432,7 @@ const PublicSiteView: React.FC = () => {
         </p>
       </section>
 
+      {/* Kontak layanan pelanggan dan jam operasional. */}
       <section className="service-page-grid mt-8">
         <article className="service-page-column">
           <div className="mt-1 space-y-3">
@@ -1353,6 +1475,7 @@ const PublicSiteView: React.FC = () => {
         </article>
       </section>
 
+      {/* FAQ layanan menggunakan sumber data SITE_FAQS. */}
       <section className="service-page-faq mt-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Layanan</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -1369,6 +1492,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderTracking = () => (
     <div className="tracking-page-shell px-0 py-8">
+      {/* Hero halaman tracking pesanan. */}
       <section className="tracking-page-hero">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Lacak Pesanan</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Cek status produksi internal dengan order code atau nomor resi</h1>
@@ -1377,6 +1501,7 @@ const PublicSiteView: React.FC = () => {
         </p>
       </section>
 
+      {/* Teks panel tracking internal dan tracking kurir resmi. */}
       <section className="tracking-page-grid">
         <article className="tracking-page-panel">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Status produksi internal</p>
@@ -1494,6 +1619,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderStoreLocator = () => (
     <div className="store-page-shell px-0 py-8">
+      {/* Hero halaman Temukan Toko. */}
       <section className="store-page-hero">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Temukan Toko</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Workshop dan titik lokasi Bradwear Indonesia</h1>
@@ -1503,6 +1629,7 @@ const PublicSiteView: React.FC = () => {
         </p>
       </section>
 
+      {/* Copy alamat workshop, CTA map, dan CTA WhatsApp. */}
       <section className="store-page-grid">
         <article className="store-page-panel">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Alamat workshop</p>
@@ -1555,12 +1682,14 @@ const PublicSiteView: React.FC = () => {
 
     return (
       <div className="brand-profile-page px-0 py-8">
+        {/* Hero halaman profil mengambil teks dari BRAND_PROFILE_ITEMS sesuai route aktif. */}
         <section className="brand-profile-hero brand-profile-hero-flat px-6 py-8 text-white md:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">{activeBrandProfilePage.kicker}</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">{activeBrandProfilePage.title}</h1>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/82">{activeBrandProfilePage.body}</p>
         </section>
 
+        {/* Fokus halaman dan poin utama profil. */}
         <section className="brand-profile-grid mt-8 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
           <article className="brand-profile-card brand-profile-card-flat p-0 shadow-none">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">
@@ -1609,6 +1738,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderClientGallery = () => (
     <div className="client-gallery-page-shell px-0 py-8">
+      {/* Hero halaman Galeri Klien. */}
       <section className="client-gallery-page-hero px-6 py-8 text-white md:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Galeri Klien</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight">Dipercaya Berbagai Perusahaan di Indonesia</h1>
@@ -1617,6 +1747,7 @@ const PublicSiteView: React.FC = () => {
         </p>
       </section>
 
+      {/* Judul per folder dan subtitle gallery band mengambil data dari CLIENT_GALLERY_META. */}
       <section className="parallax-static-zone mt-8 grid gap-0">
         {clientGalleryGroups.map((group) => {
           const meta = CLIENT_GALLERY_META[group.slug] ?? {
@@ -1673,6 +1804,7 @@ const PublicSiteView: React.FC = () => {
   const renderBradAiPage = () => (
     <div className="brodi-page-shell px-6 py-8 md:px-10">
       <div className="brodi-page-content">
+        {/* Hero halaman Brodi / AI assistant. */}
         <section className="brodi-hero-shell mb-6 rounded-[32px] border border-[var(--border-soft)] p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Brodi</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Asisten AI untuk konsultasi awal seputar layanan Bradwear</h1>
@@ -1701,6 +1833,7 @@ const PublicSiteView: React.FC = () => {
   );
 
   const content = (() => {
+    // Routing render halaman publik dan sumber copy utamanya.
     switch (currentRoute) {
       case RouteKey.THREE_D:
         return renderThreeDPage();
@@ -1760,6 +1893,7 @@ const PublicSiteView: React.FC = () => {
             className={`slideshow-lightbox-panel ${lightboxSlide.variant === 'size-guide' ? 'is-size-guide' : ''}`}
             onClick={(event) => event.stopPropagation()}
           >
+            {/* Header popup preview gambar penuh. */}
             <div className="slideshow-lightbox-header">
               <div className="slideshow-lightbox-copy">
                 <p className="slideshow-lightbox-kicker">

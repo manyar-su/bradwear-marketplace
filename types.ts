@@ -35,7 +35,18 @@ export interface Article {
   excerpt: string;
   category: string;
   readTime: string;
+  seoTitle: string;
+  seoDescription: string;
+  keywords: string[];
   body: string[];
+}
+
+export interface CustomerServiceContact {
+  id: string;
+  name: string;
+  phone: string;
+  avatar: string;
+  statusLabel: string;
 }
 
 export interface CourierProvider {

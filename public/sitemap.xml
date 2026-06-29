@@ -1,57 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://bradwear.store/</loc>
+    <loc>https://www.bradwearindonesia.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/3d</loc>
+    <loc>https://www.bradwearindonesia.com/3d</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/katalog</loc>
+    <loc>https://www.bradwearindonesia.com/katalog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/client</loc>
+    <loc>https://www.bradwearindonesia.com/client</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/pants</loc>
+    <loc>https://www.bradwearindonesia.com/pants</loc>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/artikel</loc>
+    <loc>https://www.bradwearindonesia.com/artikel</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.78</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/cara-order</loc>
+    <loc>https://www.bradwearindonesia.com/artikel/panduan-memilih-bahan-seragam</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/beda-pdh-pdl-dan-lapangan</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/tips-order-seragam-instansi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/checklist-sebelum-produksi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/kemeja-custom-untuk-perusahaan-dan-komunitas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/seragam-dinas-dan-komunitas-pilih-model-yang-tepat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/cara-order</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/layanan-pelanggan</loc>
+    <loc>https://www.bradwearindonesia.com/layanan-pelanggan</loc>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/lacak-pesanan</loc>
+    <loc>https://www.bradwearindonesia.com/lacak-pesanan</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/temukan-toko</loc>
+    <loc>https://www.bradwearindonesia.com/temukan-toko</loc>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://bradwear.store/brad-ai</loc>
+    <loc>https://www.bradwearindonesia.com/brad-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

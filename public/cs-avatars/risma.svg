@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none">
+  <rect width="160" height="160" rx="80" fill="#4C0519"/>
+  <circle cx="80" cy="58" r="30" fill="#FB7185" fill-opacity="0.3"/>
+  <path d="M34 126C42 101 58 90 80 90C102 90 118 101 126 126" fill="#FB7185" fill-opacity="0.3"/>
+  <text x="80" y="146" text-anchor="middle" fill="#FFF1F2" font-family="Arial, sans-serif" font-size="22" font-weight="700">RISMA</text>
+</svg>

@@ -9,10 +9,12 @@ import { SITE_FAQS } from './lib/siteConfig';
 import { applySeoMeta } from './lib/seo';
 import SiteHeader from './components/SiteHeader';
 import BradAiChat from './components/BradAiChat';
+import CustomerServiceDock from './components/CustomerServiceDock';
 
 const App: React.FC = () => {
-  const { currentRoute, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
+  const { currentRoute, currentPathname, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
+  const [showCustomerServiceDock, setShowCustomerServiceDock] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
 
   useEffect(() => {
@@ -26,13 +28,18 @@ const App: React.FC = () => {
   }, [currentRoute, selectedProduct, setCurrentRoute]);
 
   useEffect(() => {
-    applySeoMeta(currentRoute, products, SITE_FAQS);
-  }, [currentRoute, products]);
+    applySeoMeta(currentRoute, currentPathname, products, SITE_FAQS);
+  }, [currentRoute, currentPathname, products]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.querySelector('main')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [currentRoute]);
+  }, [currentPathname]);
+
+  useEffect(() => {
+    setShowBradAiWidget(false);
+    setShowCustomerServiceDock(false);
+  }, [currentPathname]);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -64,7 +71,7 @@ const App: React.FC = () => {
       window.removeEventListener('resize', updateScrollTopVisibility);
       main?.removeEventListener('scroll', updateScrollTopVisibility);
     };
-  }, [currentRoute]);
+  }, [currentPathname]);
 
   const handleScrollTop = React.useCallback(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -115,6 +122,15 @@ const App: React.FC = () => {
                   <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
                 </div>
               ) : null}
+              {showCustomerServiceDock ? (
+                <div className="animate-fade-in-up w-[min(96vw,400px)] max-h-[calc(100dvh-5.25rem)]">
+                  <CustomerServiceDock
+                    currentRoute={currentRoute}
+                    currentPathname={currentPathname}
+                    onClose={() => setShowCustomerServiceDock(false)}
+                  />
+                </div>
+              ) : null}
               <div className="flex items-center justify-end gap-2 sm:gap-3">
                 {showScrollTop ? (
                   <button
@@ -129,7 +145,23 @@ const App: React.FC = () => {
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => setShowBradAiWidget((current) => !current)}
+                  onClick={() => {
+                    setShowBradAiWidget(false);
+                    setShowCustomerServiceDock((current) => !current);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(117,242,26,0.22)] bg-[linear-gradient(135deg,#ffffff,#f5faef)] px-3 py-2 text-xs font-black tracking-tight text-[var(--text-primary)] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0f172a,#1f4d17)] text-[11px] font-black uppercase tracking-[0.18em] text-white sm:h-10 sm:w-10">
+                    CS
+                  </span>
+                  CS Aktif
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCustomerServiceDock(false);
+                    setShowBradAiWidget((current) => !current);
+                  }}
                   className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-3 py-2 text-xs font-black tracking-tight text-[#071106] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-base text-white sm:h-10 sm:w-10 sm:text-lg">AI</span>

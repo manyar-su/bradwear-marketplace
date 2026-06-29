@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bradwear.store/sitemap.xml
+Sitemap: https://www.bradwearindonesia.com/sitemap.xml

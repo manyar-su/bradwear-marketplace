@@ -2,11 +2,12 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { RouteKey, Product, DesignData, OrderItem, ProductionOrder, WorkflowStage, Category } from '../types';
 import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_WORKFLOW_STAGES } from '../constants';
 import { COLORS } from '../constants'; // Sometimes needed for designData defaults
-import { ROUTE_PATHS, pathToRoute } from '../lib/siteConfig';
+import { normalizePathname, ROUTE_PATHS, pathToRoute } from '../lib/siteConfig';
 
 interface StoreState {
   currentRoute: RouteKey;
-  setCurrentRoute: (route: RouteKey, options?: { replace?: boolean }) => void;
+  currentPathname: string;
+  setCurrentRoute: (route: RouteKey, options?: { path?: string; replace?: boolean }) => void;
   theme: 'light' | 'dark';
   setTheme: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
   products: Product[];
@@ -40,6 +41,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const persistedRoute = localStorage.getItem('bradwear_current_route') as RouteKey | null;
     return pathToRoute(window.location.pathname) || persistedRoute || RouteKey.HOME;
   });
+  const [currentPathname, setCurrentPathname] = useState(() => normalizePathname(window.location.pathname));
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
@@ -100,10 +102,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return saved ? JSON.parse(saved) : [];
   });
 
-  const setCurrentRoute = useCallback((route: RouteKey, options?: { replace?: boolean }) => {
+  const setCurrentRoute = useCallback((route: RouteKey, options?: { path?: string; replace?: boolean }) => {
     setCurrentRouteState(route);
+    const nextPath = normalizePathname(options?.path ?? ROUTE_PATHS[route]);
+    setCurrentPathname(nextPath);
 
-    const nextPath = ROUTE_PATHS[route];
     if (window.location.pathname !== nextPath) {
       const method = options?.replace ? 'replaceState' : 'pushState';
       window.history[method](null, '', nextPath);
@@ -125,6 +128,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     localStorage.setItem('bradwear_production_orders', JSON.stringify(productionOrders));
 
     localStorage.setItem('bradwear_current_route', currentRoute);
+    localStorage.setItem('bradwear_current_pathname', currentPathname);
     localStorage.setItem('bradwear_catalog_category', preferredCatalogCategory);
     localStorage.setItem('bradwear_order_code', orderCode);
     localStorage.setItem('bradwear_design_data', JSON.stringify(designData));
@@ -134,12 +138,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     } else {
       localStorage.removeItem('bradwear_selected_product');
     }
-  }, [products, productionOrders, currentRoute, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
+  }, [products, productionOrders, currentRoute, currentPathname, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
 
   useEffect(() => {
     const handlePopState = () => {
-      const nextRoute = pathToRoute(window.location.pathname);
+      const nextPath = normalizePathname(window.location.pathname);
+      const nextRoute = pathToRoute(nextPath);
       setCurrentRouteState(nextRoute);
+      setCurrentPathname(nextPath);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -171,7 +177,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   return (
     <StoreContext.Provider value={{
-      currentRoute, setCurrentRoute,
+      currentRoute, currentPathname, setCurrentRoute,
       theme, setTheme,
       products, setProducts,
       orderCode, setOrderCode,

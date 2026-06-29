@@ -1,5 +1,21 @@
-import { ARTICLES, BRAD_AI_CONTEXT, HOW_TO_ORDER_STEPS, ROUTE_LABELS, ROUTE_PATHS, SEO_META, SITE_NAME, SITE_URL, SITE_TAGLINE, STORE_ADDRESS, STORE_MAP_URL, WHATSAPP_NUMBER } from './siteConfig';
-import { Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
+import {
+  ARTICLES,
+  BRAD_AI_CONTEXT,
+  HOW_TO_ORDER_STEPS,
+  ROUTE_LABELS,
+  ROUTE_PATHS,
+  SEO_META,
+  SITE_NAME,
+  SITE_URL,
+  SITE_TAGLINE,
+  STORE_ADDRESS,
+  STORE_MAP_URL,
+  WHATSAPP_NUMBER,
+  getArticleBySlug,
+  getArticlePath,
+  getArticleSlugFromPathname,
+} from './siteConfig';
+import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
   let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
@@ -21,6 +37,8 @@ const upsertLinkTag = (selector: string, attributes: Record<string, string>) => 
   Object.entries(attributes).forEach(([key, value]) => tag?.setAttribute(key, value));
 };
 
+const dedupeKeywords = (keywords: string[]) => Array.from(new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)));
+
 const buildProductKeywords = (products: Product[]) => {
   const keywords = products.flatMap((product) => {
     const category = product.category.toLowerCase();
@@ -38,41 +56,158 @@ const buildProductKeywords = (products: Product[]) => {
     ];
   });
 
-  return Array.from(new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)));
+  return dedupeKeywords(keywords);
 };
 
-const buildRouteKeywords = (route: RouteKey, products: Product[], meta: SeoMeta) => {
+const buildArticleMeta = (article: Article): SeoMeta => ({
+  title: article.seoTitle,
+  description: article.seoDescription,
+  path: getArticlePath(article.slug),
+  keywords: dedupeKeywords([
+    ...SEO_META[RouteKey.ARTIKEL].keywords,
+    ...article.keywords,
+    article.title,
+    article.category,
+    `artikel ${article.category.toLowerCase()}`,
+  ]),
+  schema: [],
+});
+
+const resolveSeoMeta = (route: RouteKey, pathname: string) => {
+  const article = getArticleBySlug(getArticleSlugFromPathname(pathname));
+  if (route === RouteKey.ARTIKEL && article) {
+    return {
+      article,
+      meta: buildArticleMeta(article),
+    };
+  }
+
+  return {
+    article: null,
+    meta: SEO_META[route],
+  };
+};
+
+const buildRouteKeywords = (
+  route: RouteKey,
+  pathname: string,
+  products: Product[],
+  meta: SeoMeta,
+  article: Article | null,
+) => {
   const routeTerms: Record<RouteKey, string[]> = {
-    [RouteKey.HOME]: ['kemeja custom', 'kemeja dinas', 'seragam kerja custom', 'seragam kantor', 'bordir logo instansi'],
-    [RouteKey.THREE_D]: ['desain 3d kemeja custom', 'preview kemeja custom 3d'],
-    [RouteKey.KATALOG]: ['katalog kemeja custom', 'katalog kemeja dinas', 'model seragam kerja'],
-    [RouteKey.CLIENT]: ['hasil jadi kemeja custom', 'galeri seragam dinas'],
-    [RouteKey.ABOUT]: ['tentang bradwear indonesia', 'profil vendor seragam'],
-    [RouteKey.VISION_MISSION]: ['visi misi bradwear', 'standar kualitas seragam'],
-    [RouteKey.PRODUCTS_SERVICES]: ['produk seragam bradwear', 'jasa kemeja custom'],
-    [RouteKey.COMPETITIVE_ADVANTAGE]: ['keunggulan vendor seragam', 'jahitan seragam rapi'],
-    [RouteKey.CLIENT_REACH]: ['jangkauan pengiriman seragam', 'klien instansi bradwear'],
-    [RouteKey.LEGAL_LICENSE]: ['legalitas vendor seragam', 'lisensi hukum bradwear'],
-    [RouteKey.PANTS]: ['celana tactical custom', 'celana kerja custom'],
-    [RouteKey.ARTIKEL]: ['panduan kemeja dinas', 'panduan bahan seragam'],
-    [RouteKey.CARA_ORDER]: ['cara pesan kemeja custom', 'cara order seragam dinas'],
-    [RouteKey.LAYANAN_PELANGGAN]: ['konsultasi kemeja custom', 'whatsapp kemeja dinas'],
-    [RouteKey.LACAK_PESANAN]: ['lacak order seragam custom', 'tracking kemeja custom'],
+    [RouteKey.HOME]: [
+      'kemeja custom',
+      'kemeja dinas',
+      'seragam kerja custom',
+      'seragam kantor',
+      'bordir logo instansi',
+      'seragam komunitas custom',
+      'vendor kemeja kerja',
+    ],
+    [RouteKey.THREE_D]: ['desain 3d kemeja custom', 'preview kemeja custom 3d', 'simulasi seragam kerja custom'],
+    [RouteKey.KATALOG]: [
+      'katalog kemeja custom',
+      'katalog kemeja dinas',
+      'model seragam kerja',
+      'vendor seragam komunitas',
+      'katalog seragam dinas instansi',
+    ],
+    [RouteKey.CLIENT]: ['hasil jadi kemeja custom', 'galeri seragam dinas', 'portofolio seragam komunitas'],
+    [RouteKey.ABOUT]: ['tentang bradwear indonesia', 'profil vendor seragam', 'konveksi seragam tasikmalaya'],
+    [RouteKey.VISION_MISSION]: ['visi misi bradwear', 'standar kualitas seragam', 'komitmen vendor seragam'],
+    [RouteKey.PRODUCTS_SERVICES]: ['produk seragam bradwear', 'jasa kemeja custom', 'jasa seragam dinas'],
+    [RouteKey.COMPETITIVE_ADVANTAGE]: ['keunggulan vendor seragam', 'jahitan seragam rapi', 'vendor seragam berkualitas'],
+    [RouteKey.CLIENT_REACH]: ['jangkauan pengiriman seragam', 'klien instansi bradwear', 'vendor seragam seluruh indonesia'],
+    [RouteKey.LEGAL_LICENSE]: ['legalitas vendor seragam', 'lisensi hukum bradwear', 'pengadaan seragam instansi'],
+    [RouteKey.PANTS]: ['celana tactical custom', 'celana kerja custom', 'celana lapangan custom'],
+    [RouteKey.ARTIKEL]: ['panduan kemeja dinas', 'panduan bahan seragam', 'artikel seragam komunitas'],
+    [RouteKey.CARA_ORDER]: ['cara pesan kemeja custom', 'cara order seragam dinas', 'langkah order seragam komunitas'],
+    [RouteKey.LAYANAN_PELANGGAN]: ['konsultasi kemeja custom', 'whatsapp kemeja dinas', 'cs seragam komunitas'],
+    [RouteKey.LACAK_PESANAN]: ['lacak order seragam custom', 'tracking kemeja custom', 'cek status seragam dinas'],
     [RouteKey.TEMUKAN_TOKO]: ['workshop kemeja custom tasikmalaya', 'alamat konveksi seragam tasikmalaya'],
-    [RouteKey.BRAD_AI]: ['ai kemeja custom', 'asisten seragam bradwear'],
-    [RouteKey.EDITOR]: ['editor kemeja custom', 'simulasi desain seragam'],
-    [RouteKey.SUMMARY]: ['ringkasan pesanan kemeja custom', 'checkout seragam dinas'],
+    [RouteKey.BRAD_AI]: ['ai kemeja custom', 'asisten seragam bradwear', 'konsultasi ai seragam dinas'],
+    [RouteKey.EDITOR]: ['editor kemeja custom', 'simulasi desain seragam', 'desain kemeja kerja custom'],
+    [RouteKey.SUMMARY]: ['ringkasan pesanan kemeja custom', 'checkout seragam dinas', 'ringkasan order seragam komunitas'],
   };
 
   const productKeywords = route === RouteKey.HOME || route === RouteKey.KATALOG || route === RouteKey.PANTS
     ? buildProductKeywords(products).slice(0, 24)
     : [];
 
-  return Array.from(new Set([...meta.keywords, ...(routeTerms[route] ?? []), ...productKeywords]));
+  const articleKeywords = route === RouteKey.ARTIKEL && article
+    ? [
+      article.title,
+      article.seoTitle,
+      article.category,
+      ...article.keywords,
+      pathname.includes('/artikel/') ? 'artikel detail seragam' : 'artikel bradwear',
+    ]
+    : [];
+
+  return dedupeKeywords([...meta.keywords, ...(routeTerms[route] ?? []), ...productKeywords, ...articleKeywords]);
 };
 
-const buildBaseSchemas = (meta: SeoMeta, keywords: string[]): Record<string, unknown>[] => {
-  const canonical = `${SITE_URL}${meta.path}`;
+const buildBreadcrumbItems = (route: RouteKey, canonical: string, article: Article | null) => {
+  if (route === RouteKey.HOME) {
+    return [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+    ];
+  }
+
+  if (route === RouteKey.ARTIKEL && article) {
+    return [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Beranda / Artikel',
+        item: `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: article.title,
+        item: canonical,
+      },
+    ];
+  }
+
+  return [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: SITE_URL,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: ROUTE_LABELS[route],
+      item: canonical,
+    },
+  ];
+};
+
+const buildBaseSchemas = (
+  route: RouteKey,
+  meta: SeoMeta,
+  keywords: string[],
+  canonical: string,
+  article: Article | null,
+): Record<string, unknown>[] => {
+  const breadcrumbItems = buildBreadcrumbItems(route, canonical, article);
+
   return [
     {
       '@context': 'https://schema.org',
@@ -143,7 +278,7 @@ const buildBaseSchemas = (meta: SeoMeta, keywords: string[]): Record<string, unk
     },
     {
       '@context': 'https://schema.org',
-      '@type': 'WebPage',
+      '@type': article ? 'Article' : 'WebPage',
       name: meta.title,
       url: canonical,
       description: meta.description,
@@ -153,34 +288,16 @@ const buildBaseSchemas = (meta: SeoMeta, keywords: string[]): Record<string, unk
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          position: 1,
-          name: 'Home',
-          item: SITE_URL,
-        },
-        {
-          '@type': 'ListItem',
-          position: 2,
-          name: ROUTE_LABELS[pathToParent(meta.path)],
-          item: canonical,
-        },
-      ],
+      itemListElement: breadcrumbItems,
     },
   ];
 };
 
-const pathToParent = (path: string): RouteKey => {
-  const match = Object.entries(ROUTE_PATHS).find(([, value]) => value === path);
-  return (match?.[0] as RouteKey) ?? RouteKey.HOME;
-};
-
-export const buildPageSchema = (route: RouteKey, products: Product[], faqs: SiteFaqItem[]) => {
-  const meta = SEO_META[route];
-  const keywords = buildRouteKeywords(route, products, meta);
-  const base = buildBaseSchemas(meta, keywords);
+export const buildPageSchema = (route: RouteKey, pathname: string, products: Product[], faqs: SiteFaqItem[]) => {
+  const { article, meta } = resolveSeoMeta(route, pathname);
+  const keywords = buildRouteKeywords(route, pathname, products, meta, article);
   const canonical = `${SITE_URL}${meta.path}`;
+  const base = buildBaseSchemas(route, meta, keywords, canonical, article);
 
   if (route === RouteKey.KATALOG || route === RouteKey.PANTS || route === RouteKey.HOME) {
     const filteredProducts = route === RouteKey.PANTS
@@ -258,19 +375,50 @@ export const buildPageSchema = (route: RouteKey, products: Product[], faqs: Site
   }
 
   if (route === RouteKey.ARTIKEL) {
-    base.push({
-      '@context': 'https://schema.org',
-      '@type': 'Blog',
-      name: 'Artikel Bradwear',
-      blogPost: ARTICLES.map((article) => ({
+    if (article) {
+      base.push({
+        '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: article.title,
-        description: article.excerpt,
+        description: article.seoDescription,
         articleSection: article.category,
         inLanguage: 'id-ID',
-        url: `${SITE_URL}/artikel`,
-      })),
-    });
+        url: canonical,
+        keywords: article.keywords.join(', '),
+        articleBody: article.body.join(' '),
+        isPartOf: {
+          '@type': 'Blog',
+          name: 'Artikel Bradwear',
+          url: `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: SITE_NAME,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${SITE_URL}/assets/logo.png`,
+          },
+        },
+        mainEntityOfPage: canonical,
+      });
+    } else {
+      base.push({
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: 'Artikel Bradwear',
+        url: canonical,
+        description: meta.description,
+        blogPost: ARTICLES.map((item) => ({
+          '@type': 'BlogPosting',
+          headline: item.title,
+          description: item.seoDescription,
+          articleSection: item.category,
+          inLanguage: 'id-ID',
+          url: `${SITE_URL}${getArticlePath(item.slug)}`,
+          keywords: item.keywords.join(', '),
+        })),
+      });
+    }
   }
 
   if (route === RouteKey.BRAD_AI) {
@@ -285,19 +433,20 @@ export const buildPageSchema = (route: RouteKey, products: Product[], faqs: Site
   return base;
 };
 
-export const applySeoMeta = (route: RouteKey, products: Product[], faqs: SiteFaqItem[]) => {
-  const meta = SEO_META[route];
+export const applySeoMeta = (route: RouteKey, pathname: string, products: Product[], faqs: SiteFaqItem[]) => {
+  const { article, meta } = resolveSeoMeta(route, pathname);
   const canonical = `${SITE_URL}${meta.path}`;
-  const keywords = buildRouteKeywords(route, products, meta);
-  const schemas = buildPageSchema(route, products, faqs);
+  const keywords = buildRouteKeywords(route, pathname, products, meta, article);
+  const schemas = buildPageSchema(route, pathname, products, faqs);
+  const pageLabel = article ? article.category : ROUTE_LABELS[route];
 
   document.title = meta.title;
 
   upsertMetaTag('meta[name="description"]', { name: 'description', content: meta.description });
   upsertMetaTag('meta[name="keywords"]', { name: 'keywords', content: keywords.join(', ') });
   upsertMetaTag('meta[name="news_keywords"]', { name: 'news_keywords', content: keywords.join(', ') });
-  upsertMetaTag('meta[name="classification"]', { name: 'classification', content: ROUTE_LABELS[route] });
-  upsertMetaTag('meta[name="category"]', { name: 'category', content: ROUTE_LABELS[route] });
+  upsertMetaTag('meta[name="classification"]', { name: 'classification', content: pageLabel });
+  upsertMetaTag('meta[name="category"]', { name: 'category', content: pageLabel });
   upsertMetaTag('meta[name="robots"]', { name: 'robots', content: 'index,follow,max-image-preview:large' });
   upsertMetaTag('meta[name="author"]', { name: 'author', content: SITE_NAME });
   upsertMetaTag('meta[name="application-name"]', { name: 'application-name', content: SITE_NAME });
@@ -309,7 +458,7 @@ export const applySeoMeta = (route: RouteKey, products: Product[], faqs: SiteFaq
   upsertMetaTag('meta[name="ICBM"]', { name: 'ICBM', content: '-7.3506, 108.2172' });
   upsertMetaTag('meta[property="og:title"]', { property: 'og:title', content: meta.title });
   upsertMetaTag('meta[property="og:description"]', { property: 'og:description', content: meta.description });
-  upsertMetaTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
+  upsertMetaTag('meta[property="og:type"]', { property: 'og:type', content: article ? 'article' : 'website' });
   upsertMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonical });
   upsertMetaTag('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
   upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
@@ -317,6 +466,14 @@ export const applySeoMeta = (route: RouteKey, products: Product[], faqs: SiteFaq
   upsertMetaTag('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
   upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${SITE_URL}/assets/logo.png` });
   upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} logo` });
+  upsertMetaTag('meta[property="article:section"]', {
+    property: 'article:section',
+    content: article?.category ?? ROUTE_LABELS[route],
+  });
+  upsertMetaTag('meta[property="article:tag"]', {
+    property: 'article:tag',
+    content: keywords.slice(0, 10).join(', '),
+  });
   upsertMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title });
   upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description });

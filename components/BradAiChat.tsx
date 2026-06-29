@@ -33,7 +33,7 @@ const createInitialMessage = (): ChatMessage => ({
   content: 'Halo, saya Brodi. Saya siap membantu penjelasan katalog, bahan, alur pemesanan, tracking, dan layanan Bradwear Indonesia.',
 });
 
-const WHATSAPP_URL_PATTERN = /whatsapp:\/\/send\?[^\s]+/i;
+const WHATSAPP_URL_PATTERN = /(https:\/\/wa\.me\/[^\s]+|whatsapp:\/\/send\?[^\s]+)/i;
 
 const parseMessageContent = (content: string) => {
   const paragraphs = content
