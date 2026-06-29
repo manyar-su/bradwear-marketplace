@@ -1,6 +1,7 @@
 import {
   ARTICLES,
   BRAD_AI_CONTEXT,
+  GOOGLE_PLAY_URL,
   HOW_TO_ORDER_STEPS,
   ROUTE_LABELS,
   ROUTE_PATHS,
@@ -113,6 +114,7 @@ const buildRouteKeywords = (
       'vendor seragam komunitas',
       'katalog seragam dinas instansi',
     ],
+    [RouteKey.DOWNLOAD]: ['download aplikasi bradwear', 'bradwear android', 'google play bradwear', 'aplikasi seragam custom'],
     [RouteKey.CLIENT]: ['hasil jadi kemeja custom', 'galeri seragam dinas', 'portofolio seragam komunitas'],
     [RouteKey.ABOUT]: ['tentang bradwear indonesia', 'profil vendor seragam', 'konveksi seragam tasikmalaya'],
     [RouteKey.VISION_MISSION]: ['visi misi bradwear', 'standar kualitas seragam', 'komitmen vendor seragam'],
@@ -384,8 +386,25 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
         articleSection: article.category,
         inLanguage: 'id-ID',
         url: canonical,
+        datePublished: article.publishedAt,
+        dateModified: article.updatedAt ?? article.publishedAt,
         keywords: article.keywords.join(', '),
         articleBody: article.body.join(' '),
+        author: {
+          '@type': 'Person',
+          name: article.author,
+          description: article.authorRole,
+        },
+        commentCount: article.comments.length,
+        comment: article.comments.map((comment) => ({
+          '@type': 'Comment',
+          author: {
+            '@type': 'Person',
+            name: comment.author,
+          },
+          datePublished: comment.publishedAt,
+          text: comment.body,
+        })),
         isPartOf: {
           '@type': 'Blog',
           name: 'Artikel Bradwear',
@@ -415,10 +434,38 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
           articleSection: item.category,
           inLanguage: 'id-ID',
           url: `${SITE_URL}${getArticlePath(item.slug)}`,
+          datePublished: item.publishedAt,
+          dateModified: item.updatedAt ?? item.publishedAt,
           keywords: item.keywords.join(', '),
+          author: {
+            '@type': 'Person',
+            name: item.author,
+          },
         })),
       });
     }
+  }
+
+  if (route === RouteKey.DOWNLOAD) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Bradwear Indonesia App',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Android',
+      description: 'Halaman download aplikasi Bradwear Indonesia untuk akses katalog, artikel, dan konsultasi seragam custom.',
+      url: canonical,
+      sameAs: GOOGLE_PLAY_URL || undefined,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'IDR',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: SITE_NAME,
+      },
+    });
   }
 
   if (route === RouteKey.BRAD_AI) {

@@ -1,0 +1,6 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" rx="48" fill="#F7EEF8"/>
+  <circle cx="120" cy="92" r="42" fill="#D9B4DE"/>
+  <path d="M52 196C58 154 84 132 120 132C156 132 182 154 188 196H52Z" fill="#8E4A97"/>
+  <text x="120" y="212" text-anchor="middle" fill="#3A1540" font-family="Arial, sans-serif" font-size="32" font-weight="700">AY</text>
+</svg>

@@ -4080,6 +4080,125 @@ a {
   text-transform: uppercase;
 }
 
+.catalog-category-table-shell {
+  overflow-x: auto;
+  border-radius: 28px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+}
+
+.catalog-category-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.catalog-category-table th,
+.catalog-category-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.catalog-category-table th {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.catalog-category-table td {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.catalog-category-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.catalog-category-table tbody tr.is-active {
+  background: linear-gradient(90deg, rgba(117, 242, 26, 0.12), rgba(117, 242, 26, 0.02));
+}
+
+.catalog-category-table td strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.catalog-category-table-action {
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  padding: 10px 18px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.catalog-category-table-action:hover {
+  transform: translateY(-1px);
+  border-color: rgba(117, 242, 26, 0.42);
+}
+
+.catalog-category-table-action.is-active {
+  border-color: rgba(117, 242, 26, 0.42);
+  background: linear-gradient(135deg, #75f21a, #2c7a12);
+  color: #071106;
+}
+
+.customer-service-dock-panel {
+  max-height: calc(100dvh - 5rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.article-news-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+}
+
+.article-card-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.article-comment-input {
+  width: 100%;
+  border-radius: 20px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fdfefb;
+  padding: 14px 16px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.article-comment-input:focus {
+  border-color: rgba(117, 242, 26, 0.48);
+  box-shadow: 0 0 0 4px rgba(117, 242, 26, 0.12);
+}
+
+.article-comment-textarea {
+  min-height: 128px;
+  resize: vertical;
+}
+
+.download-page-shell .rounded-\[28px\],
+.article-page-shell .rounded-\[28px\] {
+  backdrop-filter: blur(10px);
+}
+
 .catalog-size-guide-shell {
   align-items: center;
   padding-inline: 0;
@@ -4145,6 +4264,60 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .article-news-grid,
+  .article-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .catalog-category-table {
+    min-width: 100%;
+  }
+
+  .catalog-category-table thead {
+    display: none;
+  }
+
+  .catalog-category-table,
+  .catalog-category-table tbody,
+  .catalog-category-table tr,
+  .catalog-category-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .catalog-category-table tr {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 12px 0;
+  }
+
+  .catalog-category-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .catalog-category-table td {
+    padding: 8px 16px;
+    border-bottom: 0;
+  }
+
+  .catalog-category-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .catalog-category-table td:last-child {
+    padding-top: 12px;
+  }
 }
 
 .material-guide-meta-block {

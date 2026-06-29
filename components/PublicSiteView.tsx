@@ -10,9 +10,11 @@ import {
   CONTACT_CHANNELS,
   COURIER_PROVIDERS,
   CUSTOMER_SERVICE_HOURS,
+  GOOGLE_PLAY_URL,
   HOW_TO_ORDER_STEPS,
   ROUTE_PATHS,
   SITE_FAQS,
+  SITE_NAME,
   STORE_ADDRESS,
   STORE_MAP_URL,
   getArticleBySlug,
@@ -33,6 +35,42 @@ const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(
 const SLIDESHOW_INTERVAL_MS = 5000;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
+const CATEGORY_COPY: Record<(typeof CATEGORIES)[number], { useCase: string; focus: string }> = {
+  Kemeja: {
+    useCase: 'PDH, seragam dinas, komunitas, dan kemeja kerja custom.',
+    focus: 'Fokus pada approval visual, identitas bordir, dan kebutuhan formal harian.',
+  },
+  Jaket: {
+    useCase: 'Outer tim, safety ringan, dan kebutuhan branding lapangan.',
+    focus: 'Cocok untuk tim operasional yang perlu layering dan perlindungan tambahan.',
+  },
+  Celana: {
+    useCase: 'Celana tactical, kerja aktif, dan mobilitas lapangan.',
+    focus: 'Masuk ke halaman pants untuk membandingkan model khusus kategori celana.',
+  },
+  Rompi: {
+    useCase: 'Survey lapangan, dokumentasi, dan identitas tim lapangan.',
+    focus: 'Memudahkan pembagian fungsi tim lewat desain ringan dan banyak kompartemen.',
+  },
+  Polo: {
+    useCase: 'Event, promosi, gathering, dan seragam semi-formal.',
+    focus: 'Pilihan ringkas ketika tim membutuhkan tampilan santai namun tetap branded.',
+  },
+};
+const DOWNLOAD_HIGHLIGHTS = [
+  {
+    title: 'Akses cepat katalog',
+    body: 'Masuk ke model kemeja, jaket, rompi, polo, dan pants tanpa berpindah alur terlalu jauh.',
+  },
+  {
+    title: 'Lanjut konsultasi lebih cepat',
+    body: 'Setelah memilih model, user bisa langsung melanjutkan ke customer service atau Brodi dari perangkat Android.',
+  },
+  {
+    title: 'Ruang untuk update Play Store',
+    body: 'Halaman ini disiapkan sebagai landing page download saat listing Play Store Bradwear diperbarui.',
+  },
+];
 
 // Sumber copy untuk seluruh halaman profil publik.
 const BRAND_PROFILE_ITEMS = [
@@ -328,6 +366,9 @@ const PublicSiteView: React.FC = () => {
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
+  const [articleCommentName, setArticleCommentName] = useState('');
+  const [articleCommentBody, setArticleCommentBody] = useState('');
+  const [articleCommentStatus, setArticleCommentStatus] = useState('');
   const catalogRef = useRef<HTMLElement | null>(null);
   const homeCarouselTouchStartX = useRef<number | null>(null);
   const homeCarouselTouchDeltaX = useRef(0);
@@ -456,6 +497,12 @@ const PublicSiteView: React.FC = () => {
     }
   }, [activeArticle, activeArticleSlug, currentRoute, setCurrentRoute]);
 
+  useEffect(() => {
+    setArticleCommentName('');
+    setArticleCommentBody('');
+    setArticleCommentStatus('');
+  }, [activeArticleSlug]);
+
   const visibleProducts = useMemo(() => products.filter((product) => !product.isHidden), [products]);
   const categoryModelOptions = useMemo(() => {
     const names = visibleProducts.filter((product) => product.category === activeCategory).map((product) => product.name);
@@ -500,6 +547,25 @@ const PublicSiteView: React.FC = () => {
     () => BRAND_PROFILE_ITEMS.find((item) => item.route === currentRoute) ?? null,
     [currentRoute],
   );
+  const articleFeed = useMemo(
+    () =>
+      [...ARTICLES].sort(
+        (left, right) => new Date(right.updatedAt ?? right.publishedAt).getTime() - new Date(left.updatedAt ?? left.publishedAt).getTime(),
+      ),
+    [],
+  );
+  const articleSpotlight = articleFeed[0] ?? null;
+  const articleLatest = articleFeed.slice(1, 4);
+  const categorySummaryRows = useMemo(
+    () =>
+      CATEGORIES.map((category) => ({
+        category,
+        modelCount: visibleProducts.filter((product) => product.category === category).length,
+        useCase: CATEGORY_COPY[category].useCase,
+        focus: CATEGORY_COPY[category].focus,
+      })),
+    [visibleProducts],
+  );
 
   const currentProductionOrder = useMemo(
     () =>
@@ -531,6 +597,39 @@ const PublicSiteView: React.FC = () => {
     event.preventDefault();
     setTrackingLookup(trackingCodeInput.trim());
   };
+
+  const handleCatalogCategorySelect = (category: typeof CATEGORIES[number]) => {
+    setActiveCategory(category);
+    setPreferredCatalogCategory(category);
+    setActiveModelFilter(ALL_MODELS);
+
+    if (category === 'Celana') {
+      setCurrentRoute(RouteKey.PANTS);
+      return;
+    }
+
+    setCurrentRoute(RouteKey.KATALOG);
+  };
+
+  const handleArticleCommentSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (!articleCommentName.trim() || !articleCommentBody.trim()) {
+      setArticleCommentStatus('Isi nama dan komentar terlebih dahulu.');
+      return;
+    }
+
+    setArticleCommentStatus(`Komentar dari ${articleCommentName.trim()} sudah ditampung untuk moderasi editorial Bradwear.`);
+    setArticleCommentName('');
+    setArticleCommentBody('');
+  };
+  const formatArticleDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  const hasGooglePlayLink = GOOGLE_PLAY_URL.trim().length > 0;
 
   useEffect(() => {
     if (homeCarouselProducts.length < 2) return;
@@ -1054,32 +1153,45 @@ const PublicSiteView: React.FC = () => {
       {showCategoryTabs ? (
         <section ref={catalogRef} className="catalog-filter-band">
           <p className="catalog-filter-band-title">Pilih kategori utama</p>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => {
-                  setActiveCategory(category);
-                  setPreferredCatalogCategory(category);
-                  setActiveModelFilter(ALL_MODELS);
-                  if (category === 'Celana') {
-                    setCurrentRoute(RouteKey.PANTS);
-                    return;
-                  }
-                  setCurrentRoute(RouteKey.KATALOG);
-                }}
-                className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition ${
-                  activeCategory === category
-                    ? 'brand-cta text-white'
-                    : 'bg-[var(--surface-base)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="catalog-category-table-shell">
+            <table className="catalog-category-table">
+              <thead>
+                <tr>
+                  <th>Kategori</th>
+                  <th>Model</th>
+                  <th>Cocok untuk</th>
+                  <th>Fokus</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categorySummaryRows.map((row) => {
+                  const isActive = activeCategory === row.category;
+
+                  return (
+                    <tr key={row.category} className={isActive ? 'is-active' : ''}>
+                      <td data-label="Kategori">
+                        <strong>{row.category}</strong>
+                      </td>
+                      <td data-label="Model">{row.modelCount} model</td>
+                      <td data-label="Cocok untuk">{row.useCase}</td>
+                      <td data-label="Fokus">{row.focus}</td>
+                      <td data-label="Aksi">
+                        <button
+                          type="button"
+                          onClick={() => handleCatalogCategorySelect(row.category)}
+                          className={`catalog-category-table-action ${isActive ? 'is-active' : ''}`}
+                        >
+                          {isActive ? 'Terpilih' : 'Pilih'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-          <p className="catalog-filter-band-subtitle">Pilih model yang ingin dibandingkan</p>
+          <p className="catalog-filter-band-subtitle">Pilih model</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {categoryModelOptions.map((modelName) => (
               <button
@@ -1199,11 +1311,11 @@ const PublicSiteView: React.FC = () => {
 
   const renderArticles = () => {
     if (activeArticle) {
-      const relatedArticles = ARTICLES.filter((article) => article.slug !== activeArticle.slug).slice(0, 3);
+      const relatedArticles = articleFeed.filter((article) => article.slug !== activeArticle.slug).slice(0, 3);
 
       return (
-        <div className="px-6 py-8 md:px-10">
-          <section className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+        <div className="article-page-shell px-6 py-8 md:px-10">
+          <section className="article-detail-hero rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
             <button
               type="button"
               onClick={() => setCurrentRoute(RouteKey.ARTIKEL)}
@@ -1215,25 +1327,112 @@ const PublicSiteView: React.FC = () => {
               <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
                 {activeArticle.category}
               </span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(activeArticle.publishedAt)}</span>
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.readTime}</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeArticle.comments.length} komentar</span>
             </div>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">{activeArticle.title}</h1>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.seoDescription}</p>
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+              <span className="rounded-full bg-white px-3 py-2 font-semibold">Oleh {activeArticle.author}</span>
+              <span>{activeArticle.authorRole}</span>
+            </div>
           </section>
 
           <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-            <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
-              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.excerpt}</p>
-              <div className="mt-6 grid gap-5">
-                {activeArticle.body.map((paragraph, index) => (
-                  <p key={`${activeArticle.slug}-${index}`} className="text-base leading-8 text-[var(--text-secondary)]">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </article>
+            <div className="grid gap-6">
+              <article className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.excerpt}</p>
+                <div className="mt-6 grid gap-5">
+                  {activeArticle.body.map((paragraph, index) => (
+                    <p key={`${activeArticle.slug}-${index}`} className="text-base leading-8 text-[var(--text-secondary)]">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                    className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                  >
+                    Lihat katalog model
+                  </button>
+                  <a
+                    href={buildWhatsAppUrl(buildConsultationMessage(`artikel ${activeArticle.title.toLowerCase()}`))}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hero-secondary"
+                  >
+                    Diskusikan artikel ini
+                  </a>
+                </div>
+              </article>
+
+              <section className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Komentar pembaca</p>
+                    <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--text-primary)]">Tanggapan pada artikel ini</h2>
+                  </div>
+                  <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-2 text-[11px] font-semibold text-[var(--text-secondary)]">
+                    Moderasi editorial aktif
+                  </span>
+                </div>
+
+                <div className="mt-6 grid gap-4">
+                  {activeArticle.comments.map((comment) => (
+                    <article key={comment.id} className="rounded-[24px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{comment.author}</p>
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{comment.role}</span>
+                        <span className="text-[11px] text-[var(--text-muted)]">{formatArticleDate(comment.publishedAt)}</span>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{comment.body}</p>
+                    </article>
+                  ))}
+                </div>
+
+                <form onSubmit={handleArticleCommentSubmit} className="article-comment-form mt-6 grid gap-3">
+                  <div className="grid gap-3 md:grid-cols-[220px_minmax(0,1fr)]">
+                    <input
+                      type="text"
+                      value={articleCommentName}
+                      onChange={(event) => setArticleCommentName(event.target.value)}
+                      placeholder="Nama Anda"
+                      className="article-comment-input"
+                    />
+                    <textarea
+                      value={articleCommentBody}
+                      onChange={(event) => setArticleCommentBody(event.target.value)}
+                      placeholder="Tulis tanggapan atau pertanyaan singkat seputar artikel ini."
+                      rows={3}
+                      className="article-comment-input article-comment-textarea"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="submit"
+                      className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+                    >
+                      Kirim komentar
+                    </button>
+                    <p className="text-sm text-[var(--text-secondary)]">{articleCommentStatus || 'Komentar baru akan ditinjau dulu sebelum ditampilkan publik.'}</p>
+                  </div>
+                </form>
+              </section>
+            </div>
 
             <aside className="grid gap-5 self-start">
+              <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Tentang penulis</p>
+                <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--text-primary)]">{activeArticle.author}</h3>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">{activeArticle.authorRole}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                  Tim editorial Bradwear menulis artikel berbasis kebutuhan order seragam custom, approval desain, bahan, dan alur produksi yang sering ditanyakan customer.
+                </p>
+              </section>
+
               <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Topik SEO</p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -1249,7 +1448,7 @@ const PublicSiteView: React.FC = () => {
               </section>
 
               <section className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel Lainnya</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Artikel terbaru</p>
                 <div className="mt-4 grid gap-3">
                   {relatedArticles.map((article) => (
                     <button
@@ -1258,7 +1457,8 @@ const PublicSiteView: React.FC = () => {
                       onClick={() => navigateToArticle(article.slug)}
                       className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-left transition hover:-translate-y-0.5"
                     >
-                      <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
+                      <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
                       <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
                     </button>
                   ))}
@@ -1271,37 +1471,85 @@ const PublicSiteView: React.FC = () => {
     }
 
     return (
-      <div className="px-6 py-8 md:px-10">
-        {/* Hero halaman artikel. */}
-        <section className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Panduan memilih bahan, model, dan proses order seragam</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-            Halaman artikel ini dibuat untuk membantu user dan mesin pencari memahami konteks layanan Bradwear Indonesia,
-            mulai dari bahan seragam, tipe model, alur persetujuan, sampai checklist sebelum produksi.
-          </p>
+      <div className="article-page-shell px-6 py-8 md:px-10">
+        <section className="article-news-grid">
+          <div className="rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">Halaman artikel bergaya news untuk keyword seragam, kemeja custom, dan pengadaan</h1>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
+              Setiap artikel dibuat sebagai landing page yang bisa dibaca user, diindeks Google, dan dipahami mesin AI untuk konteks kemeja custom, seragam dinas, komunitas, serta proses order Bradwear Indonesia.
+            </p>
+          </div>
+
+          {articleSpotlight ? (
+            <article className="article-spotlight-card rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] p-6 text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Sorotan utama</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-tight">{articleSpotlight.title}</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/78">{articleSpotlight.excerpt}</p>
+              <div className="mt-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-white/74">
+                <span>{articleSpotlight.category}</span>
+                <span>{formatArticleDate(articleSpotlight.publishedAt)}</span>
+                <span>{articleSpotlight.readTime}</span>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigateToArticle(articleSpotlight.slug)}
+                  className="rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
+                >
+                  Baca artikel utama
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                  className="rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5"
+                >
+                  Lihat katalog
+                </button>
+              </div>
+            </article>
+          ) : null}
+
+          <aside className="article-latest-stack rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Terbaru</p>
+            <div className="mt-4 grid gap-3">
+              {articleLatest.map((article) => (
+                <button
+                  key={article.slug}
+                  type="button"
+                  onClick={() => navigateToArticle(article.slug)}
+                  className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--surface-subtle)] px-4 py-4 text-left transition hover:-translate-y-0.5"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
+                  <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
+                  <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                </button>
+              ))}
+            </div>
+          </aside>
         </section>
 
-        {/* Daftar artikel publik; judul, excerpt, dan isi berasal dari ARTICLES. */}
-        <section className="mt-8 grid gap-6">
-          {ARTICLES.map((article) => (
-            <article key={article.slug} className="rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
+        <section className="mt-8 article-card-grid">
+          {articleFeed.map((article) => (
+            <article key={article.slug} className="article-feed-card rounded-[32px] border border-[var(--border-soft)] bg-[var(--surface-base)] p-6 shadow-sm">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
                   {article.category}
                 </span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(article.publishedAt)}</span>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
               </div>
               <h2 className="mt-4 text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                {article.body.map((paragraph, index) => (
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {article.body.slice(0, 2).map((paragraph, index) => (
                   <p key={`${article.slug}-${index}`} className="text-sm leading-relaxed text-[var(--text-secondary)]">
                     {paragraph}
                   </p>
                 ))}
               </div>
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-[var(--text-muted)]">{article.comments.length} komentar · {article.author}</p>
                 <button
                   type="button"
                   onClick={() => navigateToArticle(article.slug)}
@@ -1316,6 +1564,73 @@ const PublicSiteView: React.FC = () => {
       </div>
     );
   };
+
+  const renderDownloadPage = () => (
+    <div className="download-page-shell px-6 py-8 md:px-10">
+      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(140deg,#0f172a,#14380c)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] md:p-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#d4f9af]">Download Bradwear</p>
+        <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">Halaman download aplikasi Bradwear Indonesia untuk Android</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
+          Halaman ini memulihkan akses download yang sebelumnya hilang. Pengunjung desktop tetap bisa melihat menu <strong>Download</strong> di navbar, sementara user mobile mendapat jalur cepat ke katalog, artikel, dan konsultasi Bradwear.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {hasGooglePlayLink ? (
+            <a
+              href={GOOGLE_PLAY_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-black tracking-tight text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
+            >
+              <GooglePlayIcon />
+              Buka di Google Play
+            </a>
+          ) : (
+            <span className="inline-flex items-center gap-3 rounded-full border border-white/18 bg-white/10 px-5 py-3 text-sm font-black tracking-tight text-white/92">
+              <GooglePlayIcon />
+              Listing Google Play sedang disiapkan
+            </span>
+          )}
+          <a
+            href={buildWhatsAppUrl(buildConsultationMessage('download aplikasi android bradwear dan akses mobile katalog'))}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-3 rounded-full border border-white/18 px-5 py-3 text-sm font-black tracking-tight text-white transition hover:-translate-y-0.5"
+          >
+            Hubungi admin untuk link mobile
+          </a>
+        </div>
+      </section>
+
+      <section className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="grid gap-5 md:grid-cols-3">
+          {DOWNLOAD_HIGHLIGHTS.map((item) => (
+            <article key={item.title} className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-black tracking-tight text-[var(--text-primary)]">{item.title}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{item.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <aside className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Akses cepat</p>
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">{SITE_NAME}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+            Halaman download ini juga berfungsi sebagai landing page SEO untuk intent seperti download aplikasi Bradwear, Android Bradwear, dan akses Play Store Bradwear Indonesia.
+          </p>
+          <div className="mt-5 grid gap-3">
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
+              <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">Masuk ke katalog</p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">Bandingkan kategori kemeja, jaket, celana, rompi, dan polo.</p>
+            </button>
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.ARTIKEL)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
+              <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">Baca artikel</p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">Akses panduan bahan, tips order, dan artikel seragam yang sudah dioptimalkan untuk index.</p>
+            </button>
+          </div>
+        </aside>
+      </section>
+    </div>
+  );
 
   const renderHowToOrder = () => (
     <div className="px-6 py-8 md:px-10">
@@ -1843,6 +2158,8 @@ const PublicSiteView: React.FC = () => {
           'Katalog seragam custom yang lebih mudah dipilih',
           'Tampilan katalog disusun lebih terarah agar pengunjung mudah membandingkan model, fungsi, dan kesiapan desain sebelum masuk ke editor.',
         );
+      case RouteKey.DOWNLOAD:
+        return renderDownloadPage();
       case RouteKey.CLIENT:
         return renderClientGallery();
       case RouteKey.ABOUT:

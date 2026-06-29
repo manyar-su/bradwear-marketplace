@@ -123,7 +123,7 @@ const App: React.FC = () => {
                 </div>
               ) : null}
               {showCustomerServiceDock ? (
-                <div className="animate-fade-in-up w-[min(96vw,400px)] max-h-[calc(100dvh-5.25rem)]">
+                <div className="animate-fade-in-up w-[min(96vw,460px)] max-h-[calc(100dvh-4.5rem)]">
                   <CustomerServiceDock
                     currentRoute={currentRoute}
                     currentPathname={currentPathname}

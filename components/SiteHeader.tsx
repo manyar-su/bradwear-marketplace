@@ -20,15 +20,19 @@ type HeaderMenuSection = {
   items: HeaderNavItem[];
 };
 
+// Label menu header desktop.
 const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
   { label: '3D', route: RouteKey.THREE_D },
   { label: 'Katalog', route: RouteKey.KATALOG },
+  { label: 'Download', route: RouteKey.DOWNLOAD },
+  { label: 'Artikel', route: RouteKey.ARTIKEL },
   { label: 'Galeri Klien', route: RouteKey.CLIENT },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER },
   { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
 ];
 
+// Label grup menu untuk header mobile.
 const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
   {
     title: 'Navigasi Utama',
@@ -36,6 +40,8 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
       { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
       { label: 'Studio 3D', route: RouteKey.THREE_D },
       { label: 'Katalog', route: RouteKey.KATALOG },
+      { label: 'Download', route: RouteKey.DOWNLOAD },
+      { label: 'Artikel', route: RouteKey.ARTIKEL },
       { label: 'Galeri Klien', route: RouteKey.CLIENT },
       { label: 'Cara Order', route: RouteKey.CARA_ORDER },
       { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },

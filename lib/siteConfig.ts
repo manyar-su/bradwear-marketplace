@@ -11,10 +11,22 @@ import {
   SiteFaqItem,
 } from '../types';
 
+const arisAvatar = new URL('../assets/CSavatar/aris.svg', import.meta.url).href;
+const ayangAvatar = new URL('../assets/CSavatar/ayang.svg', import.meta.url).href;
+const bayuAvatar = new URL('../assets/CSavatar/bayu.png', import.meta.url).href;
+const edeAvatar = new URL('../assets/CSavatar/ede.png', import.meta.url).href;
+const elshaAvatar = new URL('../assets/CSavatar/elsha.svg', import.meta.url).href;
+const fikriAvatar = new URL('../assets/CSavatar/fikri.png', import.meta.url).href;
+const gilangAvatar = new URL('../assets/CSavatar/gilang.png', import.meta.url).href;
+const nadhifaAvatar = new URL('../assets/CSavatar/nadhifa.png', import.meta.url).href;
+const rismaAvatar = new URL('../assets/CSavatar/risma.svg', import.meta.url).href;
+const ucuAvatar = new URL('../assets/CSavatar/ucu.png', import.meta.url).href;
+
 export const SITE_URL = 'https://www.bradwearindonesia.com';
 export const SITE_NAME = 'Bradwear Indonesia';
 export const SITE_TAGLINE = 'Konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
 export const WHATSAPP_NUMBER = '6287736834454';
+export const GOOGLE_PLAY_URL = '';
 export const STORE_ADDRESS = 'Karisma Residence, Blok C.46, RT.008/RW.003, Margajaya, Kec. Mangunreja, Kabupaten Tasikmalaya, Jawa Barat 46462';
 export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STORE_ADDRESS)}`;
 
@@ -22,6 +34,7 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.HOME]: '/',
   [RouteKey.THREE_D]: '/3d',
   [RouteKey.KATALOG]: '/katalog',
+  [RouteKey.DOWNLOAD]: '/download',
   [RouteKey.CLIENT]: '/client',
   [RouteKey.ABOUT]: '/tentang-kami',
   [RouteKey.VISION_MISSION]: '/visi-misi',
@@ -44,6 +57,7 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.HOME,
   RouteKey.THREE_D,
   RouteKey.KATALOG,
+  RouteKey.DOWNLOAD,
   RouteKey.CLIENT,
   RouteKey.ABOUT,
   RouteKey.VISION_MISSION,
@@ -65,6 +79,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, description: 'Halaman utama Bradwear Indonesia.' },
   { label: 'Studio 3D', route: RouteKey.THREE_D, description: 'Halaman khusus preview dan custom seragam 3D Bradwear.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
+  { label: 'Download', route: RouteKey.DOWNLOAD, description: 'Halaman download aplikasi Android dan akses cepat Bradwear.' },
   { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
@@ -87,6 +102,7 @@ export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.HOME]: 'Beranda',
   [RouteKey.THREE_D]: 'Beranda / Studio 3D',
   [RouteKey.KATALOG]: 'Beranda / Katalog',
+  [RouteKey.DOWNLOAD]: 'Beranda / Download',
   [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
   [RouteKey.ABOUT]: 'Beranda / Tentang Kami',
   [RouteKey.VISION_MISSION]: 'Beranda / Visi dan Misi',
@@ -149,6 +165,10 @@ export const ARTICLES: Article[] = [
     slug: 'panduan-memilih-bahan-seragam',
     category: 'Bahan',
     readTime: '5 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset bahan dan produksi',
+    publishedAt: '2026-06-03',
+    updatedAt: '2026-06-24',
     title: 'Panduan memilih bahan seragam agar nyaman dipakai dan tetap rapi',
     excerpt: 'Perbedaan material seperti Tropical, Nagata Drill, Ripstop, dan Oxford perlu disesuaikan dengan ritme kerja, lokasi lapangan, dan tampilan yang diinginkan.',
     seoTitle: 'Panduan Memilih Bahan Seragam Kerja dan Kemeja Dinas | Bradwear Indonesia',
@@ -159,11 +179,23 @@ export const ARTICLES: Article[] = [
       'Jika kebutuhan lebih berat, misalnya untuk lapangan atau operasional yang aktif, bahan seperti Ripstop dan Nagata Drill memberi struktur yang lebih kokoh serta ketahanan lebih baik terhadap gesekan.',
       'Bradwear membantu pelanggan mencocokkan bahan, warna, dan model sebelum masuk tahap produksi agar hasil akhir tetap nyaman sekaligus profesional.',
     ],
+    comments: [
+      {
+        id: 'comment-bahan-1',
+        author: 'Rudi Pratama',
+        role: 'PIC procurement sekolah swasta',
+        publishedAt: '2026-06-08',
+        body: 'Penjelasan bahan seperti ini membantu saat kami harus memilih antara kain yang adem untuk harian dan opsi yang lebih kokoh untuk kegiatan lapangan.',
+      },
+    ],
   },
   {
     slug: 'beda-pdh-pdl-dan-lapangan',
     category: 'Model',
     readTime: '4 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset model seragam',
+    publishedAt: '2026-06-05',
     title: 'Memahami beda PDH, PDL, dan seragam lapangan sebelum order produksi',
     excerpt: 'Jenis seragam yang terlihat mirip sering punya kebutuhan pola, bahan, dan detail finishing yang berbeda.',
     seoTitle: 'Beda PDH, PDL, dan Seragam Lapangan untuk Instansi | Bradwear Indonesia',
@@ -174,11 +206,24 @@ export const ARTICLES: Article[] = [
       'Kesalahan memilih tipe model di awal akan memengaruhi bahan, biaya, dan waktu persetujuan desain. Karena itu, Bradwear menyiapkan katalog terstruktur agar pelanggan bisa membedakan fungsi tiap seri dengan lebih cepat.',
       'Saat konsultasi, jelaskan konteks penggunaan seragam: di kantor, perjalanan dinas, kegiatan teknis, atau operasional lapangan. Informasi ini akan mempermudah penentuan model terbaik.',
     ],
+    comments: [
+      {
+        id: 'comment-model-1',
+        author: 'Fajar Nugraha',
+        role: 'Koordinator lapangan komunitas',
+        publishedAt: '2026-06-07',
+        body: 'Bagian pembeda fungsi PDH dan PDL paling membantu karena tim kami sering menyamakan dua kebutuhan yang sebenarnya berbeda.',
+      },
+    ],
   },
   {
     slug: 'tips-order-seragam-instansi',
     category: 'Pemesanan',
     readTime: '6 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset alur order',
+    publishedAt: '2026-06-09',
+    updatedAt: '2026-06-26',
     title: 'Tips order seragam instansi agar proses revisi dan produksi lebih cepat',
     excerpt: 'Kejelasan data ukuran, identitas instansi, jumlah item, dan target waktu akan sangat mempercepat persetujuan.',
     seoTitle: 'Tips Order Seragam Instansi dan Perusahaan | Bradwear Indonesia',
@@ -189,11 +234,23 @@ export const ARTICLES: Article[] = [
       'Untuk seragam yang membutuhkan bordir logo, file referensi berkualitas baik akan mempersingkat proses penyesuaian. Jika ada panduan warna resmi instansi, lampirkan sejak awal.',
       'Bradwear juga menyarankan pelanggan menentukan PIC internal agar revisi tidak berjalan dari banyak jalur komunikasi sekaligus. Dengan begitu, desain dapat disetujui lebih cepat dan produksi lebih stabil.',
     ],
+    comments: [
+      {
+        id: 'comment-order-1',
+        author: 'Laras Widuri',
+        role: 'Admin pengadaan perusahaan',
+        publishedAt: '2026-06-11',
+        body: 'Tips menunjuk satu PIC internal benar-benar relevan. Setelah kami pakai cara itu, revisi desain jauh lebih cepat.',
+      },
+    ],
   },
   {
     slug: 'checklist-sebelum-produksi',
     category: 'Checklist',
     readTime: '4 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Kontrol kualitas',
+    publishedAt: '2026-06-12',
     title: 'Checklist sebelum produksi seragam custom dimulai',
     excerpt: 'Approval akhir sebaiknya mencakup model, ukuran, material, warna, logo, nama, dan alamat pengiriman.',
     seoTitle: 'Checklist Sebelum Produksi Seragam Custom Dimulai | Bradwear Indonesia',
@@ -204,11 +261,24 @@ export const ARTICLES: Article[] = [
       'Cek ulang penulisan nama personel, jabatan, atau divisi yang akan dibordir. Kesalahan data kecil justru sering menyebabkan penundaan produksi di tahap akhir.',
       'Konfirmasi alamat kirim, PIC penerima, dan kurir yang diinginkan jika ada preferensi tertentu. Bradwear lalu dapat menyiapkan update tracking yang lebih rapi sampai barang diterima.',
     ],
+    comments: [
+      {
+        id: 'comment-checklist-1',
+        author: 'Meysa Putri',
+        role: 'Sekretariat organisasi daerah',
+        publishedAt: '2026-06-14',
+        body: 'Checklist ini cocok dijadikan daftar final sebelum kami kirim data bordir nama dan alamat penerima ke vendor.',
+      },
+    ],
   },
   {
     slug: 'kemeja-custom-untuk-perusahaan-dan-komunitas',
     category: 'Kemeja Custom',
     readTime: '7 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Strategi produk custom',
+    publishedAt: '2026-06-15',
+    updatedAt: '2026-06-25',
     title: 'Kemeja custom untuk perusahaan dan komunitas: hal yang perlu disiapkan sebelum produksi',
     excerpt: 'Kemeja custom untuk perusahaan, organisasi, dan komunitas akan lebih cepat diproduksi jika brief desain, fungsi pemakaian, dan identitas visual sudah jelas sejak awal.',
     seoTitle: 'Kemeja Custom untuk Perusahaan dan Komunitas | Bradwear Indonesia',
@@ -219,11 +289,23 @@ export const ARTICLES: Article[] = [
       'Untuk perusahaan dan komunitas, referensi warna utama, posisi logo, jenis identitas personel, dan jumlah item per divisi perlu dikunci lebih cepat. Langkah ini mempercepat diskusi desain dan mencegah revisi berulang di tengah proses approval.',
       'Bradwear membantu pelanggan menyusun kebutuhan kemeja custom agar lebih mudah diterjemahkan ke mockup, pilihan bahan, dan estimasi produksi. Dengan data yang rapi sejak awal, hasil akhirnya lebih konsisten dan proses order lebih efisien.',
     ],
+    comments: [
+      {
+        id: 'comment-kemeja-custom-1',
+        author: 'Dian Kurnia',
+        role: 'Ketua komunitas otomotif',
+        publishedAt: '2026-06-17',
+        body: 'Poin tentang fungsi pemakaian sangat kena. Untuk komunitas, beda kebutuhan touring dan kebutuhan event memang berpengaruh ke pilihan model.',
+      },
+    ],
   },
   {
     slug: 'seragam-dinas-dan-komunitas-pilih-model-yang-tepat',
     category: 'Seragam Dinas',
     readTime: '6 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset seragam dinas',
+    publishedAt: '2026-06-18',
     title: 'Seragam dinas dan komunitas: cara memilih model yang tepat untuk kerja formal dan lapangan',
     excerpt: 'Pemilihan model seragam dinas dan komunitas perlu disesuaikan dengan ritme kerja, kebutuhan identitas, serta citra yang ingin ditampilkan di lapangan maupun kantor.',
     seoTitle: 'Seragam Dinas dan Seragam Komunitas: Pilih Model yang Tepat | Bradwear Indonesia',
@@ -234,20 +316,83 @@ export const ARTICLES: Article[] = [
       'Model yang tepat bukan hanya soal tampilan. Bentuk kerah, komposisi warna, bahan, bordir logo, dan panjang lengan akan memengaruhi kenyamanan pemakai sekaligus kesan profesional saat dipresentasikan ke pimpinan atau anggota tim.',
       'Bradwear memudahkan proses pemilihan model lewat katalog visual dan konsultasi WhatsApp sehingga user bisa membandingkan opsi untuk dinas, perusahaan, komunitas, dan kebutuhan custom lainnya sebelum produksi dimulai.',
     ],
+    comments: [
+      {
+        id: 'comment-seragam-dinas-1',
+        author: 'Nur Aini',
+        role: 'Staf administrasi instansi',
+        publishedAt: '2026-06-20',
+        body: 'Artikel ini memudahkan kami membedakan model untuk kebutuhan formal kantor dan kebutuhan lapangan yang lebih aktif.',
+      },
+    ],
+  },
+  {
+    slug: 'vendor-seragam-dinas-untuk-pengadaan-instansi',
+    category: 'Pengadaan',
+    readTime: '6 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset pengadaan dan vendor',
+    publishedAt: '2026-06-21',
+    title: 'Memilih vendor seragam dinas untuk pengadaan instansi: data yang perlu disiapkan sejak awal',
+    excerpt: 'Vendor seragam dinas lebih mudah memberi estimasi akurat jika instansi menyiapkan data fungsi pemakaian, jumlah item, identitas visual, dan timeline penggunaan.',
+    seoTitle: 'Vendor Seragam Dinas untuk Pengadaan Instansi | Bradwear Indonesia',
+    seoDescription: 'Panduan memilih vendor seragam dinas, vendor kemeja kerja, dan konveksi seragam instansi agar brief pengadaan lebih jelas, approval lebih cepat, dan produksi lebih terukur.',
+    keywords: ['vendor seragam dinas', 'pengadaan seragam instansi', 'vendor kemeja kerja', 'konveksi seragam pemerintah', 'seragam kerja pengadaan'],
+    body: [
+      'Dalam proses pengadaan, vendor tidak cukup hanya melihat contoh desain. Mereka perlu memahami konteks penggunaan, rentang ukuran, detail bordir, komposisi warna, dan batas waktu pemakaian seragam.',
+      'Instansi yang menyiapkan data lebih rapi sejak awal akan lebih mudah membandingkan proposal, estimasi bahan, dan alur revisi. Hal ini penting agar keputusan tidak hanya didasarkan pada harga, tetapi juga kesiapan produksi.',
+      'Bradwear menyarankan setiap tim pengadaan menyiapkan satu dokumen ringkas yang memuat jumlah item, fungsi seragam, referensi visual, serta PIC persetujuan internal sebelum menghubungi vendor.',
+    ],
+    comments: [
+      {
+        id: 'comment-vendor-1',
+        author: 'Agus Firmansyah',
+        role: 'Tim pengadaan lembaga pendidikan',
+        publishedAt: '2026-06-22',
+        body: 'Konten seperti ini berguna untuk menyusun brief awal sebelum kami meminta penawaran ke beberapa vendor seragam dinas.',
+      },
+    ],
+  },
+  {
+    slug: 'seragam-komunitas-dan-event-agar-branding-lebih-rapi',
+    category: 'Komunitas',
+    readTime: '5 menit',
+    author: 'Tim Editorial Bradwear',
+    authorRole: 'Riset komunitas dan event',
+    publishedAt: '2026-06-23',
+    title: 'Seragam komunitas dan event agar branding lebih rapi tanpa mengorbankan kenyamanan',
+    excerpt: 'Seragam komunitas, gathering, dan event akan terlihat lebih kuat jika logo, warna utama, dan model dipilih sesuai situasi pemakaian.',
+    seoTitle: 'Seragam Komunitas dan Kemeja Event Custom | Bradwear Indonesia',
+    seoDescription: 'Pelajari cara menyiapkan seragam komunitas, kemeja event custom, dan kemeja kostum custom agar branding tim lebih rapi, nyaman dipakai, dan mudah diproduksi.',
+    keywords: ['seragam komunitas', 'kemeja event custom', 'kemeja kostum custom', 'seragam gathering', 'vendor kemeja komunitas'],
+    body: [
+      'Komunitas dan penyelenggara event sering memerlukan seragam yang terlihat kuat di foto, mudah dikenali, tetapi tetap nyaman dipakai berjam-jam. Karena itu, pemilihan kain dan warna tidak bisa hanya mengikuti tren visual.',
+      'Untuk event di ruang luar, model yang lebih ringan dan cepat kering sering menjadi pilihan aman. Sementara untuk komunitas yang ingin tampil lebih formal, potongan kemeja dengan bordir identitas masih menjadi opsi paling fleksibel.',
+      'Sebelum produksi, cocokkan dulu warna utama, ukuran logo, serta pembagian item untuk panitia, peserta inti, dan divisi pendukung agar hasil branding tetap konsisten.',
+    ],
+    comments: [
+      {
+        id: 'comment-komunitas-1',
+        author: 'Aldo Saputra',
+        role: 'Panitia event komunitas daerah',
+        publishedAt: '2026-06-24',
+        body: 'Kami sering fokus ke desain depan saja. Artikel ini mengingatkan bahwa pembagian item per divisi juga harus dihitung dari awal.',
+      },
+    ],
   },
 ];
 
 export const CUSTOMER_SERVICE_CONTACTS: CustomerServiceContact[] = [
-  { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: '/cs-avatars/gilang.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: '/cs-avatars/elsha.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'bayu', name: 'Bayu', phone: '6287736834454', avatar: '/cs-avatars/bayu.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'nadhifa', name: 'Nadhifa', phone: '6282316067692', avatar: '/cs-avatars/nadhifa.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: '/cs-avatars/risma.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'ede', name: 'Ede', phone: '6285317159575', avatar: '/cs-avatars/ede.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: '/cs-avatars/fikri.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'aris', name: 'Aris', phone: '6281295395823', avatar: '/cs-avatars/aris.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: '/cs-avatars/ayang.svg', statusLabel: 'Aktif sekarang' },
-  { id: 'ucu', name: 'Ucu', phone: '6281462327318', avatar: '/cs-avatars/ucu.svg', statusLabel: 'Aktif sekarang' },
+  { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: gilangAvatar, statusLabel: 'Online' },
+  { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: elshaAvatar, statusLabel: 'Online' },
+  { id: 'bayu', name: 'Bayu', phone: '6287736834454', avatar: bayuAvatar, statusLabel: 'Online' },
+  { id: 'nadhifa', name: 'Nadhifa', phone: '6282316067692', avatar: nadhifaAvatar, statusLabel: 'Online' },
+  { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: rismaAvatar, statusLabel: 'Online' },
+  { id: 'ede', name: 'Ede', phone: '6285317159575', avatar: edeAvatar, statusLabel: 'Online' },
+  { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: fikriAvatar, statusLabel: 'Online' },
+  { id: 'aris', name: 'Aris', phone: '6281295395823', avatar: arisAvatar, statusLabel: 'Online' },
+  { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: ayangAvatar, statusLabel: 'Online' },
+  { id: 'ucu', name: 'Ucu', phone: '6281462327318', avatar: ucuAvatar, statusLabel: 'Online' },
 ];
 
 // Sumber teks tahapan halaman Cara Order.
@@ -477,6 +622,12 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
     'Lihat katalog kemeja custom, kemeja dinas, PDH, PDL, jaket, rompi, polo, dan celana kerja Bradwear Indonesia untuk kebutuhan kantor, lapangan, operasional, dan pengadaan instansi.',
     ['katalog seragam custom', 'kemeja dinas', 'jaket bomber custom', 'rompi lapangan', 'polo custom', 'pants tactical', 'katalog kemeja custom', 'katalog kemeja dinas', 'seragam kantor custom', 'seragam kerja lapangan']
   ),
+  [RouteKey.DOWNLOAD]: makeMeta(
+    RouteKey.DOWNLOAD,
+    'Download Aplikasi Bradwear Indonesia | Android, Play Store, dan Konsultasi Cepat',
+    'Akses halaman download aplikasi Bradwear Indonesia untuk Android, informasi Play Store, konsultasi cepat WhatsApp, dan jalur masuk paling ringkas ke katalog serta artikel seragam custom.',
+    ['download aplikasi bradwear', 'bradwear android', 'google play bradwear', 'download app seragam custom', 'aplikasi bradwear indonesia']
+  ),
   [RouteKey.CLIENT]: makeMeta(
     RouteKey.CLIENT,
     'Galeri Klien Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
@@ -643,6 +794,7 @@ export const getConsultationTopicForPath = (route: RouteKey, pathname: string) =
     [RouteKey.HOME]: 'kemeja custom dan seragam kerja',
     [RouteKey.THREE_D]: 'preview desain 3d seragam custom',
     [RouteKey.KATALOG]: 'katalog kemeja custom dan seragam dinas',
+    [RouteKey.DOWNLOAD]: 'download aplikasi android bradwear',
     [RouteKey.CLIENT]: 'hasil jadi seragam dan referensi klien',
     [RouteKey.ABOUT]: 'profil dan layanan bradwear indonesia',
     [RouteKey.VISION_MISSION]: 'standar layanan dan kualitas bradwear',

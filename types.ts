@@ -3,6 +3,7 @@ export enum RouteKey {
   HOME = 'HOME',
   THREE_D = 'THREE_D',
   KATALOG = 'KATALOG',
+  DOWNLOAD = 'DOWNLOAD',
   CLIENT = 'CLIENT',
   ABOUT = 'ABOUT',
   VISION_MISSION = 'VISION_MISSION',
@@ -35,10 +36,23 @@ export interface Article {
   excerpt: string;
   category: string;
   readTime: string;
+  author: string;
+  authorRole: string;
+  publishedAt: string;
+  updatedAt?: string;
   seoTitle: string;
   seoDescription: string;
   keywords: string[];
   body: string[];
+  comments: ArticleComment[];
+}
+
+export interface ArticleComment {
+  id: string;
+  author: string;
+  role: string;
+  publishedAt: string;
+  body: string;
 }
 
 export interface CustomerServiceContact {
