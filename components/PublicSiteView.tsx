@@ -1,5 +1,8 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS } from '../assets';
+import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
+import howToOrderDetailImageB from '../assets/cara order/22.webp';
+import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
 import heroTopImage from '../assets/Hero/atas.webp';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
@@ -14,6 +17,7 @@ import {
   HOW_TO_ORDER_STEPS,
   ROUTE_PATHS,
   SITE_FAQS,
+  GOOGLE_PLAY_URL,
   SITE_NAME,
   STORE_ADDRESS,
   STORE_MAP_URL,
@@ -33,6 +37,7 @@ const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
 const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
+const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const SLIDESHOW_INTERVAL_MS = 5000;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
@@ -162,6 +167,19 @@ type BrandProfileCta = {
   secondaryLabel: string;
 };
 
+type SupportDirectoryItem = {
+  question: string;
+  answer: string;
+};
+
+type SupportDirectorySection = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  icon: 'faq' | 'order' | 'shipping' | 'privacy' | 'terms' | 'return' | 'contact';
+  items: SupportDirectoryItem[];
+};
+
 type BrandProfileVisualItem = {
   route: RouteKey;
   kicker: string;
@@ -176,6 +194,126 @@ type BrandProfileVisualItem = {
   processSteps: BrandProfileProcessStep[];
   cta: BrandProfileCta;
 };
+
+const SUPPORT_DIRECTORY_SECTIONS: SupportDirectorySection[] = [
+  {
+    slug: 'faq',
+    title: 'FAQ',
+    subtitle: 'Pertanyaan yang sering ditanyakan',
+    icon: 'faq',
+    items: SITE_FAQS.map((faq) => ({
+      question: faq.title,
+      answer: faq.answer,
+    })),
+  },
+  {
+    slug: 'cara-order',
+    title: 'Cara Order',
+    subtitle: 'Panduan pemesanan seragam',
+    icon: 'order',
+    items: HOW_TO_ORDER_STEPS.map((step, index) => ({
+      question: `Tahap ${index + 1}: ${step.title}`,
+      answer: `${step.description} ${step.detail}`,
+    })),
+  },
+  {
+    slug: 'shipping-production',
+    title: 'Pengiriman & Produksi',
+    subtitle: 'Informasi waktu produksi & pengiriman',
+    icon: 'shipping',
+    items: [
+      {
+        question: 'Berapa estimasi produksi normal Bradwear?',
+        answer:
+          'Estimasi produksi normal berada di kisaran 14 sampai 21 hari kerja, tergantung jumlah order, kompleksitas desain, bahan, dan antrean produksi saat approval masuk.',
+      },
+      {
+        question: 'Kapan order mulai diproses ke produksi?',
+        answer:
+          'Produksi dimulai setelah model, bahan, identitas, ukuran, dan ringkasan order sudah disetujui agar tim dapat bekerja lebih rapi tanpa revisi besar di tengah jalan.',
+      },
+      {
+        question: 'Apakah pengiriman bisa dilacak?',
+        answer:
+          'Ya. Pelanggan bisa memantau status internal melalui order code Bradwear, lalu melanjutkan tracking ke situs resmi kurir saat nomor resi sudah diterbitkan.',
+      },
+    ],
+  },
+  {
+    slug: 'privacy',
+    title: 'Privacy Policy',
+    subtitle: 'Kebijakan privasi',
+    icon: 'privacy',
+    items: [
+      {
+        question: 'Data apa yang digunakan saat konsultasi atau order?',
+        answer:
+          'Bradwear menggunakan data yang Anda kirimkan seperti nama, instansi, nomor WhatsApp, detail model, file logo, dan catatan order hanya untuk kebutuhan konsultasi, approval, produksi, dan tindak lanjut layanan.',
+      },
+      {
+        question: 'Apakah file desain dan identitas instansi dibagikan ke pihak lain?',
+        answer:
+          'File hanya dipakai secara internal oleh tim yang menangani desain, admin order, dan produksi agar pesanan dapat diselesaikan dengan benar. Publikasi portofolio akan tetap menyesuaikan konteks dan izin yang relevan.',
+      },
+    ],
+  },
+  {
+    slug: 'terms',
+    title: 'Terms & Conditions',
+    subtitle: 'Syarat dan ketentuan penggunaan',
+    icon: 'terms',
+    items: [
+      {
+        question: 'Kapan harga dan timeline dianggap final?',
+        answer:
+          'Harga dan estimasi waktu dianggap final setelah detail model, bahan, jumlah, ukuran, dan identitas produksi sudah jelas serta disepakati bersama dengan tim Bradwear.',
+      },
+      {
+        question: 'Apakah warna hasil akhir bisa berbeda dari tampilan layar?',
+        answer:
+          'Sedikit perbedaan visual dapat terjadi karena tampilan layar, pencahayaan foto, dan karakter bahan. Karena itu, pemilihan bahan dan warna selalu lebih aman jika disejajarkan dengan referensi produksi yang jelas.',
+      },
+    ],
+  },
+  {
+    slug: 'return-policy',
+    title: 'Kebijakan Pengembalian',
+    subtitle: 'Kebijakan retur & revisi',
+    icon: 'return',
+    items: [
+      {
+        question: 'Bagaimana jika hasil tidak sesuai detail yang sudah disetujui?',
+        answer:
+          'Jika ada ketidaksesuaian terhadap detail approved order, tim Bradwear akan meninjau kasus tersebut dan menyiapkan tindak lanjut revisi yang relevan berdasarkan temuan produksi dan dokumen approval.',
+      },
+      {
+        question: 'Apakah order bisa dibatalkan setelah produksi berjalan?',
+        answer:
+          'Order yang sudah masuk tahap produksi umumnya tidak dapat dibatalkan sepihak karena bahan, pola, bordir, dan alokasi kerja sudah diproses sesuai brief yang disetujui sebelumnya.',
+      },
+    ],
+  },
+  {
+    slug: 'contact',
+    title: 'Hubungi Kami',
+    subtitle: 'Chat, telepon atau email kami',
+    icon: 'contact',
+    items: [
+      {
+        question: 'Ke mana saya harus konsultasi paling cepat?',
+        answer: `${CONTACT_CHANNELS[0]?.label ?? 'WhatsApp Konsultasi'} tersedia di ${CONTACT_CHANNELS[0]?.value ?? '+62 877-3683-4454'} untuk konsultasi model, bahan, estimasi, dan tindak lanjut order.`,
+      },
+      {
+        question: 'Kapan layanan pelanggan aktif?',
+        answer: `Jam operasional utama: ${CUSTOMER_SERVICE_HOURS.join(' • ')}.`,
+      },
+      {
+        question: 'Apakah Bradwear melayani luar kota?',
+        answer: `${CONTACT_CHANNELS[1]?.value ?? 'Seluruh Indonesia'}. Titik workshop utama berada di ${CONTACT_CHANNELS[2]?.value ?? 'Tasikmalaya, Jawa Barat'} untuk pengembangan sampel dan kontrol kualitas.`,
+      },
+    ],
+  },
+];
 
 // Sumber copy untuk seluruh halaman profil publik berdasarkan company profile resmi.
 const BRAND_PROFILE_ITEMS: BrandProfileItem[] = [
@@ -589,6 +727,60 @@ const ShippingIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h3l3 3v2h-6z" />
     <circle cx="7.5" cy="17.5" r="1.5" />
     <circle cx="17.5" cy="17.5" r="1.5" />
+  </svg>
+);
+
+const FaqCircleIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <circle cx="12" cy="12" r="8.5" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.4a2.47 2.47 0 0 1 4.6 1.27c0 1.35-.88 1.95-1.63 2.47-.7.49-1.22.93-1.22 1.86" />
+    <circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const CartOutlineIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h1.6l1.9 9.2h8.8l2-6.3H7.2" />
+    <circle cx="10.2" cy="18.2" r="1.45" />
+    <circle cx="16.8" cy="18.2" r="1.45" />
+  </svg>
+);
+
+const ShieldCheckIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.6 6 6v5.55c0 4.08 2.53 7.82 6 8.85 3.47-1.03 6-4.77 6-8.85V6l-6-2.4Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="m9.55 12.4 1.73 1.72 3.25-3.4" />
+  </svg>
+);
+
+const DocumentTextIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 3.8h6.2L18 7.6V20H8z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M14 3.8v3.8h4" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10.1 11.2h5.7M10.1 14.3h5.7M10.1 17.4h4.1" />
+  </svg>
+);
+
+const ReturnPolicyIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.4 8.2H5.2v3.2" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5.4 11.2A6.9 6.9 0 1 0 7 7.4" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10.2 12h3.7" />
+  </svg>
+);
+
+const HeadsetSupportIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-5 w-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12a7 7 0 0 1 14 0" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6.2 11.8h1.3a1.5 1.5 0 0 1 1.5 1.5v2.4a1.5 1.5 0 0 1-1.5 1.5H6.7A1.7 1.7 0 0 1 5 15.5V13a1.2 1.2 0 0 1 1.2-1.2Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 11.8h1.3A1.2 1.2 0 0 1 19 13v2.5a1.7 1.7 0 0 1-1.7 1.7h-.8a1.5 1.5 0 0 1-1.5-1.5v-2.4a1.5 1.5 0 0 1 1.5-1.5Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 18.5c.72.43 1.92.7 3 .7s2.28-.27 3-.7" />
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-4 w-4">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m7.2 4.8 5 5-5 5" />
   </svg>
 );
 
@@ -1054,6 +1246,7 @@ const PublicSiteView: React.FC = () => {
   const [trackingLookup, setTrackingLookup] = useState('');
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
+  const [openSupportSectionSlug, setOpenSupportSectionSlug] = useState<string | null>(SUPPORT_DIRECTORY_SECTIONS[0]?.slug ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
   const [articleHighlightIndex, setArticleHighlightIndex] = useState(0);
@@ -1073,6 +1266,8 @@ const PublicSiteView: React.FC = () => {
         : TESTIMONIAL_ITEMS.filter((item) => item.category === activeTestimonialFilter),
     [activeTestimonialFilter],
   );
+  const downloadPreviewHero = ASSETS.CONTENT.GOOGLE_PLAY_GALLERY[0] ?? null;
+  const downloadPreviewSlides = ASSETS.CONTENT.GOOGLE_PLAY_GALLERY.slice(1, 4);
 
   const heroSlides = useMemo(
     () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
@@ -1640,6 +1835,27 @@ const PublicSiteView: React.FC = () => {
     </article>
   );
 
+  const renderSupportDirectoryIcon = (icon: SupportDirectorySection['icon']) => {
+    switch (icon) {
+      case 'faq':
+        return <FaqCircleIcon />;
+      case 'order':
+        return <CartOutlineIcon />;
+      case 'shipping':
+        return <ShippingIcon />;
+      case 'privacy':
+        return <ShieldCheckIcon />;
+      case 'terms':
+        return <DocumentTextIcon />;
+      case 'return':
+        return <ReturnPolicyIcon />;
+      case 'contact':
+        return <HeadsetSupportIcon />;
+      default:
+        return <FaqCircleIcon />;
+    }
+  };
+
   const renderHome = () => {
     return (
       <>
@@ -1991,41 +2207,8 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
-  const renderCatalog = (_catalogProducts: Product[], title: string, description: string) => (
+  const renderCatalog = (_catalogProducts: Product[]) => (
     <div className="catalog-page-shell">
-      <section className="catalog-page-hero scroll-reveal-block">
-        <div className="catalog-page-breadcrumb">
-          <button type="button" onClick={() => setCurrentRoute(RouteKey.HOME)} className="catalog-page-breadcrumb-link">
-            Beranda
-          </button>
-          <span>&gt;</span>
-          <span>{currentRoute === RouteKey.PANTS ? 'Celana' : 'Katalog'}</span>
-        </div>
-
-        <div className="catalog-page-hero-grid">
-          <div className="catalog-page-hero-copy">
-            <h1 className="catalog-page-title">{title}</h1>
-            <p className="catalog-page-copy">{description}</p>
-          </div>
-          <div className="catalog-page-hero-visual catalog-page-hero-visual-full">
-            <img
-              src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
-              alt="Fast respon customer service Bradwear Indonesia"
-              className="catalog-page-hero-image"
-            />
-          </div>
-        </div>
-
-        <div className="catalog-trust-grid">
-          {catalogTrustItems.map((item) => (
-            <article key={item.title} className="catalog-trust-card">
-              <div className="catalog-trust-icon-shell">{item.icon}</div>
-              <h2 className="catalog-trust-title">{item.title}</h2>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
         <div className="catalog-filter-pill-row">
           {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
@@ -2750,17 +2933,37 @@ const PublicSiteView: React.FC = () => {
         <section className="download-gallery-shell scroll-reveal-block mt-8">
           <div className="download-gallery-copy">
             <p className="catalog-copy-band-kicker">Preview Mobile</p>
-            <h2 className="catalog-copy-band-title">Tampilan cepat dari folder Google Play</h2>
+            <h2 className="catalog-copy-band-title">Preview aplikasi Bradwear dari Google Play</h2>
             <p className="catalog-copy-band-copy">
-              Foto-foto ini dipakai sebagai preview visual untuk kebutuhan halaman download agar pengunjung tetap melihat konteks tampilan Bradwear dari perangkat mobile.
+              Satu tampilan hero dipakai untuk preview utama, lalu tiga layar lain ditampilkan sebagai slider ringkas agar pengunjung langsung melihat konteks aplikasi sebelum download.
             </p>
           </div>
-          <div className="download-gallery-grid">
-            {ASSETS.CONTENT.GOOGLE_PLAY_GALLERY.map((image, index) => (
-              <article key={`${image}-${index}`} className="download-gallery-card">
-                <img src={image} alt={`Preview mobile Bradwear ${index + 1}`} className="download-gallery-image" />
-              </article>
-            ))}
+
+          {downloadPreviewHero ? (
+            <article className="download-gallery-hero">
+              <img src={downloadPreviewHero} alt="Preview hero aplikasi Bradwear di Google Play" className="download-gallery-hero-image" />
+            </article>
+          ) : null}
+
+          {downloadPreviewSlides.length ? (
+            <div className="download-gallery-grid">
+              {downloadPreviewSlides.map((image, index) => (
+                <article key={`${image}-${index}`} className="download-gallery-card">
+                  <img src={image} alt={`Preview slider aplikasi Bradwear ${index + 1}`} className="download-gallery-image" />
+                </article>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="download-gallery-actions">
+            <a
+              href={GOOGLE_PLAY_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="download-gallery-primary-link"
+            >
+              Download di Google Play
+            </a>
           </div>
         </section>
       ) : null}
@@ -2800,174 +3003,220 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
-  const renderHowToOrder = () => (
-    <div className="px-6 py-8 md:px-10">
-      {/* Hero halaman Cara Order. */}
-      <section className="rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-6 shadow-sm md:p-8">
-        <div className="max-w-3xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Cara Order</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--text-primary)]">Proses Pemesanan yang Mudah dan Terstruktur</h1>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Mulai dari konsultasi, pemilihan model, hingga produksi dan pengiriman dalam satu alur yang jelas.
-          </p>
-        </div>
+  const renderHowToOrder = () => {
+    const activeHowToOrderVisual = HOW_TO_ORDER_VISUALS[activeHowToOrderStepIndex] ?? howToOrderHeroImage;
 
-        {/* Tahapan order mengambil title, description, dan detail dari HOW_TO_ORDER_STEPS. */}
-        <div className="order-step-selector mt-6">
-          {HOW_TO_ORDER_STEPS.map((step, index) => {
-            const isActive = index === activeHowToOrderStepIndex;
+    return (
+      <div className="how-to-order-page-shell px-6 py-8 md:px-10">
+        <section className="how-to-order-hero-media scroll-reveal-block">
+          <img
+            src={howToOrderHeroImage}
+            alt="Proses pemesanan Bradwear dari konsultasi hingga produksi"
+            className="how-to-order-hero-image"
+            loading="eager"
+          />
+          <div className="how-to-order-hero-overlay">
+            <p className="how-to-order-hero-kicker">Cara Order</p>
+            <h1 className="how-to-order-hero-title">Proses pemesanan seragam yang rapi, jelas, dan mudah diikuti.</h1>
+            <p className="how-to-order-hero-copy">
+              Gunakan alur ini untuk memilih model, menyesuaikan desain, mengirim detail order, lalu memantau proses produksi
+              sampai pengiriman.
+            </p>
+          </div>
+        </section>
 
-            return (
-              <button
-                key={step.id}
-                type="button"
-                onClick={() => setActiveHowToOrderStepIndex(index)}
-                className={`order-step-pill ${isActive ? 'is-active' : ''}`}
-                aria-pressed={isActive}
-              >
-                <span className="order-step-pill-number">{index + 1}</span>
-                <span className="order-step-pill-label">Tahap {index + 1}</span>
-              </button>
-            );
-          })}
-        </div>
+        <section className="how-to-order-shell scroll-reveal-block">
+          <div className="how-to-order-intro-shell">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Tahapan Order</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)] md:text-[2.55rem]">
+              Ikuti langkah yang sesuai sampai order siap diproses tim Bradwear.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
+              Struktur tahap tetap memakai data `HOW_TO_ORDER_STEPS`, tetapi sekarang ditata ulang supaya lebih presisi dan mudah
+              dipakai dari mobile maupun desktop.
+            </p>
+          </div>
 
-        <article key={activeHowToOrderStep.id} className="order-step-panel mt-6">
-          <div className="order-step-panel-head">
-            <div className="order-step-panel-index">Tahap {activeHowToOrderStepIndex + 1}</div>
-            <div className="order-step-panel-progress">
-              {HOW_TO_ORDER_STEPS.map((step, index) => (
-                <span
-                  key={step.id}
-                  className={`order-step-progress-dot ${index <= activeHowToOrderStepIndex ? 'is-done' : ''}`}
+          <div className="how-to-order-layout mt-6">
+            <aside className="how-to-order-selector-shell">
+              <div className="order-step-selector">
+                {HOW_TO_ORDER_STEPS.map((step, index) => {
+                  const isActive = index === activeHowToOrderStepIndex;
+
+                  return (
+                    <button
+                      key={step.id}
+                      type="button"
+                      onClick={() => setActiveHowToOrderStepIndex(index)}
+                      className={`order-step-pill ${isActive ? 'is-active' : ''}`}
+                      aria-pressed={isActive}
+                    >
+                      <span className="order-step-pill-number">{index + 1}</span>
+                      <span className="order-step-pill-label">Tahap {index + 1}</span>
+                      <span className="order-step-pill-title">{step.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
+
+            <article key={activeHowToOrderStep.id} className="order-step-panel how-to-order-panel-shell">
+              <div className="how-to-order-panel-visual-shell">
+                <img
+                  src={activeHowToOrderVisual}
+                  alt={activeHowToOrderStep.title}
+                  className="how-to-order-panel-visual"
+                  loading="lazy"
                 />
-              ))}
-            </div>
-          </div>
-          <h2 className="order-step-panel-title">{activeHowToOrderStep.title}</h2>
-          <p className="order-step-panel-copy">{activeHowToOrderStep.description}</p>
-          <p className="order-step-panel-detail">{activeHowToOrderStep.detail}</p>
+              </div>
 
-          <div className="order-step-panel-actions">
-            {activeHowToOrderStep.id === 'discover' ? (
-              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
-                Buka katalog
-              </button>
-            ) : null}
-            {activeHowToOrderStep.id === 'customize' ? (
-              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
-                Pilih model lalu desain
-              </button>
-            ) : null}
-            {activeHowToOrderStep.id === 'summary' ? (
-              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
-                Lanjut siapkan data order
-              </button>
-            ) : null}
-            {activeHowToOrderStep.id === 'consult' ? (
-              <a
-                href={buildWhatsAppUrl(buildConsultationMessage('kirim detail order seragam custom untuk ditindaklanjuti'))}
-                target="_blank"
-                rel="noreferrer"
-                className="hero-primary brand-cta"
-              >
-                Kirim ke WhatsApp
-              </a>
-            ) : null}
-            {activeHowToOrderStep.id === 'track' ? (
-              <button type="button" onClick={() => setCurrentRoute(RouteKey.LACAK_PESANAN)} className="hero-primary brand-cta">
-                Cek status order
-              </button>
-            ) : null}
+              <div className="how-to-order-panel-content">
+                <div className="order-step-panel-head">
+                  <div className="order-step-panel-index">Tahap {activeHowToOrderStepIndex + 1}</div>
+                  <div className="order-step-panel-progress">
+                    {HOW_TO_ORDER_STEPS.map((step, index) => (
+                      <span
+                        key={step.id}
+                        className={`order-step-progress-dot ${index <= activeHowToOrderStepIndex ? 'is-done' : ''}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <h3 className="order-step-panel-title">{activeHowToOrderStep.title}</h3>
+                <p className="order-step-panel-copy">{activeHowToOrderStep.description}</p>
+                <p className="order-step-panel-detail">{activeHowToOrderStep.detail}</p>
 
-            {activeHowToOrderStepIndex < HOW_TO_ORDER_STEPS.length - 1 ? (
-              <button
-                type="button"
-                onClick={() => setActiveHowToOrderStepIndex((prev) => Math.min(prev + 1, HOW_TO_ORDER_STEPS.length - 1))}
-                className="hero-secondary"
-              >
-                Lanjut ke tahap {activeHowToOrderStepIndex + 2}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setActiveHowToOrderStepIndex(0)}
-                className="hero-secondary"
-              >
-                Ulang dari tahap 1
-              </button>
-            )}
+                <div className="order-step-panel-actions">
+                  {activeHowToOrderStep.id === 'discover' ? (
+                    <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                      Buka katalog
+                    </button>
+                  ) : null}
+                  {activeHowToOrderStep.id === 'customize' ? (
+                    <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                      Pilih model lalu desain
+                    </button>
+                  ) : null}
+                  {activeHowToOrderStep.id === 'summary' ? (
+                    <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-primary brand-cta">
+                      Lanjut siapkan data order
+                    </button>
+                  ) : null}
+                  {activeHowToOrderStep.id === 'consult' ? (
+                    <a
+                      href={buildWhatsAppUrl(buildConsultationMessage('kirim detail order seragam custom untuk ditindaklanjuti'))}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hero-primary brand-cta"
+                    >
+                      Kirim ke WhatsApp
+                    </a>
+                  ) : null}
+                  {activeHowToOrderStep.id === 'track' ? (
+                    <button type="button" onClick={() => setCurrentRoute(RouteKey.LACAK_PESANAN)} className="hero-primary brand-cta">
+                      Cek status order
+                    </button>
+                  ) : null}
+
+                  {activeHowToOrderStepIndex < HOW_TO_ORDER_STEPS.length - 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveHowToOrderStepIndex((prev) => Math.min(prev + 1, HOW_TO_ORDER_STEPS.length - 1))}
+                      className="hero-secondary"
+                    >
+                      Lanjut ke tahap {activeHowToOrderStepIndex + 2}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setActiveHowToOrderStepIndex(0)}
+                      className="hero-secondary"
+                    >
+                      Ulang dari tahap 1
+                    </button>
+                  )}
+                </div>
+              </div>
+            </article>
           </div>
-        </article>
-      </section>
-    </div>
-  );
+        </section>
+      </div>
+    );
+  };
 
   const renderCustomerService = () => (
-    <div className="service-page-shell px-0 py-8">
-      {/* Hero halaman layanan pelanggan. */}
-      <section className="service-page-hero">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Layanan Pelanggan</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Bantuan cepat untuk konsultasi, revisi, dan tindak lanjut order</h1>
-        <p className="mt-4 text-sm leading-relaxed text-white/80">
-          Tim layanan pelanggan Bradwear membantu penjelasan model, bahan, estimasi, pengumpulan data ukuran,
-          konfirmasi revisi, hingga pembaruan pengiriman.
+    <div className="support-directory-page-shell px-6 py-8 md:px-10">
+      <section className="support-directory-heading scroll-reveal-block">
+        <p className="support-directory-kicker">Bantuan & Informasi</p>
+        <h1 className="support-directory-title">Pilih topik bantuan yang ingin Anda buka.</h1>
+        <p className="support-directory-copy">
+          Halaman ini merangkum pertanyaan umum, panduan order, pengiriman, legal dasar, serta jalur kontak Bradwear
+          dalam format ringkas yang lebih mudah dipakai dari mobile.
         </p>
       </section>
 
-      {/* Kontak layanan pelanggan dan jam operasional. */}
-      <section className="service-page-grid mt-8">
-        <article className="service-page-column">
-          <div className="mt-1 space-y-3">
-            {CONTACT_CHANNELS.map((channel) => (
-              <div key={channel.label} className="service-page-item">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{channel.label}</p>
-                <p className="mt-1 text-base font-bold text-[var(--text-primary)]">{channel.value}</p>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{channel.note}</p>
-              </div>
-            ))}
-          </div>
-        </article>
+      <section className="support-directory-list-shell scroll-reveal-block">
+        {SUPPORT_DIRECTORY_SECTIONS.map((section) => {
+          const isOpen = openSupportSectionSlug === section.slug;
 
-        <article className="service-page-column service-page-column-alt">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Jam Operasional</p>
-          <div className="mt-4 space-y-3">
-            {CUSTOMER_SERVICE_HOURS.map((hour) => (
-              <div key={hour} className="service-page-item text-sm font-semibold text-[var(--text-secondary)]">
-                {hour}
+          return (
+            <article key={section.slug} className={`support-directory-item ${isOpen ? 'is-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => setOpenSupportSectionSlug(isOpen ? null : section.slug)}
+                className="support-directory-trigger"
+                aria-expanded={isOpen}
+              >
+                <span className="support-directory-trigger-main">
+                  <span className="support-directory-icon-shell">{renderSupportDirectoryIcon(section.icon)}</span>
+                  <span className="support-directory-trigger-copy">
+                    <span className="support-directory-trigger-title">{section.title}</span>
+                    <span className="support-directory-trigger-subtitle">{section.subtitle}</span>
+                  </span>
+                </span>
+                <span className={`support-directory-chevron ${isOpen ? 'open' : ''}`} aria-hidden="true">
+                  <ChevronRightIcon />
+                </span>
+              </button>
+
+              <div className={`support-directory-answer ${isOpen ? 'open' : ''}`}>
+                <div className="support-directory-answer-inner">
+                  {section.items.map((item) => (
+                    <article key={`${section.slug}-${item.question}`} className="support-directory-answer-item">
+                      <h2 className="support-directory-answer-question">{item.question}</h2>
+                      <p className="support-directory-answer-copy">{item.answer}</p>
+                    </article>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="mt-6 grid gap-3">
-            <a
-              href={buildWhatsAppUrl(buildConsultationMessage('estimasi biaya, bahan, dan timeline produksi'))}
-              target="_blank"
-              rel="noreferrer"
-                className="brand-cta rounded-full px-5 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-white"
-            >
-              Konsultasi via WhatsApp
-            </a>
-            <button
-              type="button"
-              onClick={() => setCurrentRoute(RouteKey.LACAK_PESANAN)}
-              className="rounded-full border border-[var(--border-soft)] px-5 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--text-primary)]"
-            >
-              Cek status order
-            </button>
-          </div>
-        </article>
+            </article>
+          );
+        })}
       </section>
 
-      {/* FAQ layanan menggunakan sumber data SITE_FAQS. */}
-      <section className="service-page-faq mt-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">FAQ Layanan</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          {SITE_FAQS.map((faq) => (
-            <article key={faq.slug} className="service-page-item">
-              <h3 className="text-base font-bold text-[var(--text-primary)]">{faq.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{faq.answer}</p>
-            </article>
-          ))}
+      <section className="support-directory-cta scroll-reveal-block">
+        <div className="support-directory-cta-copy">
+          <p className="support-directory-kicker">Butuh bantuan langsung?</p>
+          <h2>Hubungi tim Bradwear untuk konsultasi model, bahan, dan tindak lanjut order.</h2>
+        </div>
+        <div className="support-directory-cta-actions">
+          <a
+            href={buildWhatsAppUrl(buildConsultationMessage('estimasi biaya, bahan, dan timeline produksi'))}
+            target="_blank"
+            rel="noreferrer"
+            className="catalog-bottom-cta-primary"
+          >
+            Konsultasi Gratis
+            <InlineWhatsAppIcon />
+          </a>
+          <button
+            type="button"
+            onClick={() => setCurrentRoute(RouteKey.LACAK_PESANAN)}
+            className="catalog-bottom-cta-secondary"
+          >
+            Cek Status Order
+            <ArrowRightTinyIcon />
+          </button>
         </div>
       </section>
     </div>
@@ -3486,11 +3735,7 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.THREE_D:
         return renderThreeDPage();
       case RouteKey.KATALOG:
-        return renderCatalog(
-          featured,
-          'Katalog Produk',
-          'Berbagai pilihan model seragam custom berkualitas dengan material terbaik dan jahitan presisi.',
-        );
+        return renderCatalog(featured);
       case RouteKey.DOWNLOAD:
         return renderDownloadPage();
       case RouteKey.CLIENT:
@@ -3506,11 +3751,7 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.LEGAL_LICENSE:
         return renderLegacyBrandProfilePage();
       case RouteKey.PANTS:
-        return renderCatalog(
-          pantsProducts,
-          'Katalog Celana',
-          'Berbagai pilihan model celana custom berkualitas dengan material terbaik dan jahitan presisi.',
-        );
+        return renderCatalog(pantsProducts);
       case RouteKey.ARTIKEL:
         return renderArticles();
       case RouteKey.CARA_ORDER:
