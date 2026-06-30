@@ -4,6 +4,7 @@ import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
 import heroTopImage from '../assets/Hero/atas.webp';
+import portfolioHeroImage from '../assets/Hero/portfolio-hero.png';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
@@ -490,6 +491,45 @@ const ABOUT_DELIVERY_IMAGE = clientSlide3;
 
 const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
   {
+    route: RouteKey.CLIENT,
+    kicker: 'Portofolio',
+    title: 'Portofolio Bradwear Indonesia',
+    intro: 'Rangkaian proyek seragam custom untuk instansi, perusahaan, sektor medis, dan tim operasional yang membutuhkan hasil rapi, presisi, dan siap dipresentasikan.',
+    heroImage: portfolioHeroImage,
+    heroImageAlt: 'Dokumentasi proses produksi seragam custom Bradwear Indonesia',
+    values: [
+      { icon: 'shield', title: 'Hasil Nyata', copy: 'Setiap visual di halaman ini berasal dari proyek produksi dan dokumentasi yang benar-benar dikerjakan tim Bradwear.' },
+      { icon: 'team', title: 'Multi-Sektor', copy: 'Portofolio mencakup kebutuhan pemerintahan, kejaksaan, medis, hingga seragam operasional lapangan.' },
+      { icon: 'clock', title: 'Detail Presisi', copy: 'Model, bordir, warna, dan finishing ditampilkan agar tim Anda lebih mudah menilai referensi yang paling cocok.' },
+      { icon: 'handshake', title: 'Siap Dikustom', copy: 'Setiap referensi portofolio tetap bisa dikembangkan lagi sesuai identitas instansi atau perusahaan Anda.' },
+    ],
+    stats: [
+      { icon: 'building', value: '1.250+', label: 'Instansi', copy: 'Berbagai institusi dan tim operasional telah mempercayakan kebutuhan seragamnya kepada Bradwear.' },
+      { icon: 'shirt', value: '60.000+', label: 'Produk', copy: 'Hasil produksi mencakup kemeja, rompi, jaket, celana, dan kombinasi kebutuhan lapangan.' },
+      { icon: 'badge', value: '4 Kategori', label: 'Portofolio Aktif', copy: 'Dokumentasi saat ini diringkas ke dalam kategori utama agar referensi lebih mudah dipilih.' },
+      { icon: 'truck', value: 'Nasional', label: 'Jangkauan', copy: 'Proyek datang dari berbagai sektor dan wilayah dengan alur produksi yang tetap terukur.' },
+    ],
+    story: {
+      title: 'Cerita di Balik Portofolio Kami',
+      paragraphs: [
+        'Portofolio Bradwear dibangun dari kebutuhan nyata klien yang datang dengan standar, identitas visual, dan konteks kerja yang berbeda-beda. Karena itu, setiap hasil jadi yang ditampilkan bukan sekadar foto produk, tetapi bukti bagaimana desain, bahan, dan pengerjaan diterjemahkan menjadi seragam yang siap dipakai.',
+        'Halaman ini disusun agar Anda lebih cepat menemukan referensi yang mendekati kebutuhan tim sendiri, lalu melanjutkan diskusi ke model, bahan, dan penyesuaian yang paling relevan.',
+      ],
+      image: ABOUT_CLIENT_IMAGE,
+      imageAlt: 'Dokumentasi hasil proyek klien Bradwear Indonesia',
+      buttonLabel: 'Lihat kategori',
+    },
+    processTitle: 'Alur Proyek Kami',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Siap Menjadi Proyek Berikutnya?',
+      copy: 'Konsultasikan kebutuhan seragam Anda, lalu kami bantu arahkan dari referensi portofolio ke model yang paling tepat untuk produksi.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'konsultasi kebutuhan seragam custom dari halaman portofolio',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+  {
     route: RouteKey.ABOUT,
     kicker: 'Tentang Kami',
     title: 'Bradwear Indonesia',
@@ -512,7 +552,7 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
       title: 'Cerita Bradwear',
       paragraphs: [
         'Bradwear Indonesia berawal dari semangat untuk memberikan solusi seragam berkualitas bagi instansi, perusahaan, dan komunitas di Indonesia.',
-        'Kami memahami bahwa seragam bukan hanya pakaian, tetapi juga identitas, kesatuan, dan kebanggaan. Karena itu, setiap produk yang kami hasilkan dibuat dengan ketelitian, tanggung jawab, dan hati.',
+        'Kami memahami bahwa seragam bukan hanya pakaian, tetapi juga identitas, kesatuan, dan kebanggaan. Karena itu, setiap produk yang kami hasilkan dibuat dengan ketelitian, tanggung jawab, dan hati. Bradwear dibangun oleh Gilang sebagai owner sekaligus founder, sementara pengelolaan website ditangani Maris Ibrahim agar pengalaman katalog dan konsultasi digital tetap terarah.',
       ],
       image: ABOUT_SUPPORT_IMAGE,
       imageAlt: 'Tim customer service Bradwear Indonesia',
@@ -1963,11 +2003,11 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
-        {/* Preview Galeri Klien di home. */}
+        {/* Preview portofolio klien di home. */}
         <section className="home-section" data-home-section="client-gallery">
           <div className="home-section-shell home-section-shell-bleed home-section-grid">
             <div className="home-section-heading">
-              <p className="home-section-kicker">Galeri Klien</p>
+              <p className="home-section-kicker">Portofolio</p>
               <h2 className="home-section-title">Dipilih oleh Berbagai Instansi &amp; Perusahaan</h2>
               <p className="home-section-copy">
                 Bukti nyata kualitas produksi dan kepercayaan yang telah kami bangun bersama klien.
@@ -2027,7 +2067,7 @@ const PublicSiteView: React.FC = () => {
                 onClick={() => setCurrentRoute(RouteKey.CLIENT)}
                 className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
               >
-                Menuju Galeri Klien
+                Menuju Portofolio
               </button>
               <a
                 href={buildWhatsAppUrl(buildConsultationMessage('minta referensi hasil jadi seragam custom Bradwear'))}
@@ -3633,70 +3673,239 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
-  const renderClientGallery = () => (
-    <div className="client-gallery-page-shell px-0 py-8">
-      {/* Hero halaman Galeri Klien. */}
-      <section className="client-gallery-page-hero px-6 py-8 text-white md:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/60">Galeri Klien</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight">Dipercaya Berbagai Perusahaan di Indonesia</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Setiap proyek mencerminkan komitmen Bradwear dalam menghadirkan seragam berkualitas dengan detail yang presisi dan hasil yang profesional.
-        </p>
-        <div className="client-gallery-page-actions mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setCurrentRoute(RouteKey.TESTIMONI)} className="catalog-bottom-cta-secondary">
-            <span>Lihat Testimoni</span>
-            <ArrowRightTinyIcon />
-          </button>
-        </div>
-      </section>
+  const renderClientGallery = () => {
+    const portfolioPage = activeBrandProfileVisualPage;
+    if (!portfolioPage) return null;
 
-      {/* Judul per folder dan subtitle gallery band mengambil data dari CLIENT_GALLERY_META. */}
-      <section className="parallax-static-zone mt-8 grid gap-0">
-        {clientGalleryGroups.map((group) => {
-          const meta = CLIENT_GALLERY_META[group.slug] ?? {
-            title: group.name,
-            subtitle: 'Dokumentasi hasil jadi klien Bradwear Indonesia.',
-            logo: clientLogoMap.KEMENDAGRI,
-          };
-          const [featuredImage, ...otherImages] = group.images;
-          const gallerySlides = [...(featuredImage ? [featuredImage] : []), ...otherImages];
-
-          return (
-            <article key={group.slug} className="client-gallery-band">
-              <div className="client-gallery-band-copy px-6 py-7 md:px-10">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Folder {group.slug}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-4">
-                  {meta.logo ? <img src={meta.logo} alt={meta.title} className="client-gallery-band-logo" /> : null}
-                  <div>
-                    <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
-                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="hero-banner client-gallery-band-slider">
-                <div className="hero-banner-stage client-gallery-band-stage">
-                  {gallerySlides.map((image, index) => (
-                    <img
-                      key={`${group.slug}-${index}-${image}`}
-                      src={image}
-                      alt={`${meta.title} gallery ${index + 1}`}
-                      className={`hero-banner-image hero-banner-image-ambient ${index === 0 ? 'is-active' : ''}`}
-                      style={{
-                        animationDelay: `${index * 5}s`,
-                        animationDuration: `${Math.max(gallerySlides.length, 1) * 5}s`,
-                      }}
-                    />
-                  ))}
-                  <div className="hero-banner-overlay hero-banner-overlay-soft" />
-                </div>
-              </div>
+    return (
+      <div className="client-gallery-page-shell px-0 py-8">
+        <div className="profile-showcase-page client-portfolio-page">
+          <section className="profile-showcase-hero scroll-reveal-block">
+            <article className="profile-showcase-hero-copy">
+              <p className="profile-showcase-kicker">{portfolioPage.kicker}</p>
+              <h1 className="profile-showcase-title">{portfolioPage.title}</h1>
+              <p className="profile-showcase-intro">{portfolioPage.intro}</p>
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage(portfolioPage.cta.primaryMessage))}
+                target="_blank"
+                rel="noreferrer"
+                className="profile-showcase-primary"
+              >
+                <span>{portfolioPage.cta.primaryLabel}</span>
+                <span className="profile-showcase-primary-icon" aria-hidden="true">
+                  <InlineWhatsAppIcon />
+                </span>
+              </a>
             </article>
-          );
-        })}
-      </section>
-    </div>
-  );
+
+            <div className="profile-showcase-hero-media">
+              <img
+                src={portfolioPage.heroImage}
+                alt={portfolioPage.heroImageAlt}
+                className="profile-showcase-hero-image"
+              />
+            </div>
+          </section>
+
+          <section className="profile-showcase-values scroll-reveal-block">
+            <div className="profile-showcase-section-head">
+              <h2>Nilai yang Kami Pegang</h2>
+            </div>
+            <div className="profile-showcase-values-grid">
+              {portfolioPage.values.map((item) => (
+                <article key={`${portfolioPage.route}-${item.title}`} className="profile-showcase-value-card">
+                  <div className="profile-showcase-value-icon">
+                    <BrandProfileIcon icon={item.icon} className="profile-showcase-icon-svg" />
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.copy}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="profile-showcase-stats scroll-reveal-block">
+            {portfolioPage.stats.map((item) => (
+              <article key={`${portfolioPage.route}-${item.label}`} className="profile-showcase-stat-card">
+                <div className="profile-showcase-stat-icon">
+                  <BrandProfileIcon icon={item.icon} className="profile-showcase-icon-svg" />
+                </div>
+                <p className="profile-showcase-stat-value">{item.value}</p>
+                <p className="profile-showcase-stat-label">{item.label}</p>
+                <p className="profile-showcase-stat-copy">{item.copy}</p>
+              </article>
+            ))}
+          </section>
+
+          <section className="profile-showcase-story scroll-reveal-block">
+            <article className="profile-showcase-story-copy">
+              <h2>{portfolioPage.story.title}</h2>
+              <div className="profile-showcase-story-flow">
+                {portfolioPage.story.paragraphs.map((paragraph, index) => (
+                  <p key={`${portfolioPage.route}-story-${index}`}>{paragraph}</p>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => scrollToBrandProfileSection('client-portfolio-categories')}
+                className="profile-showcase-secondary"
+              >
+                <span>{portfolioPage.story.buttonLabel}</span>
+                <ArrowRightTinyIcon />
+              </button>
+            </article>
+
+            <div className="profile-showcase-story-media">
+              <img
+                src={portfolioPage.story.image}
+                alt={portfolioPage.story.imageAlt}
+                className="profile-showcase-story-image"
+              />
+            </div>
+          </section>
+
+          <section
+            id={`profile-process-${portfolioPage.route}`}
+            className="profile-showcase-process scroll-reveal-block"
+          >
+            <div className="profile-showcase-section-head">
+              <h2>{portfolioPage.processTitle}</h2>
+            </div>
+            <div className="profile-showcase-process-grid">
+              {portfolioPage.processSteps.map((step, index) => (
+                <article key={`${portfolioPage.route}-${step.number}`} className="profile-showcase-process-item">
+                  <div className="profile-showcase-process-badge">
+                    <BrandProfileIcon icon={step.icon} className="profile-showcase-icon-svg" />
+                  </div>
+                  {index < portfolioPage.processSteps.length - 1 ? <span className="profile-showcase-process-line" aria-hidden="true" /> : null}
+                  <p className="profile-showcase-process-number">{step.number}</p>
+                  <h3>{step.title}</h3>
+                  <p>{step.copy}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section id="client-portfolio-categories" className="portfolio-gallery-overview scroll-reveal-block">
+            <div className="profile-showcase-section-head portfolio-gallery-head">
+              <h2>Kategori Portofolio</h2>
+              <p>Referensi hasil jadi diringkas per sektor agar Anda lebih cepat menemukan model yang paling dekat dengan kebutuhan tim.</p>
+            </div>
+
+            <div className="portfolio-gallery-card-grid">
+              {clientGalleryGroups.map((group) => {
+                const meta = CLIENT_GALLERY_META[group.slug] ?? {
+                  title: group.name,
+                  subtitle: 'Dokumentasi hasil jadi klien Bradwear Indonesia.',
+                  logo: clientLogoMap.KEMENDAGRI,
+                };
+                const cover = group.images[0] ?? portfolioPage.heroImage;
+
+                return (
+                  <article key={`portfolio-card-${group.slug}`} className="portfolio-gallery-card">
+                    <div className="portfolio-gallery-card-media">
+                      <img src={cover} alt={`${meta.title} cover`} className="portfolio-gallery-card-image" />
+                    </div>
+
+                    <div className="portfolio-gallery-card-copy">
+                      <div className="portfolio-gallery-card-topline">
+                        {meta.logo ? <img src={meta.logo} alt={meta.title} className="portfolio-gallery-card-logo" /> : <span />}
+                        <span>{group.images.length} dokumentasi</span>
+                      </div>
+                      <h3>{meta.title}</h3>
+                      <p>{meta.subtitle}</p>
+                      <button
+                        type="button"
+                        onClick={() => scrollToBrandProfileSection(`client-band-${group.slug}`)}
+                        className="profile-showcase-secondary portfolio-gallery-card-action"
+                      >
+                        <span>Lihat detail</span>
+                        <ArrowRightTinyIcon />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="parallax-static-zone portfolio-gallery-band-stack scroll-reveal-block">
+            {clientGalleryGroups.map((group) => {
+              const meta = CLIENT_GALLERY_META[group.slug] ?? {
+                title: group.name,
+                subtitle: 'Dokumentasi hasil jadi klien Bradwear Indonesia.',
+                logo: clientLogoMap.KEMENDAGRI,
+              };
+              const [featuredImage, ...otherImages] = group.images;
+              const gallerySlides = [...(featuredImage ? [featuredImage] : []), ...otherImages];
+
+              return (
+                <article id={`client-band-${group.slug}`} key={group.slug} className="client-gallery-band">
+                  <div className="client-gallery-band-copy px-6 py-7 md:px-10">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Kategori Portofolio</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-4">
+                      {meta.logo ? <img src={meta.logo} alt={meta.title} className="client-gallery-band-logo" /> : null}
+                      <div>
+                        <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
+                        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="hero-banner client-gallery-band-slider">
+                    <div className="hero-banner-stage client-gallery-band-stage">
+                      {gallerySlides.map((image, index) => (
+                        <img
+                          key={`${group.slug}-${index}-${image}`}
+                          src={image}
+                          alt={`${meta.title} gallery ${index + 1}`}
+                          className={`hero-banner-image hero-banner-image-ambient ${index === 0 ? 'is-active' : ''}`}
+                          style={{
+                            animationDelay: `${index * 5}s`,
+                            animationDuration: `${Math.max(gallerySlides.length, 1) * 5}s`,
+                          }}
+                        />
+                      ))}
+                      <div className="hero-banner-overlay hero-banner-overlay-soft" />
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          <section className="profile-showcase-cta scroll-reveal-block">
+            <article className="profile-showcase-cta-copy">
+              <h2>{portfolioPage.cta.title}</h2>
+              <p>{portfolioPage.cta.copy}</p>
+            </article>
+
+            <div className="profile-showcase-cta-actions">
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage(portfolioPage.cta.primaryMessage))}
+                target="_blank"
+                rel="noreferrer"
+                className="profile-showcase-cta-primary"
+              >
+                <span>{portfolioPage.cta.primaryLabel}</span>
+                <span className="profile-showcase-primary-icon" aria-hidden="true">
+                  <InlineWhatsAppIcon />
+                </span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+                className="profile-showcase-cta-secondary"
+              >
+                <span>{portfolioPage.cta.secondaryLabel}</span>
+                <ArrowRightTinyIcon />
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  };
 
   const renderBradAiPage = () => (
     <div className="brodi-page-shell px-6 py-8 md:px-10">

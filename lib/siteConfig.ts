@@ -82,7 +82,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Studio 3D', route: RouteKey.THREE_D, description: 'Halaman khusus preview dan custom seragam 3D Bradwear.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
   { label: 'Download', route: RouteKey.DOWNLOAD, description: 'Hub akses cepat ke katalog, artikel, dan konsultasi web Bradwear.' },
-  { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
+  { label: 'Portofolio', route: RouteKey.CLIENT, description: 'Portofolio hasil jadi dan dokumentasi proyek klien Bradwear Indonesia.' },
   { label: 'Testimoni', route: RouteKey.TESTIMONI, description: 'Ulasan klien dan rangkuman kepuasan layanan Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
@@ -106,7 +106,7 @@ export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.THREE_D]: 'Beranda / Studio 3D',
   [RouteKey.KATALOG]: 'Beranda / Katalog',
   [RouteKey.DOWNLOAD]: 'Beranda / Download',
-  [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
+  [RouteKey.CLIENT]: 'Beranda / Portofolio',
   [RouteKey.TESTIMONI]: 'Beranda / Testimoni',
   [RouteKey.ABOUT]: 'Beranda / Tentang Kami',
   [RouteKey.VISION_MISSION]: 'Beranda / Visi dan Misi',
@@ -542,6 +542,10 @@ export const BRAD_AI_CONTEXT: BradAiContextSection[] = [
     body: 'Bradwear Indonesia adalah layanan konveksi dan custom seragam yang berbasis di Tasikmalaya, Jawa Barat, melayani instansi, perusahaan, komunitas, dan kebutuhan operasional di seluruh Indonesia.',
   },
   {
+    heading: 'Kepemilikan dan pengelolaan',
+    body: 'Owner sekaligus founder Bradwear adalah Gilang. Pengelolaan website Bradwear Indonesia ditangani oleh Maris Ibrahim untuk kebutuhan katalog, informasi layanan, dan pengalaman konsultasi digital.',
+  },
+  {
     heading: 'Produk utama',
     body: 'Produk utama meliputi kemeja dinas, jaket, rompi, polo shirt, dan celana tactical atau pants custom. Pengguna dapat memilih model dari katalog lalu masuk ke editor desain.',
   },
@@ -678,9 +682,9 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   ),
   [RouteKey.CLIENT]: makeMeta(
     RouteKey.CLIENT,
-    'Galeri Klien Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
-    'Lihat dokumentasi hasil produksi kemeja custom, kemeja dinas, dan seragam kerja Bradwear Indonesia untuk kebutuhan instansi, medis, operasional, kejaksaan, dan pemerintah daerah.',
-    ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien', 'hasil jadi kemeja dinas', 'galeri kemeja custom']
+    'Portofolio Kemeja Custom dan Seragam Dinas | Bradwear Indonesia',
+    'Lihat portofolio hasil produksi kemeja custom, kemeja dinas, dan seragam kerja Bradwear Indonesia untuk kebutuhan instansi, medis, operasional, kejaksaan, dan pemerintah daerah.',
+    ['client gallery', 'portofolio bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien', 'hasil jadi kemeja dinas', 'galeri kemeja custom']
   ),
   [RouteKey.TESTIMONI]: makeMeta(
     RouteKey.TESTIMONI,

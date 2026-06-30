@@ -17,6 +17,12 @@ import {
 } from './siteConfig';
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
+const SEO_ICON_URL = `${SITE_URL}/favicon-bradwear.png`;
+const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/seo-kemeja.webp`;
+const SEO_PREVIEW_IMAGE_ALT = 'Produk kemeja custom Bradwear Indonesia';
+const BRADWEAR_FOUNDER_NAME = 'Gilang';
+const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
+
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
   let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
   if (!tag) {
@@ -218,7 +224,16 @@ const buildBaseSchemas = (
       url: SITE_URL,
       description: SITE_TAGLINE,
       keywords: keywords.join(', '),
-      logo: `${SITE_URL}/assets/logo.png`,
+      logo: SEO_ICON_URL,
+      image: SEO_PREVIEW_IMAGE_URL,
+      founder: {
+        '@type': 'Person',
+        name: BRADWEAR_FOUNDER_NAME,
+      },
+      owner: {
+        '@type': 'Person',
+        name: BRADWEAR_FOUNDER_NAME,
+      },
       sameAs: [SITE_URL],
       contactPoint: {
         '@type': 'ContactPoint',
@@ -244,7 +259,7 @@ const buildBaseSchemas = (
       hasMap: STORE_MAP_URL,
       areaServed: 'Indonesia',
       description: meta.description,
-      image: `${SITE_URL}/assets/logo.png`,
+      image: SEO_PREVIEW_IMAGE_URL,
       keywords: keywords.join(', '),
     },
     {
@@ -254,6 +269,14 @@ const buildBaseSchemas = (
       url: SITE_URL,
       description: SITE_TAGLINE,
       inLanguage: 'id-ID',
+      maintainer: {
+        '@type': 'Person',
+        name: BRADWEAR_WEBSITE_MANAGER,
+      },
+      creator: {
+        '@type': 'Person',
+        name: BRADWEAR_FOUNDER_NAME,
+      },
       potentialAction: {
         '@type': 'SearchAction',
         target: `${SITE_URL}/katalog`,
@@ -415,7 +438,7 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
           name: SITE_NAME,
           logo: {
             '@type': 'ImageObject',
-            url: `${SITE_URL}/assets/logo.png`,
+            url: SEO_ICON_URL,
           },
         },
         mainEntityOfPage: canonical,
@@ -503,8 +526,8 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
   upsertMetaTag('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
   upsertMetaTag('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
-  upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${SITE_URL}/assets/logo.png` });
-  upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} logo` });
+  upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: SEO_PREVIEW_IMAGE_URL });
+  upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: SEO_PREVIEW_IMAGE_ALT });
   upsertMetaTag('meta[property="article:section"]', {
     property: 'article:section',
     content: article?.category ?? ROUTE_LABELS[route],
@@ -517,13 +540,15 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title });
   upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description });
   upsertMetaTag('meta[name="twitter:url"]', { name: 'twitter:url', content: canonical });
-  upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${SITE_URL}/assets/logo.png` });
-  upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${SITE_NAME} logo` });
+  upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: SEO_PREVIEW_IMAGE_URL });
+  upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: SEO_PREVIEW_IMAGE_ALT });
   upsertMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: SITE_NAME });
   upsertMetaTag('meta[name="format-detection"]', { name: 'format-detection', content: 'telephone=no,address=no,email=no' });
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="id-ID"]', { rel: 'alternate', hreflang: 'id-ID', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
+  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/favicon-bradwear.png' });
+  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/favicon-bradwear.png' });
 
   let script = document.getElementById('bradwear-jsonld');
   if (!script) {
