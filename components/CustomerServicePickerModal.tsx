@@ -38,7 +38,7 @@ const CustomerServicePickerModal: React.FC<CustomerServicePickerModalProps> = ({
           </button>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="customer-service-picker-grid mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {CUSTOMER_SERVICE_CONTACTS.map((contact) => (
             <a
               key={contact.id}
@@ -47,17 +47,17 @@ const CustomerServicePickerModal: React.FC<CustomerServicePickerModalProps> = ({
               rel="noreferrer"
               data-direct-whatsapp="true"
               onClick={onClose}
-              className="grid gap-3 rounded-[24px] border border-[var(--border-soft)] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[rgba(117,242,26,0.3)]"
+              className="customer-service-picker-card grid gap-3 rounded-[22px] border border-[var(--border-soft)] bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[rgba(117,242,26,0.3)]"
             >
-              <div className="flex items-center gap-3">
-                <img src={contact.avatar} alt={`Avatar ${contact.name}`} className="h-14 w-14 rounded-full object-cover ring-2 ring-[rgba(117,242,26,0.16)]" />
-                <div>
+              <div className="customer-service-picker-card-main flex items-center gap-3">
+                <img src={contact.avatar} alt={`Avatar ${contact.name}`} className="customer-service-picker-avatar h-14 w-14 rounded-full object-cover ring-2 ring-[rgba(117,242,26,0.16)]" />
+                <div className="min-w-0">
                   <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">{contact.name}</p>
                   <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{contact.statusLabel}</p>
                 </div>
               </div>
-              <span className="inline-flex w-fit rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#071106]">
-                Pilih CS
+              <span className="customer-service-picker-action inline-flex w-fit rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#071106]">
+                Chat sekarang
               </span>
             </a>
           ))}

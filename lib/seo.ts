@@ -115,6 +115,7 @@ const buildRouteKeywords = (
     ],
     [RouteKey.DOWNLOAD]: ['akses web bradwear', 'katalog web bradwear', 'seragam custom online', 'studio 3d seragam'],
     [RouteKey.CLIENT]: ['hasil jadi kemeja custom', 'galeri seragam dinas', 'portofolio seragam komunitas'],
+    [RouteKey.TESTIMONI]: ['testimoni seragam custom', 'review vendor seragam', 'kepuasan klien bradwear'],
     [RouteKey.ABOUT]: ['tentang bradwear indonesia', 'profil vendor seragam', 'konveksi seragam tasikmalaya'],
     [RouteKey.VISION_MISSION]: ['visi misi bradwear', 'standar kualitas seragam', 'komitmen vendor seragam'],
     [RouteKey.PRODUCTS_SERVICES]: ['produk seragam bradwear', 'jasa kemeja custom', 'jasa seragam dinas'],

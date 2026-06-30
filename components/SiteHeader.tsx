@@ -27,6 +27,7 @@ const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Download', route: RouteKey.DOWNLOAD },
   { label: 'Artikel', route: RouteKey.ARTIKEL },
   { label: 'Galeri Klien', route: RouteKey.CLIENT },
+  { label: 'Testimoni', route: RouteKey.TESTIMONI },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER },
   { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
 ];
@@ -41,6 +42,7 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
       { label: 'Download', route: RouteKey.DOWNLOAD },
       { label: 'Artikel', route: RouteKey.ARTIKEL },
       { label: 'Galeri Klien', route: RouteKey.CLIENT },
+      { label: 'Testimoni', route: RouteKey.TESTIMONI },
       { label: 'Cara Order', route: RouteKey.CARA_ORDER },
       { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
     ],

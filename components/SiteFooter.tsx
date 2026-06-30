@@ -14,7 +14,7 @@ interface SiteFooterProps {
 }
 
 const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
-  [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN].includes(item.route),
+  [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.TESTIMONI, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN].includes(item.route),
 );
 
 const footerSocialLinks = [

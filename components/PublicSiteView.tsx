@@ -5,6 +5,7 @@ import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 a
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
 import { useStore } from '../context/StoreContext';
+import { CLIENT_LOGOS } from '../constants';
 import {
   ARTICLES,
   CONTACT_CHANNELS,
@@ -35,6 +36,7 @@ const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(
 const SLIDESHOW_INTERVAL_MS = 5000;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
+type TestimonialCategoryFilter = 'Semua Testimoni' | 'Instansi Pemerintah' | 'Perusahaan' | 'Pendidikan' | 'Kesehatan';
 const DOWNLOAD_HIGHLIGHTS = [
   {
     title: 'Masuk cepat ke katalog web',
@@ -828,30 +830,121 @@ const GovernmentIcon = () => (
   </svg>
 );
 
-const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; gradient: string; icon: React.ReactNode }> = {
+const clientLogoMap = Object.fromEntries(CLIENT_LOGOS.map((client) => [client.name, client.logo])) as Record<string, string>;
+const medisGalleryCover = ASSETS.CLIENT_GALLERY.find((group) => group.slug === 'medis')?.images[0] ?? null;
+
+const TESTIMONIAL_FILTERS: TestimonialCategoryFilter[] = [
+  'Semua Testimoni',
+  'Instansi Pemerintah',
+  'Perusahaan',
+  'Pendidikan',
+  'Kesehatan',
+];
+
+const TESTIMONIAL_STATS = [
+  {
+    label: 'Instansi',
+    value: '1.250+',
+    caption: 'Telah dilayani',
+    icon: 'building' as const,
+  },
+  {
+    label: 'Produk',
+    value: '60.000+',
+    caption: 'Telah diproduksi',
+    icon: 'team' as const,
+  },
+  {
+    label: 'Kepuasan Klien',
+    value: '98%',
+    caption: 'Berdasarkan survei',
+    icon: 'gauge' as const,
+  },
+  {
+    label: 'Tahun Pengalaman',
+    value: '5+',
+    caption: 'Berpengalaman',
+    icon: 'badge' as const,
+  },
+];
+
+const TESTIMONIAL_ITEMS = [
+  {
+    organization: 'Kementerian Dalam Negeri',
+    division: 'Biro Umum dan Pengadaan',
+    role: 'Tim administrasi pusat',
+    category: 'Instansi Pemerintah' as TestimonialCategoryFilter,
+    logo: clientLogoMap['KEMENDAGRI'],
+    quote:
+      'Kualitas bahan sangat baik, jahitan rapi, dan proses koordinasi dengan tim Bradwear terasa jelas dari awal sampai akhir produksi.',
+  },
+  {
+    organization: 'Kementerian Perhubungan',
+    division: 'Unit Operasional Lapangan',
+    role: 'Koordinator seragam kerja',
+    category: 'Instansi Pemerintah' as TestimonialCategoryFilter,
+    logo: clientLogoMap['KEMENHUB'],
+    quote:
+      'Seragam yang dibuat sesuai kebutuhan tim kami. Finishing bordir terlihat rapi dan pengiriman datang sesuai timeline yang dijanjikan.',
+  },
+  {
+    organization: 'Kementerian BUMN',
+    division: 'Divisi Pengadaan Regional',
+    role: 'Supervisor administrasi',
+    category: 'Perusahaan' as TestimonialCategoryFilter,
+    logo: clientLogoMap.BUMN,
+    quote:
+      'Tim Bradwear responsif saat revisi desain dan hasil akhirnya terasa premium. Vendor ini enak diajak kerja untuk kebutuhan seragam skala besar.',
+  },
+  {
+    organization: 'BAPPENAS',
+    division: 'Sekretariat Program',
+    role: 'Manajer dukungan operasional',
+    category: 'Perusahaan' as TestimonialCategoryFilter,
+    logo: clientLogoMap.BAPPENAS,
+    quote:
+      'Produksi berjalan rapi dari approval sampai pengiriman. Kami terbantu karena update progresnya jelas dan tidak membingungkan tim internal.',
+  },
+  {
+    organization: 'Tut Wuri Handayani',
+    division: 'Kemitraan Pendidikan',
+    role: 'Wakil kepala unit',
+    category: 'Pendidikan' as TestimonialCategoryFilter,
+    logo: clientLogoMap['TUT WURI'],
+    quote:
+      'Seragam untuk kebutuhan pendidikan terlihat bersih, nyaman dipakai, dan warnanya konsisten. Siswa dan tenaga pendamping merasa puas dengan hasilnya.',
+  },
+  {
+    organization: 'Unit Medis Bradwear Client',
+    division: 'Layanan umum rumah sakit',
+    role: 'Kepala bagian umum',
+    category: 'Kesehatan' as TestimonialCategoryFilter,
+    logo: medisGalleryCover,
+    quote:
+      'Bahan terasa nyaman untuk dipakai seharian dan kualitas jahitannya kuat. Pesanan untuk tim medis datang tepat waktu tanpa kendala berarti.',
+  },
+];
+
+const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; logo?: string | null }> = {
   dinsos: {
     title: 'Dinsos',
     subtitle: 'Dokumentasi seragam untuk kebutuhan layanan sosial dan aktivitas lapangan.',
-    gradient: 'linear-gradient(135deg, #0f766e, #22c55e)',
-    icon: <SocialServiceIcon />,
+    logo: clientLogoMap.KEMENDAGRI,
   },
   kejagung: {
     title: 'Kejagung',
     subtitle: 'Galeri hasil jadi dengan karakter formal, tegas, dan siap dipresentasikan.',
-    gradient: 'linear-gradient(135deg, #7c2d12, #dc2626)',
-    icon: <JusticeIcon />,
+    logo: clientLogoMap['DPR RI'],
   },
   medis: {
     title: 'Medis',
     subtitle: 'Referensi visual seragam dengan nuansa bersih, ringan, dan profesional.',
-    gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)',
-    icon: <MedicalIcon />,
+    logo: medisGalleryCover,
   },
   pemkab: {
     title: 'Pemkab',
     subtitle: 'Portofolio seragam instansi pemerintah daerah untuk kebutuhan dinas dan operasional.',
-    gradient: 'linear-gradient(135deg, #4338ca, #22c55e)',
-    icon: <GovernmentIcon />,
+    logo: clientLogoMap.BAPPENAS,
   },
 };
 
@@ -967,11 +1060,19 @@ const PublicSiteView: React.FC = () => {
   const [articleCommentName, setArticleCommentName] = useState('');
   const [articleCommentBody, setArticleCommentBody] = useState('');
   const [articleCommentStatus, setArticleCommentStatus] = useState('');
+  const [activeTestimonialFilter, setActiveTestimonialFilter] = useState<TestimonialCategoryFilter>('Semua Testimoni');
   const catalogRef = useRef<HTMLElement | null>(null);
   const homeCarouselTouchStartX = useRef<number | null>(null);
   const homeCarouselTouchDeltaX = useRef(0);
   const activeArticleSlug = getArticleSlugFromPathname(currentPathname);
   const activeArticle = getArticleBySlug(activeArticleSlug);
+  const visibleTestimonials = useMemo(
+    () =>
+      activeTestimonialFilter === 'Semua Testimoni'
+        ? TESTIMONIAL_ITEMS
+        : TESTIMONIAL_ITEMS.filter((item) => item.category === activeTestimonialFilter),
+    [activeTestimonialFilter],
+  );
 
   const heroSlides = useMemo(
     () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
@@ -1564,18 +1665,6 @@ const PublicSiteView: React.FC = () => {
           </button>
         </section>
 
-        {/* Intro hero gambar pertama home. */}
-        <section className="hero-display-strip hero-display-strip-top home-fast-response-strip" data-home-section="hero-intro">
-          <img
-            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
-            alt="Fast respon customer service Bradwear Indonesia"
-            className="hero-display-strip-image"
-          />
-          <div className="hero-display-strip-overlay">
-            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Fast respon untuk kebutuhan konsultasi seragam custom</h2>
-          </div>
-        </section>
-
         {/* Headline utama home beserta CTA utama. */}
         <section className="home-hero editorial-home-hero" data-home-section="hero">
           <article className="hero-panel hero-panel-editorial hero-panel-clean">
@@ -1828,6 +1917,18 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
+        {/* Foto fast response home dipindah agar tampil tepat sebelum FAQ. */}
+        <section className="hero-display-strip hero-display-strip-top home-fast-response-strip" data-home-section="hero-intro">
+          <img
+            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            alt="Fast respon customer service Bradwear Indonesia"
+            className="hero-display-strip-image"
+          />
+          <div className="hero-display-strip-overlay">
+            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Fast respon untuk kebutuhan konsultasi seragam custom</h2>
+          </div>
+        </section>
+
         {/* FAQ ringkas home. */}
         <section className="home-section home-section-tight" data-home-section="faq">
           <div className="home-section-shell faq-panel">
@@ -1910,7 +2011,11 @@ const PublicSiteView: React.FC = () => {
             <p className="catalog-page-copy">{description}</p>
           </div>
           <div className="catalog-page-hero-visual catalog-page-hero-visual-full">
-            <img src={heroTopImage} alt="Koleksi seragam Bradwear Indonesia" className="catalog-page-hero-image" />
+            <img
+              src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+              alt="Fast respon customer service Bradwear Indonesia"
+              className="catalog-page-hero-image"
+            />
           </div>
         </div>
 
@@ -1919,7 +2024,6 @@ const PublicSiteView: React.FC = () => {
             <article key={item.title} className="catalog-trust-card">
               <div className="catalog-trust-icon-shell">{item.icon}</div>
               <h2 className="catalog-trust-title">{item.title}</h2>
-              <p className="catalog-trust-copy">{item.copy}</p>
             </article>
           ))}
         </div>
@@ -2093,6 +2197,105 @@ const PublicSiteView: React.FC = () => {
           />
         </section>
       ) : null}
+    </div>
+  );
+
+  const renderTestimonialsPage = () => (
+    <div className="testimonial-page-shell px-6 py-8 md:px-10">
+      <section className="testimonial-page-hero scroll-reveal-block">
+        <div className="testimonial-page-copy">
+          <p className="testimonial-page-kicker">Testimoni Klien Kami</p>
+          <h1 className="testimonial-page-title">Kepercayaan klien menjadi alasan kami menjaga kualitas produk dan layanan tetap rapi.</h1>
+          <p className="testimonial-page-intro">
+            Ringkasan ini menampilkan kesan dari instansi, perusahaan, pendidikan, dan layanan operasional yang sudah mempercayakan produksi seragam custom kepada Bradwear Indonesia.
+          </p>
+        </div>
+
+        <div className="testimonial-stats-grid">
+          {TESTIMONIAL_STATS.map((item) => (
+            <article key={item.label} className="testimonial-stat-card">
+              <div className="testimonial-stat-icon-shell">
+                <BrandProfileIcon icon={item.icon} className="testimonial-stat-icon" />
+              </div>
+              <p className="testimonial-stat-value">{item.value}</p>
+              <p className="testimonial-stat-label">{item.label}</p>
+              <p className="testimonial-stat-caption">{item.caption}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="testimonial-filter-band scroll-reveal-block">
+        <div className="testimonial-filter-row">
+          {TESTIMONIAL_FILTERS.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setActiveTestimonialFilter(filter)}
+              className={`testimonial-filter-pill ${activeTestimonialFilter === filter ? 'is-active' : ''}`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="testimonial-card-grid scroll-reveal-block">
+        {visibleTestimonials.map((item) => (
+          <article key={`${item.organization}-${item.division}`} className="testimonial-card-panel">
+            <div className="testimonial-card-quote-mark" aria-hidden="true">
+              "
+            </div>
+            <p className="testimonial-card-body">{item.quote}</p>
+            <div className="testimonial-card-stars" aria-label="Rating 5 dari 5">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <span key={`${item.organization}-star-${index}`}>★</span>
+              ))}
+            </div>
+            <div className="testimonial-card-company">
+              {item.logo ? (
+                <img
+                  src={item.logo}
+                  alt={item.organization}
+                  className="testimonial-card-company-logo"
+                />
+              ) : null}
+              <div className="testimonial-card-company-copy">
+                <h2>{item.organization}</h2>
+                <p>{item.division}</p>
+                <span>{item.role}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="testimonial-page-cta scroll-reveal-block">
+        <div className="testimonial-page-cta-copy">
+          <div className="testimonial-page-cta-icon-shell">
+            <BrandProfileIcon icon="comment" className="testimonial-page-cta-icon" />
+          </div>
+          <div>
+            <h2>Jadilah klien berikutnya</h2>
+            <p>Ribuan instansi dan perusahaan telah mempercayakan produksi seragam custom kepada tim Bradwear Indonesia.</p>
+          </div>
+        </div>
+        <div className="testimonial-page-cta-actions">
+          <a
+            href={buildWhatsAppUrl(buildConsultationMessage('konsultasi setelah membaca testimoni klien Bradwear'))}
+            target="_blank"
+            rel="noreferrer"
+            className="catalog-bottom-cta-primary"
+          >
+            <span>Konsultasi Sekarang</span>
+            <InlineWhatsAppIcon />
+          </a>
+          <button type="button" onClick={() => setCurrentRoute(RouteKey.CLIENT)} className="catalog-bottom-cta-secondary">
+            <span>Lihat Portofolio</span>
+            <ArrowRightTinyIcon />
+          </button>
+        </div>
+      </section>
     </div>
   );
 
@@ -3193,6 +3396,12 @@ const PublicSiteView: React.FC = () => {
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
           Setiap proyek mencerminkan komitmen Bradwear dalam menghadirkan seragam berkualitas dengan detail yang presisi dan hasil yang profesional.
         </p>
+        <div className="client-gallery-page-actions mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setCurrentRoute(RouteKey.TESTIMONI)} className="catalog-bottom-cta-secondary">
+            <span>Lihat Testimoni</span>
+            <ArrowRightTinyIcon />
+          </button>
+        </div>
       </section>
 
       {/* Judul per folder dan subtitle gallery band mengambil data dari CLIENT_GALLERY_META. */}
@@ -3201,8 +3410,7 @@ const PublicSiteView: React.FC = () => {
           const meta = CLIENT_GALLERY_META[group.slug] ?? {
             title: group.name,
             subtitle: 'Dokumentasi hasil jadi klien Bradwear Indonesia.',
-            gradient: 'linear-gradient(135deg,#166534,#1d4ed8)',
-            icon: <GovernmentIcon />,
+            logo: clientLogoMap.KEMENDAGRI,
           };
           const [featuredImage, ...otherImages] = group.images;
           const gallerySlides = [...(featuredImage ? [featuredImage] : []), ...otherImages];
@@ -3212,12 +3420,7 @@ const PublicSiteView: React.FC = () => {
               <div className="client-gallery-band-copy px-6 py-7 md:px-10">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Folder {group.slug}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-4">
-                  <div
-                    className="client-gallery-band-icon"
-                    style={{ background: meta.gradient }}
-                  >
-                    {meta.icon}
-                  </div>
+                  {meta.logo ? <img src={meta.logo} alt={meta.title} className="client-gallery-band-logo" /> : null}
                   <div>
                     <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{meta.title}</h2>
                     <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{meta.subtitle}</p>
@@ -3295,6 +3498,8 @@ const PublicSiteView: React.FC = () => {
         return renderDownloadPage();
       case RouteKey.CLIENT:
         return renderClientGallery();
+      case RouteKey.TESTIMONI:
+        return renderTestimonialsPage();
       case RouteKey.ABOUT:
       case RouteKey.VISION_MISSION:
       case RouteKey.PRODUCTS_SERVICES:

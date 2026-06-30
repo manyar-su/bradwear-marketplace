@@ -36,6 +36,7 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.KATALOG]: '/katalog',
   [RouteKey.DOWNLOAD]: '/download',
   [RouteKey.CLIENT]: '/client',
+  [RouteKey.TESTIMONI]: '/testimoni',
   [RouteKey.ABOUT]: '/tentang-kami',
   [RouteKey.VISION_MISSION]: '/visi-misi',
   [RouteKey.PRODUCTS_SERVICES]: '/produk-dan-jasa',
@@ -59,6 +60,7 @@ export const PUBLIC_ROUTES = new Set<RouteKey>([
   RouteKey.KATALOG,
   RouteKey.DOWNLOAD,
   RouteKey.CLIENT,
+  RouteKey.TESTIMONI,
   RouteKey.ABOUT,
   RouteKey.VISION_MISSION,
   RouteKey.PRODUCTS_SERVICES,
@@ -81,6 +83,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
   { label: 'Download', route: RouteKey.DOWNLOAD, description: 'Hub akses cepat ke katalog, artikel, dan konsultasi web Bradwear.' },
   { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
+  { label: 'Testimoni', route: RouteKey.TESTIMONI, description: 'Ulasan klien dan rangkuman kepuasan layanan Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
   { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN, description: 'Bantuan konsultasi, revisi, dan tindak lanjut order.' },
@@ -104,6 +107,7 @@ export const ROUTE_LABELS: Record<RouteKey, string> = {
   [RouteKey.KATALOG]: 'Beranda / Katalog',
   [RouteKey.DOWNLOAD]: 'Beranda / Download',
   [RouteKey.CLIENT]: 'Beranda / Galeri Klien',
+  [RouteKey.TESTIMONI]: 'Beranda / Testimoni',
   [RouteKey.ABOUT]: 'Beranda / Tentang Kami',
   [RouteKey.VISION_MISSION]: 'Beranda / Visi dan Misi',
   [RouteKey.PRODUCTS_SERVICES]: 'Beranda / Produk dan Jasa',
@@ -678,6 +682,12 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
     'Lihat dokumentasi hasil produksi kemeja custom, kemeja dinas, dan seragam kerja Bradwear Indonesia untuk kebutuhan instansi, medis, operasional, kejaksaan, dan pemerintah daerah.',
     ['client gallery', 'galeri klien bradwear', 'hasil jadi seragam', 'portofolio seragam custom', 'dokumentasi klien', 'hasil jadi kemeja dinas', 'galeri kemeja custom']
   ),
+  [RouteKey.TESTIMONI]: makeMeta(
+    RouteKey.TESTIMONI,
+    'Testimoni Klien Seragam Custom dan Kemeja Dinas | Bradwear Indonesia',
+    'Baca testimoni klien Bradwear Indonesia dari instansi, perusahaan, pendidikan, dan layanan operasional yang mempercayakan produksi seragam custom kepada tim kami.',
+    ['testimoni klien bradwear', 'review seragam custom', 'kepuasan klien seragam', 'ulasan vendor seragam', 'testimoni kemeja dinas']
+  ),
   [RouteKey.ABOUT]: makeMeta(
     RouteKey.ABOUT,
     'Tentang Bradwear Indonesia | Konveksi Kemeja Custom dan Seragam Dinas',
@@ -840,6 +850,7 @@ export const getConsultationTopicForPath = (route: RouteKey, pathname: string) =
     [RouteKey.KATALOG]: 'katalog kemeja custom dan seragam dinas',
     [RouteKey.DOWNLOAD]: 'akses web katalog Bradwear',
     [RouteKey.CLIENT]: 'hasil jadi seragam dan referensi klien',
+    [RouteKey.TESTIMONI]: 'testimoni klien dan kepuasan layanan seragam',
     [RouteKey.ABOUT]: 'profil dan layanan bradwear indonesia',
     [RouteKey.VISION_MISSION]: 'standar layanan dan kualitas bradwear',
     [RouteKey.PRODUCTS_SERVICES]: 'produk dan jasa seragam custom',
