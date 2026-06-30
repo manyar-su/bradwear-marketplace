@@ -11,15 +11,15 @@ import {
   SiteFaqItem,
 } from '../types';
 
-const arisAvatar = new URL('../assets/CSavatar/aris.svg', import.meta.url).href;
-const ayangAvatar = new URL('../assets/CSavatar/ayang.svg', import.meta.url).href;
+const arisAvatar = new URL('../assets/CSavatar/Aris.jpeg', import.meta.url).href;
+const ayangAvatar = new URL('../assets/CSavatar/ayang.jpeg', import.meta.url).href;
 const bayuAvatar = new URL('../assets/CSavatar/bayu.png', import.meta.url).href;
 const edeAvatar = new URL('../assets/CSavatar/ede.png', import.meta.url).href;
-const elshaAvatar = new URL('../assets/CSavatar/elsha.svg', import.meta.url).href;
+const elshaAvatar = new URL('../assets/CSavatar/Elsha.jpeg', import.meta.url).href;
 const fikriAvatar = new URL('../assets/CSavatar/fikri.png', import.meta.url).href;
 const gilangAvatar = new URL('../assets/CSavatar/gilang.png', import.meta.url).href;
 const nadhifaAvatar = new URL('../assets/CSavatar/nadhifa.png', import.meta.url).href;
-const rismaAvatar = new URL('../assets/CSavatar/risma.svg', import.meta.url).href;
+const rismaAvatar = new URL('../assets/CSavatar/risma.jpeg', import.meta.url).href;
 const ucuAvatar = new URL('../assets/CSavatar/ucu.png', import.meta.url).href;
 
 export const SITE_URL = 'https://www.bradwearindonesia.com';
@@ -79,7 +79,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, description: 'Halaman utama Bradwear Indonesia.' },
   { label: 'Studio 3D', route: RouteKey.THREE_D, description: 'Halaman khusus preview dan custom seragam 3D Bradwear.' },
   { label: 'Katalog', route: RouteKey.KATALOG, description: 'Koleksi seragam kustom untuk berbagai kebutuhan instansi.' },
-  { label: 'Download', route: RouteKey.DOWNLOAD, description: 'Halaman download aplikasi Android dan akses cepat Bradwear.' },
+  { label: 'Download', route: RouteKey.DOWNLOAD, description: 'Hub akses cepat ke katalog, artikel, dan konsultasi web Bradwear.' },
   { label: 'Galeri Klien', route: RouteKey.CLIENT, description: 'Galeri hasil jadi dan dokumentasi klien Bradwear Indonesia.' },
   { label: 'Artikel', route: RouteKey.ARTIKEL, description: 'Konten panduan bahan, proses order, dan insight seragam.' },
   { label: 'Cara Order', route: RouteKey.CARA_ORDER, description: 'Panduan visual memesan seragam custom di Bradwear.' },
@@ -668,9 +668,9 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   ),
   [RouteKey.DOWNLOAD]: makeMeta(
     RouteKey.DOWNLOAD,
-    'Download Aplikasi Bradwear Indonesia | Android, Play Store, dan Konsultasi Cepat',
-    'Akses halaman download aplikasi Bradwear Indonesia untuk Android, informasi Play Store, konsultasi cepat WhatsApp, dan jalur masuk paling ringkas ke katalog serta artikel seragam custom.',
-    ['download aplikasi bradwear', 'bradwear android', 'google play bradwear', 'download app seragam custom', 'aplikasi bradwear indonesia']
+    'Akses Web Bradwear Indonesia | Katalog, Artikel, dan Konsultasi Cepat',
+    'Gunakan halaman akses web Bradwear Indonesia untuk masuk ke katalog, artikel, studio 3D, dan konsultasi seragam custom tanpa bergantung pada aplikasi mobile.',
+    ['akses web bradwear', 'katalog web bradwear', 'seragam custom online', 'masuk katalog bradwear', 'konsultasi seragam bradwear']
   ),
   [RouteKey.CLIENT]: makeMeta(
     RouteKey.CLIENT,
@@ -838,7 +838,7 @@ export const getConsultationTopicForPath = (route: RouteKey, pathname: string) =
     [RouteKey.HOME]: 'kemeja custom dan seragam kerja',
     [RouteKey.THREE_D]: 'preview desain 3d seragam custom',
     [RouteKey.KATALOG]: 'katalog kemeja custom dan seragam dinas',
-    [RouteKey.DOWNLOAD]: 'download aplikasi android bradwear',
+    [RouteKey.DOWNLOAD]: 'akses web katalog Bradwear',
     [RouteKey.CLIENT]: 'hasil jadi seragam dan referensi klien',
     [RouteKey.ABOUT]: 'profil dan layanan bradwear indonesia',
     [RouteKey.VISION_MISSION]: 'standar layanan dan kualitas bradwear',

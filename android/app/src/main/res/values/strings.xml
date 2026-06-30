@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Bradwear</string>
-    <string name="title_activity_main">Bradwear</string>
-    <string name="package_name">com.bradwear.app</string>
-    <string name="custom_url_scheme">com.bradwear.app</string>
-</resources>

@@ -10,7 +10,6 @@ import {
   CONTACT_CHANNELS,
   COURIER_PROVIDERS,
   CUSTOMER_SERVICE_HOURS,
-  GOOGLE_PLAY_URL,
   HOW_TO_ORDER_STEPS,
   ROUTE_PATHS,
   SITE_FAQS,
@@ -29,7 +28,8 @@ import { CompletedOrder, CourierProvider, Product, RouteKey } from '../types';
 import BradAiChat from './BradAiChat';
 import SiteFooter from './SiteFooter';
 
-const CATEGORIES = ['Kemeja', 'Jaket', 'Celana', 'Rompi', 'Polo'] as const;
+const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
+type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
 const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const SLIDESHOW_INTERVAL_MS = 5000;
@@ -37,16 +37,16 @@ const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
 const DOWNLOAD_HIGHLIGHTS = [
   {
-    title: 'Akses cepat katalog',
-    body: 'Masuk ke model kemeja, jaket, rompi, polo, dan pants tanpa berpindah alur terlalu jauh.',
+    title: 'Masuk cepat ke katalog web',
+    body: 'Arahkan user ke model kemeja, jaket, rompi, polo, dan celana tanpa bergantung pada app store.',
   },
   {
-    title: 'Lanjut konsultasi lebih cepat',
-    body: 'Setelah memilih model, user bisa langsung melanjutkan ke customer service atau Brodi dari perangkat Android.',
+    title: 'Jalur konsultasi langsung',
+    body: 'Setelah melihat model, user bisa lanjut ke customer service atau Brodi dari browser biasa di desktop maupun mobile.',
   },
   {
-    title: 'Ruang untuk update Play Store',
-    body: 'Halaman ini disiapkan sebagai landing page download saat listing Play Store Bradwear diperbarui.',
+    title: 'Landing page akses web',
+    body: 'Halaman ini tetap menjaga route download aktif, tetapi fungsinya diarahkan ke pusat akses website Bradwear.',
   },
 ];
 
@@ -334,6 +334,53 @@ const GooglePlayIcon = () => (
   </svg>
 );
 
+const CatalogTrustIcon: React.FC<{ path: React.ReactNode }> = ({ path }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-trust-icon" aria-hidden="true">
+    {path}
+  </svg>
+);
+
+const CatalogGridIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-filter-icon" aria-hidden="true">
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+  </svg>
+);
+
+const CatalogShirtIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-filter-icon" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 4.5 12 7l4-2.5 3 2.8-2.2 3.7-1.3-.7V20H8.5v-9.2l-1.3.7L5 7.3l3-2.8Z" />
+  </svg>
+);
+
+const CatalogPantsIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-filter-icon" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 4h8l-1 7 1.8 9h-4l-.8-5h-.2l-.8 5H7.2L9 11 8 4Z" />
+  </svg>
+);
+
+const CatalogJacketIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-filter-icon" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.4 4.5 12 7l3.6-2.5 3.1 3.2-1.8 2.8-1.4-.7V20H8.5V9.8l-1.4.7-1.8-2.8 3.1-3.2Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v13" />
+  </svg>
+);
+
+const CatalogVestIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-filter-icon" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.5 4h7l3 4.6-2.2 1.9V20H7.7v-9.5L5.5 8.6 8.5 4Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16" />
+  </svg>
+);
+
+const ArrowRightTinyIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-arrow-icon" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h12m-4-4 4 4-4 4" />
+  </svg>
+);
+
 const SocialServiceIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-6.5-4.35-6.5-10.07A3.93 3.93 0 0 1 9.44 7a4.55 4.55 0 0 1 2.56.87A4.55 4.55 0 0 1 14.56 7a3.93 3.93 0 0 1 3.94 3.93C18.5 16.65 12 21 12 21Z" />
@@ -467,6 +514,9 @@ const PublicSiteView: React.FC = () => {
     setPreferredCatalogCategory,
   } = useStore();
   const [activeCategory, setActiveCategory] = useState<typeof CATEGORIES[number]>('Kemeja');
+  const [activeCatalogSection, setActiveCatalogSection] = useState<CatalogSectionFilter>(() =>
+    currentRoute === RouteKey.PANTS ? 'Celana' : 'Semua',
+  );
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
@@ -596,8 +646,13 @@ const PublicSiteView: React.FC = () => {
   useEffect(() => {
     if (currentRoute === RouteKey.PANTS) {
       setActiveCategory('Celana');
+      setActiveCatalogSection('Celana');
       setActiveModelFilter(ALL_MODELS);
       return;
+    }
+
+    if (currentRoute === RouteKey.KATALOG) {
+      setActiveCatalogSection((previous) => (previous === 'Celana' ? 'Semua' : previous));
     }
 
     setActiveCategory(preferredCatalogCategory);
@@ -690,6 +745,21 @@ const PublicSiteView: React.FC = () => {
       })),
     [visibleProducts],
   );
+  const catalogSections = useMemo(
+    () =>
+      CATEGORIES.map((category) => ({
+        category,
+        products: visibleProducts.filter((product) => product.category === category),
+      })).filter((section) => section.products.length > 0),
+    [visibleProducts],
+  );
+  const visibleCatalogSections = useMemo(
+    () =>
+      activeCatalogSection === 'Semua'
+        ? catalogSections
+        : catalogSections.filter((section) => section.category === activeCatalogSection),
+    [activeCatalogSection, catalogSections],
+  );
 
   useEffect(() => {
     setArticleHighlightIndex(0);
@@ -736,7 +806,15 @@ const PublicSiteView: React.FC = () => {
     setTrackingLookup(trackingCodeInput.trim());
   };
 
-  const handleCatalogCategorySelect = (category: typeof CATEGORIES[number]) => {
+  const handleCatalogCategorySelect = (category: CatalogSectionFilter) => {
+    if (category === 'Semua') {
+      setActiveCatalogSection('Semua');
+      setActiveModelFilter(ALL_MODELS);
+      setCurrentRoute(RouteKey.KATALOG);
+      return;
+    }
+
+    setActiveCatalogSection(category);
     setActiveCategory(category);
     setPreferredCatalogCategory(category);
     setActiveModelFilter(ALL_MODELS);
@@ -767,8 +845,6 @@ const PublicSiteView: React.FC = () => {
       month: 'long',
       year: 'numeric',
     });
-  const hasGooglePlayLink = GOOGLE_PLAY_URL.trim().length > 0;
-
   useEffect(() => {
     if (homeCarouselProducts.length < 2) return;
     const timer = window.setInterval(() => {
@@ -855,6 +931,103 @@ const PublicSiteView: React.FC = () => {
           Pesan sekarang
         </button>
       </div>
+    </article>
+  );
+
+  const catalogTrustItems = [
+    {
+      title: 'Kualitas Terjamin',
+      copy: 'Material pilihan dan jahitan rapi untuk hasil seragam yang lebih presisi.',
+      icon: (
+        <CatalogTrustIcon
+          path={
+            <>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4 18 6.5v4.8c0 3.6-2.4 6.9-6 8.2-3.6-1.3-6-4.6-6-8.2V6.5L12 4Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="m9.3 11.8 1.7 1.7 3.8-4.1" />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      title: 'Custom Desain',
+      copy: 'Bebas desain, warna, dan bordir logo sesuai kebutuhan tim atau instansi.',
+      icon: (
+        <CatalogTrustIcon
+          path={
+            <>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5h12M6 12h12M6 16.5h8" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="m15.5 5.5 3 3" />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      title: 'Produksi Tepat Waktu',
+      copy: 'Proses cepat dengan alur approval yang lebih jelas agar hasil tetap maksimal.',
+      icon: (
+        <CatalogTrustIcon
+          path={
+            <>
+              <circle cx="12" cy="12" r="7" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l2.8 2" />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      title: 'Konsultasi Gratis',
+      copy: 'Tim kami siap membantu kebutuhan Anda mulai dari model, bahan, hingga jalur order.',
+      icon: (
+        <CatalogTrustIcon
+          path={
+            <>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5.5 16.5a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3" />
+              <circle cx="8.2" cy="10" r="2.1" />
+              <circle cx="15.8" cy="10" r="2.1" />
+            </>
+          }
+        />
+      ),
+    },
+  ];
+
+  const catalogFilterIcons: Record<CatalogSectionFilter, React.ReactNode> = {
+    Semua: <CatalogGridIcon />,
+    Kemeja: <CatalogShirtIcon />,
+    Celana: <CatalogPantsIcon />,
+    Jaket: <CatalogJacketIcon />,
+    Rompi: <CatalogVestIcon />,
+    Polo: <CatalogShirtIcon />,
+  };
+
+  const getCatalogProductDetail = (product: Product) => {
+    const materialMatch = product.description.match(/material\s+([^.]+)/i);
+    if (materialMatch?.[1]) {
+      return `Material ${materialMatch[1].trim()}`;
+    }
+
+    const descriptionHead = product.description.split('.').shift()?.trim() ?? product.description;
+    return descriptionHead.replace(/^Seri\s+[^:]+:\s*/i, '').replace(/^Seri\s+/i, '');
+  };
+
+  const renderCatalogProductCard = (product: Product) => (
+    <article key={product.id} className="catalog-product-card">
+      <button type="button" onClick={() => handleSelectProduct(product)} className="catalog-product-card-button">
+        <div className="catalog-product-card-media">
+          <ProductCardImage product={product} />
+        </div>
+        <div className="catalog-product-card-body">
+          <h3 className="catalog-product-card-title">{product.name}</h3>
+          <p className="catalog-product-card-copy">{getCatalogProductDetail(product)}</p>
+          <span className="catalog-product-card-cta">
+            <span>Lihat Detail</span>
+            <ArrowRightTinyIcon />
+          </span>
+        </div>
+      </button>
     </article>
   );
 
@@ -1278,88 +1451,96 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
-  const renderCatalog = (catalogProducts: Product[], title: string, description: string, showCategoryTabs = true) => (
-    <div className="catalog-page-shell px-0 py-8">
-      {/* Hero katalog: judul dan deskripsi dikirim dari argumen renderCatalog. */}
+  const renderCatalog = (_catalogProducts: Product[], title: string, description: string) => (
+    <div className="catalog-page-shell">
       <section className="catalog-page-hero scroll-reveal-block">
-        <p className="home-section-kicker">Katalog Bradwear</p>
-        <h1 className="home-section-title">{title}</h1>
-        <p className="home-section-copy">{description}</p>
+        <div className="catalog-page-breadcrumb">
+          <button type="button" onClick={() => setCurrentRoute(RouteKey.HOME)} className="catalog-page-breadcrumb-link">
+            Beranda
+          </button>
+          <span>&gt;</span>
+          <span>{currentRoute === RouteKey.PANTS ? 'Celana' : 'Katalog'}</span>
+        </div>
+
+        <div className="catalog-page-hero-grid">
+          <div className="catalog-page-hero-copy">
+            <h1 className="catalog-page-title">{title}</h1>
+            <p className="catalog-page-copy">{description}</p>
+          </div>
+          <div className="catalog-page-hero-visual">
+            <img src={heroTopImage} alt="Koleksi seragam Bradwear Indonesia" className="catalog-page-hero-image" />
+          </div>
+        </div>
+
+        <div className="catalog-trust-grid">
+          {catalogTrustItems.map((item) => (
+            <article key={item.title} className="catalog-trust-card">
+              <div className="catalog-trust-icon-shell">{item.icon}</div>
+              <h2 className="catalog-trust-title">{item.title}</h2>
+              <p className="catalog-trust-copy">{item.copy}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* Filter kategori dan model katalog. */}
-      {showCategoryTabs ? (
-        <section ref={catalogRef} className="catalog-filter-band scroll-reveal-block">
-          <div className="catalog-filter-band-heading">
-            <p className="catalog-filter-band-title">Pilih kategori</p>
-            <p className="catalog-filter-band-caption">Pilih kategori utama lalu lanjutkan ke daftar model di bawahnya.</p>
-          </div>
-          <div className="catalog-category-table-shell">
-            <table className="catalog-category-table">
-              <thead>
-                <tr>
-                  <th>Kategori</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categorySummaryRows.map((row) => {
-                  const isActive = activeCategory === row.category;
+      <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
+        <div className="catalog-filter-pill-row">
+          {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
+            const isActive = activeCatalogSection === category;
 
-                  return (
-                    <tr key={row.category} className={isActive ? 'is-active' : ''}>
-                      <td data-label="Kategori">
-                        <div className="catalog-category-cell">
-                          <strong>{row.category}</strong>
-                          <span className="catalog-category-badge">{row.modelCount} model</span>
-                        </div>
-                      </td>
-                      <td data-label="Aksi" className="catalog-category-action-cell">
-                        <button
-                          type="button"
-                          onClick={() => handleCatalogCategorySelect(row.category)}
-                          className={`catalog-category-table-action ${isActive ? 'is-active' : ''}`}
-                        >
-                          {isActive ? 'Terpilih' : 'Pilih'}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          <p className="catalog-filter-band-subtitle">Pilih model</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {categoryModelOptions.map((modelName) => (
+            return (
               <button
-                key={modelName}
+                key={category}
                 type="button"
-                onClick={() => setActiveModelFilter(modelName)}
-                className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] transition ${
-                  activeModelFilter === modelName
-                    ? 'border-[var(--brand-accent)] bg-[var(--brand-accent-soft)] text-[var(--brand-accent-strong)]'
-                    : 'border-[var(--border-soft)] bg-[var(--surface-base)] text-[var(--text-muted)] hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]'
-                }`}
+                onClick={() => handleCatalogCategorySelect(category)}
+                className={`catalog-filter-pill ${isActive ? 'is-active' : ''}`}
               >
-                {modelName}
+                {catalogFilterIcons[category]}
+                <span>{category}</span>
               </button>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="catalog-product-grid scroll-reveal-block mt-8 grid grid-cols-2 gap-4 xl:grid-cols-3">
-        {catalogProducts.map((product, index) => renderProductCard(product, index < 2 ? 'Favorit' : undefined))}
+            );
+          })}
+        </div>
       </section>
 
-      {/* Copy size guide dan tombol pembuka popup gambar penuh. */}
+      <section className="catalog-section-stack">
+        {visibleCatalogSections.map((section) => {
+          const isOverview = activeCatalogSection === 'Semua';
+          const sectionProducts = isOverview ? section.products.slice(0, 4) : section.products;
+
+          return (
+            <article key={section.category} className="catalog-category-section scroll-reveal-block">
+              <div className="catalog-category-section-header">
+                <div>
+                  <h2 className="catalog-category-section-title">{section.category}</h2>
+                  <p className="catalog-category-section-caption">{section.products.length} model siap dikustom untuk kebutuhan tim Anda.</p>
+                </div>
+                {isOverview ? (
+                  <button
+                    type="button"
+                    onClick={() => handleCatalogCategorySelect(section.category)}
+                    className="catalog-section-link"
+                  >
+                    <span>Lihat semua</span>
+                    <ArrowRightTinyIcon />
+                  </button>
+                ) : null}
+              </div>
+
+              <div className="catalog-product-grid">
+                {sectionProducts.map((product) => renderCatalogProductCard(product))}
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
       {ASSETS.CONTENT.SIZE_GUIDE ? (
-      <section className="catalog-size-guide-shell scroll-reveal-block mt-12 grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
+        <section className="catalog-size-guide-shell scroll-reveal-block">
           <article className="catalog-copy-band">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Size Guide</p>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
+            <p className="catalog-copy-band-kicker">Size Guide</p>
+            <h2 className="catalog-copy-band-title">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
+            <p className="catalog-copy-band-copy">
               Gunakan panduan ini untuk membaca ukuran dasar sebelum masuk ke editor atau saat menyiapkan data tim. Jika ada kebutuhan ukuran khusus, detailnya tetap bisa dilanjutkan saat konsultasi.
             </p>
           </article>
@@ -1379,22 +1560,17 @@ const PublicSiteView: React.FC = () => {
               className="block w-full cursor-zoom-in"
               aria-label="Buka size guide penuh"
             >
-              <img
-                src={ASSETS.CONTENT.SIZE_GUIDE}
-                alt="Bradwear size guide"
-                className="catalog-size-guide-image"
-              />
+              <img src={ASSETS.CONTENT.SIZE_GUIDE} alt="Bradwear size guide" className="catalog-size-guide-image" />
             </button>
           </article>
         </section>
       ) : null}
 
-      {/* Copy panduan bahan; isi bahan per item ada di MATERIAL_GUIDE_ITEMS. */}
-      <section className="mt-12 material-guide-shell scroll-reveal-block">
+      <section className="material-guide-shell scroll-reveal-block">
         <div className="max-w-3xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Panduan Bahan</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)]">Keterangan jenis bahan</h2>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+          <p className="catalog-copy-band-kicker">Panduan Bahan</p>
+          <h2 className="catalog-copy-band-title">Keterangan jenis bahan</h2>
+          <p className="catalog-copy-band-copy">
             Setiap bahan punya karakter yang berbeda. Bagian ini dibuat supaya user lebih cepat membedakan bahan yang cocok untuk tampilan formal, mobilitas lapangan, atau kebutuhan harian yang lebih ringan.
           </p>
         </div>
@@ -1442,6 +1618,27 @@ const PublicSiteView: React.FC = () => {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="catalog-bottom-cta scroll-reveal-block">
+        <div className="catalog-bottom-cta-copy">
+          <h2>Butuh Model Custom Sesuai Kebutuhan Anda?</h2>
+          <p>Tim kami siap membantu mulai dari desain, pemilihan bahan, hingga produksi seragam Anda.</p>
+        </div>
+        <div className="catalog-bottom-cta-actions">
+          <a
+            href={buildWhatsAppUrl(buildConsultationMessage('konsultasi model seragam custom dari halaman katalog web'))}
+            target="_blank"
+            rel="noreferrer"
+            className="catalog-bottom-cta-primary"
+          >
+            Konsultasi Sekarang
+          </a>
+          <button type="button" onClick={() => setCurrentRoute(RouteKey.CLIENT)} className="catalog-bottom-cta-secondary">
+            <span>Lihat Portofolio</span>
+            <ArrowRightTinyIcon />
+          </button>
         </div>
       </section>
     </div>
@@ -1872,35 +2069,27 @@ const PublicSiteView: React.FC = () => {
   const renderDownloadPage = () => (
     <div className="download-page-shell px-6 py-8 md:px-10">
       <section className="scroll-reveal-block rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(140deg,#0f172a,#14380c)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] md:p-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#d4f9af]">Download Bradwear</p>
-        <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">Halaman download aplikasi Bradwear Indonesia untuk Android</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#d4f9af]">Download Route</p>
+        <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight">Pusat akses web Bradwear Indonesia</h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
-          Halaman ini memulihkan akses download yang sebelumnya hilang. Pengunjung desktop tetap bisa melihat menu <strong>Download</strong> di navbar, sementara user mobile mendapat jalur cepat ke katalog, artikel, dan konsultasi Bradwear.
+          Route <strong>/download</strong> tetap dipertahankan untuk kompatibilitas navigasi lama, tetapi sekarang diarahkan sebagai hub akses ke katalog, artikel, konsultasi, dan editor web Bradwear.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          {hasGooglePlayLink ? (
-            <a
-              href={GOOGLE_PLAY_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-black tracking-tight text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
-            >
-              <GooglePlayIcon />
-              Buka di Google Play
-            </a>
-          ) : (
-            <span className="inline-flex items-center gap-3 rounded-full border border-white/18 bg-white/10 px-5 py-3 text-sm font-black tracking-tight text-white/92">
-              <GooglePlayIcon />
-              Listing Google Play sedang disiapkan
-            </span>
-          )}
+          <button
+            type="button"
+            onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+            className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-black tracking-tight text-[#0f172a] shadow-sm transition hover:-translate-y-0.5"
+          >
+            <CatalogGridIcon />
+            Buka katalog web
+          </button>
           <a
-            href={buildWhatsAppUrl(buildConsultationMessage('download aplikasi android bradwear dan akses mobile katalog'))}
+            href={buildWhatsAppUrl(buildConsultationMessage('butuh bantuan akses web Bradwear dan konsultasi model seragam'))}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-3 rounded-full border border-white/18 px-5 py-3 text-sm font-black tracking-tight text-white transition hover:-translate-y-0.5"
           >
-            Hubungi admin untuk link mobile
+            Hubungi tim Bradwear
           </a>
         </div>
       </section>
@@ -1919,7 +2108,7 @@ const PublicSiteView: React.FC = () => {
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Akses cepat</p>
           <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">{SITE_NAME}</h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Halaman download ini juga berfungsi sebagai landing page SEO untuk intent seperti download aplikasi Bradwear, Android Bradwear, dan akses Play Store Bradwear Indonesia.
+            Halaman ini dipakai sebagai landing page akses web Bradwear untuk user yang sebelumnya mencari jalur download, akses katalog, atau butuh titik masuk cepat ke konsultasi.
           </p>
           <div className="mt-5 grid gap-3">
             <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
@@ -1929,6 +2118,10 @@ const PublicSiteView: React.FC = () => {
             <button type="button" onClick={() => setCurrentRoute(RouteKey.ARTIKEL)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
               <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">Baca artikel</p>
               <p className="mt-1 text-xs text-[var(--text-secondary)]">Akses panduan bahan, tips order, dan artikel seragam yang sudah dioptimalkan untuk index.</p>
+            </button>
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.THREE_D)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
+              <p className="text-sm font-black tracking-tight text-[var(--text-primary)]">Buka studio 3D</p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">Lanjutkan eksplorasi model 3D tanpa perlu instalasi aplikasi tambahan.</p>
             </button>
           </div>
         </aside>
@@ -2474,8 +2667,8 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.KATALOG:
         return renderCatalog(
           featured,
-          'Katalog seragam custom yang lebih mudah dipilih',
-          'Tampilan katalog disusun lebih terarah agar pengunjung mudah membandingkan model, fungsi, dan kesiapan desain sebelum masuk ke editor.',
+          'Katalog Produk',
+          'Berbagai pilihan model seragam custom berkualitas dengan material terbaik dan jahitan presisi.',
         );
       case RouteKey.DOWNLOAD:
         return renderDownloadPage();
@@ -2491,8 +2684,8 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.PANTS:
         return renderCatalog(
           pantsProducts,
-          'Pants dan celana tactical untuk kebutuhan kerja aktif',
-          'Halaman ini difokuskan pada kategori celana agar proses pemilihan model lebih ringkas. Cocok untuk tim lapangan, operasional, dan kebutuhan kerja dengan mobilitas tinggi.',
+          'Katalog Celana',
+          'Berbagai pilihan model celana custom berkualitas dengan material terbaik dan jahitan presisi.',
         );
       case RouteKey.ARTIKEL:
         return renderArticles();

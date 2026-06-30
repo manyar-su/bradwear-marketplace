@@ -21,7 +21,6 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
 }) => {
     const [src, setSrc] = useState<string>(fallback || '');
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -37,7 +36,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
             } catch (err) {
                 console.error('Failed to load optimized image:', err);
                 if (isMounted) {
-                    setError(true);
+                    setSrc(fallback || '');
                     setLoading(false);
                 }
             }
@@ -68,7 +67,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
             src={src}
             className={className}
             style={style}
-            onError={() => setError(true)}
+            onError={() => setSrc(fallback || '')}
             {...props}
         />
     );

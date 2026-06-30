@@ -1,8 +1,4 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { App as CapacitorApp } from '@capacitor/app'; // Added import for Back Button
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Media } from '@capacitor-community/media';
 import html2canvas from 'html2canvas';
 import { Product, DesignData, DesignElement, RouteKey } from '../types';
 import { MATERIALS, COLORS, MATERIAL_SPECS, PRODUCTS, POLO_MATERIALS, POLO_MATERIAL_SPECS } from '../constants';
@@ -47,10 +43,9 @@ const DesignEditorView: React.FC = () => {
 
 
   // Helper Haptic
-  const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Light) => {
+  const triggerHaptic = async (_style?: unknown) => {
     try {
       if (window.navigator?.vibrate) window.navigator.vibrate(10);
-      await Haptics.impact({ style });
     } catch (e) {
       // Fallback silent
     }
@@ -187,13 +182,13 @@ interface OrderItem {
       setActiveFormModel(product);
       setActiveFormColor(designData.color);
       onUpdate({ color: designData.color });
-      triggerHaptic(ImpactStyle.Medium);
+      triggerHaptic('medium');
     }
   }, [editorStep, product, designData.color]);
 
   // Tambahkan item ke cart
   const handleAddToCart = (silent = false) => {
-    triggerHaptic(ImpactStyle.Heavy);
+    triggerHaptic('heavy');
     // Validasi: Wanya kode warna yang wajib diisi untuk menghindari kesalahan produksi
     if (!newItem.colorCode.trim()) {
       setColorCodeError("Mohon isi kode warna atau scan katalog agar tidak ada kesalahan produksi");
@@ -389,9 +384,11 @@ interface OrderItem {
   const [catalogScale, setCatalogScale] = useState(1);
   const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
 
-  // --- HARDWARE BACK BUTTON ---
+  // --- ESCAPE KEY BACK/FALLBACK ---
   useEffect(() => {
-    const backListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+
       // 1. Priority: Close Zoom/Catalog Image
       if (isZoomed) {
         setIsZoomed(false);
@@ -424,10 +421,11 @@ interface OrderItem {
         // 4. Priority: Exit Editor to Home
         onBack();
       }
-    });
+    };
 
+    window.addEventListener('keydown', handleEscape);
     return () => {
-      backListener.then(f => f.remove());
+      window.removeEventListener('keydown', handleEscape);
     };
   }, [isZoomed, showCatalogModal, showCustomSizeModal, expandedMaterial, editorStep, product.category, onBack]);
 
@@ -925,69 +923,8 @@ interface OrderItem {
 
     try {
       const base64Data = await renderDesignToCanvas();
-      // JPEG bukan PNG
-      const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, '');
       const fileName = `BRADWEAR_${product.name.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
 
-      const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
-
-      if (isNative) {
-        // --- NATIVE ANDROID ---
-        const { Media } = await import('@capacitor-community/media');
-
-        // Request permission dulu (Android 13+)
-        try {
-          if ((Media as any).requestPermissions) {
-            await (Media as any).requestPermissions();
-          }
-        } catch (e) { /* lanjut */ }
-
-        // Tulis ke cache dulu
-        let tempUri = '';
-        try {
-          const tempFile = await Filesystem.writeFile({
-            path: fileName,
-            data: base64Content,
-            directory: Directory.Cache,
-          });
-          tempUri = tempFile.uri;
-        } catch (writeErr) {
-          console.warn('Cache write failed:', writeErr);
-          // Fallback: tulis ke Documents
-          try {
-            const docFile = await Filesystem.writeFile({
-              path: `Bradmock/${fileName}`,
-              data: base64Content,
-              directory: Directory.Documents,
-              recursive: true,
-            });
-            tempUri = docFile.uri;
-          } catch (docErr) {
-            throw new Error('Tidak bisa menulis file ke storage');
-          }
-        }
-
-        // Simpan ke galeri
-        let savedToGallery = false;
-        try {
-          await Media.savePhoto({ path: tempUri, albumIdentifier: 'Bradmock' });
-          savedToGallery = true;
-        } catch {
-          try {
-            await Media.savePhoto({ path: tempUri });
-            savedToGallery = true;
-          } catch (e2) {
-            console.warn('Media.savePhoto gagal:', e2);
-          }
-        }
-
-        if (savedToGallery) {
-          alert('✅ Desain tersimpan di Galeri (Album: Bradmock)');
-        } else {
-          alert('📁 Desain tersimpan di Dokumen\n\nBuka File Manager > Documents > Bradmock');
-        }
-        return;
-      }
 
       // --- WEB / BROWSER ---
       // Coba Web Share API (Android Chrome, Samsung Internet)
@@ -1009,11 +946,11 @@ interface OrderItem {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      alert('⬇️ Gambar diunduh ke perangkat.');
+      alert('Gambar diunduh ke perangkat.');
 
     } catch (err) {
       console.error('Save failed:', err);
-      alert('Gagal menyimpan gambar. Pastikan izin penyimpanan sudah diberikan di Pengaturan > Aplikasi > Bradwear > Izin.');
+      alert('Gagal menyimpan gambar. Coba ulangi proses download atau gunakan browser yang mendukung penyimpanan file.');
     } finally {
       setIsExporting(false);
     }
@@ -2722,11 +2659,6 @@ interface OrderItem {
                   </button>
                   <button
                     onClick={async () => {
-                      // PERMISSION CHECK FOR DOWNLOAD
-                      try {
-                        await Filesystem.requestPermissions();
-                      } catch (e) { console.error("Permission request error", e); }
-
                       setIsScanning(true);
                       setDetectedCode(null);
 
@@ -2748,22 +2680,12 @@ interface OrderItem {
                       try {
                         capturedImage = await captureCatalogScanBox();
 
-                        // AUTO SAVE TO GALLERY (Android 10+ MediaStore)
-                        try {
-                          await Media.savePhoto({
-                            path: capturedImage,
-                            albumIdentifier: 'Bradwear Scans'
-                          });
-                        } catch (mediaErr) {
-                          console.warn("Auto save scan failed", mediaErr);
-                          // Fallback download browser
-                          const link = document.createElement('a');
-                          link.href = capturedImage;
-                          link.download = `scan_color_${Date.now()}.jpg`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                        }
+                        const link = document.createElement('a');
+                        link.href = capturedImage;
+                        link.download = `scan_color_${Date.now()}.jpg`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
 
                         capturedText = await analyzeImageWithGemini(capturedImage);
                       } catch (err) {

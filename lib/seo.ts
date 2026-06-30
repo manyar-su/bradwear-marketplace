@@ -1,7 +1,6 @@
 import {
   ARTICLES,
   BRAD_AI_CONTEXT,
-  GOOGLE_PLAY_URL,
   HOW_TO_ORDER_STEPS,
   ROUTE_LABELS,
   ROUTE_PATHS,
@@ -114,7 +113,7 @@ const buildRouteKeywords = (
       'vendor seragam komunitas',
       'katalog seragam dinas instansi',
     ],
-    [RouteKey.DOWNLOAD]: ['download aplikasi bradwear', 'bradwear android', 'google play bradwear', 'aplikasi seragam custom'],
+    [RouteKey.DOWNLOAD]: ['akses web bradwear', 'katalog web bradwear', 'seragam custom online', 'studio 3d seragam'],
     [RouteKey.CLIENT]: ['hasil jadi kemeja custom', 'galeri seragam dinas', 'portofolio seragam komunitas'],
     [RouteKey.ABOUT]: ['tentang bradwear indonesia', 'profil vendor seragam', 'konveksi seragam tasikmalaya'],
     [RouteKey.VISION_MISSION]: ['visi misi bradwear', 'standar kualitas seragam', 'komitmen vendor seragam'],
@@ -449,18 +448,10 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
   if (route === RouteKey.DOWNLOAD) {
     base.push({
       '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: 'Bradwear Indonesia App',
-      applicationCategory: 'BusinessApplication',
-      operatingSystem: 'Android',
-      description: 'Halaman download aplikasi Bradwear Indonesia untuk akses katalog, artikel, dan konsultasi seragam custom.',
+      '@type': 'WebPage',
+      name: 'Akses Web Bradwear Indonesia',
+      description: 'Halaman akses web Bradwear Indonesia untuk membuka katalog, artikel, studio 3D, dan konsultasi seragam custom.',
       url: canonical,
-      sameAs: GOOGLE_PLAY_URL || undefined,
-      offers: {
-        '@type': 'Offer',
-        price: '0',
-        priceCurrency: 'IDR',
-      },
       publisher: {
         '@type': 'Organization',
         name: SITE_NAME,
