@@ -6454,77 +6454,79 @@ a {
   }
 
   .testimonial-page-shell {
-    gap: 1.1rem;
+    gap: 0.95rem;
   }
 
   .testimonial-page-hero,
   .testimonial-page-copy {
-    gap: 0.85rem;
+    gap: 0.72rem;
   }
 
   .testimonial-page-kicker {
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     letter-spacing: 0.16em;
   }
 
   .testimonial-page-title {
-    font-size: clamp(1.9rem, 9vw, 2.45rem);
-    line-height: 0.96;
+    font-size: clamp(1.72rem, 8.2vw, 2.28rem);
+    line-height: 0.94;
   }
 
   .testimonial-page-intro {
-    font-size: 0.92rem;
-    line-height: 1.62;
+    max-width: none;
+    font-size: 0.84rem;
+    line-height: 1.54;
   }
 
   .testimonial-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
   }
 
   .testimonial-stat-card,
   .testimonial-card-panel {
-    padding: 18px 16px;
-    border-radius: 22px;
+    padding: 16px 14px;
+    border-radius: 20px;
   }
 
   .testimonial-stat-card {
-    gap: 8px;
-    padding: 16px 14px;
+    gap: 7px;
+    padding: 14px 12px;
   }
 
   .testimonial-stat-icon-shell,
   .testimonial-page-cta-icon-shell {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
   }
 
   .testimonial-stat-icon,
   .testimonial-page-cta-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .testimonial-stat-value {
-    font-size: 1.55rem;
+    font-size: 1.34rem;
   }
 
   .testimonial-stat-label {
-    font-size: 0.82rem;
-    line-height: 1.25;
+    font-size: 0.76rem;
+    line-height: 1.16;
   }
 
   .testimonial-stat-caption {
-    font-size: 0.76rem;
-    line-height: 1.4;
+    font-size: 0.7rem;
+    line-height: 1.3;
   }
 
   .testimonial-filter-row {
     flex-wrap: nowrap;
     overflow-x: auto;
+    gap: 7px;
     padding-bottom: 4px;
-    gap: 8px;
+    scroll-snap-type: x proximity;
     scrollbar-width: none;
   }
 
@@ -6534,90 +6536,101 @@ a {
 
   .testimonial-filter-pill {
     flex: 0 0 auto;
-    min-height: 40px;
-    padding: 0 14px;
-    font-size: 0.78rem;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.72rem;
+    letter-spacing: -0.01em;
+    scroll-snap-align: start;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.035);
   }
 
   .testimonial-card-grid {
-    gap: 12px;
+    gap: 10px;
   }
 
   .testimonial-card-company-logo,
   .client-gallery-band-logo {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
   }
 
   .testimonial-card-panel {
-    gap: 12px;
-    padding: 16px 14px;
+    gap: 10px;
+    padding: 14px 12px;
   }
 
   .testimonial-card-quote-mark {
-    font-size: 2rem;
+    order: 1;
+    font-size: 1.5rem;
+    line-height: 0.72;
   }
 
   .testimonial-card-body {
-    font-size: 0.88rem;
-    line-height: 1.62;
+    order: 3;
+    font-size: 0.79rem;
+    line-height: 1.5;
   }
 
   .testimonial-card-stars {
-    font-size: 0.9rem;
+    order: 2;
+    justify-self: end;
+    margin-top: -30px;
+    font-size: 0.78rem;
     gap: 2px;
   }
 
   .testimonial-card-company {
-    gap: 10px;
-    padding-top: 10px;
+    order: 4;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 9px;
+    padding-top: 9px;
   }
 
   .testimonial-card-company-copy {
-    gap: 2px;
+    gap: 1px;
   }
 
   .testimonial-card-company-copy h2 {
-    font-size: 0.9rem;
-    line-height: 1.22;
+    font-size: 0.82rem;
+    line-height: 1.16;
   }
 
   .testimonial-card-company-copy p,
   .testimonial-card-company-copy span {
-    font-size: 0.76rem;
-    line-height: 1.4;
+    font-size: 0.7rem;
+    line-height: 1.28;
   }
 
   .testimonial-page-cta {
-    gap: 14px;
-    padding: 16px 14px;
-    border-radius: 22px;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 20px;
   }
 
   .testimonial-page-cta-copy {
-    gap: 12px;
+    gap: 10px;
   }
 
   .testimonial-page-cta-copy h2 {
-    font-size: 1.35rem;
-    line-height: 1.02;
+    font-size: 1.12rem;
+    line-height: 1;
   }
 
   .testimonial-page-cta-copy p {
-    margin-top: 4px;
-    font-size: 0.84rem;
-    line-height: 1.5;
+    margin-top: 3px;
+    font-size: 0.74rem;
+    line-height: 1.38;
   }
 
   .testimonial-page-cta-actions {
-    gap: 10px;
+    gap: 8px;
   }
 
   .testimonial-page-cta-actions .catalog-bottom-cta-primary,
   .testimonial-page-cta-actions .catalog-bottom-cta-secondary {
-    min-height: 46px;
-    font-size: 0.78rem;
+    min-height: 42px;
+    padding-inline: 14px;
+    font-size: 0.68rem;
   }
 
   .client-gallery-band-copy {
@@ -6691,45 +6704,58 @@ a {
 
 @media (max-width: 420px) {
   .testimonial-stats-grid {
-    gap: 8px;
+    gap: 7px;
   }
 
   .testimonial-stat-card {
-    padding: 14px 12px;
+    padding: 12px 11px;
   }
 
   .testimonial-stat-value {
-    font-size: 1.42rem;
+    font-size: 1.22rem;
+  }
+
+  .testimonial-stat-label {
+    font-size: 0.72rem;
+  }
+
+  .testimonial-stat-caption {
+    font-size: 0.66rem;
   }
 
   .testimonial-filter-pill {
-    min-height: 38px;
-    padding: 0 12px;
-    font-size: 0.74rem;
+    min-height: 34px;
+    padding: 0 11px;
+    font-size: 0.68rem;
   }
 
   .testimonial-card-panel {
-    padding: 14px 12px;
-    border-radius: 20px;
+    padding: 13px 11px;
+    border-radius: 18px;
   }
 
   .testimonial-card-body {
-    font-size: 0.84rem;
+    font-size: 0.75rem;
   }
 
   .testimonial-card-company-logo {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .testimonial-card-stars {
+    margin-top: -26px;
+    font-size: 0.72rem;
   }
 
   .testimonial-page-cta-copy h2 {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .testimonial-page-cta-actions .catalog-bottom-cta-primary,
   .testimonial-page-cta-actions .catalog-bottom-cta-secondary {
-    min-height: 44px;
-    font-size: 0.74rem;
+    min-height: 40px;
+    font-size: 0.64rem;
   }
 }
 
