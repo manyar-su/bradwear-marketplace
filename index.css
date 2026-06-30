@@ -1071,7 +1071,7 @@ a {
 .hero-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.3) 70%, rgba(15, 23, 42, 0.6));
+  background: transparent;
   pointer-events: none;
 }
 
@@ -1106,7 +1106,7 @@ a {
 }
 
 .middle-showcase-overlay {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.36));
+  background: transparent;
 }
 
 .middle-showcase-banner .hero-arrow {
@@ -2794,7 +2794,7 @@ a {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(5, 12, 19, 0.04), rgba(5, 12, 19, 0.2) 48%, rgba(5, 12, 19, 0.78));
+  background: transparent;
   pointer-events: none;
 }
 
@@ -4760,7 +4760,7 @@ a {
 }
 
 .hero-banner-overlay-soft {
-  background: linear-gradient(180deg, rgba(10, 18, 12, 0.08), rgba(10, 18, 12, 0.24) 58%, rgba(10, 18, 12, 0.48));
+  background: transparent;
 }
 
 .client-proof-shell-open .client-proof-overlay {
@@ -4769,8 +4769,8 @@ a {
   bottom: clamp(16px, 3vw, 28px);
   border: 0;
   border-radius: 0;
-  background: linear-gradient(180deg, rgba(6, 10, 18, 0.22), rgba(6, 10, 18, 0.74));
-  backdrop-filter: blur(10px);
+  background: rgba(6, 10, 18, 0.42);
+  backdrop-filter: none;
 }
 
 .client-gallery-grid .middle-showcase-shell,
@@ -5703,9 +5703,7 @@ a {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 0% 50%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 34%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 30%);
+  background: transparent;
 }
 
 .profile-showcase-hero-image,
