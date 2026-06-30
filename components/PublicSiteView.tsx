@@ -1665,6 +1665,15 @@ const PublicSiteView: React.FC = () => {
           </button>
         </section>
 
+        {/* Hero foto customer service dikembalikan ke atas seperti layout home sebelumnya. */}
+        <section className="hero-display-strip hero-display-strip-top home-fast-response-strip home-fast-response-strip-clean" data-home-section="hero-intro">
+          <img
+            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            alt="Customer service Bradwear Indonesia"
+            className="hero-display-strip-image"
+          />
+        </section>
+
         {/* Headline utama home beserta CTA utama. */}
         <section className="home-hero editorial-home-hero" data-home-section="hero">
           <article className="hero-panel hero-panel-editorial hero-panel-clean">
@@ -1914,18 +1923,6 @@ const PublicSiteView: React.FC = () => {
               ))}
             </div>
           </div>
-          </div>
-        </section>
-
-        {/* Foto fast response home dipindah agar tampil tepat sebelum FAQ. */}
-        <section className="hero-display-strip hero-display-strip-top home-fast-response-strip" data-home-section="hero-intro">
-          <img
-            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
-            alt="Fast respon customer service Bradwear Indonesia"
-            className="hero-display-strip-image"
-          />
-          <div className="hero-display-strip-overlay">
-            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Fast respon untuk kebutuhan konsultasi seragam custom</h2>
           </div>
         </section>
 
