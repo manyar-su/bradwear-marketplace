@@ -42,7 +42,7 @@ const DOWNLOAD_HIGHLIGHTS = [
   },
   {
     title: 'Jalur konsultasi langsung',
-    body: 'Setelah melihat model, user bisa lanjut ke customer service atau Brodi dari browser biasa di desktop maupun mobile.',
+    body: 'Setelah melihat model, user bisa lanjut ke customer service melalui WhatsApp dari browser biasa di desktop maupun mobile.',
   },
   {
     title: 'Landing page akses web',
@@ -107,6 +107,72 @@ type BrandProfileItem = {
   points: string[];
   facts?: Array<{ label: string; value: string }>;
   note?: string;
+};
+
+type BrandProfileIconKey =
+  | 'shield'
+  | 'team'
+  | 'clock'
+  | 'handshake'
+  | 'building'
+  | 'shirt'
+  | 'gauge'
+  | 'badge'
+  | 'comment'
+  | 'pen'
+  | 'sample'
+  | 'sewing'
+  | 'truck';
+
+type BrandProfileValueCard = {
+  icon: BrandProfileIconKey;
+  title: string;
+  copy: string;
+};
+
+type BrandProfileStatCard = {
+  icon: BrandProfileIconKey;
+  value: string;
+  label: string;
+  copy: string;
+};
+
+type BrandProfileStory = {
+  title: string;
+  paragraphs: string[];
+  image: string;
+  imageAlt: string;
+  buttonLabel: string;
+};
+
+type BrandProfileProcessStep = {
+  icon: BrandProfileIconKey;
+  number: string;
+  title: string;
+  copy: string;
+};
+
+type BrandProfileCta = {
+  title: string;
+  copy: string;
+  primaryLabel: string;
+  primaryMessage: string;
+  secondaryLabel: string;
+};
+
+type BrandProfileVisualItem = {
+  route: RouteKey;
+  kicker: string;
+  title: string;
+  intro: string;
+  heroImage: string;
+  heroImageAlt: string;
+  values: BrandProfileValueCard[];
+  stats: BrandProfileStatCard[];
+  story: BrandProfileStory;
+  processTitle: string;
+  processSteps: BrandProfileProcessStep[];
+  cta: BrandProfileCta;
 };
 
 // Sumber copy untuk seluruh halaman profil publik berdasarkan company profile resmi.
@@ -243,6 +309,243 @@ const BRAND_PROFILE_ITEMS: BrandProfileItem[] = [
   },
 ];
 
+const BRAND_PROFILE_PROCESS_STEPS: BrandProfileProcessStep[] = [
+  {
+    icon: 'comment',
+    number: '01',
+    title: 'Konsultasi',
+    copy: 'Diskusi kebutuhan dan arah seragam yang ingin dibangun untuk tim Anda.',
+  },
+  {
+    icon: 'pen',
+    number: '02',
+    title: 'Desain',
+    copy: 'Pembuatan arahan desain dan penyesuaian identitas sesuai kebutuhan kerja.',
+  },
+  {
+    icon: 'sample',
+    number: '03',
+    title: 'Sampel',
+    copy: 'Review sample dan penyamaan ekspektasi sebelum produksi berjalan massal.',
+  },
+  {
+    icon: 'sewing',
+    number: '04',
+    title: 'Produksi',
+    copy: 'Produksi dijalankan dengan kontrol kualitas, bahan terpilih, dan jahitan presisi.',
+  },
+  {
+    icon: 'truck',
+    number: '05',
+    title: 'Pengiriman',
+    copy: 'Pesanan dikirim tepat waktu dengan koordinasi yang jelas sampai barang diterima.',
+  },
+];
+
+const ABOUT_HERO_IMAGE = ASSETS.BRAND.HERO || heroTopImage;
+const ABOUT_SUPPORT_IMAGE = ASSETS.CONTENT.FAST_RESPONSE_HERO || clientSlide1;
+const ABOUT_ALT_IMAGE = heroTopImage;
+const ABOUT_CLIENT_IMAGE = clientSlide2;
+const ABOUT_DELIVERY_IMAGE = clientSlide3;
+
+const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
+  {
+    route: RouteKey.ABOUT,
+    kicker: 'Tentang Kami',
+    title: 'Bradwear Indonesia',
+    intro: 'Solusi pengadaan seragam custom yang menggabungkan kualitas terbaik, desain profesional, dan pelayanan yang berorientasi pada kepuasan pelanggan.',
+    heroImage: ABOUT_HERO_IMAGE,
+    heroImageAlt: 'Suasana produksi Bradwear Indonesia',
+    values: [
+      { icon: 'shield', title: 'Kualitas Terjamin', copy: 'Kami selalu memilih bahan terbaik dan proses produksi berstandar tinggi.' },
+      { icon: 'team', title: 'Profesional', copy: 'Didukung tim berpengalaman dan peralatan modern untuk hasil yang konsisten.' },
+      { icon: 'clock', title: 'Tepat Waktu', copy: 'Komitmen kami adalah menyelesaikan setiap pesanan sesuai jadwal yang disepakati.' },
+      { icon: 'handshake', title: 'Bersama Tumbuh', copy: 'Kami membangun kolaborasi jangka panjang lewat layanan yang jelas dan responsif.' },
+    ],
+    stats: [
+      { icon: 'building', value: '1.250+', label: 'Instansi', copy: 'Telah mempercayakan pengadaan seragamnya kepada Bradwear.' },
+      { icon: 'shirt', value: '60.000+', label: 'Produk', copy: 'Diproduksi dengan kontrol kualitas dan pengerjaan yang konsisten.' },
+      { icon: 'clock', value: '98%', label: 'Tepat Waktu', copy: 'Komitmen kami dalam setiap proses produksi dan pengiriman.' },
+      { icon: 'badge', value: '5+', label: 'Tahun Pengalaman', copy: 'Melayani berbagai kebutuhan seragam di seluruh Indonesia.' },
+    ],
+    story: {
+      title: 'Cerita Bradwear',
+      paragraphs: [
+        'Bradwear Indonesia berawal dari semangat untuk memberikan solusi seragam berkualitas bagi instansi, perusahaan, dan komunitas di Indonesia.',
+        'Kami memahami bahwa seragam bukan hanya pakaian, tetapi juga identitas, kesatuan, dan kebanggaan. Karena itu, setiap produk yang kami hasilkan dibuat dengan ketelitian, tanggung jawab, dan hati.',
+      ],
+      image: ABOUT_SUPPORT_IMAGE,
+      imageAlt: 'Tim customer service Bradwear Indonesia',
+      buttonLabel: 'Selengkapnya',
+    },
+    processTitle: 'Proses Kami',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Siap Mengadakan Seragam Berkualitas untuk Instansi Anda?',
+      copy: 'Konsultasikan kebutuhan Anda sekarang juga, tim kami siap membantu dari pemilihan model sampai produksi.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'konsultasi kebutuhan seragam custom dari halaman tentang kami',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+  {
+    route: RouteKey.VISION_MISSION,
+    kicker: 'Visi & Misi',
+    title: 'Arah kerja yang kami pegang untuk membangun seragam yang layak dipakai dengan bangga.',
+    intro: 'Bradwear bergerak dengan visi menjadi perusahaan konveksi seragam dinas terdepan di Indonesia melalui kualitas, inovasi, ketepatan waktu, dan kepuasan pelanggan.',
+    heroImage: ABOUT_SUPPORT_IMAGE,
+    heroImageAlt: 'Tim Bradwear Indonesia siap melayani konsultasi',
+    values: [
+      { icon: 'shield', title: 'Mutu Konsisten', copy: 'Setiap misi kami diarahkan pada hasil seragam yang rapi, nyaman, dan tahan digunakan.' },
+      { icon: 'team', title: 'Tim Bertanggung Jawab', copy: 'Kami membangun kultur kerja yang fokus pada detail, komunikasi, dan penyelesaian yang jelas.' },
+      { icon: 'clock', title: 'Disiplin Timeline', copy: 'Ketepatan waktu menjadi bagian inti dari standar kerja Bradwear.' },
+      { icon: 'handshake', title: 'Hubungan Jangka Panjang', copy: 'Kami menempatkan kepercayaan klien sebagai hasil akhir yang paling penting.' },
+    ],
+    stats: [
+      { icon: 'gauge', value: '100%', label: 'Fokus Mutu', copy: 'Kualitas dan kenyamanan selalu menjadi dasar pengambilan keputusan produksi.' },
+      { icon: 'clock', value: '24/7', label: 'Koordinasi Cepat', copy: 'Tim responsif untuk kebutuhan follow up, revisi, dan konsultasi order.' },
+      { icon: 'building', value: 'Nasional', label: 'Cakupan Layanan', copy: 'Bradwear melayani instansi, perusahaan, dan komunitas di berbagai kota.' },
+      { icon: 'badge', value: 'Jangka Panjang', label: 'Orientasi Klien', copy: 'Kami membangun relasi kerja yang berulang dan berkelanjutan.' },
+    ],
+    story: {
+      title: 'Nilai yang Menjadi Dasar Kerja',
+      paragraphs: [
+        'Visi dan misi Bradwear tidak berhenti sebagai slogan. Keduanya diterjemahkan menjadi standar kualitas bahan, disiplin timeline, inovasi desain, dan layanan yang lebih jelas untuk pelanggan.',
+        'Karena itu, setiap proyek dikerjakan dengan fokus pada mutu hasil, kesiapan komunikasi, dan kemampuan memberi solusi yang realistis sejak tahap konsultasi.',
+      ],
+      image: ABOUT_HERO_IMAGE,
+      imageAlt: 'Area produksi Bradwear Indonesia',
+      buttonLabel: 'Lihat proses',
+    },
+    processTitle: 'Bagaimana Visi Itu Dijalankan',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Perlu Partner Produksi yang Punya Standar Kerja Jelas?',
+      copy: 'Diskusikan kebutuhan seragam Anda dan lihat bagaimana tim kami menerjemahkan kebutuhan itu menjadi produksi yang terukur.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'diskusi visi produksi dan kebutuhan seragam dari halaman visi misi',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+  {
+    route: RouteKey.PRODUCTS_SERVICES,
+    kicker: 'Produk & Jasa',
+    title: 'Layanan seragam custom yang lengkap, dari pemilihan model sampai penyesuaian identitas visual.',
+    intro: 'Bradwear melayani berbagai kebutuhan seragam dinas, seragam kerja, wearpack, seragam medis, dan custom desain dengan alur yang lebih terstruktur.',
+    heroImage: heroTopImage,
+    heroImageAlt: 'Model seragam Bradwear Indonesia',
+    values: [
+      { icon: 'shirt', title: 'Produk Beragam', copy: 'Kemeja, jaket, rompi, polo, celana, hingga kebutuhan seragam teknis dan lapangan.' },
+      { icon: 'pen', title: 'Custom Desain', copy: 'Model, warna, bordir logo, dan identitas dapat disesuaikan sesuai kebutuhan klien.' },
+      { icon: 'sample', title: 'Preview Lebih Jelas', copy: 'Arahan desain dibahas lebih awal agar proses produksi lebih terkontrol.' },
+      { icon: 'handshake', title: 'Layanan Terintegrasi', copy: 'Konsultasi, desain, produksi, dan pengiriman berjalan dalam satu alur kerja.' },
+    ],
+    stats: [
+      { icon: 'shirt', value: '5 Kategori', label: 'Produk Utama', copy: 'Kemeja, celana, jaket, rompi, dan polo tersedia untuk basis custom.' },
+      { icon: 'pen', value: 'Custom', label: 'Desain Fleksibel', copy: 'Bisa disesuaikan untuk instansi, perusahaan, komunitas, dan kebutuhan event.' },
+      { icon: 'building', value: 'Multi-Sektor', label: 'Klien', copy: 'Melayani pemerintah, perusahaan, medis, pendidikan, dan organisasi.' },
+      { icon: 'clock', value: 'Terstruktur', label: 'Alur Kerja', copy: 'Kebutuhan order diringkas sejak awal agar tindak lanjut lebih cepat.' },
+    ],
+    story: {
+      title: 'Dibuat untuk Kebutuhan yang Berbeda',
+      paragraphs: [
+        'Setiap klien datang dengan kebutuhan yang tidak sama. Karena itu Bradwear menyediakan pilihan model dasar yang kuat, lalu membuka ruang untuk penyesuaian material, warna, identitas, dan fungsi lapangan.',
+        'Pendekatan ini membuat proses pengadaan lebih efisien tanpa mengorbankan identitas visual dan kenyamanan pemakaian.',
+      ],
+      image: ABOUT_ALT_IMAGE,
+      imageAlt: 'Produk kemeja Bradwear Indonesia',
+      buttonLabel: 'Selengkapnya',
+    },
+    processTitle: 'Dari Kebutuhan Menjadi Produk Jadi',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Butuh Rekomendasi Model dan Bahan yang Tepat?',
+      copy: 'Kami bisa bantu memilih model yang paling dekat dengan karakter kerja tim Anda sebelum masuk ke tahap desain.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'diskusi produk dan jasa seragam custom dari halaman produk jasa',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+  {
+    route: RouteKey.COMPETITIVE_ADVANTAGE,
+    kicker: 'Keunggulan Kami',
+    title: 'Bradwear mengutamakan kualitas bahan, jahitan presisi, harga kompetitif, dan layanan custom yang tetap realistis.',
+    intro: 'Keunggulan kami dibangun dari kombinasi bahan yang tepat, proses kerja yang disiplin, dan komunikasi yang memudahkan pelanggan mengambil keputusan.',
+    heroImage: ABOUT_HERO_IMAGE,
+    heroImageAlt: 'Pemandangan area produksi Bradwear',
+    values: [
+      { icon: 'shield', title: 'Bahan Berkualitas', copy: 'Pemilihan bahan diarahkan pada kenyamanan, daya tahan, dan fungsi pemakaian.' },
+      { icon: 'badge', title: 'Jahitan Presisi', copy: 'Standar pengerjaan dibuat agar hasil akhir lebih rapi dan profesional.' },
+      { icon: 'gauge', title: 'Harga Kompetitif', copy: 'Kami menjaga nilai terbaik antara kualitas hasil dan biaya pengadaan.' },
+      { icon: 'pen', title: 'Custom Relevan', copy: 'Penyesuaian desain dibuka seluas mungkin, tetapi tetap dijaga agar produksi efisien.' },
+    ],
+    stats: [
+      { icon: 'shield', value: 'Premium', label: 'Standar Bahan', copy: 'Material dipilih menyesuaikan kebutuhan formal, lapangan, atau operasional harian.' },
+      { icon: 'badge', value: 'Rapi', label: 'Standar Jahit', copy: 'Detail pengerjaan dijaga untuk menciptakan hasil yang lebih presisi.' },
+      { icon: 'gauge', value: 'Efisien', label: 'Nilai Pengadaan', copy: 'Solusi biaya dibuat seimbang tanpa menurunkan mutu inti produk.' },
+      { icon: 'team', value: 'Responsif', label: 'Layanan', copy: 'Tim kami membantu memperjelas pilihan model, bahan, dan spesifikasi order.' },
+    ],
+    story: {
+      title: 'Keunggulan yang Bisa Dirasakan Langsung',
+      paragraphs: [
+        'Keunggulan Bradwear bukan hanya terlihat dari tampilan jadi, tetapi juga terasa pada proses komunikasi yang lebih jelas, tindak lanjut yang lebih cepat, dan pilihan produksi yang lebih relevan dengan kebutuhan lapangan.',
+        'Tujuannya sederhana: membantu klien mendapat hasil yang pantas dipakai, tepat fungsi, dan mudah dipertanggungjawabkan sebagai pengadaan.',
+      ],
+      image: ABOUT_SUPPORT_IMAGE,
+      imageAlt: 'Customer service dan tim Bradwear Indonesia',
+      buttonLabel: 'Selengkapnya',
+    },
+    processTitle: 'Standar Keunggulan Kami',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Butuh Seragam dengan Hasil yang Lebih Meyakinkan?',
+      copy: 'Sampaikan kebutuhan kerja tim Anda, lalu kami bantu arahkan model, bahan, dan standar pengerjaan yang paling masuk akal.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'diskusi keunggulan dan kualitas produksi dari halaman keunggulan',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+  {
+    route: RouteKey.CLIENT_REACH,
+    kicker: 'Klien & Jangkauan',
+    title: 'Dipercaya berbagai instansi dan tim operasional dengan cakupan layanan ke seluruh Indonesia.',
+    intro: 'Bradwear melayani kebutuhan seragam dari instansi pemerintahan, perusahaan swasta, rumah sakit, sekolah, organisasi, hingga komunitas dengan jalur koordinasi yang tetap sederhana.',
+    heroImage: ABOUT_CLIENT_IMAGE,
+    heroImageAlt: 'Dokumentasi hasil proyek klien Bradwear',
+    values: [
+      { icon: 'building', title: 'Lintas Instansi', copy: 'Klien datang dari sektor publik, swasta, medis, pendidikan, dan organisasi.' },
+      { icon: 'team', title: 'Komunikasi Mudah', copy: 'Koordinasi kebutuhan tim dilakukan dengan jalur yang lebih cepat dan terarah.' },
+      { icon: 'truck', title: 'Jangkauan Luas', copy: 'Pengiriman dan tindak lanjut produksi dirancang untuk kebutuhan klien lintas daerah.' },
+      { icon: 'handshake', title: 'Hubungan Berulang', copy: 'Banyak pengadaan berjalan berulang karena hasil dan komunikasi dinilai memuaskan.' },
+    ],
+    stats: [
+      { icon: 'building', value: 'Seluruh Indonesia', label: 'Area Layanan', copy: 'Melayani kebutuhan seragam custom dari berbagai kota dan sektor.' },
+      { icon: 'truck', value: 'Tasikmalaya', label: 'Basis Operasional', copy: 'Workshop dan koordinasi utama berada di Tasikmalaya, Jawa Barat.' },
+      { icon: 'team', value: 'Multi-Sektor', label: 'Jenis Klien', copy: 'Pemerintah, perusahaan, medis, sekolah, organisasi, dan komunitas.' },
+      { icon: 'clock', value: 'Berulang', label: 'Pola Kerja', copy: 'Hubungan pengadaan dibangun untuk jangka panjang, bukan transaksi sesaat.' },
+    ],
+    story: {
+      title: 'Jangkauan yang Dibangun dari Kepercayaan',
+      paragraphs: [
+        'Cakupan layanan Bradwear tumbuh karena kebutuhan tiap klien dilayani dengan pendekatan yang rapi dan tidak bertele-tele. Ini penting terutama untuk pengadaan yang butuh kejelasan spesifikasi dan timeline.',
+        'Dari Tasikmalaya, kami melayani kebutuhan seragam untuk berbagai institusi dengan fokus pada ketepatan, komunikasi, dan hasil yang konsisten.',
+      ],
+      image: ABOUT_DELIVERY_IMAGE,
+      imageAlt: 'Dokumentasi hasil jadi klien Bradwear',
+      buttonLabel: 'Selengkapnya',
+    },
+    processTitle: 'Cara Kami Menjangkau Klien',
+    processSteps: BRAND_PROFILE_PROCESS_STEPS,
+    cta: {
+      title: 'Butuh Partner Produksi yang Siap Melayani dari Jarak Jauh?',
+      copy: 'Tim kami siap membantu kebutuhan pengadaan seragam custom dengan alur konsultasi, produksi, dan pengiriman yang lebih terukur.',
+      primaryLabel: 'Konsultasi Gratis',
+      primaryMessage: 'konsultasi pengadaan seragam dari halaman klien dan jangkauan',
+      secondaryLabel: 'Lihat Katalog',
+    },
+  },
+];
+
 type LightboxSlide = {
   alt: string;
   description?: string;
@@ -333,6 +636,126 @@ const GooglePlayIcon = () => (
     <path fill="#EA4335" d="M16.2 8.85 5.42 2.46c-.77-.42-1.41-.36-1.82.06L13 12l3.2-3.15Z" />
   </svg>
 );
+
+const InlineWhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
+    <path d="M20.52 11.84a8.52 8.52 0 0 1-12.57 7.48l-4.07 1.04 1.09-3.95A8.52 8.52 0 1 1 20.52 11.84Zm-8.5-7.1a7.08 7.08 0 0 0-6.13 10.63l.23.37-.64 2.33 2.4-.63.35.21a7.08 7.08 0 1 0 3.79-12.91Zm4 8.95c-.23-.11-1.31-.64-1.52-.72-.2-.07-.34-.1-.49.11-.14.23-.56.72-.69.87-.13.14-.26.17-.49.05-.23-.1-.93-.34-1.77-1.08-.65-.58-1.1-1.3-1.23-1.52-.12-.21-.01-.33.1-.44.1-.1.23-.26.34-.39.11-.13.14-.22.22-.37.08-.14.04-.28-.02-.39-.06-.11-.48-1.16-.66-1.58-.17-.42-.35-.36-.48-.37h-.41c-.14 0-.37.06-.57.27-.2.21-.75.73-.75 1.77 0 1.03.77 2.04.88 2.17.11.15 1.5 2.3 3.64 3.22.5.22.9.36 1.2.45.5.16.96.14 1.32.09.41-.06 1.31-.53 1.5-1.04.18-.51.18-.94.12-1.04-.05-.09-.2-.15-.42-.26Z" />
+  </svg>
+);
+
+const BrandProfileIcon: React.FC<{ icon: BrandProfileIconKey; className?: string }> = ({ icon, className }) => {
+  const sharedProps = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    className,
+    'aria-hidden': true,
+  } as const;
+
+  switch (icon) {
+    case 'shield':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.6 18.4 6v5.2c0 4.27-2.66 7.3-6.4 9.2-3.74-1.9-6.4-4.93-6.4-9.2V6L12 3.6Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m8.9 11.95 2.1 2.1 4.1-4.3" />
+        </svg>
+      );
+    case 'team':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 11.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.6 9.7a2.6 2.6 0 1 0 0-5.2" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.6 19.2c.55-2.8 2.57-4.4 5.4-4.4s4.85 1.6 5.4 4.4" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.8 15.3c1.57.2 2.78 1.06 3.58 2.65" />
+        </svg>
+      );
+    case 'clock':
+      return (
+        <svg {...sharedProps}>
+          <circle cx="12" cy="12" r="7.9" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.8v4.5l3 1.8" />
+        </svg>
+      );
+    case 'handshake':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.4 12.8 6 15.2a2.1 2.1 0 1 1-2.95-2.97l3.14-3.1a3.9 3.9 0 0 1 5.52 0l.9.9" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m15.6 11.2 2.4-2.4a2.1 2.1 0 1 1 2.95 2.97l-3.14 3.1a3.9 3.9 0 0 1-5.52 0l-.9-.9" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9.5 14.1 1.85 1.85a2 2 0 0 0 2.83 0l2.34-2.33" />
+        </svg>
+      );
+    case 'building':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 20V7.2L12 4l6 3.2V20" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 20v-3.4h6V20M9 9.4h1.8m3.4 0H15m-6 3.3h1.8m3.4 0H15" />
+        </svg>
+      );
+    case 'shirt':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.2 4.7 12 7l3.8-2.3 3.1 2.8-2 3.6-1.4-.7V20H8.5v-9.6l-1.4.7-2-3.6 3.1-2.8Z" />
+        </svg>
+      );
+    case 'gauge':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5.2 16.4a7.7 7.7 0 1 1 13.6 0" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m12 12 3.7-3.7" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 12.1h.01" />
+        </svg>
+      );
+    case 'badge':
+      return (
+        <svg {...sharedProps}>
+          <circle cx="12" cy="10.3" r="4.8" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9.4 14.4-1.1 5 3.7-2.3 3.7 2.3-1.1-5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m10.55 10.4.95.95 1.95-2.15" />
+        </svg>
+      );
+    case 'comment':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.2 17.9 6.8 15a6.7 6.7 0 1 1 2.1 1.02Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 10.1h6M9 13.1h4.1" />
+        </svg>
+      );
+    case 'pen':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="m5.3 18.7 3.2-.72 8-8a2 2 0 1 0-2.82-2.82l-8 8L5.3 18.7Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 6.7 17.3 11" />
+        </svg>
+      );
+    case 'sample':
+      return (
+        <svg {...sharedProps}>
+          <rect x="6.3" y="5" width="11.4" height="14.3" rx="1.8" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.2 5.1h5.6v2H9.2zM9.1 11.2h5.8M9.1 14.2h3.7" />
+        </svg>
+      );
+    case 'sewing':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5.1 15.7h13.8v2.2H5.1z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.2 15.7V10a2.3 2.3 0 0 1 2.3-2.3h3.4a2.3 2.3 0 0 1 2.3 2.3v5.7" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.4 7.7V5.5h5.2v2.2" />
+        </svg>
+      );
+    case 'truck':
+      return (
+        <svg {...sharedProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.8 7.4h10.4v7.1H3.8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.2 9.7h3.3l2.4 2.6v2.2h-5.7z" />
+          <circle cx="8.1" cy="17.2" r="1.6" />
+          <circle cx="17.2" cy="17.2" r="1.6" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
 
 const CatalogTrustIcon: React.FC<{ path: React.ReactNode }> = ({ path }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="catalog-trust-icon" aria-hidden="true">
@@ -477,6 +900,17 @@ const MATERIAL_GUIDE_ITEMS = [
       'Twill memberi struktur kain yang lebih terbaca secara visual. Kesan akhirnya lebih kokoh dan berisi, sehingga sering dipilih ketika seragam perlu terlihat solid dan profesional.',
     advantages: ['Tampilan lebih tegas', 'Lebih berisi secara visual', 'Cocok untuk citra profesional yang kuat'],
     disadvantages: ['Bisa terasa lebih hangat dari kain ringan', 'Kurang ringan untuk pemakaian luar ruang yang sangat panas'],
+  },
+  {
+    name: 'Drill',
+    note: 'Serbaguna dan stabil',
+    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.DRILL,
+    specification: 'Karakter kain stabil, cukup padat, dan aman dipakai untuk seragam kerja yang butuh struktur rapi namun tetap nyaman.',
+    usage: 'Kemeja kerja, celana operasional, jaket ringan, dan seragam harian instansi.',
+    description:
+      'Drill berada di jalur bahan yang mudah dipakai untuk banyak kebutuhan seragam. Kesan visualnya tetap rapi, cukup kokoh untuk pemakaian rutin, dan relatif aman untuk kebutuhan kantor maupun operasional lapangan menengah.',
+    advantages: ['Fleksibel untuk banyak model seragam', 'Tampilan tetap rapi saat dipakai rutin', 'Cocok untuk kebutuhan kerja harian'],
+    disadvantages: ['Tidak seringan tropical untuk cuaca sangat panas', 'Tidak se-teknis ripstop untuk medan berat'],
   },
   {
     name: 'Nagata Drill',
@@ -724,6 +1158,10 @@ const PublicSiteView: React.FC = () => {
   const activeHowToOrderStep = HOW_TO_ORDER_STEPS[activeHowToOrderStepIndex] ?? HOW_TO_ORDER_STEPS[0];
   const activeBrandProfilePage = useMemo(
     () => BRAND_PROFILE_ITEMS.find((item) => item.route === currentRoute) ?? null,
+    [currentRoute],
+  );
+  const activeBrandProfileVisualPage = useMemo(
+    () => BRAND_PROFILE_VISUAL_ITEMS.find((item) => item.route === currentRoute) ?? null,
     [currentRoute],
   );
   const articleFeed = useMemo(
@@ -1127,10 +1565,14 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         {/* Intro hero gambar pertama home. */}
-        <section className="hero-display-strip hero-display-strip-top" data-home-section="hero-intro">
-          <img src={heroTopImage} alt="Seragam Bradwear sebagai identitas perusahaan" className="hero-display-strip-image" />
+        <section className="hero-display-strip hero-display-strip-top home-fast-response-strip" data-home-section="hero-intro">
+          <img
+            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            alt="Fast respon customer service Bradwear Indonesia"
+            className="hero-display-strip-image"
+          />
           <div className="hero-display-strip-overlay">
-            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Seragam merupakan identitas perusahaan</h2>
+            <h2 className="hero-display-strip-title hero-display-strip-title-intro">Fast respon untuk kebutuhan konsultasi seragam custom</h2>
           </div>
         </section>
 
@@ -1467,7 +1909,7 @@ const PublicSiteView: React.FC = () => {
             <h1 className="catalog-page-title">{title}</h1>
             <p className="catalog-page-copy">{description}</p>
           </div>
-          <div className="catalog-page-hero-visual">
+          <div className="catalog-page-hero-visual catalog-page-hero-visual-full">
             <img src={heroTopImage} alt="Koleksi seragam Bradwear Indonesia" className="catalog-page-hero-image" />
           </div>
         </div>
@@ -1641,6 +2083,16 @@ const PublicSiteView: React.FC = () => {
           </button>
         </div>
       </section>
+
+      {ASSETS.CONTENT.FAST_RESPONSE_HERO ? (
+        <section className="catalog-full-bleed-media scroll-reveal-block" aria-label="Fast respon customer service Bradwear">
+          <img
+            src={ASSETS.CONTENT.FAST_RESPONSE_HERO}
+            alt="Fast respon customer service Bradwear"
+            className="catalog-full-bleed-image"
+          />
+        </section>
+      ) : null}
     </div>
   );
 
@@ -2094,6 +2546,25 @@ const PublicSiteView: React.FC = () => {
         </div>
       </section>
 
+      {ASSETS.CONTENT.GOOGLE_PLAY_GALLERY.length ? (
+        <section className="download-gallery-shell scroll-reveal-block mt-8">
+          <div className="download-gallery-copy">
+            <p className="catalog-copy-band-kicker">Preview Mobile</p>
+            <h2 className="catalog-copy-band-title">Tampilan cepat dari folder Google Play</h2>
+            <p className="catalog-copy-band-copy">
+              Foto-foto ini dipakai sebagai preview visual untuk kebutuhan halaman download agar pengunjung tetap melihat konteks tampilan Bradwear dari perangkat mobile.
+            </p>
+          </div>
+          <div className="download-gallery-grid">
+            {ASSETS.CONTENT.GOOGLE_PLAY_GALLERY.map((image, index) => (
+              <article key={`${image}-${index}`} className="download-gallery-card">
+                <img src={image} alt={`Preview mobile Bradwear ${index + 1}`} className="download-gallery-image" />
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="scroll-reveal-block mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid gap-5 md:grid-cols-3">
           {DOWNLOAD_HIGHLIGHTS.map((item) => (
@@ -2489,7 +2960,14 @@ const PublicSiteView: React.FC = () => {
     </div>
   );
 
-  const renderBrandProfilePage = () => {
+  const scrollToBrandProfileSection = (sectionId: string) => {
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const renderLegacyBrandProfilePage = () => {
     if (!activeBrandProfilePage) return null;
 
     return (
@@ -2558,6 +3036,149 @@ const PublicSiteView: React.FC = () => {
               </section>
             ) : null}
           </article>
+        </section>
+      </div>
+    );
+  };
+
+  const renderBrandProfileShowcasePage = () => {
+    if (!activeBrandProfileVisualPage) return null;
+
+    return (
+      <div className="profile-showcase-page px-0 py-8">
+        <section className="profile-showcase-hero scroll-reveal-block">
+          <article className="profile-showcase-hero-copy">
+            <p className="profile-showcase-kicker">{activeBrandProfileVisualPage.kicker}</p>
+            <h1 className="profile-showcase-title">{activeBrandProfileVisualPage.title}</h1>
+            <p className="profile-showcase-intro">{activeBrandProfileVisualPage.intro}</p>
+            <a
+              href={buildWhatsAppUrl(buildConsultationMessage(activeBrandProfileVisualPage.cta.primaryMessage))}
+              target="_blank"
+              rel="noreferrer"
+              className="profile-showcase-primary"
+            >
+              <span>{activeBrandProfileVisualPage.cta.primaryLabel}</span>
+              <span className="profile-showcase-primary-icon" aria-hidden="true">
+                <InlineWhatsAppIcon />
+              </span>
+            </a>
+          </article>
+
+          <div className="profile-showcase-hero-media">
+            <img
+              src={activeBrandProfileVisualPage.heroImage}
+              alt={activeBrandProfileVisualPage.heroImageAlt}
+              className="profile-showcase-hero-image"
+            />
+          </div>
+        </section>
+
+        <section className="profile-showcase-values scroll-reveal-block">
+          <div className="profile-showcase-section-head">
+            <h2>Nilai yang Kami Pegang</h2>
+          </div>
+          <div className="profile-showcase-values-grid">
+            {activeBrandProfileVisualPage.values.map((item) => (
+              <article key={`${activeBrandProfileVisualPage.route}-${item.title}`} className="profile-showcase-value-card">
+                <div className="profile-showcase-value-icon">
+                  <BrandProfileIcon icon={item.icon} className="profile-showcase-icon-svg" />
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="profile-showcase-stats scroll-reveal-block">
+          {activeBrandProfileVisualPage.stats.map((item) => (
+            <article key={`${activeBrandProfileVisualPage.route}-${item.label}`} className="profile-showcase-stat-card">
+              <div className="profile-showcase-stat-icon">
+                <BrandProfileIcon icon={item.icon} className="profile-showcase-icon-svg" />
+              </div>
+              <p className="profile-showcase-stat-value">{item.value}</p>
+              <p className="profile-showcase-stat-label">{item.label}</p>
+              <p className="profile-showcase-stat-copy">{item.copy}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="profile-showcase-story scroll-reveal-block">
+          <article className="profile-showcase-story-copy">
+            <h2>{activeBrandProfileVisualPage.story.title}</h2>
+            <div className="profile-showcase-story-flow">
+              {activeBrandProfileVisualPage.story.paragraphs.map((paragraph, index) => (
+                <p key={`${activeBrandProfileVisualPage.route}-story-${index}`}>{paragraph}</p>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => scrollToBrandProfileSection(`profile-process-${activeBrandProfileVisualPage.route}`)}
+              className="profile-showcase-secondary"
+            >
+              <span>{activeBrandProfileVisualPage.story.buttonLabel}</span>
+              <ArrowRightTinyIcon />
+            </button>
+          </article>
+
+          <div className="profile-showcase-story-media">
+            <img
+              src={activeBrandProfileVisualPage.story.image}
+              alt={activeBrandProfileVisualPage.story.imageAlt}
+              className="profile-showcase-story-image"
+            />
+          </div>
+        </section>
+
+        <section
+          id={`profile-process-${activeBrandProfileVisualPage.route}`}
+          className="profile-showcase-process scroll-reveal-block"
+        >
+          <div className="profile-showcase-section-head">
+            <h2>{activeBrandProfileVisualPage.processTitle}</h2>
+          </div>
+          <div className="profile-showcase-process-grid">
+            {activeBrandProfileVisualPage.processSteps.map((step, index) => (
+              <article key={`${activeBrandProfileVisualPage.route}-${step.number}`} className="profile-showcase-process-item">
+                <div className="profile-showcase-process-badge">
+                  <BrandProfileIcon icon={step.icon} className="profile-showcase-icon-svg" />
+                </div>
+                {index < activeBrandProfileVisualPage.processSteps.length - 1 ? <span className="profile-showcase-process-line" aria-hidden="true" /> : null}
+                <p className="profile-showcase-process-number">{step.number}</p>
+                <h3>{step.title}</h3>
+                <p>{step.copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="profile-showcase-cta scroll-reveal-block">
+          <article className="profile-showcase-cta-copy">
+            <h2>{activeBrandProfileVisualPage.cta.title}</h2>
+            <p>{activeBrandProfileVisualPage.cta.copy}</p>
+          </article>
+
+          <div className="profile-showcase-cta-actions">
+            <a
+              href={buildWhatsAppUrl(buildConsultationMessage(activeBrandProfileVisualPage.cta.primaryMessage))}
+              target="_blank"
+              rel="noreferrer"
+              className="profile-showcase-cta-primary"
+            >
+              <span>{activeBrandProfileVisualPage.cta.primaryLabel}</span>
+              <span className="profile-showcase-primary-icon" aria-hidden="true">
+                <InlineWhatsAppIcon />
+              </span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setCurrentRoute(RouteKey.KATALOG)}
+              className="profile-showcase-cta-secondary"
+            >
+              <span>{activeBrandProfileVisualPage.cta.secondaryLabel}</span>
+              <ArrowRightTinyIcon />
+            </button>
+          </div>
         </section>
       </div>
     );
@@ -2679,8 +3300,9 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.PRODUCTS_SERVICES:
       case RouteKey.COMPETITIVE_ADVANTAGE:
       case RouteKey.CLIENT_REACH:
+        return renderBrandProfileShowcasePage();
       case RouteKey.LEGAL_LICENSE:
-        return renderBrandProfilePage();
+        return renderLegacyBrandProfilePage();
       case RouteKey.PANTS:
         return renderCatalog(
           pantsProducts,

@@ -5,18 +5,20 @@ const DesignEditorView = React.lazy(() => import('./components/DesignEditorView'
 const SummaryView = React.lazy(() => import('./components/SummaryView'));
 import { preloadCriticalAssets } from './assets';
 import { useStore } from './context/StoreContext';
-import { SITE_FAQS } from './lib/siteConfig';
+import { SITE_FAQS, buildCustomerServiceMessage, getConsultationTopicForPath } from './lib/siteConfig';
 import { applySeoMeta } from './lib/seo';
 import { CUSTOMER_SERVICE_DIALOG_EVENT, CustomerServiceDialogDetail } from './lib/customerServiceDialog';
 import SiteHeader from './components/SiteHeader';
-import BradAiChat from './components/BradAiChat';
-import CustomerServiceDock from './components/CustomerServiceDock';
 import CustomerServicePickerModal from './components/CustomerServicePickerModal';
+
+const FloatingWhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+    <path d="M20.52 11.84a8.52 8.52 0 0 1-12.57 7.48l-4.07 1.04 1.09-3.95A8.52 8.52 0 1 1 20.52 11.84Zm-8.5-7.1a7.08 7.08 0 0 0-6.13 10.63l.23.37-.64 2.33 2.4-.63.35.21a7.08 7.08 0 1 0 3.79-12.91Zm4 8.95c-.23-.11-1.31-.64-1.52-.72-.2-.07-.34-.1-.49.11-.14.23-.56.72-.69.87-.13.14-.26.17-.49.05-.23-.1-.93-.34-1.77-1.08-.65-.58-1.1-1.3-1.23-1.52-.12-.21-.01-.33.1-.44.1-.1.23-.26.34-.39.11-.13.14-.22.22-.37.08-.14.04-.28-.02-.39-.06-.11-.48-1.16-.66-1.58-.17-.42-.35-.36-.48-.37h-.41c-.14 0-.37.06-.57.27-.2.21-.75.73-.75 1.77 0 1.03.77 2.04.88 2.17.11.15 1.5 2.3 3.64 3.22.5.22.9.36 1.2.45.5.16.96.14 1.32.09.41-.06 1.31-.53 1.5-1.04.18-.51.18-.94.12-1.04-.05-.09-.2-.15-.42-.26Z" />
+  </svg>
+);
 
 const App: React.FC = () => {
   const { currentRoute, currentPathname, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
-  const [showBradAiWidget, setShowBradAiWidget] = React.useState(false);
-  const [showCustomerServiceDock, setShowCustomerServiceDock] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [customerServiceRequest, setCustomerServiceRequest] = React.useState<CustomerServiceDialogDetail | null>(null);
 
@@ -40,8 +42,6 @@ const App: React.FC = () => {
   }, [currentPathname]);
 
   useEffect(() => {
-    setShowBradAiWidget(false);
-    setShowCustomerServiceDock(false);
     setCustomerServiceRequest(null);
   }, [currentPathname]);
 
@@ -49,8 +49,6 @@ const App: React.FC = () => {
     const openDialog = (event: Event) => {
       const customEvent = event as CustomEvent<CustomerServiceDialogDetail>;
       if (!customEvent.detail?.message) return;
-      setShowBradAiWidget(false);
-      setShowCustomerServiceDock(false);
       setCustomerServiceRequest(customEvent.detail);
     };
 
@@ -72,11 +70,9 @@ const App: React.FC = () => {
       if (!message) return;
 
       event.preventDefault();
-      setShowBradAiWidget(false);
-      setShowCustomerServiceDock(false);
       setCustomerServiceRequest({
         message,
-        title: 'Pilih costumer service yang kamu inginkan',
+        title: 'Pilih customer service yang Anda inginkan',
       });
     };
 
@@ -121,6 +117,15 @@ const App: React.FC = () => {
     document.querySelector('main')?.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }, []);
 
+  const openCustomerServicePicker = React.useCallback(() => {
+    const topic = getConsultationTopicForPath(currentRoute, currentPathname);
+    setCustomerServiceRequest({
+      message: buildCustomerServiceMessage(topic),
+      title: 'Pilih WhatsApp customer service',
+      description: 'Pilih admin yang ingin Anda hubungi. Pesan akan langsung dibawa sesuai halaman yang sedang Anda buka.',
+    });
+  }, [currentPathname, currentRoute]);
+
   return (
     <div className="min-h-screen w-full bg-[var(--surface-subtle)] text-[var(--text-primary)]">
       <div className="min-h-screen w-full">
@@ -160,20 +165,6 @@ const App: React.FC = () => {
 
           {currentRoute !== RouteKey.EDITOR ? (
             <div className="fixed bottom-3 right-2 z-50 flex flex-col items-end gap-2 sm:bottom-5 sm:right-5 sm:gap-3">
-              {showBradAiWidget ? (
-                <div className="animate-fade-in-up h-[min(80dvh,760px)] w-[min(96vw,420px)] max-h-[calc(100dvh-5.25rem)]">
-                  <BradAiChat variant="widget" onClose={() => setShowBradAiWidget(false)} />
-                </div>
-              ) : null}
-              {showCustomerServiceDock ? (
-                <div className="animate-fade-in-up w-[min(96vw,460px)] max-h-[calc(100dvh-4.5rem)]">
-                  <CustomerServiceDock
-                    currentRoute={currentRoute}
-                    currentPathname={currentPathname}
-                    onClose={() => setShowCustomerServiceDock(false)}
-                  />
-                </div>
-              ) : null}
               <div className="flex items-center justify-end gap-2 sm:gap-3">
                 {showScrollTop ? (
                   <button
@@ -188,27 +179,14 @@ const App: React.FC = () => {
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowBradAiWidget(false);
-                    setShowCustomerServiceDock((current) => !current);
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(117,242,26,0.22)] bg-[linear-gradient(135deg,#ffffff,#f5faef)] px-3 py-2 text-xs font-black tracking-tight text-[var(--text-primary)] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
+                  onClick={openCustomerServicePicker}
+                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(37,211,102,0.26)] bg-[linear-gradient(135deg,#ffffff,#f4fff8)] px-3 py-2 text-xs font-black tracking-tight text-[var(--text-primary)] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
+                  aria-label="Buka pilihan WhatsApp customer service"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0f172a,#1f4d17)] text-[11px] font-black uppercase tracking-[0.18em] text-white sm:h-10 sm:w-10">
-                    CS
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#25d366,#16803c)] text-white shadow-[0_12px_24px_rgba(37,211,102,0.28)] sm:h-10 sm:w-10">
+                    <FloatingWhatsAppIcon />
                   </span>
-                  CS Aktif
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCustomerServiceDock(false);
-                    setShowBradAiWidget((current) => !current);
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-3 py-2 text-xs font-black tracking-tight text-[#071106] shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
-                >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-base text-white sm:h-10 sm:w-10 sm:text-lg">AI</span>
-                  Brodi
+                  WhatsApp
                 </button>
               </div>
             </div>

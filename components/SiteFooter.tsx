@@ -2,12 +2,10 @@
 import { ASSETS } from '../assets';
 import { CLIENT_LOGOS } from '../constants';
 import {
-  CONTACT_CHANNELS,
   PRIMARY_NAV_ITEMS,
+  SITE_FAQS,
   SITE_NAME,
   STORE_ADDRESS,
-  buildConsultationMessage,
-  buildWhatsAppUrl,
 } from '../lib/siteConfig';
 import { RouteKey } from '../types';
 
@@ -16,7 +14,7 @@ interface SiteFooterProps {
 }
 
 const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
-  [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN, RouteKey.BRAD_AI].includes(item.route),
+  [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN].includes(item.route),
 );
 
 const footerSocialLinks = [
@@ -64,8 +62,8 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      <div className="site-footer-grid">
-        <div className="site-footer-brand site-footer-panel site-footer-brand-panel">
+      <div className="site-footer-main-shell">
+        <div className="site-footer-main-column site-footer-brand-panel">
           <div className="site-footer-logo-shell">
             <img src={ASSETS.BRAND.LOGO} alt={SITE_NAME} className="site-footer-logo" />
           </div>
@@ -89,7 +87,7 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="site-footer-panel">
+        <div className="site-footer-main-column">
           <p className="site-footer-heading">Navigasi</p>
           <div className="site-footer-links site-footer-nav-links">
             {footerRoutes.map((item) => (
@@ -108,28 +106,23 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="site-footer-panel">
-          <p className="site-footer-heading">Kontak Cepat</p>
-          <div className="site-footer-links site-footer-contact-list">
-            {CONTACT_CHANNELS.map((channel) => (
-              <div key={channel.label} className="site-footer-contact-card">
-                <p className="site-footer-contact-label">{channel.label}</p>
-                <p className="site-footer-contact-value">{channel.value}</p>
-              </div>
+        <div className="site-footer-main-column">
+          <p className="site-footer-heading">FAQ</p>
+          <div className="site-footer-faq-list">
+            {SITE_FAQS.slice(0, 5).map((faq) => (
+              <button
+                key={faq.slug}
+                type="button"
+                onClick={() => onNavigate(RouteKey.LAYANAN_PELANGGAN)}
+                className="site-footer-faq-item"
+              >
+                <span>{faq.title}</span>
+              </button>
             ))}
           </div>
-        </div>
-
-        <div className="site-footer-panel site-footer-cta-panel">
-          <p className="site-footer-heading">Mulai Konsultasi</p>
-          <a
-            href={buildWhatsAppUrl(buildConsultationMessage('konsultasi seragam custom untuk instansi atau perusahaan'))}
-            target="_blank"
-            rel="noreferrer"
-            className="site-footer-whatsapp brand-cta"
-          >
-            Konsultasi via WhatsApp
-          </a>
+          <button type="button" onClick={() => onNavigate(RouteKey.LAYANAN_PELANGGAN)} className="site-footer-faq-link">
+            Lihat semua FAQ
+          </button>
         </div>
       </div>
 

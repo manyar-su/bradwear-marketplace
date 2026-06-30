@@ -35,6 +35,7 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
 // Import logo dan UI assets dynamically
 const LOGO_BRADWEAR = resolveAsset('./assets/logo.png');
 const HERO_BG = resolveAsset('./assets/factory_hero.webp');
+const HERO_FAST_RESPONSE = resolveAsset('./assets/Hero/Fast Respond.png') || resolveAsset('./assets/Hero/fast  respon .webp');
 const HERO_SLIDES = Object.keys(allImagesGlob)
   .filter((key) => key.toLowerCase().includes('/slideshow/'))
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -47,17 +48,25 @@ const SIZE_GUIDE = resolveAsset('./assets/size guide.webp');
 const MATERIAL_GUIDE_SOURCE = Object.keys(allImagesGlob)
   .filter((key) => key.toLowerCase().includes('/jenis bahan/'))
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+const GOOGLE_PLAY_GALLERY = Object.keys(allImagesGlob)
+  .filter((key) => key.toLowerCase().includes('/google play/'))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  .map((key) => resolveAsset(key));
 
 const findMaterialGuideImage = (pattern: string) =>
   resolveAsset(MATERIAL_GUIDE_SOURCE.find((key) => key.toLowerCase().includes(pattern)) ?? '');
 
+const findMaterialGuideImageByFileName = (fileName: string) =>
+  resolveAsset(MATERIAL_GUIDE_SOURCE.find((key) => key.split('/').pop()?.toLowerCase() === fileName.toLowerCase()) ?? '');
+
 const MATERIAL_GUIDE_IMAGES = {
-  JAPAN_DRILL: findMaterialGuideImage('japan'),
-  RIPSTOP: findMaterialGuideImage('ripstop'),
-  TROPICAL: findMaterialGuideImage('tropical'),
-  TWILL: findMaterialGuideImage('twill.webp') || findMaterialGuideImage('twill'),
-  NAGATA_DRILL: findMaterialGuideImage('nagata'),
-  STANFORD: findMaterialGuideImage('stanford'),
+  DRILL: findMaterialGuideImageByFileName('DRILL.webp') || findMaterialGuideImage('drill.webp'),
+  JAPAN_DRILL: findMaterialGuideImageByFileName('JAPAN DRILL.webp') || findMaterialGuideImage('japan'),
+  RIPSTOP: findMaterialGuideImageByFileName('RIPSTOP.webp') || findMaterialGuideImage('ripstop'),
+  TROPICAL: findMaterialGuideImageByFileName('TROPICAL.webp') || findMaterialGuideImage('tropical'),
+  TWILL: findMaterialGuideImageByFileName('TWILL.webp') || findMaterialGuideImage('twill'),
+  NAGATA_DRILL: findMaterialGuideImageByFileName('NAGATA.webp') || findMaterialGuideImage('nagata'),
+  STANFORD: findMaterialGuideImageByFileName('STANFORD.webp') || findMaterialGuideImage('stanford'),
 };
 
 const CLIENT_GALLERY_ORDER = ['dinsos', 'kejagung', 'medis', 'pemkab'] as const;
@@ -552,6 +561,8 @@ export const ASSETS = {
   CONTENT: {
     MIDDLE_SLIDES: MIDDLE_CONTENT_SLIDES,
     SIZE_GUIDE,
+    FAST_RESPONSE_HERO: HERO_FAST_RESPONSE,
+    GOOGLE_PLAY_GALLERY,
     MATERIAL_GUIDE_IMAGES,
   },
 

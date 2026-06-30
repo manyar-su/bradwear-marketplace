@@ -10,19 +10,22 @@ const CustomerServicePickerModal: React.FC<CustomerServicePickerModalProps> = ({
   if (!request) return null;
 
   return (
-    <div className="fixed inset-0 z-[710] flex items-end justify-center bg-[rgba(4,9,5,0.72)] p-3 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[710] flex items-start justify-center overflow-y-auto bg-[rgba(4,9,5,0.72)] p-3 pt-6 backdrop-blur-sm animate-fade-in sm:items-center sm:p-6"
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-[720px] rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-5 shadow-[0_28px_80px_rgba(15,23,42,0.26)] sm:p-6"
+        className="customer-service-picker-panel w-full max-w-[720px] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#ffffff,#f5faef)] p-5 shadow-[0_28px_80px_rgba(15,23,42,0.26)] animate-modal-fade sm:p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Customer Service</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--text-primary)]">
-              {request.title || 'Pilih costumer service yang kamu inginkan'}
+              {request.title || 'Pilih customer service yang Anda inginkan'}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              {request.description || 'Pilih costumer service yang kamu inginkan, lalu pesan akan langsung dikirim otomatis sesuai konteks halaman atau ringkasan desain Anda.'}
+              {request.description || 'Pilih customer service yang Anda inginkan, lalu pesan akan langsung dikirim sesuai konteks halaman atau ringkasan desain Anda.'}
             </p>
           </div>
           <button
