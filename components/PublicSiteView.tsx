@@ -40,6 +40,7 @@ const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const SLIDESHOW_INTERVAL_MS = 5000;
+const PROCESS_SLIDE_TRANSITION_MS = 420;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
 type TestimonialCategoryFilter = 'Semua Testimoni' | 'Instansi Pemerintah' | 'Perusahaan' | 'Pendidikan' | 'Kesehatan';
@@ -158,6 +159,7 @@ type BrandProfileProcessStep = {
   number: string;
   title: string;
   copy: string;
+  detail: string;
 };
 
 type BrandProfileCta = {
@@ -456,30 +458,40 @@ const BRAND_PROFILE_PROCESS_STEPS: BrandProfileProcessStep[] = [
     number: '01',
     title: 'Konsultasi',
     copy: 'Diskusi kebutuhan dan arah seragam yang ingin dibangun untuk tim Anda.',
+    detail:
+      'Tahap ini dipakai untuk memetakan fungsi seragam, konteks pemakaian, target tampilan, referensi visual, serta kebutuhan bahan dan bordir. Dari sini tim Bradwear menyusun arah kerja agar desain dan produksi bergerak di jalur yang sama sejak awal.',
   },
   {
     icon: 'pen',
     number: '02',
     title: 'Desain',
     copy: 'Pembuatan arahan desain dan penyesuaian identitas sesuai kebutuhan kerja.',
+    detail:
+      'Setelah kebutuhan terkunci, tim menyiapkan arahan desain yang lebih presisi: komposisi warna, penempatan logo, identitas personel, dan bentuk model. Revisi dikendalikan supaya hasil visual tetap jelas dan siap dilanjutkan ke tahap approval.',
   },
   {
     icon: 'sample',
     number: '03',
     title: 'Sampel',
     copy: 'Review sample dan penyamaan ekspektasi sebelum produksi berjalan massal.',
+    detail:
+      'Sampel membantu menyamakan ekspektasi terhadap bahan, warna, ukuran, dan detail finishing sebelum produksi massal dimulai. Tahap ini penting untuk menekan perubahan mendadak ketika order sudah masuk proses jahit dan kontrol kualitas.',
   },
   {
     icon: 'sewing',
     number: '04',
     title: 'Produksi',
     copy: 'Produksi dijalankan dengan kontrol kualitas, bahan terpilih, dan jahitan presisi.',
+    detail:
+      'Saat produksi berjalan, setiap item dikerjakan dengan kontrol pada pemotongan bahan, bordir, jahitan, dan kerapian hasil akhir. Fokus utamanya adalah menjaga konsistensi antara approval yang sudah disepakati dengan barang jadi yang diterima klien.',
   },
   {
     icon: 'truck',
     number: '05',
     title: 'Pengiriman',
     copy: 'Pesanan dikirim tepat waktu dengan koordinasi yang jelas sampai barang diterima.',
+    detail:
+      'Setelah proses akhir selesai, pesanan disiapkan untuk pengiriman dengan koordinasi penerima, alamat, dan jalur distribusi yang lebih rapi. Tim tetap menjaga komunikasi agar status kirim, penerimaan barang, dan tindak lanjut berjalan jelas.',
   },
 ];
 
@@ -1288,6 +1300,9 @@ const PublicSiteView: React.FC = () => {
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const [openSupportSectionSlug, setOpenSupportSectionSlug] = useState<string | null>(SUPPORT_DIRECTORY_SECTIONS[0]?.slug ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
+  const [activeProfileProcessStepIndex, setActiveProfileProcessStepIndex] = useState(0);
+  const [leavingProfileProcessStepIndex, setLeavingProfileProcessStepIndex] = useState<number | null>(null);
+  const [profileProcessMotionDirection, setProfileProcessMotionDirection] = useState<'forward' | 'backward'>('forward');
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
   const [articleHighlightIndex, setArticleHighlightIndex] = useState(0);
   const [articleCommentName, setArticleCommentName] = useState('');
@@ -1297,6 +1312,7 @@ const PublicSiteView: React.FC = () => {
   const catalogRef = useRef<HTMLElement | null>(null);
   const homeCarouselTouchStartX = useRef<number | null>(null);
   const homeCarouselTouchDeltaX = useRef(0);
+  const profileProcessTransitionTimeoutRef = useRef<number | null>(null);
   const activeArticleSlug = getArticleSlugFromPathname(currentPathname);
   const activeArticle = getArticleBySlug(activeArticleSlug);
   const visibleTestimonials = useMemo(
@@ -1511,6 +1527,7 @@ const PublicSiteView: React.FC = () => {
   const articleLatest = articleFeed.slice(1, 4);
   const articleHeadlineItems = articleFeed.slice(0, 5);
   const activeArticleHeadline = articleHeadlineItems[articleHighlightIndex % Math.max(articleHeadlineItems.length, 1)] ?? articleSpotlight;
+  const activeProcessVisualPage = activeBrandProfileVisualPage ?? (currentRoute === RouteKey.CLIENT ? BRAND_PROFILE_VISUAL_ITEMS.find((item) => item.route === RouteKey.CLIENT) ?? null : null);
   const categorySummaryRows = useMemo(
     () =>
       CATEGORIES.map((category) => ({
@@ -1538,6 +1555,20 @@ const PublicSiteView: React.FC = () => {
   useEffect(() => {
     setArticleHighlightIndex(0);
   }, [currentRoute, activeArticleSlug]);
+
+  useEffect(() => {
+    setActiveProfileProcessStepIndex(0);
+    setLeavingProfileProcessStepIndex(null);
+    setProfileProcessMotionDirection('forward');
+  }, [currentRoute]);
+
+  useEffect(() => {
+    return () => {
+      if (profileProcessTransitionTimeoutRef.current) {
+        window.clearTimeout(profileProcessTransitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (currentRoute !== RouteKey.ARTIKEL || activeArticle || articleHeadlineItems.length < 2) return;
@@ -1673,6 +1704,108 @@ const PublicSiteView: React.FC = () => {
 
   const navigateToArticle = (slug: string) => {
     setCurrentRoute(RouteKey.ARTIKEL, { path: getArticlePath(slug) });
+  };
+
+  const showProfileProcessStep = (nextIndex: number, stepCount: number) => {
+    if (!activeProcessVisualPage || stepCount < 1) return;
+
+    const normalizedNextIndex = ((nextIndex % stepCount) + stepCount) % stepCount;
+    if (normalizedNextIndex === activeProfileProcessStepIndex) return;
+
+    if (profileProcessTransitionTimeoutRef.current) {
+      window.clearTimeout(profileProcessTransitionTimeoutRef.current);
+    }
+
+    setProfileProcessMotionDirection(normalizedNextIndex > activeProfileProcessStepIndex ? 'forward' : 'backward');
+    setLeavingProfileProcessStepIndex(activeProfileProcessStepIndex);
+    setActiveProfileProcessStepIndex(normalizedNextIndex);
+    profileProcessTransitionTimeoutRef.current = window.setTimeout(() => {
+      setLeavingProfileProcessStepIndex(null);
+    }, PROCESS_SLIDE_TRANSITION_MS);
+  };
+
+  const showNextProfileProcessStep = (steps: BrandProfileProcessStep[]) => {
+    if (!steps.length) return;
+    showProfileProcessStep(activeProfileProcessStepIndex + 1, steps.length);
+  };
+
+  const renderProfileProcessSection = (route: RouteKey, title: string, steps: BrandProfileProcessStep[]) => {
+    const activeStep =
+      steps[activeProfileProcessStepIndex % Math.max(steps.length, 1)] ??
+      steps[0] ??
+      null;
+    const leavingStep = leavingProfileProcessStepIndex === null ? null : steps[leavingProfileProcessStepIndex] ?? null;
+
+    if (!activeStep) return null;
+
+    const directionClass = profileProcessMotionDirection === 'forward' ? 'is-forward' : 'is-backward';
+
+    return (
+      <section id={`profile-process-${route}`} className="profile-showcase-process scroll-reveal-block">
+        <div className="profile-showcase-process-head">
+          <div className="profile-showcase-section-head profile-showcase-section-head-left">
+            <h2>{title}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => showNextProfileProcessStep(steps)}
+            className="profile-showcase-process-next"
+            aria-label={`Lihat tahap setelah ${activeStep.title}`}
+          >
+            <span>Langkah berikutnya</span>
+            <ChevronRightIcon />
+          </button>
+        </div>
+
+        <div className="profile-showcase-process-slider">
+          <div className="profile-showcase-process-stage">
+            {leavingStep ? (
+              <article className={`profile-showcase-process-slide profile-showcase-process-slide-leaving ${directionClass}`} aria-hidden="true">
+                <div className="profile-showcase-process-badge">
+                  <BrandProfileIcon icon={leavingStep.icon} className="profile-showcase-icon-svg" />
+                </div>
+                <p className="profile-showcase-process-number">{leavingStep.number}</p>
+                <h3>{leavingStep.title}</h3>
+                <p className="profile-showcase-process-copy">{leavingStep.copy}</p>
+                <p className="profile-showcase-process-detail">{leavingStep.detail}</p>
+              </article>
+            ) : null}
+
+            <article
+              key={`${route}-${activeStep.number}-${activeProfileProcessStepIndex}`}
+              className={`profile-showcase-process-slide profile-showcase-process-slide-active ${directionClass}`}
+            >
+              <div className="profile-showcase-process-badge">
+                <BrandProfileIcon icon={activeStep.icon} className="profile-showcase-icon-svg" />
+              </div>
+              <p className="profile-showcase-process-number">{activeStep.number}</p>
+              <h3>{activeStep.title}</h3>
+              <p className="profile-showcase-process-copy">{activeStep.copy}</p>
+              <p className="profile-showcase-process-detail">{activeStep.detail}</p>
+            </article>
+          </div>
+
+          <div className="profile-showcase-process-nav" role="tablist" aria-label={`${title} steps`}>
+            {steps.map((step, index) => {
+              const isActive = index === activeProfileProcessStepIndex;
+              return (
+                <button
+                  key={`${route}-process-nav-${step.number}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => showProfileProcessStep(index, steps.length)}
+                  className={`profile-showcase-process-nav-item ${isActive ? 'is-active' : ''}`}
+                >
+                  <span className="profile-showcase-process-nav-number">{step.number}</span>
+                  <span className="profile-showcase-process-nav-title">{step.title}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
   };
 
   const renderProductCard = (product: Product, badge?: string) => (
@@ -3064,14 +3197,6 @@ const PublicSiteView: React.FC = () => {
             className="how-to-order-hero-image"
             loading="eager"
           />
-          <div className="how-to-order-hero-overlay">
-            <p className="how-to-order-hero-kicker">Cara Order</p>
-            <h1 className="how-to-order-hero-title">Proses pemesanan seragam yang rapi, jelas, dan mudah diikuti.</h1>
-            <p className="how-to-order-hero-copy">
-              Gunakan alur ini untuk memilih model, menyesuaikan desain, mengirim detail order, lalu memantau proses produksi
-              sampai pengiriman.
-            </p>
-          </div>
         </section>
 
         <section className="how-to-order-shell scroll-reveal-block">
@@ -3080,10 +3205,6 @@ const PublicSiteView: React.FC = () => {
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--text-primary)] md:text-[2.55rem]">
               Ikuti langkah yang sesuai sampai order siap diproses tim Bradwear.
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              Struktur tahap tetap memakai data `HOW_TO_ORDER_STEPS`, tetapi sekarang ditata ulang supaya lebih presisi dan mudah
-              dipakai dari mobile maupun desktop.
-            </p>
           </div>
 
           <div className="how-to-order-layout mt-6">
@@ -3628,27 +3749,11 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
-        <section
-          id={`profile-process-${activeBrandProfileVisualPage.route}`}
-          className="profile-showcase-process scroll-reveal-block"
-        >
-          <div className="profile-showcase-section-head">
-            <h2>{activeBrandProfileVisualPage.processTitle}</h2>
-          </div>
-          <div className="profile-showcase-process-grid">
-            {activeBrandProfileVisualPage.processSteps.map((step, index) => (
-              <article key={`${activeBrandProfileVisualPage.route}-${step.number}`} className="profile-showcase-process-item">
-                <div className="profile-showcase-process-badge">
-                  <BrandProfileIcon icon={step.icon} className="profile-showcase-icon-svg" />
-                </div>
-                {index < activeBrandProfileVisualPage.processSteps.length - 1 ? <span className="profile-showcase-process-line" aria-hidden="true" /> : null}
-                <p className="profile-showcase-process-number">{step.number}</p>
-                <h3>{step.title}</h3>
-                <p>{step.copy}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+        {renderProfileProcessSection(
+          activeBrandProfileVisualPage.route,
+          activeBrandProfileVisualPage.processTitle,
+          activeBrandProfileVisualPage.processSteps,
+        )}
 
         <section className="profile-showcase-cta scroll-reveal-block">
           <article className="profile-showcase-cta-copy">
@@ -3773,27 +3878,11 @@ const PublicSiteView: React.FC = () => {
             </div>
           </section>
 
-          <section
-            id={`profile-process-${portfolioPage.route}`}
-            className="profile-showcase-process scroll-reveal-block"
-          >
-            <div className="profile-showcase-section-head">
-              <h2>{portfolioPage.processTitle}</h2>
-            </div>
-            <div className="profile-showcase-process-grid">
-              {portfolioPage.processSteps.map((step, index) => (
-                <article key={`${portfolioPage.route}-${step.number}`} className="profile-showcase-process-item">
-                  <div className="profile-showcase-process-badge">
-                    <BrandProfileIcon icon={step.icon} className="profile-showcase-icon-svg" />
-                  </div>
-                  {index < portfolioPage.processSteps.length - 1 ? <span className="profile-showcase-process-line" aria-hidden="true" /> : null}
-                  <p className="profile-showcase-process-number">{step.number}</p>
-                  <h3>{step.title}</h3>
-                  <p>{step.copy}</p>
-                </article>
-              ))}
-            </div>
-          </section>
+          {renderProfileProcessSection(
+            portfolioPage.route,
+            portfolioPage.processTitle,
+            portfolioPage.processSteps,
+          )}
 
           <section id="client-portfolio-categories" className="portfolio-gallery-overview scroll-reveal-block">
             <div className="profile-showcase-section-head portfolio-gallery-head">

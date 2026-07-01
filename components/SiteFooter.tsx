@@ -3,7 +3,6 @@ import { ASSETS } from '../assets';
 import { CLIENT_LOGOS } from '../constants';
 import {
   PRIMARY_NAV_ITEMS,
-  SITE_FAQS,
   SITE_NAME,
   STORE_ADDRESS,
 } from '../lib/siteConfig';
@@ -16,6 +15,14 @@ interface SiteFooterProps {
 const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
   [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.TESTIMONI, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN].includes(item.route),
 );
+
+const footerProfileLinks = [
+  { label: 'Tentang Kami', route: RouteKey.ABOUT },
+  { label: 'Visi & Misi', route: RouteKey.VISION_MISSION },
+  { label: 'Produk & Jasa', route: RouteKey.PRODUCTS_SERVICES },
+  { label: 'Keunggulan', route: RouteKey.COMPETITIVE_ADVANTAGE },
+  { label: 'Klien & Jangkauan', route: RouteKey.CLIENT_REACH },
+];
 
 const footerSocialLinks = [
   {
@@ -107,21 +114,21 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
         </div>
 
         <div className="site-footer-main-column">
-          <p className="site-footer-heading">FAQ</p>
+          <p className="site-footer-heading">Link Profil</p>
           <div className="site-footer-faq-list">
-            {SITE_FAQS.slice(0, 5).map((faq) => (
+            {footerProfileLinks.map((item) => (
               <button
-                key={faq.slug}
+                key={item.route}
                 type="button"
-                onClick={() => onNavigate(RouteKey.LAYANAN_PELANGGAN)}
+                onClick={() => onNavigate(item.route)}
                 className="site-footer-faq-item"
               >
-                <span>{faq.title}</span>
+                <span>{item.label}</span>
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => onNavigate(RouteKey.LAYANAN_PELANGGAN)} className="site-footer-faq-link">
-            Lihat semua FAQ
+          <button type="button" onClick={() => onNavigate(RouteKey.ABOUT)} className="site-footer-faq-link">
+            Buka halaman profil
           </button>
         </div>
       </div>
