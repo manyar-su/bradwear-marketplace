@@ -1,6 +1,7 @@
 import {
   ARTICLES,
   BRAD_AI_CONTEXT,
+  CATALOG_GUIDE_PATHS,
   HOW_TO_ORDER_STEPS,
   ROUTE_LABELS,
   ROUTE_PATHS,
@@ -11,9 +12,14 @@ import {
   STORE_ADDRESS,
   STORE_MAP_URL,
   WHATSAPP_NUMBER,
+  buildCatalogProductSlug,
+  getCatalogGuideFromPathname,
+  getCatalogProductPath,
+  getCatalogProductSlugFromPathname,
   getArticleBySlug,
   getArticlePath,
   getArticleSlugFromPathname,
+  normalizePathname,
 } from './siteConfig';
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
@@ -87,7 +93,61 @@ const buildArticleMeta = (article: Article): SeoMeta => ({
   schema: [],
 });
 
-const resolveSeoMeta = (route: RouteKey, pathname: string) => {
+const buildCatalogSubpageMeta = (pathname: string, products: Product[]): SeoMeta | null => {
+  const guide = getCatalogGuideFromPathname(pathname);
+  if (guide === 'size') {
+    return {
+      title: 'Panduan Ukuran Seragam Bradwear Indonesia',
+      description: 'Panduan ukuran seragam Bradwear Indonesia untuk mempermudah briefing size tim sebelum masuk ke editor atau konsultasi order.',
+      path: CATALOG_GUIDE_PATHS.size,
+      keywords: dedupeKeywords([
+        ...SEO_META[RouteKey.KATALOG].keywords,
+        'panduan ukuran seragam',
+        'size guide kemeja custom',
+        'ukuran seragam dinas',
+      ]),
+      schema: [],
+    };
+  }
+
+  if (guide === 'material') {
+    return {
+      title: 'Panduan Jenis Bahan Seragam Bradwear Indonesia',
+      description: 'Pelajari karakter Japan Drill, Ripstop, Tropical, Twill, Drill, Nagata Drill, dan Stanford untuk kebutuhan seragam custom Bradwear.',
+      path: CATALOG_GUIDE_PATHS.material,
+      keywords: dedupeKeywords([
+        ...SEO_META[RouteKey.KATALOG].keywords,
+        'panduan jenis bahan seragam',
+        'bahan kemeja custom',
+        'material seragam dinas',
+      ]),
+      schema: [],
+    };
+  }
+
+  const productSlug = getCatalogProductSlugFromPathname(pathname);
+  if (!productSlug) return null;
+
+  const product = products.find((item) => buildCatalogProductSlug(item) === productSlug);
+  if (!product) return null;
+
+  return {
+    title: `${product.name} | Detail Model ${product.category} Bradwear Indonesia`,
+    description: `Detail model ${product.name} kategori ${product.category} dari Bradwear Indonesia, lengkap dengan informasi material, detail saku, bordir 3D, dan CTA ke editor desain.`,
+    path: getCatalogProductPath(product),
+    keywords: dedupeKeywords([
+      ...SEO_META[RouteKey.KATALOG].keywords,
+      product.name,
+      `${product.name} ${product.category.toLowerCase()}`,
+      `${product.category.toLowerCase()} premium`,
+      'bordir 3d seragam',
+      'detail model seragam custom',
+    ]),
+    schema: [],
+  };
+};
+
+const resolveSeoMeta = (route: RouteKey, pathname: string, products: Product[]) => {
   const article = getArticleBySlug(getArticleSlugFromPathname(pathname));
   if (route === RouteKey.ARTIKEL && article) {
     return {
@@ -96,9 +156,22 @@ const resolveSeoMeta = (route: RouteKey, pathname: string) => {
     };
   }
 
+  if (route === RouteKey.KATALOG || route === RouteKey.PANTS) {
+    const catalogSubpageMeta = buildCatalogSubpageMeta(pathname, products);
+    if (catalogSubpageMeta) {
+      return {
+        article: null,
+        meta: catalogSubpageMeta,
+      };
+    }
+  }
+
   return {
     article: null,
-    meta: SEO_META[route],
+    meta: {
+      ...SEO_META[route],
+      path: normalizePathname(pathname) === ROUTE_PATHS[route] ? SEO_META[route].path : normalizePathname(pathname),
+    },
   };
 };
 
@@ -328,10 +401,48 @@ const buildBaseSchemas = (
 };
 
 export const buildPageSchema = (route: RouteKey, pathname: string, products: Product[], faqs: SiteFaqItem[]) => {
-  const { article, meta } = resolveSeoMeta(route, pathname);
+  const { article, meta } = resolveSeoMeta(route, pathname, products);
   const keywords = buildRouteKeywords(route, pathname, products, meta, article);
   const canonical = `${SITE_URL}${meta.path}`;
   const base = buildBaseSchemas(route, meta, keywords, canonical, article);
+  const catalogGuide = getCatalogGuideFromPathname(pathname);
+  const catalogProductSlug = getCatalogProductSlugFromPathname(pathname);
+  const catalogProduct = catalogProductSlug
+    ? products.find((product) => buildCatalogProductSlug(product) === catalogProductSlug) ?? null
+    : null;
+
+  if (route === RouteKey.KATALOG && catalogGuide) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: meta.title,
+      url: canonical,
+      description: meta.description,
+      about: keywords.slice(0, 8).map((keyword) => ({
+        '@type': 'Thing',
+        name: keyword,
+      })),
+    });
+    return base;
+  }
+
+  if (route === RouteKey.KATALOG && catalogProduct) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: catalogProduct.name,
+      description: catalogProduct.description,
+      image: catalogProduct.image,
+      category: catalogProduct.category,
+      brand: {
+        '@type': 'Brand',
+        name: SITE_NAME,
+      },
+      url: canonical,
+      keywords: keywords.join(', '),
+    });
+    return base;
+  }
 
   if (route === RouteKey.KATALOG || route === RouteKey.PANTS || route === RouteKey.HOME) {
     const filteredProducts = route === RouteKey.PANTS
@@ -539,7 +650,7 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
 };
 
 export const applySeoMeta = (route: RouteKey, pathname: string, products: Product[], faqs: SiteFaqItem[]) => {
-  const { article, meta } = resolveSeoMeta(route, pathname);
+  const { article, meta } = resolveSeoMeta(route, pathname, products);
   const canonical = `${SITE_URL}${meta.path}`;
   const keywords = buildRouteKeywords(route, pathname, products, meta, article);
   const schemas = buildPageSchema(route, pathname, products, faqs);

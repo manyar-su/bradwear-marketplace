@@ -12,8 +12,10 @@ import { useStore } from '../context/StoreContext';
 import { CLIENT_LOGOS } from '../constants';
 import {
   ARTICLES,
+  buildCatalogProductSlug,
   CONTACT_CHANNELS,
   COURIER_PROVIDERS,
+  CATALOG_GUIDE_PATHS,
   CUSTOMER_SERVICE_HOURS,
   HOW_TO_ORDER_STEPS,
   ROUTE_PATHS,
@@ -25,7 +27,11 @@ import {
   getArticleBySlug,
   getArticlePath,
   getArticleSlugFromPathname,
+  getCatalogGuideFromPathname,
+  getCatalogProductPath,
+  getCatalogProductSlugFromPathname,
   buildConsultationMessage,
+  buildCustomerServiceMessage,
   buildTrackingUrl,
   buildWhatsAppUrl,
   getTrackingProviderById,
@@ -33,6 +39,7 @@ import {
 import { CompletedOrder, CourierProvider, Product, RouteKey } from '../types';
 import BradAiChat from './BradAiChat';
 import SiteFooter from './SiteFooter';
+import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
 
 const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
@@ -1278,6 +1285,209 @@ const MATERIAL_GUIDE_ITEMS = [
   },
 ] as const;
 
+type ProductDetailContent = {
+  material: string;
+  pocketLayout: string;
+  silhouette: string;
+  embroidery: string;
+  bestFor: string;
+  intro: string;
+  badges: string[];
+  features: Array<{ title: string; copy: string }>;
+  craftsmanship: string[];
+};
+
+const SIZE_GUIDE_DETAIL_POINTS = [
+  {
+    title: 'Baca ukuran dasar lebih cepat',
+    copy: 'Gunakan tabel ini untuk menyiapkan panjang badan, lebar dada, bahu, dan panjang lengan sebelum diskusi order masuk ke tahap final.',
+  },
+  {
+    title: 'Validasi per divisi atau gender',
+    copy: 'Jika tim Anda memiliki kombinasi ukuran pria, wanita, atau kebutuhan custom, panduan ini membantu menyamakan acuan awal sebelum detail dibahas lebih lanjut.',
+  },
+  {
+    title: 'Tetap bisa lanjut ukuran khusus',
+    copy: 'Untuk kebutuhan yang lebih presisi, CTA desain dan konsultasi tetap membuka jalur custom size agar tim Bradwear bisa menyesuaikan pola dengan kebutuhan lapangan.',
+  },
+] as const;
+
+const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetailContent> = {
+  Kemeja: {
+    material: 'Japan Drill, Tropical, atau Oxford premium sesuai kebutuhan visual dan ritme kerja.',
+    pocketLayout: 'Dua area saku depan yang bisa disesuaikan menjadi flap formal, utility pocket, atau kompartemen alat tulis.',
+    silhouette: 'Potongan semi formal tactical yang tetap rapi untuk dinas, operasional, dan aktivitas presentasi tim.',
+    embroidery: 'Bordir timbul 3D dan identitas personel ditempatkan agar tetap terbaca jelas saat dipakai harian.',
+    bestFor: 'Seragam dinas, operasional kantor, pengadaan instansi, dan tim lapangan ringan.',
+    intro: 'Model kemeja Bradwear dirancang agar tampilan tetap profesional, namun masih fleksibel untuk fungsi kerja harian dan kebutuhan custom identitas tim.',
+    badges: ['Premium Stitching', 'Bordir 3D', 'Custom Pocket'],
+    features: [
+      { title: 'Saku depan lebih tegas', copy: 'Layout saku dibangun agar area utilitas terlihat rapi sekaligus fungsional untuk kebutuhan kerja harian.' },
+      { title: 'Bahan premium sesuai ritme kerja', copy: 'Pemilihan kain diarahkan ke target visual, kenyamanan, dan tingkat mobilitas tim agar hasil akhir tidak sekadar bagus di foto.' },
+      { title: 'Kerah, manset, dan panel bordir lebih presisi', copy: 'Detail kecil seperti posisi emblem, piping, dan panel nama dipersiapkan agar tetap konsisten saat masuk produksi massal.' },
+    ],
+    craftsmanship: [
+      'Jahitan rapat untuk menjaga struktur kemeja tetap stabil.',
+      'Bordir timbul 3D bisa ditempatkan di dada, lengan, atau punggung.',
+      'Pilihan saku dapat dibuat lebih formal atau lebih tactical sesuai kebutuhan.',
+    ],
+  },
+  Celana: {
+    material: 'Drill, Ripstop, atau Japan Drill untuk struktur celana kerja dan tactical yang tetap nyaman dipakai seharian.',
+    pocketLayout: 'Kompartemen samping dan belakang bisa diatur untuk fungsi cargo ringan, tactical, atau kerja lapangan yang lebih formal.',
+    silhouette: 'Cutting lurus-tegas dengan ruang gerak yang aman untuk aktivitas mobile, inspeksi, dan operasional teknis.',
+    embroidery: 'Identitas 3D dapat ditempatkan pada flap, panel belakang, atau detail aksen yang tetap proporsional.',
+    bestFor: 'Celana kerja, tactical, lapangan, dan seragam operasional dengan mobilitas tinggi.',
+    intro: 'Detail celana Bradwear dibuat agar tidak hanya terlihat kokoh, tetapi juga nyaman dipakai untuk ritme kerja yang aktif dari pagi sampai sore.',
+    badges: ['Tactical Utility', 'Reinforced Stitch', '3D Accent Ready'],
+    features: [
+      { title: 'Kantong utilitas lebih fungsional', copy: 'Posisi saku disiapkan agar tetap mudah dijangkau tanpa membuat siluet celana terlalu berat.' },
+      { title: 'Potongan lebih aman untuk bergerak', copy: 'Ruang paha, lutut, dan bukaan bawah dibuat lebih stabil agar nyaman dipakai saat banyak perpindahan titik kerja.' },
+      { title: 'Material kokoh namun tetap terukur', copy: 'Pilihan kain diarahkan pada kebutuhan kerja lapangan, bukan sekadar kesan tactical yang berlebihan.' },
+    ],
+    craftsmanship: [
+      'Jahitan penguat pada area rawan tarik dan gesekan.',
+      'Panel saku bisa disesuaikan untuk kebutuhan cargo, formal, atau semi tactical.',
+      'Aksen identitas dibuat tetap rapi tanpa mengganggu fungsi utama celana.',
+    ],
+  },
+  Jaket: {
+    material: 'Taslan, drill, atau kombinasi bahan luar dan lining yang disesuaikan dengan target visual dan pemakaian lapangan.',
+    pocketLayout: 'Saku samping, saku dada, dan kompartemen dalam bisa diatur agar jaket tetap rapi namun fungsional.',
+    silhouette: 'Struktur jaket dibuat solid, lebih tegas di bahu, dan nyaman untuk layer seragam kerja harian.',
+    embroidery: 'Bordir timbul 3D dan patch logo tetap bisa diangkat tanpa membuat panel jaket terasa berat.',
+    bestFor: 'Jaket tim, safety, operasional luar ruang, dan seragam kerja dengan kebutuhan proteksi tambahan.',
+    intro: 'Jaket Bradwear dibuat untuk kebutuhan seragam yang membutuhkan kesan kuat, pelindung, dan tetap pantas dipakai sebagai identitas tim di lapangan.',
+    badges: ['Layered Comfort', 'Bold Utility', '3D Patch Ready'],
+    features: [
+      { title: 'Panel luar lebih rapi', copy: 'Bidang depan jaket disusun agar logo, nama tim, dan garis aksen tetap terlihat bersih dari jarak dekat maupun jauh.' },
+      { title: 'Saku kerja dan kompartemen tambahan', copy: 'Posisi saku dibuat lebih praktis untuk aktivitas lapangan, briefing, dan mobilitas luar ruang.' },
+      { title: 'Struktur tegas untuk branding tim', copy: 'Jaket memberi bidang visual yang kuat untuk membangun kesan profesional pada tim operasional.' },
+    ],
+    craftsmanship: [
+      'Area saku dan resleting dijahit lebih rapat untuk pemakaian rutin.',
+      'Bordir timbul 3D dan patch bisa dipasang pada area dada atau lengan.',
+      'Finishing dirapikan agar jatuh jaket tetap presisi saat dipakai berlapis.',
+    ],
+  },
+  Rompi: {
+    material: 'Drill, canvas ringan, atau bahan teknis lapangan yang memberi struktur kuat namun tetap mudah dipakai bergerak.',
+    pocketLayout: 'Multi pocket depan dan panel samping dapat diatur untuk membawa alat kerja ringan, identitas, atau kebutuhan tim lapangan.',
+    silhouette: 'Rompi dibuat lebih ringkas di badan agar area saku tetap fungsional tanpa terlihat penuh berlebihan.',
+    embroidery: 'Logo tim, patch identitas, dan bordir 3D dapat diposisikan agar tetap terbaca di area dada dan punggung.',
+    bestFor: 'Rompi lapangan, rompi safety, tim proyek, dan kebutuhan operasional yang memerlukan utilitas ekstra.',
+    intro: 'Rompi Bradwear cocok dipakai ketika tim membutuhkan identitas visual yang kuat sekaligus area utilitas tambahan untuk pekerjaan lapangan.',
+    badges: ['Multi Pocket', 'Lapangan Ready', 'Identity Focused'],
+    features: [
+      { title: 'Panel saku lebih banyak', copy: 'Konfigurasi saku disusun agar rompi tetap rapat ke badan tetapi masih praktis untuk alat kerja ringan.' },
+      { title: 'Area dada dan punggung lebih mudah dibaca', copy: 'Logo, nama tim, dan label keselamatan bisa diangkat lebih jelas berkat bidang rompi yang tegas.' },
+      { title: 'Tetap nyaman untuk mobilitas tinggi', copy: 'Bobot dan struktur rompi dijaga agar tidak terasa terlalu berat saat dipakai berjam-jam.' },
+    ],
+    craftsmanship: [
+      'Kombinasi saku dapat dibuat lebih teknis atau lebih formal tergantung sektor kerja.',
+      'Bordir timbul 3D tetap aman dipasang pada panel yang lebih tebal.',
+      'Finishing sisi rompi dirapikan agar area utilitas tidak tampak berantakan.',
+    ],
+  },
+  Polo: {
+    material: 'Lacoste premium, cotton combed, atau dry fit yang diarahkan ke kenyamanan harian dan tampilan lebih santai tetapi tetap rapi.',
+    pocketLayout: 'Opsional saku kecil atau panel dada bersih untuk menonjolkan bordir logo dan identitas tim.',
+    silhouette: 'Polo dibuat lebih ringkas, mudah dipakai harian, namun tetap membawa citra profesional saat dipakai bersama tim.',
+    embroidery: 'Bordir timbul 3D dan logo dada bisa ditonjolkan lebih clean pada area front panel polo.',
+    bestFor: 'Seragam casual formal, event, komunitas, dan kebutuhan kantor dengan nuansa santai premium.',
+    intro: 'Polo Bradwear diarahkan untuk kebutuhan seragam yang lebih santai namun tetap menjaga kesan rapi dan identitas visual yang kuat.',
+    badges: ['Casual Premium', 'Clean Embroidery', 'Daily Comfort'],
+    features: [
+      { title: 'Panel dada lebih bersih', copy: 'Area depan polo memberi ruang logo dan bordir lebih tegas tanpa banyak gangguan detail tambahan.' },
+      { title: 'Nyaman dipakai harian', copy: 'Bahan diarahkan ke kenyamanan kulit dan flow yang lebih ringan untuk pemakaian panjang.' },
+      { title: 'Mudah dipadukan dengan banyak divisi', copy: 'Polo cocok untuk tim event, frontliner, komunitas, atau staf internal yang butuh visual santai tetapi tetap seragam.' },
+    ],
+    craftsmanship: [
+      'Kerah dan placket dijaga agar tetap rapi setelah pemakaian rutin.',
+      'Bordir 3D bisa tampil clean pada area dada kiri atau kanan.',
+      'Aksen warna dan lis dapat disesuaikan untuk memperkuat identitas tim.',
+    ],
+  },
+};
+
+const PRODUCT_DETAIL_OVERRIDES: Record<string, Partial<ProductDetailContent>> = {
+  k2: {
+    material: 'Japan Drill premium dengan struktur rapi untuk kebutuhan semi formal tactical.',
+    pocketLayout: 'Dua saku flap depan dengan kompartemen alat tulis dan panel dada yang tetap seimbang secara visual.',
+    silhouette: 'Semi formal tactical dengan badan lebih bersih dan garis jahit tegas.',
+    embroidery: 'Bordir timbul 3D menonjol di area dada tanpa mengganggu keseimbangan layout kemeja.',
+  },
+  k3: {
+    material: 'Oxford atau Tropical premium untuk tampilan modern yang lebih clean.',
+    pocketLayout: 'Saku depan dibuat lebih ramping agar tetap fungsional tetapi visualnya lebih ringan.',
+    silhouette: 'Modern fit yang lebih halus untuk kebutuhan kantor, event, dan tim representatif.',
+  },
+  k1: {
+    material: 'Ripstop Tornado premium untuk kebutuhan aktif dengan struktur kain lebih kuat.',
+    pocketLayout: 'Dual pocket depan dan ventilasi punggung membuat model ini cocok untuk ritme kerja yang lebih dinamis.',
+    embroidery: 'Logo 3D dan panel nama tetap aman saat digabung dengan detail ventilasi.',
+  },
+  k11: {
+    material: 'Japan Drill atau Ripstop dengan karakter tactical yang lebih tangguh.',
+    pocketLayout: 'Beberapa saku utilitas depan cocok untuk tim lapangan dan kebutuhan akses cepat.',
+    silhouette: 'Tactical penuh dengan bidang dada yang tegas dan panel kerja yang kuat.',
+  },
+  k5: {
+    material: 'Drill premium dengan struktur padat untuk kebutuhan dinas dan operasional.',
+    pocketLayout: 'Desain kantong terbaru memberi bidang saku yang lebih kuat dan mudah dibaca.',
+    embroidery: 'Bordir 3D lebih menonjol karena bidang depan model ini cenderung solid.',
+  },
+  k6: {
+    material: 'Tropical premium untuk flow kain yang lebih ringan dan bersih.',
+    pocketLayout: 'Saku lebih minimal sehingga fokus utama ada di logo dan garis potongan model.',
+  },
+  k8: {
+    material: 'Katun drill untuk kebutuhan PDH yang rapi, aman, dan nyaman dipakai harian.',
+    pocketLayout: 'Dua saku depan formal dengan penataan yang lebih klasik untuk instansi.',
+  },
+  k10: {
+    material: 'Stanford atau Oxford premium untuk karakter formal ekspor yang lebih refined.',
+    pocketLayout: 'Bidang saku tetap hadir namun dibuat lebih bersih untuk kesan premium.',
+  },
+  k12: {
+    material: 'Material premium formal tactical dengan jatuh kain lebih elegan.',
+    silhouette: 'Lebih formal, presisi, dan cocok untuk tim yang ingin citra eksklusif.',
+    embroidery: 'Bordir timbul 3D tampil lebih clean pada panel depan yang minim distraksi.',
+  },
+  j1: {
+    material: 'Taslan dan lining ringan untuk jaket bomber industri yang tetap nyaman dipakai bergerak.',
+    pocketLayout: 'Saku samping dan kompartemen internal menjaga fungsi tanpa mengorbankan bentuk bomber yang bersih.',
+  },
+  r1: {
+    material: 'Drill premium dengan struktur rompi yang kuat untuk lapangan aktif.',
+    pocketLayout: 'Multi pocket depan siap untuk kebutuhan alat kerja ringan dan identitas tim.',
+  },
+  r2: {
+    material: 'Parasute ringan dengan handling lebih fleksibel untuk mobilitas tinggi.',
+    pocketLayout: 'Saku depan disusun agar rompi tetap ringan dan cepat dipakai untuk aktivitas luar ruang.',
+  },
+  c1: {
+    material: 'Ripstop tactical untuk kebutuhan outdoor berat dan mobilitas tinggi.',
+    pocketLayout: 'Cargo pocket samping dan belakang membantu tim membawa alat kerja lapangan secara lebih praktis.',
+  },
+  c2: {
+    material: 'Drill atau Japan Drill dengan durabilitas tinggi untuk aktivitas teknis.',
+    silhouette: 'Cutting lebih kokoh dan terasa aman untuk pemakaian kerja intens.',
+  },
+  c3: {
+    material: 'Bahan kerja fungsional yang tetap nyaman untuk ritme operasional harian.',
+    pocketLayout: 'Panel saku dibuat lebih bersih untuk menyeimbangkan fungsi dan tampilan.',
+  },
+  c4: {
+    material: 'Drill tactical dengan opsi warna lebih luas untuk tim operasional.',
+    pocketLayout: 'Utility pocket dan flap belakang membuat model ini lebih siap untuk kebutuhan semi tactical.',
+  },
+  p1: {
+    material: 'Lacoste premium dengan handfeel rapi untuk seragam santai profesional.',
+    pocketLayout: 'Area dada clean lebih cocok untuk bordir logo dan identitas yang ingin tampil sederhana.',
+  },
+};
+
 const PublicSiteView: React.FC = () => {
   const {
     currentRoute,
@@ -1285,6 +1495,8 @@ const PublicSiteView: React.FC = () => {
     setCurrentRoute,
     products,
     handleSelectProduct,
+    setSelectedProduct,
+    updateDesignData,
     productionOrders,
     preferredCatalogCategory,
     setPreferredCatalogCategory,
@@ -1320,6 +1532,7 @@ const PublicSiteView: React.FC = () => {
   const profileProcessTransitionTimeoutRef = useRef<number | null>(null);
   const activeArticleSlug = getArticleSlugFromPathname(currentPathname);
   const activeArticle = getArticleBySlug(activeArticleSlug);
+  const activeCatalogGuide = getCatalogGuideFromPathname(currentPathname);
   const visibleTestimonials = useMemo(
     () =>
       activeTestimonialFilter === 'Semua Testimoni'
@@ -1432,7 +1645,7 @@ const PublicSiteView: React.FC = () => {
       });
       revealNodes.forEach((node) => node.classList.remove('is-visible'));
     };
-  }, [currentRoute]);
+  }, [currentPathname, currentRoute]);
 
   useEffect(() => {
     if (currentRoute === RouteKey.PANTS) {
@@ -1467,13 +1680,31 @@ const PublicSiteView: React.FC = () => {
     }
   }, [activeArticle, activeArticleSlug, currentRoute, setCurrentRoute]);
 
+  const visibleProducts = useMemo(() => products.filter((product) => !product.isHidden), [products]);
+  const activeCatalogProduct = useMemo(() => {
+    const productSlug = getCatalogProductSlugFromPathname(currentPathname);
+    if (!productSlug) return null;
+    return visibleProducts.find((product) => buildCatalogProductSlug(product) === productSlug) ?? null;
+  }, [currentPathname, visibleProducts]);
+
+  useEffect(() => {
+    const productSlug = getCatalogProductSlugFromPathname(currentPathname);
+    if (currentRoute === RouteKey.KATALOG && productSlug && !activeCatalogProduct) {
+      setCurrentRoute(RouteKey.KATALOG, { path: ROUTE_PATHS[RouteKey.KATALOG], replace: true });
+    }
+  }, [activeCatalogProduct, currentPathname, currentRoute, setCurrentRoute]);
+
+  useEffect(() => {
+    if (!activeCatalogProduct) return;
+    setSelectedProduct(activeCatalogProduct);
+    updateDesignData({ productId: activeCatalogProduct.id });
+  }, [activeCatalogProduct, setSelectedProduct, updateDesignData]);
+
   useEffect(() => {
     setArticleCommentName('');
     setArticleCommentBody('');
     setArticleCommentStatus('');
   }, [activeArticleSlug]);
-
-  const visibleProducts = useMemo(() => products.filter((product) => !product.isHidden), [products]);
   const categoryModelOptions = useMemo(() => {
     const names = visibleProducts.filter((product) => product.category === activeCategory).map((product) => product.name);
     return [ALL_MODELS, ...Array.from(new Set(names))];
@@ -1711,6 +1942,55 @@ const PublicSiteView: React.FC = () => {
     setCurrentRoute(RouteKey.ARTIKEL, { path: getArticlePath(slug) });
   };
 
+  const openCatalogGuide = (guide: keyof typeof CATALOG_GUIDE_PATHS) => {
+    setCurrentRoute(RouteKey.KATALOG, { path: CATALOG_GUIDE_PATHS[guide] });
+  };
+
+  const openCatalogProductDetail = (product: Product) => {
+    setSelectedProduct(product);
+    updateDesignData({ productId: product.id });
+    setCurrentRoute(RouteKey.KATALOG, { path: getCatalogProductPath(product) });
+  };
+
+  const openCatalogProductDesign = (product: Product) => {
+    setSelectedProduct(product);
+    updateDesignData({ productId: product.id });
+    setCurrentRoute(RouteKey.EDITOR);
+  };
+
+  const openCatalogProductCustomerService = (product: Product) => {
+    openCustomerServiceDialog({
+      title: `Pilih customer service untuk ${product.name}`,
+      description: 'Pilih admin yang ingin Anda hubungi. Pesan akan otomatis membawa konteks model yang sedang Anda buka.',
+      message: buildCustomerServiceMessage(`pemesanan model ${product.name} kategori ${product.category} dari halaman detail katalog`),
+    });
+  };
+
+  const getProductDetailContent = (product: Product): ProductDetailContent => {
+    const categoryDefaults = PRODUCT_CATEGORY_DETAIL_DEFAULTS[product.category];
+    const overrides = PRODUCT_DETAIL_OVERRIDES[product.id] ?? {};
+    return {
+      ...categoryDefaults,
+      ...overrides,
+      badges: overrides.badges ?? categoryDefaults.badges,
+      features: overrides.features ?? categoryDefaults.features,
+      craftsmanship: overrides.craftsmanship ?? categoryDefaults.craftsmanship,
+    };
+  };
+
+  const getProductDetailVisuals = (product: Product) => {
+    const visuals = [
+      product.images?.front,
+      product.images?.back,
+      product.images?.leftSleeve,
+      product.images?.rightSleeve,
+      ...(product.gallery ?? []),
+      product.image,
+    ].filter(Boolean) as string[];
+
+    return Array.from(new Set(visuals)).slice(0, 5);
+  };
+
   const showProfileProcessStep = (nextIndex: number, stepCount: number) => {
     if (!activeProcessVisualPage || stepCount < 1) return;
 
@@ -1927,7 +2207,7 @@ const PublicSiteView: React.FC = () => {
 
   const renderCatalogProductCard = (product: Product) => (
     <article key={product.id} className="catalog-product-card">
-      <button type="button" onClick={() => handleSelectProduct(product)} className="catalog-product-card-button">
+      <button type="button" onClick={() => openCatalogProductDetail(product)} className="catalog-product-card-button">
         <div className="catalog-product-card-media">
           <ProductCardImage product={product} />
         </div>
@@ -2385,178 +2665,398 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
-  const renderCatalog = (_catalogProducts: Product[]) => (
-    <div className="catalog-page-shell">
-      <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
-        <div className="catalog-filter-pill-row">
-          {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
-            const isActive = activeCatalogSection === category;
+  const renderCatalog = (_catalogProducts: Product[]) => {
+    if (activeCatalogProduct) {
+      const detail = getProductDetailContent(activeCatalogProduct);
+      const visuals = getProductDetailVisuals(activeCatalogProduct);
+      const heroVisual = visuals[0] ?? activeCatalogProduct.image;
+      const supportingVisuals = visuals.slice(1, 5);
+      const detailRows = [
+        { label: 'Material rekomendasi', value: detail.material },
+        { label: 'Detail saku', value: detail.pocketLayout },
+        { label: 'Siluet model', value: detail.silhouette },
+        { label: 'Cocok untuk', value: detail.bestFor },
+      ];
 
-            return (
+      return (
+        <div className="guide-story-page-shell catalog-detail-story-page-shell">
+          <section className="guide-story-topbar scroll-reveal-block">
+            <button type="button" onClick={() => setCurrentRoute(activeCatalogProduct.category === 'Celana' ? RouteKey.PANTS : RouteKey.KATALOG)} className="guide-story-back">
+              <span>&lt;</span>
+              Kembali ke katalog
+            </button>
+          </section>
+
+          <section className="guide-story-hero catalog-detail-hero scroll-reveal-block">
+            <article className="guide-story-copy">
+              <p className="guide-story-kicker">{activeCatalogProduct.category} Bradwear</p>
+              <h1>{activeCatalogProduct.name}</h1>
+              <p className="guide-story-intro">{detail.intro}</p>
+              <div className="catalog-detail-badge-row">
+                {detail.badges.map((badge) => (
+                  <span key={`${activeCatalogProduct.id}-${badge}`} className="catalog-detail-badge">
+                    {badge}
+                  </span>
+                ))}
+              </div>
+              <div className="guide-story-actions">
+                <button type="button" onClick={() => openCatalogProductDesign(activeCatalogProduct)} className="guide-story-primary">
+                  Desain Sekarang
+                </button>
+                <button type="button" onClick={() => openCatalogProductCustomerService(activeCatalogProduct)} className="guide-story-secondary">
+                  Pesan Sekarang
+                </button>
+              </div>
+            </article>
+
+            <article className="guide-story-media elegant-parallax-block">
               <button
-                key={category}
                 type="button"
-                onClick={() => handleCatalogCategorySelect(category)}
-                className={`catalog-filter-pill ${isActive ? 'is-active' : ''}`}
+                onClick={() => setLightboxSlide({ src: heroVisual, alt: activeCatalogProduct.name, title: activeCatalogProduct.name })}
+                className="guide-story-media-button"
               >
-                {catalogFilterIcons[category]}
-                <span>{category}</span>
+                <img src={heroVisual} alt={activeCatalogProduct.name} className="guide-story-image" />
               </button>
-            );
-          })}
+            </article>
+          </section>
+
+          <section className="catalog-detail-meta-grid scroll-reveal-block">
+            {detailRows.map((row) => (
+              <article key={`${activeCatalogProduct.id}-${row.label}`} className="catalog-detail-meta-card">
+                <p className="catalog-detail-meta-label">{row.label}</p>
+                <p className="catalog-detail-meta-value">{row.value}</p>
+              </article>
+            ))}
+          </section>
+
+          {supportingVisuals.length ? (
+            <section className="catalog-detail-gallery-grid scroll-reveal-block">
+              {supportingVisuals.map((visual, index) => (
+                <button
+                  key={`${activeCatalogProduct.id}-visual-${index}`}
+                  type="button"
+                  onClick={() =>
+                    setLightboxSlide({
+                      src: visual,
+                      alt: `${activeCatalogProduct.name} detail ${index + 1}`,
+                      title: `${activeCatalogProduct.name} detail ${index + 1}`,
+                    })
+                  }
+                  className="catalog-detail-gallery-card elegant-parallax-block"
+                >
+                  <img src={visual} alt={`${activeCatalogProduct.name} detail ${index + 1}`} className="catalog-detail-gallery-image" />
+                </button>
+              ))}
+            </section>
+          ) : null}
+
+          <section className="catalog-detail-content-grid scroll-reveal-block">
+            <article className="catalog-detail-copy-card">
+              <p className="catalog-detail-copy-kicker">Keterangan model</p>
+              <h2>Bagian saku, jahitan premium, dan bordir timbul 3D disiapkan lebih presisi</h2>
+              <p>{activeCatalogProduct.description}</p>
+              <div className="catalog-detail-feature-list">
+                {detail.features.map((feature) => (
+                  <article key={`${activeCatalogProduct.id}-${feature.title}`} className="catalog-detail-feature-card">
+                    <h3>{feature.title}</h3>
+                    <p>{feature.copy}</p>
+                  </article>
+                ))}
+              </div>
+            </article>
+
+            <article className="catalog-detail-copy-card catalog-detail-copy-card-dark">
+              <p className="catalog-detail-copy-kicker">Craftsmanship</p>
+              <h2>Finishing dibuat untuk tampilan lebih premium saat dipakai tim</h2>
+              <div className="catalog-detail-embroidery-note">
+                <span>Bordir timbul 3D</span>
+                <p>{detail.embroidery}</p>
+              </div>
+              <ul className="catalog-detail-craft-list">
+                {detail.craftsmanship.map((point) => (
+                  <li key={`${activeCatalogProduct.id}-${point}`}>{point}</li>
+                ))}
+              </ul>
+            </article>
+          </section>
+
+          <section className="catalog-detail-bottom-cta scroll-reveal-block">
+            <div>
+              <p className="guide-story-kicker">Lanjutkan model ini</p>
+              <h2>Model sudah dipilih, lanjut ke editor atau hubungi customer service</h2>
+              <p>Anda bisa langsung membuka halaman desain dengan model ini, atau memilih CS agar pesan WhatsApp otomatis membawa konteks model yang sedang dibuka.</p>
+            </div>
+            <div className="guide-story-actions">
+              <button type="button" onClick={() => openCatalogProductDesign(activeCatalogProduct)} className="guide-story-primary">
+                Desain Sekarang
+              </button>
+              <button type="button" onClick={() => openCatalogProductCustomerService(activeCatalogProduct)} className="guide-story-secondary">
+                Pilih CS
+              </button>
+            </div>
+          </section>
         </div>
-      </section>
+      );
+    }
 
-      <section className="catalog-section-stack">
-        {visibleCatalogSections.map((section) => {
-          const isOverview = activeCatalogSection === 'Semua';
-          const sectionProducts = isOverview ? section.products.slice(0, 4) : section.products;
+    if (activeCatalogGuide === 'size') {
+      return (
+        <div className="guide-story-page-shell">
+          <section className="guide-story-topbar scroll-reveal-block">
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-back">
+              <span>&lt;</span>
+              Kembali ke katalog
+            </button>
+          </section>
 
-          return (
+          <section className="guide-story-hero scroll-reveal-block">
+            <article className="guide-story-copy">
+              <p className="guide-story-kicker">Panduan Ukuran</p>
+              <h1>Panduan ukuran seragam Bradwear dibuat terpisah agar tim lebih mudah membaca acuan sebelum order.</h1>
+              <p className="guide-story-intro">
+                Halaman ini merangkum acuan ukuran dasar sebelum user masuk ke editor. Gunakan panduan ini untuk briefing tim, pengumpulan size, atau validasi awal sebelum ukuran detail dikirim ke customer service.
+              </p>
+              <div className="guide-story-actions">
+                <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-primary">
+                  Kembali ke Katalog
+                </button>
+                <button type="button" onClick={() => openCustomerServiceDialog({ message: buildCustomerServiceMessage('panduan ukuran seragam custom'), title: 'Pilih customer service untuk panduan ukuran' })} className="guide-story-secondary">
+                  Tanya Ukuran
+                </button>
+              </div>
+            </article>
+
+            <article className="guide-story-media elegant-parallax-block">
+              <button
+                type="button"
+                onClick={() =>
+                  ASSETS.CONTENT.SIZE_GUIDE
+                    ? setLightboxSlide({
+                        src: ASSETS.CONTENT.SIZE_GUIDE,
+                        alt: 'Panduan ukuran Bradwear',
+                        title: 'Panduan ukuran Bradwear',
+                        description: 'Tampilan size guide penuh untuk membaca detail ukuran dengan lebih jelas.',
+                        variant: 'size-guide',
+                      })
+                    : undefined
+                }
+                className="guide-story-media-button"
+              >
+                <img src={ASSETS.CONTENT.SIZE_GUIDE || heroTopImage} alt="Panduan ukuran Bradwear" className="guide-story-image" />
+              </button>
+            </article>
+          </section>
+
+          <section className="guide-story-info-grid scroll-reveal-block">
+            {SIZE_GUIDE_DETAIL_POINTS.map((item) => (
+              <article key={item.title} className="guide-story-info-card">
+                <h2>{item.title}</h2>
+                <p>{item.copy}</p>
+              </article>
+            ))}
+          </section>
+        </div>
+      );
+    }
+
+    if (activeCatalogGuide === 'material') {
+      return (
+        <div className="guide-story-page-shell">
+          <section className="guide-story-topbar scroll-reveal-block">
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-back">
+              <span>&lt;</span>
+              Kembali ke katalog
+            </button>
+          </section>
+
+          <section className="guide-story-hero scroll-reveal-block">
+            <article className="guide-story-copy">
+              <p className="guide-story-kicker">Panduan Jenis Bahan</p>
+              <h1>Panduan bahan dibuat terpisah agar user bisa membaca karakter kain dengan lebih fokus.</h1>
+              <p className="guide-story-intro">
+                Setiap material di bawah punya fungsi yang berbeda. Halaman ini menampilkan foto kain secara lebih luas, lalu diikuti keterangan pemakaian, kelebihan, dan konteks seragam yang paling cocok.
+              </p>
+              <div className="guide-story-actions">
+                <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-primary">
+                  Kembali ke Katalog
+                </button>
+                <button type="button" onClick={() => openCustomerServiceDialog({ message: buildCustomerServiceMessage('panduan jenis bahan seragam custom'), title: 'Pilih customer service untuk konsultasi bahan' })} className="guide-story-secondary">
+                  Tanya Bahan
+                </button>
+              </div>
+            </article>
+
+            <article className="guide-story-media elegant-parallax-block">
+              <img src={MATERIAL_GUIDE_ITEMS[0]?.image || heroTopImage} alt="Panduan jenis bahan Bradwear" className="guide-story-image" />
+            </article>
+          </section>
+
+          <section className="guide-material-stack">
+            {MATERIAL_GUIDE_ITEMS.map((material) => (
+              <article key={material.name} className="guide-material-section scroll-reveal-block">
+                <div className="guide-material-image-shell elegant-parallax-block">
+                  {material.image ? (
+                    <button
+                      type="button"
+                      onClick={() => setLightboxSlide({ src: material.image, alt: material.name, title: material.name })}
+                      className="guide-story-media-button"
+                    >
+                      <img src={material.image} alt={`Contoh kain ${material.name}`} className="guide-material-image" />
+                    </button>
+                  ) : (
+                    <div className="guide-material-image guide-material-image-fallback" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="guide-material-copy">
+                  <p className="guide-story-kicker">{material.note}</p>
+                  <h2>{material.name}</h2>
+                  <p className="guide-story-intro">{material.description}</p>
+                  <div className="guide-material-meta-grid">
+                    <article className="guide-material-meta-card">
+                      <h3>Spesifikasi</h3>
+                      <p>{material.specification}</p>
+                    </article>
+                    <article className="guide-material-meta-card">
+                      <h3>Cocok untuk</h3>
+                      <p>{material.usage}</p>
+                    </article>
+                    <article className="guide-material-meta-card">
+                      <h3>Kelebihan</h3>
+                      <ul>
+                        {material.advantages.map((point) => (
+                          <li key={`${material.name}-adv-${point}`}>{point}</li>
+                        ))}
+                      </ul>
+                    </article>
+                    <article className="guide-material-meta-card">
+                      <h3>Catatan</h3>
+                      <ul>
+                        {material.disadvantages.map((point) => (
+                          <li key={`${material.name}-dis-${point}`}>{point}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </section>
+        </div>
+      );
+    }
+
+    return (
+      <div className="catalog-page-shell">
+        <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
+          <div className="catalog-filter-pill-row">
+            {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
+              const isActive = activeCatalogSection === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => handleCatalogCategorySelect(category)}
+                  className={`catalog-filter-pill ${isActive ? 'is-active' : ''}`}
+                >
+                  {catalogFilterIcons[category]}
+                  <span>{category}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="catalog-guide-link-grid scroll-reveal-block">
+          <button type="button" onClick={() => openCatalogGuide('size')} className="catalog-guide-link-card">
+            <div className="catalog-guide-link-thumb">
+              <img src={ASSETS.CONTENT.SIZE_GUIDE || heroTopImage} alt="Panduan ukuran Bradwear" className="catalog-guide-link-image" />
+            </div>
+            <div className="catalog-guide-link-copy">
+              <p>Panduan ukuran</p>
+              <h2>Buka halaman size guide terpisah</h2>
+              <span>
+                Lihat panduan
+                <ArrowRightTinyIcon />
+              </span>
+            </div>
+          </button>
+
+          <button type="button" onClick={() => openCatalogGuide('material')} className="catalog-guide-link-card">
+            <div className="catalog-guide-link-thumb">
+              <img src={MATERIAL_GUIDE_ITEMS[0]?.image || heroTopImage} alt="Panduan bahan Bradwear" className="catalog-guide-link-image" />
+            </div>
+            <div className="catalog-guide-link-copy">
+              <p>Panduan jenis bahan</p>
+              <h2>Buka halaman bahan secara terpisah</h2>
+              <span>
+                Lihat panduan
+                <ArrowRightTinyIcon />
+              </span>
+            </div>
+          </button>
+        </section>
+
+        <section className="catalog-section-stack">
+          {visibleCatalogSections.map((section) => (
             <article key={section.category} className="catalog-category-section scroll-reveal-block">
               <div className="catalog-category-section-header">
                 <div>
                   <h2 className="catalog-category-section-title">{section.category}</h2>
                   <p className="catalog-category-section-caption">{section.products.length} model siap dikustom untuk kebutuhan tim Anda.</p>
                 </div>
-                {isOverview ? (
+                {activeCatalogSection === 'Semua' ? (
                   <button
                     type="button"
                     onClick={() => handleCatalogCategorySelect(section.category)}
                     className="catalog-section-link"
                   >
-                    <span>Lihat semua</span>
+                    <span>Fokus kategori</span>
                     <ArrowRightTinyIcon />
                   </button>
                 ) : null}
               </div>
 
               <div className="catalog-product-grid">
-                {sectionProducts.map((product) => renderCatalogProductCard(product))}
-              </div>
-            </article>
-          );
-        })}
-      </section>
-
-      {ASSETS.CONTENT.SIZE_GUIDE ? (
-        <section className="catalog-size-guide-shell scroll-reveal-block">
-          <article className="catalog-copy-band">
-            <p className="catalog-copy-band-kicker">Size Guide</p>
-            <h2 className="catalog-copy-band-title">Panduan ukuran dibuat lebih ringkas sebelum lanjut order</h2>
-            <p className="catalog-copy-band-copy">
-              Gunakan panduan ini untuk membaca ukuran dasar sebelum masuk ke editor atau saat menyiapkan data tim. Jika ada kebutuhan ukuran khusus, detailnya tetap bisa dilanjutkan saat konsultasi.
-            </p>
-          </article>
-
-          <article className="catalog-size-guide-stage">
-            <button
-              type="button"
-              onClick={() =>
-                setLightboxSlide({
-                  src: ASSETS.CONTENT.SIZE_GUIDE,
-                  alt: 'Bradwear size guide',
-                  title: 'Panduan Ukuran Bradwear',
-                  description: 'Tampilan size guide penuh untuk membaca detail ukuran dengan lebih jelas.',
-                  variant: 'size-guide',
-                })
-              }
-              className="block w-full cursor-zoom-in"
-              aria-label="Buka size guide penuh"
-            >
-              <img src={ASSETS.CONTENT.SIZE_GUIDE} alt="Bradwear size guide" className="catalog-size-guide-image" />
-            </button>
-          </article>
-        </section>
-      ) : null}
-
-      <section className="material-guide-shell scroll-reveal-block">
-        <div className="max-w-3xl">
-          <p className="catalog-copy-band-kicker">Panduan Bahan</p>
-          <h2 className="catalog-copy-band-title">Keterangan jenis bahan</h2>
-          <p className="catalog-copy-band-copy">
-            Setiap bahan punya karakter yang berbeda. Bagian ini dibuat supaya user lebih cepat membedakan bahan yang cocok untuk tampilan formal, mobilitas lapangan, atau kebutuhan harian yang lebih ringan.
-          </p>
-        </div>
-
-        <div className="material-guide-list mt-6">
-          {MATERIAL_GUIDE_ITEMS.map((material) => (
-            <article key={material.name} className="material-guide-card">
-              <div className="material-guide-visual">
-                {material.image ? (
-                  <img src={material.image} alt={`Contoh kain ${material.name}`} className="material-guide-image" />
-                ) : (
-                  <div className="material-guide-image material-guide-image-fallback" aria-hidden="true" />
-                )}
-              </div>
-              <div className="material-guide-body">
-                <span className="material-guide-note">{material.note}</span>
-                <h3 className="material-guide-title">{material.name}</h3>
-                <p className="material-guide-copy">{material.description}</p>
-                <div className="material-guide-meta-grid">
-                  <div className="material-guide-meta-block">
-                    <p className="material-guide-usage-label">Spesifikasi</p>
-                    <p className="material-guide-usage-copy">{material.specification}</p>
-                  </div>
-                  <div className="material-guide-meta-block">
-                    <p className="material-guide-usage-label">Cocok untuk</p>
-                    <p className="material-guide-usage-copy">{material.usage}</p>
-                  </div>
-                  <div className="material-guide-meta-block">
-                    <p className="material-guide-usage-label">Kelebihan</p>
-                    <ul className="material-guide-list-points">
-                      {material.advantages.map((point) => (
-                        <li key={`${material.name}-adv-${point}`}>{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="material-guide-meta-block">
-                    <p className="material-guide-usage-label">Kekurangan</p>
-                    <ul className="material-guide-list-points">
-                      {material.disadvantages.map((point) => (
-                        <li key={`${material.name}-dis-${point}`}>{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                {section.products.map((product) => renderCatalogProductCard(product))}
               </div>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className="catalog-bottom-cta scroll-reveal-block">
-        <div className="catalog-bottom-cta-copy">
-          <h2>Butuh Model Custom Sesuai Kebutuhan Anda?</h2>
-          <p>Tim kami siap membantu mulai dari desain, pemilihan bahan, hingga produksi seragam Anda.</p>
-        </div>
-        <div className="catalog-bottom-cta-actions">
-          <a
-            href={buildWhatsAppUrl(buildConsultationMessage('konsultasi model seragam custom dari halaman katalog web'))}
-            target="_blank"
-            rel="noreferrer"
-            className="catalog-bottom-cta-primary"
-          >
-            Konsultasi Sekarang
-          </a>
-          <button type="button" onClick={() => setCurrentRoute(RouteKey.CLIENT)} className="catalog-bottom-cta-secondary">
-            <span>Lihat Portofolio</span>
-            <ArrowRightTinyIcon />
-          </button>
-        </div>
-      </section>
-
-      {ASSETS.CONTENT.FAST_RESPONSE_HERO ? (
-        <section className="catalog-full-bleed-media scroll-reveal-block" aria-label="Fast respon customer service Bradwear">
-          <img
-            src={ASSETS.CONTENT.FAST_RESPONSE_HERO}
-            alt="Fast respon customer service Bradwear"
-            className="catalog-full-bleed-image"
-          />
         </section>
-      ) : null}
-    </div>
-  );
+
+        <section className="catalog-bottom-cta scroll-reveal-block">
+          <div className="catalog-bottom-cta-copy">
+            <h2>Butuh Model Custom Sesuai Kebutuhan Anda?</h2>
+            <p>Tim kami siap membantu mulai dari desain, pemilihan bahan, hingga produksi seragam Anda.</p>
+          </div>
+          <div className="catalog-bottom-cta-actions">
+            <a
+              href={buildWhatsAppUrl(buildConsultationMessage('konsultasi model seragam custom dari halaman katalog web'))}
+              target="_blank"
+              rel="noreferrer"
+              className="catalog-bottom-cta-primary"
+            >
+              Konsultasi Sekarang
+            </a>
+            <button type="button" onClick={() => setCurrentRoute(RouteKey.CLIENT)} className="catalog-bottom-cta-secondary">
+              <span>Lihat Portofolio</span>
+              <ArrowRightTinyIcon />
+            </button>
+          </div>
+        </section>
+
+        {ASSETS.CONTENT.FAST_RESPONSE_HERO ? (
+          <section className="catalog-full-bleed-media scroll-reveal-block" aria-label="Fast respon customer service Bradwear">
+            <img
+              src={ASSETS.CONTENT.FAST_RESPONSE_HERO}
+              alt="Fast respon customer service Bradwear"
+              className="catalog-full-bleed-image"
+            />
+          </section>
+        ) : null}
+      </div>
+    );
+  };
 
   const renderTestimonialsPage = () => (
     <div className="testimonial-page-shell px-6 py-8 md:px-10">

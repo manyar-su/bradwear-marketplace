@@ -6,6 +6,7 @@ import {
   CustomerServiceContact,
   HowToOrderStep,
   NavItem,
+  Product,
   RouteKey,
   SeoMeta,
   SiteFaqItem,
@@ -1319,6 +1320,42 @@ export const normalizePathname = (pathname: string) => {
   return pathname;
 };
 
+const slugifyPathToken = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+export const CATALOG_GUIDE_PATHS = {
+  size: `${ROUTE_PATHS[RouteKey.KATALOG]}/panduan-ukuran`,
+  material: `${ROUTE_PATHS[RouteKey.KATALOG]}/panduan-jenis-bahan`,
+} as const;
+
+export type CatalogGuideKey = keyof typeof CATALOG_GUIDE_PATHS;
+
+const CATALOG_PRODUCT_PATH_PREFIX = `${ROUTE_PATHS[RouteKey.KATALOG]}/model/`;
+
+export const buildCatalogProductSlug = (product: Pick<Product, 'category' | 'name'>) =>
+  `${slugifyPathToken(product.category)}-${slugifyPathToken(product.name)}`;
+
+export const getCatalogProductPath = (product: Pick<Product, 'category' | 'name'> | string) => {
+  const slug = typeof product === 'string' ? product : buildCatalogProductSlug(product);
+  return `${CATALOG_PRODUCT_PATH_PREFIX}${slug}`;
+};
+
+export const getCatalogGuideFromPathname = (pathname: string): CatalogGuideKey | null => {
+  const normalized = normalizePathname(pathname.toLowerCase());
+  const match = Object.entries(CATALOG_GUIDE_PATHS).find(([, path]) => path.toLowerCase() === normalized);
+  return (match?.[0] as CatalogGuideKey) ?? null;
+};
+
+export const getCatalogProductSlugFromPathname = (pathname: string) => {
+  const normalized = normalizePathname(pathname.toLowerCase());
+  if (!normalized.startsWith(CATALOG_PRODUCT_PATH_PREFIX)) return null;
+  const slug = normalized.slice(CATALOG_PRODUCT_PATH_PREFIX.length).trim();
+  return slug || null;
+};
+
 export const getArticlePath = (slug: string) => `${ROUTE_PATHS[RouteKey.ARTIKEL]}/${slug}`;
 
 export const getArticleSlugFromPathname = (pathname: string) => {
@@ -1336,6 +1373,9 @@ export const pathToRoute = (pathname: string): RouteKey => {
   if (normalized.startsWith(`${ROUTE_PATHS[RouteKey.ARTIKEL]}/`)) {
     return RouteKey.ARTIKEL;
   }
+  if (normalized.startsWith(`${ROUTE_PATHS[RouteKey.KATALOG]}/`)) {
+    return RouteKey.KATALOG;
+  }
   const match = Object.entries(ROUTE_PATHS).find(([, routePath]) => routePath.toLowerCase() === normalized);
   return (match?.[0] as RouteKey) ?? RouteKey.HOME;
 };
@@ -1344,6 +1384,19 @@ export const getConsultationTopicForPath = (route: RouteKey, pathname: string) =
   const article = getArticleBySlug(getArticleSlugFromPathname(pathname));
   if (article) {
     return `artikel ${article.title.toLowerCase()}`;
+  }
+
+  const catalogGuide = getCatalogGuideFromPathname(pathname);
+  if (catalogGuide === 'size') {
+    return 'panduan ukuran seragam custom';
+  }
+  if (catalogGuide === 'material') {
+    return 'panduan jenis bahan seragam custom';
+  }
+
+  const catalogProductSlug = getCatalogProductSlugFromPathname(pathname);
+  if (catalogProductSlug) {
+    return `model ${catalogProductSlug.replace(/-/g, ' ')}`;
   }
 
   const routeTopics: Record<RouteKey, string> = {
