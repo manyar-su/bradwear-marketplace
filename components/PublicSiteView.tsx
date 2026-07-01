@@ -2699,7 +2699,7 @@ const PublicSiteView: React.FC = () => {
       );
     }
 
-    const articleMagazineFeed = articleFeed.slice(1);
+    const articleMagazineFeed = articleFeed;
 
     return (
       <div className="article-page-shell px-6 py-8 md:px-10">
@@ -2893,13 +2893,8 @@ const PublicSiteView: React.FC = () => {
         </section>
 
         <section className="mt-8 article-card-grid">
-          {articleMagazineFeed.map((article, index) => (
-            <article
-              key={article.slug}
-              className={`article-story-card scroll-reveal-block ${
-                index === 0 ? 'article-story-card-feature' : index < 3 ? 'article-story-card-standard' : 'article-story-card-compact'
-              }`}
-            >
+          {articleMagazineFeed.map((article) => (
+            <article key={article.slug} className="article-story-card article-story-card-two-column scroll-reveal-block">
               <div className="article-story-visual">
                 <img src={article.coverImage} alt={article.coverAlt} className="article-cover-image" />
               </div>
@@ -2915,12 +2910,26 @@ const PublicSiteView: React.FC = () => {
                   <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
+                <div className="article-story-keywords mt-4">
+                  {article.keywords.slice(0, 3).map((keyword) => (
+                    <span key={`${article.slug}-keyword-${keyword}`} className="article-story-keyword-chip">
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
                 <div className="mt-4 grid gap-3">
-                  {article.highlights.slice(0, index < 2 ? 2 : 1).map((point) => (
+                  {article.highlights.slice(0, 2).map((point) => (
                     <div key={`${article.slug}-highlight-${point}`} className="article-inline-point">
                       <span />
                       <p>{point}</p>
                     </div>
+                  ))}
+                </div>
+                <div className="article-story-snippet-grid mt-5">
+                  {article.body.slice(0, 2).map((paragraph, index) => (
+                    <p key={`${article.slug}-snippet-${index}`} className="article-story-snippet">
+                      {paragraph}
+                    </p>
                   ))}
                 </div>
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-3">

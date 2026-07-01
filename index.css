@@ -5231,6 +5231,10 @@ a {
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
 }
 
+.article-story-card-two-column {
+  grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+}
+
 .article-story-card-feature {
   grid-column: span 2;
   grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
@@ -5250,6 +5254,39 @@ a {
   align-content: start;
   gap: 0;
   padding: clamp(22px, 4vw, 30px);
+}
+
+.article-story-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.article-story-keyword-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(117, 242, 26, 0.2);
+  background: linear-gradient(135deg, rgba(117, 242, 26, 0.1), rgba(255, 255, 255, 0.96));
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.article-story-snippet-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.article-story-snippet {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.article-detail-body-copy {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .article-comment-input {
@@ -5351,13 +5388,12 @@ a {
   .article-social-grid,
   .article-detail-hero-grid,
   .article-detail-layout,
-  .article-card-grid,
   .article-feature-band {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .article-story-card-feature {
-    grid-column: auto;
+  .article-story-card-feature,
+  .article-story-card-two-column {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -5410,6 +5446,10 @@ a {
 
   .article-story-card-compact,
   .article-related-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .article-detail-body-copy {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -6813,6 +6853,45 @@ a {
   .article-headline-rail-item,
   .article-related-card {
     padding: 12px;
+  }
+
+  .article-card-grid {
+    gap: 16px;
+  }
+
+  .article-story-card-two-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .article-story-body {
+    padding: 16px;
+  }
+
+  .article-story-body .article-title-highlight {
+    padding: 12px 14px;
+  }
+
+  .article-story-body .article-title-highlight h2 {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .article-story-keywords {
+    gap: 6px;
+  }
+
+  .article-story-keyword-chip {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  .article-story-snippet {
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .article-story-snippet-grid {
+    display: none;
   }
 
   .material-guide-meta-grid {
