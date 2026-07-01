@@ -17,7 +17,7 @@ import {
 } from './siteConfig';
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
-const SEO_ICON_URL = `${SITE_URL}/favicon-bradwear.png`;
+const SEO_ICON_URL = `${SITE_URL}/logo.png`;
 const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/seo-kemeja.webp`;
 const SEO_PREVIEW_IMAGE_ALT = 'Produk kemeja custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
@@ -594,8 +594,8 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="id-ID"]', { rel: 'alternate', hreflang: 'id-ID', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
-  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/favicon-bradwear.png' });
-  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/favicon-bradwear.png' });
+  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/logo.png' });
+  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/logo.png' });
 
   if (article) {
     upsertMetaTag('meta[name="publish_date"]', { name: 'publish_date', content: articlePublishedAt });

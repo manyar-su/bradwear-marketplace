@@ -4982,15 +4982,16 @@ a {
 
 .scroll-reveal-block {
   opacity: 0;
-  transform: translateY(28px) scale(0.985);
+  transform: translate3d(0, 42px, 0) scale(0.992);
+  will-change: opacity, transform;
   transition:
-    opacity 720ms ease,
-    transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 960ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 960ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .scroll-reveal-block.is-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .article-masthead-grid {
@@ -5661,7 +5662,8 @@ a {
 }
 
 .profile-showcase-page {
-  width: min(1180px, calc(100% - 32px));
+  --profile-shell-width: min(1180px, calc(100% - 32px));
+  width: var(--profile-shell-width);
   margin: 0 auto;
   display: grid;
   gap: 26px;
@@ -6140,6 +6142,65 @@ a {
 .profile-showcase-cta-primary,
 .profile-showcase-cta-secondary {
   width: 100%;
+}
+
+@media (min-width: 981px) {
+  .profile-showcase-page {
+    --profile-edge-bleed: max(0px, calc((100vw - var(--profile-shell-width)) / 2));
+  }
+
+  .profile-showcase-hero,
+  .profile-showcase-story {
+    width: calc(100% + var(--profile-edge-bleed));
+    margin-right: calc(var(--profile-edge-bleed) * -1);
+    padding: 0 0 0 30px;
+    gap: 30px;
+    overflow: hidden;
+  }
+
+  .profile-showcase-hero {
+    grid-template-columns: minmax(0, 0.78fr) minmax(480px, 1.22fr);
+  }
+
+  .profile-showcase-story {
+    grid-template-columns: minmax(0, 0.84fr) minmax(480px, 1.16fr);
+  }
+
+  .profile-showcase-hero-copy,
+  .profile-showcase-story-copy {
+    padding: 34px 0 34px;
+  }
+
+  .profile-showcase-hero-media,
+  .profile-showcase-story-media {
+    min-height: clamp(420px, 43vw, 620px);
+    border-radius: 32px 0 0 32px;
+  }
+
+  .profile-showcase-hero-image,
+  .profile-showcase-story-image {
+    object-position: center;
+  }
+}
+
+@media (min-width: 1400px) {
+  .profile-showcase-page {
+    --profile-shell-width: calc(100vw - clamp(40px, 4vw, 88px));
+  }
+
+  .catalog-page-shell {
+    --catalog-shell-width: calc(100vw - clamp(40px, 4vw, 88px));
+  }
+
+  .download-page-shell,
+  .article-page-shell,
+  .testimonial-page-shell,
+  .support-directory-page-shell,
+  .how-to-order-page-shell,
+  .client-gallery-page-shell {
+    width: calc(100vw - clamp(40px, 4vw, 88px));
+    margin-inline: auto;
+  }
 }
 
 @media (max-width: 980px) {
@@ -7316,7 +7377,8 @@ a {
 }
 
 .catalog-page-shell {
-  width: min(1180px, calc(100% - 32px));
+  --catalog-shell-width: min(1180px, calc(100% - 32px));
+  width: var(--catalog-shell-width);
   margin: 0 auto;
   padding: 22px 0 72px;
 }

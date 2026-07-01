@@ -152,6 +152,7 @@ type BrandProfileStory = {
   image: string;
   imageAlt: string;
   buttonLabel: string;
+  articleSlug?: string;
 };
 
 type BrandProfileProcessStep = {
@@ -569,6 +570,7 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
       image: ABOUT_SUPPORT_IMAGE,
       imageAlt: 'Tim customer service Bradwear Indonesia',
       buttonLabel: 'Selengkapnya',
+      articleSlug: 'tentang-bradwear-indonesia-dan-standar-produksi',
     },
     processTitle: 'Proses Kami',
     processSteps: BRAND_PROFILE_PROCESS_STEPS,
@@ -647,6 +649,7 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
       image: ABOUT_ALT_IMAGE,
       imageAlt: 'Produk kemeja Bradwear Indonesia',
       buttonLabel: 'Selengkapnya',
+      articleSlug: 'produk-dan-jasa-seragam-custom-bradwear',
     },
     processTitle: 'Dari Kebutuhan Menjadi Produk Jadi',
     processSteps: BRAND_PROFILE_PROCESS_STEPS,
@@ -686,6 +689,7 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
       image: ABOUT_SUPPORT_IMAGE,
       imageAlt: 'Customer service dan tim Bradwear Indonesia',
       buttonLabel: 'Selengkapnya',
+      articleSlug: 'keunggulan-bradwear-dalam-produksi-seragam-custom',
     },
     processTitle: 'Standar Keunggulan Kami',
     processSteps: BRAND_PROFILE_PROCESS_STEPS,
@@ -725,6 +729,7 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
       image: ABOUT_DELIVERY_IMAGE,
       imageAlt: 'Dokumentasi hasil jadi klien Bradwear',
       buttonLabel: 'Selengkapnya',
+      articleSlug: 'klien-dan-jangkauan-layanan-seragam-bradwear',
     },
     processTitle: 'Cara Kami Menjangkau Klien',
     processSteps: BRAND_PROFILE_PROCESS_STEPS,
@@ -3732,7 +3737,11 @@ const PublicSiteView: React.FC = () => {
             </div>
             <button
               type="button"
-              onClick={() => scrollToBrandProfileSection(`profile-process-${activeBrandProfileVisualPage.route}`)}
+              onClick={() => (
+                activeBrandProfileVisualPage.story.articleSlug
+                  ? navigateToArticle(activeBrandProfileVisualPage.story.articleSlug)
+                  : scrollToBrandProfileSection(`profile-process-${activeBrandProfileVisualPage.route}`)
+              )}
               className="profile-showcase-secondary"
             >
               <span>{activeBrandProfileVisualPage.story.buttonLabel}</span>
