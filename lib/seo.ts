@@ -22,6 +22,7 @@ const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/seo-kemeja.webp`;
 const SEO_PREVIEW_IMAGE_ALT = 'Produk kemeja custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
 const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
+const ARTICLE_BLOG_URL = `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`;
 
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
   let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
@@ -43,7 +44,12 @@ const upsertLinkTag = (selector: string, attributes: Record<string, string>) => 
   Object.entries(attributes).forEach(([key, value]) => tag?.setAttribute(key, value));
 };
 
+const removeHeadElement = (selector: string) => {
+  document.head.querySelector(selector)?.remove();
+};
+
 const dedupeKeywords = (keywords: string[]) => Array.from(new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)));
+const toIsoDateTime = (value?: string) => (value ? `${value}T00:00:00+07:00` : '');
 
 const buildProductKeywords = (products: Product[]) => {
   const keywords = products.flatMap((product) => {
@@ -73,7 +79,9 @@ const buildArticleMeta = (article: Article): SeoMeta => ({
     ...SEO_META[RouteKey.ARTIKEL].keywords,
     ...article.keywords,
     article.title,
+    article.excerpt,
     article.category,
+    article.authorRole,
     `artikel ${article.category.toLowerCase()}`,
   ]),
   schema: [],
@@ -309,6 +317,7 @@ const buildBaseSchemas = (
       description: meta.description,
       inLanguage: 'id-ID',
       keywords: keywords.join(', '),
+      image: article?.coverImage || SEO_PREVIEW_IMAGE_URL,
     },
     {
       '@context': 'https://schema.org',
@@ -413,6 +422,16 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
         dateModified: article.updatedAt ?? article.publishedAt,
         keywords: article.keywords.join(', '),
         articleBody: article.body.join(' '),
+        image: {
+          '@type': 'ImageObject',
+          url: article.coverImage,
+          caption: article.coverAlt,
+        },
+        wordCount: article.body.join(' ').split(/\s+/).filter(Boolean).length,
+        about: article.keywords.slice(0, 8).map((keyword) => ({
+          '@type': 'Thing',
+          name: keyword,
+        })),
         author: {
           '@type': 'Person',
           name: article.author,
@@ -441,15 +460,27 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
             url: SEO_ICON_URL,
           },
         },
-        mainEntityOfPage: canonical,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': canonical,
+        },
       });
     } else {
       base.push({
         '@context': 'https://schema.org',
         '@type': 'Blog',
         name: 'Artikel Bradwear',
-        url: canonical,
+        url: ARTICLE_BLOG_URL,
         description: meta.description,
+        inLanguage: 'id-ID',
+        publisher: {
+          '@type': 'Organization',
+          name: SITE_NAME,
+          logo: {
+            '@type': 'ImageObject',
+            url: SEO_ICON_URL,
+          },
+        },
         blogPost: ARTICLES.map((item) => ({
           '@type': 'BlogPosting',
           headline: item.title,
@@ -464,6 +495,18 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
             '@type': 'Person',
             name: item.author,
           },
+        })),
+      });
+
+      base.push({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'Daftar artikel Bradwear Indonesia',
+        itemListElement: ARTICLES.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${SITE_URL}${getArticlePath(item.slug)}`,
+          name: item.title,
         })),
       });
     }
@@ -501,6 +544,10 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   const keywords = buildRouteKeywords(route, pathname, products, meta, article);
   const schemas = buildPageSchema(route, pathname, products, faqs);
   const pageLabel = article ? article.category : ROUTE_LABELS[route];
+  const previewImage = article?.coverImage || SEO_PREVIEW_IMAGE_URL;
+  const previewImageAlt = article?.coverAlt || SEO_PREVIEW_IMAGE_ALT;
+  const articlePublishedAt = article ? toIsoDateTime(article.publishedAt) : '';
+  const articleModifiedAt = article ? toIsoDateTime(article.updatedAt ?? article.publishedAt) : '';
 
   document.title = meta.title;
 
@@ -509,7 +556,7 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[name="news_keywords"]', { name: 'news_keywords', content: keywords.join(', ') });
   upsertMetaTag('meta[name="classification"]', { name: 'classification', content: pageLabel });
   upsertMetaTag('meta[name="category"]', { name: 'category', content: pageLabel });
-  upsertMetaTag('meta[name="robots"]', { name: 'robots', content: 'index,follow,max-image-preview:large' });
+  upsertMetaTag('meta[name="robots"]', { name: 'robots', content: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' });
   upsertMetaTag('meta[name="author"]', { name: 'author', content: SITE_NAME });
   upsertMetaTag('meta[name="application-name"]', { name: 'application-name', content: SITE_NAME });
   upsertMetaTag('meta[name="apple-mobile-web-app-title"]', { name: 'apple-mobile-web-app-title', content: SITE_NAME });
@@ -526,8 +573,8 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
   upsertMetaTag('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
   upsertMetaTag('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
-  upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: SEO_PREVIEW_IMAGE_URL });
-  upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: SEO_PREVIEW_IMAGE_ALT });
+  upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: previewImage });
+  upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: previewImageAlt });
   upsertMetaTag('meta[property="article:section"]', {
     property: 'article:section',
     content: article?.category ?? ROUTE_LABELS[route],
@@ -540,8 +587,8 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title });
   upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description });
   upsertMetaTag('meta[name="twitter:url"]', { name: 'twitter:url', content: canonical });
-  upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: SEO_PREVIEW_IMAGE_URL });
-  upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: SEO_PREVIEW_IMAGE_ALT });
+  upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: previewImage });
+  upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: previewImageAlt });
   upsertMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: SITE_NAME });
   upsertMetaTag('meta[name="format-detection"]', { name: 'format-detection', content: 'telephone=no,address=no,email=no' });
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
@@ -549,6 +596,29 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
   upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/favicon-bradwear.png' });
   upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/favicon-bradwear.png' });
+
+  if (article) {
+    upsertMetaTag('meta[name="publish_date"]', { name: 'publish_date', content: articlePublishedAt });
+    upsertMetaTag('meta[name="last-modified"]', { name: 'last-modified', content: articleModifiedAt });
+    upsertMetaTag('meta[property="article:published_time"]', {
+      property: 'article:published_time',
+      content: articlePublishedAt,
+    });
+    upsertMetaTag('meta[property="article:modified_time"]', {
+      property: 'article:modified_time',
+      content: articleModifiedAt,
+    });
+    upsertMetaTag('meta[property="article:author"]', {
+      property: 'article:author',
+      content: article.author,
+    });
+  } else {
+    removeHeadElement('meta[name="publish_date"]');
+    removeHeadElement('meta[name="last-modified"]');
+    removeHeadElement('meta[property="article:published_time"]');
+    removeHeadElement('meta[property="article:modified_time"]');
+    removeHeadElement('meta[property="article:author"]');
+  }
 
   let script = document.getElementById('bradwear-jsonld');
   if (!script) {

@@ -5,6 +5,8 @@ import {
   applyApiSecurityHeaders,
   extractClientIp,
   jsonError,
+  requireContentLengthLimit,
+  requireJsonRequest,
   requireSameOrigin,
   setRateLimitHeaders,
   takeRateLimit,
@@ -27,6 +29,14 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   }
 
   if (!requireSameOrigin(req, res)) {
+    return;
+  }
+
+  if (!requireJsonRequest(req, res)) {
+    return;
+  }
+
+  if (!requireContentLengthLimit(req, res, MAX_IMAGE_PAYLOAD_LENGTH + 10_000)) {
     return;
   }
 

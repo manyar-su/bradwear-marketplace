@@ -1,6 +1,32 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "routes": [
+    {
+      "src": "/(wp-admin|wp-login\\.php|xmlrpc\\.php|phpmyadmin|\\.git(?:/.*)?|\\.svn(?:/.*)?|\\.hg(?:/.*)?|\\.env(?:\\..*)?|server-status|cgi-bin(?:/.*)?|boaform/admin(?:/.*)?)",
+      "mitigate": {
+        "action": "deny"
+      }
+    },
+    {
+      "src": "/.*\\.(php[0-9]?|asp|aspx|cgi|pl|bak|sql|ini)$",
+      "mitigate": {
+        "action": "deny"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i)^(curl|wget|python-requests|aiohttp|httpie|go-http-client|libwww-perl|powershell)/?.*"
+        }
+      ],
+      "mitigate": {
+        "action": "challenge"
+      }
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"

@@ -52,6 +52,8 @@ const API_HEADERS: Record<string, string> = {
   'Cache-Control': 'no-store, max-age=0',
   Pragma: 'no-cache',
   Expires: '0',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Resource-Policy': 'same-origin',
   'Referrer-Policy': 'same-origin',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
@@ -115,26 +117,79 @@ export const extractClientIp = (req: RequestLike) => {
   );
 };
 
-export const requireSameOrigin = (req: RequestLike, res: ResponseLike) => {
-  const origin = getHeader(req, 'origin');
-  if (!origin) {
-    return true;
-  }
+const getRequestHost = (req: RequestLike) =>
+  getHeader(req, 'x-forwarded-host') || getHeader(req, 'host') || '';
 
-  const host = getHeader(req, 'x-forwarded-host') || getHeader(req, 'host');
-  if (!host) {
-    jsonError(res, 403, 'Origin request tidak valid.');
+const matchesRequestHost = (value: string | undefined, host: string) => {
+  if (!value || !host) {
     return false;
   }
 
   try {
-    const originUrl = new URL(origin);
-    if (originUrl.host !== host) {
+    return new URL(value).host === host;
+  } catch {
+    return false;
+  }
+};
+
+export const requireSameOrigin = (
+  req: RequestLike,
+  res: ResponseLike,
+  options: {
+    allowMissingOrigin?: boolean;
+  } = {},
+) => {
+  const host = getRequestHost(req);
+  if (!host) {
+    jsonError(res, 403, 'Host request tidak valid.');
+    return false;
+  }
+
+  const origin = getHeader(req, 'origin');
+  if (origin) {
+    if (!matchesRequestHost(origin, host)) {
       jsonError(res, 403, 'Origin request tidak diizinkan.');
       return false;
     }
-  } catch {
-    jsonError(res, 403, 'Origin request tidak valid.');
+    return true;
+  }
+
+  const referer = getHeader(req, 'referer');
+  if (referer) {
+    if (!matchesRequestHost(referer, host)) {
+      jsonError(res, 403, 'Referer request tidak diizinkan.');
+      return false;
+    }
+    return true;
+  }
+
+  if (options.allowMissingOrigin) {
+    return true;
+  }
+
+  jsonError(res, 403, 'Origin atau referer request wajib tersedia.');
+  return false;
+};
+
+export const requireJsonRequest = (req: RequestLike, res: ResponseLike) => {
+  const contentType = getHeader(req, 'content-type')?.toLowerCase() || '';
+  if (!contentType.includes('application/json')) {
+    jsonError(res, 415, 'Content-Type harus application/json.');
+    return false;
+  }
+
+  return true;
+};
+
+export const getContentLength = (req: RequestLike) => {
+  const value = Number.parseInt(getHeader(req, 'content-length') || '', 10);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+};
+
+export const requireContentLengthLimit = (req: RequestLike, res: ResponseLike, maxBytes: number) => {
+  const contentLength = getContentLength(req);
+  if (contentLength !== null && contentLength > maxBytes) {
+    jsonError(res, 413, 'Payload request terlalu besar.');
     return false;
   }
 

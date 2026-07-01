@@ -2,102 +2,182 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.bradwearindonesia.com/</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/3d</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/katalog</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://www.bradwearindonesia.com/download</loc>
+    <loc>https://www.bradwearindonesia.com/pants</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.82</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/client</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.84</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/testimoni</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.84</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/tentang-kami</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/visi-misi</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/produk-dan-jasa</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.bradwearindonesia.com/pants</loc>
+    <loc>https://www.bradwearindonesia.com/keunggulan</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/klien-dan-jangkauan</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/legal-dan-lisensi</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/download</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.72</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.78</priority>
+    <priority>0.88</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/panduan-memilih-bahan-seragam</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.74</priority>
+    <priority>0.78</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/beda-pdh-pdl-dan-lapangan</loc>
+    <lastmod>2026-06-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.74</priority>
+    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/tips-order-seragam-instansi</loc>
+    <lastmod>2026-06-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.74</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/checklist-sebelum-produksi</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.74</priority>
+    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/kemeja-custom-untuk-perusahaan-dan-komunitas</loc>
+    <lastmod>2026-06-25</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.76</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/seragam-dinas-dan-komunitas-pilih-model-yang-tepat</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.76</priority>
+    <priority>0.78</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/vendor-seragam-dinas-untuk-pengadaan-instansi</loc>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.76</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/artikel/seragam-komunitas-dan-event-agar-branding-lebih-rapi</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.76</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/bordir-logo-instansi-pada-kemeja-dinas</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/celana-tactical-dan-seragam-lapangan-untuk-tim-operasional</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.bradwearindonesia.com/artikel/vendor-seragam-kerja-tasikmalaya-untuk-perusahaan</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/cara-order</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/layanan-pelanggan</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/lacak-pesanan</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.72</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/temukan-toko</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
+    <priority>0.68</priority>
   </url>
   <url>
     <loc>https://www.bradwearindonesia.com/brad-ai</loc>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.52</priority>
   </url>
 </urlset>

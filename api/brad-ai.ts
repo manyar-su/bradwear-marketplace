@@ -5,6 +5,8 @@ import {
   applyApiSecurityHeaders,
   extractClientIp,
   jsonError,
+  requireContentLengthLimit,
+  requireJsonRequest,
   requireSameOrigin,
   setRateLimitHeaders,
   takeRateLimit,
@@ -17,6 +19,7 @@ const BRAD_AI_RATE_LIMIT = {
 
 const MAX_MESSAGES = 24;
 const MAX_TOTAL_CHARACTERS = 12000;
+const MAX_REQUEST_BYTES = 40_000;
 
 export default async function handler(req: RequestLike, res: ResponseLike) {
   applyApiSecurityHeaders(res);
@@ -28,6 +31,14 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   }
 
   if (!requireSameOrigin(req, res)) {
+    return;
+  }
+
+  if (!requireJsonRequest(req, res)) {
+    return;
+  }
+
+  if (!requireContentLengthLimit(req, res, MAX_REQUEST_BYTES)) {
     return;
   }
 

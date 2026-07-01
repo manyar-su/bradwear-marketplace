@@ -12,6 +12,8 @@ import {
   normalizeIdentifier,
   parseCookies,
   registerBruteForceFailure,
+  requireContentLengthLimit,
+  requireJsonRequest,
   requireSameOrigin,
   serializeCookie,
   timingSafeEqual,
@@ -20,6 +22,7 @@ import {
 
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
 const LOGIN_BUCKET = 'admin-login';
+const MAX_LOGIN_REQUEST_BYTES = 4_096;
 const LOGIN_POLICY = {
   windowMs: 15 * 60 * 1000,
   maxFailures: 5,
@@ -94,6 +97,14 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   }
 
   if (!requireSameOrigin(req, res)) {
+    return;
+  }
+
+  if (!requireJsonRequest(req, res)) {
+    return;
+  }
+
+  if (!requireContentLengthLimit(req, res, MAX_LOGIN_REQUEST_BYTES)) {
     return;
   }
 
