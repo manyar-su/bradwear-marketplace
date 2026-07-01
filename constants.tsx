@@ -4,6 +4,7 @@ import { ASSETS } from './assets';
 
 const getRandomSold = () => Math.floor(Math.random() * (4500 - 2000 + 1)) + 2000;
 
+// Data teks produk untuk kartu katalog, slider, dan pilihan model.
 export const PRODUCTS: Product[] = [
   {
     id: 'k2',
@@ -250,6 +251,7 @@ export const PRODUCTS: Product[] = [
   }
 ];
 
+// Label tahapan status order untuk tracking dan progres produksi.
 export const INITIAL_WORKFLOW_STAGES: WorkflowStage[] = [
   { id: '1', label: 'Desain', status: 'completed', description: 'Mockup sedang dibuat oleh pemesan' },
   { id: '2', label: 'Persetujuan', status: 'completed', description: 'Detail pesanan disetujui admin' },
