@@ -2454,12 +2454,20 @@ const PublicSiteView: React.FC = () => {
           <article className="hero-banner hero-banner-editorial hero-banner-edge">
             <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
               {safeHeroSlides.map((slide, index) => (
-                <img
+                <div
                   key={`${slide}-${index}`}
-                  src={slide}
-                  alt={`Hero Bradwear ${index + 1}`}
-                  className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-                />
+                  className={`hero-banner-runway-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
+                  aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
+                >
+                  <img src={slide} alt="" className="hero-banner-runway-backdrop" />
+                  <img
+                    src={slide}
+                    alt={`Hero Bradwear ${index + 1}`}
+                    className="hero-banner-runway-image"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                  />
+                </div>
               ))}
               <div className="hero-banner-overlay hero-banner-overlay-soft" />
             </div>
