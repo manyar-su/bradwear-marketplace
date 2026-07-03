@@ -1,7 +1,8 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS, findAssetBySimilarName } from '../assets';
 import bottomFastRespondImage from '../assets/Fast Respond.png';
-import homeCustomVestpinkImage from '../assets/main hero/model/vestpink.png';
+import homeIntroTopImage from '../assets/Hero/atas.webp';
+import homeCustomVestbupatiImage from '../assets/main hero/model/vestbupati.png';
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
@@ -46,7 +47,7 @@ const MAIN_HERO_SLIDES = Object.entries(
 )
   .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
   .map(([, source]) => source as string);
-const HOME_CUSTOM_SLIDES = [homeCustomVestpinkImage];
+const HOME_CUSTOM_SLIDES = [homeCustomVestbupatiImage];
 
 const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
@@ -2453,7 +2454,7 @@ const PublicSiteView: React.FC = () => {
         {/* Hero foto customer service tetap dipakai sebagai strip terpisah di bawah slider utama. */}
         <section className="hero-display-strip hero-display-strip-top home-fast-response-strip home-fast-response-strip-clean" data-home-section="hero-intro">
           <img
-            src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            src={homeIntroTopImage}
             alt="Customer service Bradwear Indonesia"
             className="hero-display-strip-image"
           />

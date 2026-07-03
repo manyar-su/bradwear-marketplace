@@ -7819,7 +7819,7 @@ a {
 }
 
 .hero-image-runway[data-home-section="hero-slider"] .hero-banner-overlay-soft {
-  background: linear-gradient(180deg, rgba(6, 12, 18, 0.14), rgba(6, 12, 18, 0.32));
+  background: transparent;
 }
 
 .hero-banner-runway-slide {
@@ -7851,9 +7851,9 @@ a {
   height: calc(100% + 48px);
   object-fit: cover;
   object-position: center center;
-  filter: blur(24px) brightness(0.42) saturate(0.82);
-  opacity: 0.82;
-  transform: scale(1.08);
+  filter: none;
+  opacity: 0;
+  transform: none;
 }
 
 .hero-banner-runway-image {
