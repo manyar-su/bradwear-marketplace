@@ -58,7 +58,7 @@ const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const SLIDESHOW_INTERVAL_MS = 5000;
-const HOME_HERO_SLIDESHOW_INTERVAL_MS = 3000;
+const PORTRAIT_SLIDESHOW_INTERVAL_MS = 10000;
 const PROCESS_SLIDE_TRANSITION_MS = 420;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
@@ -1571,7 +1571,7 @@ const PublicSiteView: React.FC = () => {
     if (safeHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length);
-    }, HOME_HERO_SLIDESHOW_INTERVAL_MS);
+    }, PORTRAIT_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
 
@@ -1592,7 +1592,7 @@ const PublicSiteView: React.FC = () => {
     if (currentRoute !== RouteKey.KATALOG || slides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveCatalogHeroSlide((prev) => (prev + 1) % slides.length);
-    }, SLIDESHOW_INTERVAL_MS);
+    }, PORTRAIT_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [currentRoute, safeHeroSlides]);
 
@@ -1604,7 +1604,7 @@ const PublicSiteView: React.FC = () => {
     if (safeHomeCustomSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveHomeCustomSlide((prev) => (prev + 1) % safeHomeCustomSlides.length);
-    }, SLIDESHOW_INTERVAL_MS);
+    }, PORTRAIT_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [safeHomeCustomSlides]);
 
@@ -2449,31 +2449,6 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
-        {/* Slideshow katalog home lama tetap dipakai sebagai runway visual pendukung. */}
-        <section className="hero-image-runway" data-home-section="hero-slider">
-          <article className="hero-banner hero-banner-editorial hero-banner-edge">
-            <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
-              {safeHeroSlides.map((slide, index) => (
-                <div
-                  key={`${slide}-${index}`}
-                  className={`hero-banner-runway-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
-                  aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
-                >
-                  <img src={slide} alt="" className="hero-banner-runway-backdrop" />
-                  <img
-                    src={slide}
-                    alt={`Hero Bradwear ${index + 1}`}
-                    className="hero-banner-runway-image"
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    fetchPriority={index === 0 ? 'high' : 'auto'}
-                  />
-                </div>
-              ))}
-              <div className="hero-banner-overlay hero-banner-overlay-soft" />
-            </div>
-          </article>
-        </section>
-
         {/* Preview portofolio klien di home. */}
         <section className="home-section" data-home-section="client-gallery">
           <div className="home-section-shell home-section-shell-bleed home-section-grid">
@@ -2570,6 +2545,31 @@ const PublicSiteView: React.FC = () => {
               Lihat Alur Pemesanan
             </button>
           </div>
+        </section>
+
+        {/* Slideshow runway home diposisikan tepat sebelum slider kategori. */}
+        <section className="hero-image-runway" data-home-section="hero-slider">
+          <article className="hero-banner hero-banner-editorial hero-banner-edge">
+            <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
+              {safeHeroSlides.map((slide, index) => (
+                <div
+                  key={`${slide}-${index}`}
+                  className={`hero-banner-runway-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
+                  aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
+                >
+                  <img src={slide} alt="" className="hero-banner-runway-backdrop" />
+                  <img
+                    src={slide}
+                    alt={`Hero Bradwear ${index + 1}`}
+                    className="hero-banner-runway-image"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                  />
+                </div>
+              ))}
+              <div className="hero-banner-overlay hero-banner-overlay-soft" />
+            </div>
+          </article>
         </section>
 
         {/* Slider kategori/model pada home. */}
