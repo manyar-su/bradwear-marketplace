@@ -29,6 +29,26 @@ const SEO_PREVIEW_IMAGE_ALT = 'Produk kemeja custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
 const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
 const ARTICLE_BLOG_URL = `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`;
+const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+const LOCAL_BUSINESS_ID = `${SITE_URL}/#local-business`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
+const SERVICE_ID = `${SITE_URL}/#custom-uniform-service`;
+const SOCIAL_PROFILE_URLS = [
+  'https://www.instagram.com/bradwear_indonesia/',
+  'https://www.tiktok.com/@bradwearindonesia',
+];
+const CORE_SERVICE_TERMS = [
+  'kemeja custom',
+  'kemeja dinas',
+  'seragam kerja',
+  'seragam kantor',
+  'PDH',
+  'PDL',
+  'rompi custom',
+  'jaket custom',
+  'celana tactical',
+  'bordir logo instansi',
+];
 
 const upsertMetaTag = (selector: string, attributes: Record<string, string>) => {
   let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
@@ -301,12 +321,23 @@ const buildBaseSchemas = (
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
+      '@id': ORGANIZATION_ID,
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_TAGLINE,
       keywords: keywords.join(', '),
       logo: SEO_ICON_URL,
       image: SEO_PREVIEW_IMAGE_URL,
+      slogan: 'Stay Bold. Stay Bradwear.',
+      brand: {
+        '@type': 'Brand',
+        name: SITE_NAME,
+        logo: SEO_ICON_URL,
+      },
+      knowsAbout: CORE_SERVICE_TERMS.map((name) => ({
+        '@type': 'Thing',
+        name,
+      })),
       founder: {
         '@type': 'Person',
         name: BRADWEAR_FOUNDER_NAME,
@@ -315,7 +346,7 @@ const buildBaseSchemas = (
         '@type': 'Person',
         name: BRADWEAR_FOUNDER_NAME,
       },
-      sameAs: [SITE_URL],
+      sameAs: [SITE_URL, ...SOCIAL_PROFILE_URLS],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
@@ -327,6 +358,7 @@ const buildBaseSchemas = (
     {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
+      '@id': LOCAL_BUSINESS_ID,
       name: SITE_NAME,
       telephone: `+${WHATSAPP_NUMBER}`,
       address: {
@@ -342,10 +374,16 @@ const buildBaseSchemas = (
       description: meta.description,
       image: SEO_PREVIEW_IMAGE_URL,
       keywords: keywords.join(', '),
+      priceRange: '$$',
+      parentOrganization: {
+        '@id': ORGANIZATION_ID,
+      },
+      sameAs: SOCIAL_PROFILE_URLS,
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
+      '@id': WEBSITE_ID,
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_TAGLINE,
@@ -360,19 +398,24 @@ const buildBaseSchemas = (
       },
       potentialAction: {
         '@type': 'SearchAction',
-        target: `${SITE_URL}/katalog`,
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${SITE_URL}/katalog?search={search_term_string}`,
+        },
         'query-input': 'required name=search_term_string',
+      },
+      publisher: {
+        '@id': ORGANIZATION_ID,
       },
     },
     {
       '@context': 'https://schema.org',
       '@type': 'Service',
+      '@id': SERVICE_ID,
       name: `${SITE_NAME} Custom Uniform Service`,
       serviceType: 'Konveksi kemeja custom dan seragam dinas',
       provider: {
-        '@type': 'Organization',
-        name: SITE_NAME,
-        url: SITE_URL,
+        '@id': ORGANIZATION_ID,
       },
       areaServed: 'Indonesia',
       availableChannel: {
@@ -381,20 +424,33 @@ const buildBaseSchemas = (
       },
       description: meta.description,
       keywords: keywords.join(', '),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Katalog seragam custom Bradwear',
+        url: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}`,
+      },
     },
     {
       '@context': 'https://schema.org',
       '@type': article ? 'Article' : 'WebPage',
+      '@id': `${canonical}#webpage`,
       name: meta.title,
       url: canonical,
       description: meta.description,
       inLanguage: 'id-ID',
       keywords: keywords.join(', '),
       image: article?.coverImage || SEO_PREVIEW_IMAGE_URL,
+      isPartOf: {
+        '@id': WEBSITE_ID,
+      },
+      publisher: {
+        '@id': ORGANIZATION_ID,
+      },
     },
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
+      '@id': `${canonical}#breadcrumb`,
       itemListElement: breadcrumbItems,
     },
   ];
@@ -466,13 +522,14 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
         '@type': 'ListItem',
         position: index + 1,
         name: product.name,
-        url: `${SITE_URL}/katalog`,
+        url: `${SITE_URL}${getCatalogProductPath(product)}`,
         item: {
           '@type': 'Product',
           name: product.name,
           description: product.description,
           category: product.category,
           image: product.image,
+          url: `${SITE_URL}${getCatalogProductPath(product)}`,
           brand: {
             '@type': 'Brand',
             name: SITE_NAME,
@@ -685,6 +742,7 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
   upsertMetaTag('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
   upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: previewImage });
+  upsertMetaTag('meta[property="og:image:secure_url"]', { property: 'og:image:secure_url', content: previewImage });
   upsertMetaTag('meta[property="og:image:alt"]', { property: 'og:image:alt', content: previewImageAlt });
   upsertMetaTag('meta[property="article:section"]', {
     property: 'article:section',
@@ -701,10 +759,12 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: previewImage });
   upsertMetaTag('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: previewImageAlt });
   upsertMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: SITE_NAME });
+  upsertMetaTag('meta[name="twitter:domain"]', { name: 'twitter:domain', content: 'bradwearindonesia.com' });
   upsertMetaTag('meta[name="format-detection"]', { name: 'format-detection', content: 'telephone=no,address=no,email=no' });
   upsertLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="id-ID"]', { rel: 'alternate', hreflang: 'id-ID', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
+  upsertLinkTag('link[rel="sitemap"][type="application/xml"]', { rel: 'sitemap', type: 'application/xml', href: '/sitemap.xml' });
   upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/logo.png' });
   upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/logo.png' });
 
