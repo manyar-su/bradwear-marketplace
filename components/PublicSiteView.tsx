@@ -2361,28 +2361,6 @@ const PublicSiteView: React.FC = () => {
   const renderHome = () => {
     return (
       <>
-        {/* Slider hero utama home: full-width dari folder main hero tanpa overlay teks. */}
-        <section className="home-main-hero-slider" data-home-section="main-hero-slider" aria-label="Slider hero utama Bradwear">
-          <div className="home-main-hero-slider-track">
-            {safeHeroSlides.map((slide, index) => (
-              <div
-                key={`${slide}-${index}`}
-                className={`home-main-hero-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
-                aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
-              >
-                <img src={slide} alt="" className="home-main-hero-backdrop" />
-                <img
-                  src={slide}
-                  alt={`Hero utama Bradwear ${index + 1}`}
-                  className="home-main-hero-image"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  fetchPriority={index === 0 ? 'high' : 'auto'}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* Utility strip home: lokasi, sosial media, marquee, dan CTA katalog. */}
         <section className="home-utility-strip" data-home-section="hero-utility">
           <a href={STORE_MAP_URL} target="_blank" rel="noreferrer" className="home-utility-link home-utility-link-maps">
@@ -2447,6 +2425,28 @@ const PublicSiteView: React.FC = () => {
               </a>
             </div>
           </article>
+        </section>
+
+        {/* Slider hero utama home diposisikan tepat sebelum slider client. */}
+        <section className="home-main-hero-slider" data-home-section="main-hero-slider" aria-label="Slider hero utama Bradwear">
+          <div className="home-main-hero-slider-track">
+            {safeHeroSlides.map((slide, index) => (
+              <div
+                key={`${slide}-${index}`}
+                className={`home-main-hero-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
+                aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
+              >
+                <img src={slide} alt="" className="home-main-hero-backdrop" />
+                <img
+                  src={slide}
+                  alt={`Hero utama Bradwear ${index + 1}`}
+                  className="home-main-hero-image"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
+                />
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Preview portofolio klien di home. */}
