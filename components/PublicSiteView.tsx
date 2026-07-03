@@ -46,6 +46,11 @@ const MAIN_HERO_SLIDES = Object.entries(
 )
   .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
   .map(([, source]) => source as string);
+const HOME_CUSTOM_SLIDES = Object.entries(
+  import.meta.glob('../assets/main hero/custom/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
+)
+  .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
+  .map(([, source]) => source as string);
 
 const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
@@ -53,6 +58,7 @@ const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const SLIDESHOW_INTERVAL_MS = 5000;
+const HOME_HERO_SLIDESHOW_INTERVAL_MS = 3000;
 const PROCESS_SLIDE_TRANSITION_MS = 420;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
 const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
@@ -1514,6 +1520,7 @@ const PublicSiteView: React.FC = () => {
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
+  const [activeHomeCustomSlide, setActiveHomeCustomSlide] = useState(0);
   const [activeClientSlide, setActiveClientSlide] = useState(0);
   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
@@ -1551,15 +1558,20 @@ const PublicSiteView: React.FC = () => {
   const downloadPreviewSlides = ASSETS.CONTENT.GOOGLE_PLAY_GALLERY.slice(1, 4);
 
   const heroSlides = useMemo(
-    () => (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean),
+    () => (MAIN_HERO_SLIDES.length ? MAIN_HERO_SLIDES : (ASSETS.BRAND.SLIDES?.length ? ASSETS.BRAND.SLIDES : [ASSETS.BRAND.HERO]).filter(Boolean)),
     [],
   );
   const safeHeroSlides = heroSlides.length > 0 ? heroSlides : [ASSETS.KEMEJA.BRAD_V3.FRONT];
+  const safeHomeCustomSlides = HOME_CUSTOM_SLIDES.length > 0 ? HOME_CUSTOM_SLIDES : safeHeroSlides;
+  useEffect(() => {
+    setActiveHeroSlide(0);
+  }, [safeHeroSlides]);
+
   useEffect(() => {
     if (safeHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length);
-    }, SLIDESHOW_INTERVAL_MS);
+    }, HOME_HERO_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
 
@@ -1583,6 +1595,18 @@ const PublicSiteView: React.FC = () => {
     }, SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [currentRoute, safeHeroSlides]);
+
+  useEffect(() => {
+    setActiveHomeCustomSlide(0);
+  }, [safeHomeCustomSlides]);
+
+  useEffect(() => {
+    if (safeHomeCustomSlides.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveHomeCustomSlide((prev) => (prev + 1) % safeHomeCustomSlides.length);
+    }, SLIDESHOW_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [safeHomeCustomSlides]);
 
 
   useEffect(() => {
@@ -2337,6 +2361,22 @@ const PublicSiteView: React.FC = () => {
   const renderHome = () => {
     return (
       <>
+        {/* Slider hero utama home: full-width dari folder main hero tanpa overlay teks. */}
+        <section className="home-main-hero-slider" data-home-section="main-hero-slider" aria-label="Slider hero utama Bradwear">
+          <div className="home-main-hero-slider-track">
+            {safeHeroSlides.map((slide, index) => (
+              <img
+                key={`${slide}-${index}`}
+                src={slide}
+                alt={`Hero utama Bradwear ${index + 1}`}
+                className={`home-main-hero-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'auto'}
+              />
+            ))}
+          </div>
+        </section>
+
         {/* Utility strip home: lokasi, sosial media, marquee, dan CTA katalog. */}
         <section className="home-utility-strip" data-home-section="hero-utility">
           <a href={STORE_MAP_URL} target="_blank" rel="noreferrer" className="home-utility-link home-utility-link-maps">
@@ -2359,7 +2399,7 @@ const PublicSiteView: React.FC = () => {
           </button>
         </section>
 
-        {/* Hero foto customer service dikembalikan ke atas seperti layout home sebelumnya. */}
+        {/* Hero foto customer service tetap dipakai sebagai strip terpisah di bawah slider utama. */}
         <section className="hero-display-strip hero-display-strip-top home-fast-response-strip home-fast-response-strip-clean" data-home-section="hero-intro">
           <img
             src={ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
@@ -2403,7 +2443,7 @@ const PublicSiteView: React.FC = () => {
           </article>
         </section>
 
-        {/* Slideshow hero home dan label tombol navigasinya. */}
+        {/* Slideshow katalog home lama tetap dipakai sebagai runway visual pendukung. */}
         <section className="hero-image-runway" data-home-section="hero-slider">
           <article className="hero-banner hero-banner-editorial hero-banner-edge">
             <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
@@ -2417,27 +2457,6 @@ const PublicSiteView: React.FC = () => {
               ))}
               <div className="hero-banner-overlay hero-banner-overlay-soft" />
             </div>
-
-            {safeHeroSlides.length > 1 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length)}
-                  className="hero-arrow hero-arrow-left"
-                  aria-label="Banner sebelumnya"
-                >
-                  &lt;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length)}
-                  className="hero-arrow hero-arrow-right"
-                  aria-label="Banner berikutnya"
-                >
-                  &gt;
-                </button>
-              </>
-            ) : null}
           </article>
         </section>
 
@@ -2617,6 +2636,27 @@ const PublicSiteView: React.FC = () => {
               ))}
             </div>
           </div>
+          </div>
+        </section>
+
+        <section className="home-faq-slider-band scroll-reveal-block" aria-label="Slideshow seragam custom Bradwear">
+          <div className="home-faq-slider-stage">
+            {safeHomeCustomSlides.map((slide, index) => (
+              <div
+                key={`${slide}-${index}`}
+                className={`home-faq-slider-slide ${index === activeHomeCustomSlide ? 'is-active' : ''}`}
+                aria-hidden={index === activeHomeCustomSlide ? 'false' : 'true'}
+              >
+                <img src={slide} alt="" className="home-faq-slider-backdrop" />
+                <img
+                  src={slide}
+                  alt={`Seragam custom Bradwear ${index + 1}`}
+                  className="home-faq-slider-image"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
+                />
+              </div>
+            ))}
           </div>
         </section>
 
