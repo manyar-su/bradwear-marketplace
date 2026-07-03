@@ -1,5 +1,7 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS, findAssetBySimilarName } from '../assets';
+import bottomFastRespondImage from '../assets/Fast Respond.png';
+import homeCustomVestpinkImage from '../assets/main hero/model/vestpink.png';
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
@@ -44,11 +46,7 @@ const MAIN_HERO_SLIDES = Object.entries(
 )
   .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
   .map(([, source]) => source as string);
-const HOME_CUSTOM_SLIDES = Object.entries(
-  import.meta.glob('../assets/main hero/custom/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
-)
-  .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
-  .map(([, source]) => source as string);
+const HOME_CUSTOM_SLIDES = [homeCustomVestpinkImage];
 
 const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
@@ -56,11 +54,6 @@ const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const heroTopImage = findAssetBySimilarName(['atas hero', 'hero atas', 'atas'], ['hero']) || ASSETS.BRAND.HERO;
-const fastRespondImage =
-  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond'], ['hero']) ||
-  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond']) ||
-  ASSETS.CONTENT.FAST_RESPONSE_HERO ||
-  heroTopImage;
 const portfolioHeroImage = findAssetBySimilarName(['portfolio hero', 'portfolio'], ['hero']) || heroTopImage;
 const SLIDESHOW_INTERVAL_MS = 5000;
 const PORTRAIT_SLIDESHOW_INTERVAL_MS = 10000;
@@ -2521,14 +2514,6 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
-          {renderFullBleedSliderControls({
-            slides: safeHeroSlides,
-            activeSlide: activeHeroSlide,
-            onPrevious: showPreviousHeroSlide,
-            onNext: showNextHeroSlide,
-            themeClass: 'is-dark',
-            slideLabel: 'hero utama Bradwear',
-          })}
         </section>
 
         {/* Preview portofolio klien di home. */}
@@ -2762,14 +2747,6 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
-          {renderFullBleedSliderControls({
-            slides: safeHomeCustomSlides,
-            activeSlide: activeHomeCustomSlide,
-            onPrevious: showPreviousHomeCustomSlide,
-            onNext: showNextHomeCustomSlide,
-            themeClass: 'is-faq',
-            slideLabel: 'seragam custom Bradwear',
-          })}
         </section>
 
         {/* FAQ ringkas home. */}
@@ -2799,7 +2776,7 @@ const PublicSiteView: React.FC = () => {
         {/* Foto full-width fast response dipasang tepat sebelum CTA penutup home. */}
         <section className="hero-display-strip hero-display-strip-bottom home-fast-response-cta-strip" data-home-section="cta-fast-response">
           <img
-            src={fastRespondImage || ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            src={bottomFastRespondImage}
             alt="Fast response konsultasi Bradwear Indonesia"
             className="hero-display-strip-image"
           />
@@ -3147,14 +3124,6 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
-          {renderFullBleedSliderControls({
-            slides: catalogHeroSlides,
-            activeSlide: activeCatalogHeroSlide,
-            onPrevious: showPreviousCatalogHeroSlide,
-            onNext: showNextCatalogHeroSlide,
-            themeClass: 'is-catalog',
-            slideLabel: 'katalog Bradwear',
-          })}
         </section>
 
         <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">

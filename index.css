@@ -4860,7 +4860,7 @@ a {
 }
 
 .catalog-top-hero-image {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   padding: 0;
 }
@@ -7789,7 +7789,7 @@ a {
 }
 
 .home-faq-slider-image {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   padding: 0;
 }
@@ -7857,7 +7857,7 @@ a {
 }
 
 .hero-banner-runway-image {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   padding: 0;
 }
