@@ -32,10 +32,74 @@ const getAssetPath = (localPath: string, remotePath: string): string => {
   return USE_SUPABASE_STORAGE ? `${SUPABASE_BASE_URL}/${remotePath}` : localPath;
 };
 
+const normalizeAssetToken = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+export const findAssetBySimilarName = (queries: string | string[], folderHints: string[] = []): string => {
+  const normalizedQueries = (Array.isArray(queries) ? queries : [queries]).map(normalizeAssetToken).filter(Boolean);
+  const normalizedHints = folderHints.map(normalizeAssetToken).filter(Boolean);
+
+  if (normalizedQueries.length === 0) return '';
+
+  const allKeys = Object.keys(allImagesGlob);
+  const hintedKeys = normalizedHints.length
+    ? allKeys.filter((key) => {
+        const folderParts = key
+          .split('/')
+          .slice(2, -1)
+          .map(normalizeAssetToken)
+          .filter(Boolean);
+
+        return normalizedHints.some((hint) => folderParts.some((folder) => folder.includes(hint) || hint.includes(folder)));
+      })
+    : [];
+  const candidateKeys = hintedKeys.length > 0 ? hintedKeys : allKeys;
+
+  let bestKey = '';
+  let bestScore = 0;
+
+  candidateKeys.forEach((key) => {
+    const parts = key.split('/');
+    const fileName = parts[parts.length - 1] ?? '';
+    const normalizedFileName = normalizeAssetToken(fileName.replace(/\.[^.]+$/, ''));
+    const normalizedPath = normalizeAssetToken(parts.slice(2).join(' '));
+    const normalizedFolders = parts
+      .slice(2, -1)
+      .map(normalizeAssetToken)
+      .filter(Boolean);
+
+    let score = 0;
+
+    normalizedQueries.forEach((query) => {
+      if (normalizedFileName === query) {
+        score += 700;
+      } else if (normalizedFileName.includes(query) || query.includes(normalizedFileName)) {
+        score += 460;
+      }
+
+      if (normalizedPath.includes(query)) {
+        score += 240;
+      }
+    });
+
+    if (normalizedHints.length > 0 && normalizedHints.some((hint) => normalizedFolders.some((folder) => folder.includes(hint) || hint.includes(folder)))) {
+      score += 120;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestKey = key;
+    }
+  });
+
+  return bestKey ? resolveAsset(bestKey) : '';
+};
+
 // Import logo dan UI assets dynamically
 const LOGO_BRADWEAR = resolveAsset('./assets/logo.png');
 const HERO_BG = resolveAsset('./assets/factory_hero.webp');
-const HERO_FAST_RESPONSE = resolveAsset('./assets/Hero/Fast Respond.png') || resolveAsset('./assets/Hero/fast  respon .webp');
+const HERO_FAST_RESPONSE =
+  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond'], ['hero']) ||
+  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond']);
 const HERO_SLIDES = Object.keys(allImagesGlob)
   .filter((key) => key.toLowerCase().includes('/slideshow/'))
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))

@@ -1,10 +1,8 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { ASSETS } from '../assets';
+import { ASSETS, findAssetBySimilarName } from '../assets';
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
-import heroTopImage from '../assets/Hero/atas.webp';
-import portfolioHeroImage from '../assets/Hero/portfolio-hero.png';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
@@ -57,6 +55,13 @@ type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
 const ALL_MODELS = 'Semua Model';
 const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
+const heroTopImage = findAssetBySimilarName(['atas hero', 'hero atas', 'atas'], ['hero']) || ASSETS.BRAND.HERO;
+const fastRespondImage =
+  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond'], ['hero']) ||
+  findAssetBySimilarName(['fast respond', 'fast response', 'fastrespond']) ||
+  ASSETS.CONTENT.FAST_RESPONSE_HERO ||
+  heroTopImage;
+const portfolioHeroImage = findAssetBySimilarName(['portfolio hero', 'portfolio'], ['hero']) || heroTopImage;
 const SLIDESHOW_INTERVAL_MS = 5000;
 const PORTRAIT_SLIDESHOW_INTERVAL_MS = 10000;
 const PROCESS_SLIDE_TRANSITION_MS = 420;
@@ -1563,6 +1568,7 @@ const PublicSiteView: React.FC = () => {
   );
   const safeHeroSlides = heroSlides.length > 0 ? heroSlides : [ASSETS.KEMEJA.BRAD_V3.FRONT];
   const safeHomeCustomSlides = HOME_CUSTOM_SLIDES.length > 0 ? HOME_CUSTOM_SLIDES : safeHeroSlides;
+  const catalogHeroSlides = MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides;
   useEffect(() => {
     setActiveHeroSlide(0);
   }, [safeHeroSlides]);
@@ -1588,13 +1594,12 @@ const PublicSiteView: React.FC = () => {
   }, [safeHeroSlides]);
 
   useEffect(() => {
-    const slides = MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides;
-    if (currentRoute !== RouteKey.KATALOG || slides.length < 2) return;
+    if (currentRoute !== RouteKey.KATALOG || catalogHeroSlides.length < 2) return;
     const timer = window.setInterval(() => {
-      setActiveCatalogHeroSlide((prev) => (prev + 1) % slides.length);
+      setActiveCatalogHeroSlide((prev) => (prev + 1) % catalogHeroSlides.length);
     }, PORTRAIT_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [currentRoute, safeHeroSlides]);
+  }, [catalogHeroSlides, currentRoute]);
 
   useEffect(() => {
     setActiveHomeCustomSlide(0);
@@ -1947,6 +1952,75 @@ const PublicSiteView: React.FC = () => {
 
     setActiveHomeCarouselSlide((prev) => Math.min(prev, homeCarouselProducts.length - 1));
   }, [homeCarouselProducts]);
+
+  const showPreviousHeroSlide = () => {
+    if (safeHeroSlides.length < 2) return;
+    setActiveHeroSlide((prev) => (prev - 1 + safeHeroSlides.length) % safeHeroSlides.length);
+  };
+
+  const showNextHeroSlide = () => {
+    if (safeHeroSlides.length < 2) return;
+    setActiveHeroSlide((prev) => (prev + 1) % safeHeroSlides.length);
+  };
+
+  const showPreviousCatalogHeroSlide = () => {
+    if (catalogHeroSlides.length < 2) return;
+    setActiveCatalogHeroSlide((prev) => (prev - 1 + catalogHeroSlides.length) % catalogHeroSlides.length);
+  };
+
+  const showNextCatalogHeroSlide = () => {
+    if (catalogHeroSlides.length < 2) return;
+    setActiveCatalogHeroSlide((prev) => (prev + 1) % catalogHeroSlides.length);
+  };
+
+  const showPreviousHomeCustomSlide = () => {
+    if (safeHomeCustomSlides.length < 2) return;
+    setActiveHomeCustomSlide((prev) => (prev - 1 + safeHomeCustomSlides.length) % safeHomeCustomSlides.length);
+  };
+
+  const showNextHomeCustomSlide = () => {
+    if (safeHomeCustomSlides.length < 2) return;
+    setActiveHomeCustomSlide((prev) => (prev + 1) % safeHomeCustomSlides.length);
+  };
+
+  const renderFullBleedSliderControls = ({
+    slides,
+    activeSlide,
+    onPrevious,
+    onNext,
+    themeClass,
+    slideLabel,
+  }: {
+    slides: string[];
+    activeSlide: number;
+    onPrevious: () => void;
+    onNext: () => void;
+    themeClass: string;
+    slideLabel: string;
+  }) => {
+    if (slides.length < 2) return null;
+
+    return (
+      <nav className={`full-bleed-slider-controls ${themeClass}`} aria-label={`Kontrol slider ${slideLabel}`}>
+        <button type="button" onClick={onPrevious} className="full-bleed-slider-arrow" aria-label={`Slide ${slideLabel} sebelumnya`}>
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+        <div className="full-bleed-slider-status">
+          <p className="full-bleed-slider-count">
+            {String(activeSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+          </p>
+          <div className="full-bleed-slider-dots" aria-hidden="true">
+            {slides.map((slide, index) => (
+              <span key={`${slideLabel}-${slide}-${index}`} className={`full-bleed-slider-dot ${index === activeSlide ? 'is-active' : ''}`} />
+            ))}
+          </div>
+        </div>
+        <button type="button" onClick={onNext} className="full-bleed-slider-arrow" aria-label={`Slide ${slideLabel} berikutnya`}>
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+      </nav>
+    );
+  };
 
   const showPreviousHomeCarouselSlide = () => {
     if (homeCarouselProducts.length < 2) return;
@@ -2447,6 +2521,14 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
+          {renderFullBleedSliderControls({
+            slides: safeHeroSlides,
+            activeSlide: activeHeroSlide,
+            onPrevious: showPreviousHeroSlide,
+            onNext: showNextHeroSlide,
+            themeClass: 'is-dark',
+            slideLabel: 'hero utama Bradwear',
+          })}
         </section>
 
         {/* Preview portofolio klien di home. */}
@@ -2570,6 +2652,14 @@ const PublicSiteView: React.FC = () => {
               <div className="hero-banner-overlay hero-banner-overlay-soft" />
             </div>
           </article>
+          {renderFullBleedSliderControls({
+            slides: safeHeroSlides,
+            activeSlide: activeHeroSlide,
+            onPrevious: showPreviousHeroSlide,
+            onNext: showNextHeroSlide,
+            themeClass: 'is-light',
+            slideLabel: 'hero model Bradwear',
+          })}
         </section>
 
         {/* Slider kategori/model pada home. */}
@@ -2672,6 +2762,14 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
+          {renderFullBleedSliderControls({
+            slides: safeHomeCustomSlides,
+            activeSlide: activeHomeCustomSlide,
+            onPrevious: showPreviousHomeCustomSlide,
+            onNext: showNextHomeCustomSlide,
+            themeClass: 'is-faq',
+            slideLabel: 'seragam custom Bradwear',
+          })}
         </section>
 
         {/* FAQ ringkas home. */}
@@ -2696,6 +2794,15 @@ const PublicSiteView: React.FC = () => {
             </div>
             {renderFaqAccordion()}
           </div>
+        </section>
+
+        {/* Foto full-width fast response dipasang tepat sebelum CTA penutup home. */}
+        <section className="hero-display-strip hero-display-strip-bottom home-fast-response-cta-strip" data-home-section="cta-fast-response">
+          <img
+            src={fastRespondImage || ASSETS.CONTENT.FAST_RESPONSE_HERO || heroTopImage}
+            alt="Fast response konsultasi Bradwear Indonesia"
+            className="hero-display-strip-image"
+          />
         </section>
 
         {/* CTA penutup home. */}
@@ -3023,7 +3130,7 @@ const PublicSiteView: React.FC = () => {
       <div className="catalog-page-shell">
         <section className="catalog-top-hero scroll-reveal-block" aria-label="Slideshow katalog Bradwear">
           <div className="catalog-top-hero-stage">
-            {(MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides).map((slide, index) => (
+            {catalogHeroSlides.map((slide, index) => (
               <div
                 key={`${slide}-${index}`}
                 className={`catalog-top-hero-slide ${index === activeCatalogHeroSlide ? 'is-active' : ''}`}
@@ -3040,6 +3147,14 @@ const PublicSiteView: React.FC = () => {
               </div>
             ))}
           </div>
+          {renderFullBleedSliderControls({
+            slides: catalogHeroSlides,
+            activeSlide: activeCatalogHeroSlide,
+            onPrevious: showPreviousCatalogHeroSlide,
+            onNext: showNextCatalogHeroSlide,
+            themeClass: 'is-catalog',
+            slideLabel: 'katalog Bradwear',
+          })}
         </section>
 
         <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
