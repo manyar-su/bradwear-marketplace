@@ -2632,14 +2632,6 @@ const PublicSiteView: React.FC = () => {
               ))}
             </div>
           </article>
-          {renderFullBleedSliderControls({
-            slides: safeHeroSlides,
-            activeSlide: activeHeroSlide,
-            onPrevious: showPreviousHeroSlide,
-            onNext: showNextHeroSlide,
-            themeClass: 'is-light',
-            slideLabel: 'hero model Bradwear',
-          })}
         </section>
 
         {/* Slider kategori/model pada home. */}
@@ -3219,15 +3211,13 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
-        {ASSETS.CONTENT.FAST_RESPONSE_HERO ? (
-          <section className="catalog-full-bleed-media scroll-reveal-block" aria-label="Fast respon customer service Bradwear">
-            <img
-              src={ASSETS.CONTENT.FAST_RESPONSE_HERO}
-              alt="Fast respon customer service Bradwear"
-              className="catalog-full-bleed-image"
-            />
-          </section>
-        ) : null}
+        <section className="catalog-full-bleed-media scroll-reveal-block" aria-label="Fast respon customer service Bradwear">
+          <img
+            src={bottomFastRespondImage}
+            alt="Fast respon customer service Bradwear"
+            className="catalog-full-bleed-image"
+          />
+        </section>
       </div>
     );
   };
