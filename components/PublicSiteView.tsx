@@ -2365,14 +2365,20 @@ const PublicSiteView: React.FC = () => {
         <section className="home-main-hero-slider" data-home-section="main-hero-slider" aria-label="Slider hero utama Bradwear">
           <div className="home-main-hero-slider-track">
             {safeHeroSlides.map((slide, index) => (
-              <img
+              <div
                 key={`${slide}-${index}`}
-                src={slide}
-                alt={`Hero utama Bradwear ${index + 1}`}
                 className={`home-main-hero-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                fetchPriority={index === 0 ? 'high' : 'auto'}
-              />
+                aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
+              >
+                <img src={slide} alt="" className="home-main-hero-backdrop" />
+                <img
+                  src={slide}
+                  alt={`Hero utama Bradwear ${index + 1}`}
+                  className="home-main-hero-image"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
+                />
+              </div>
             ))}
           </div>
         </section>
