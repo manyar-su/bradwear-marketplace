@@ -3198,40 +3198,6 @@ const PublicSiteView: React.FC = () => {
             </article>
           </section>
 
-          <section className="size-guide-recommendation-shell scroll-reveal-block">
-            <article className="size-guide-recommendation-copy">
-              <p className="guide-story-kicker">{activeSizeGuideTab === 'kemeja' ? 'Rekomendasi Size Kemeja' : 'Rekomendasi Size Celana'}</p>
-              <h2>Rekomendasi size berdasarkan berat badan dan tinggi badan</h2>
-              <p>
-                {activeSizeGuideTab === 'kemeja'
-                  ? 'Gunakan tabel berikut untuk mendapatkan ukuran kemeja awal sebelum mengukur lebar dada, bahu, dan panjang badan.'
-                  : 'Gunakan tabel berikut untuk mendapatkan ukuran celana awal sebelum mengukur lingkar pinggang dan panjang celana.'}
-              </p>
-            </article>
-
-            <div className="size-guide-range-grid">
-              {activeSizeGuideRecommendations.map((item) => (
-                <article key={`${activeSizeGuideTab}-${item.size}`} className="size-guide-range-card">
-                  <span className="size-guide-range-size">{item.size}</span>
-                  <div className="size-guide-range-meta">
-                    <p>{item.weightMin}–{item.weightMax} kg</p>
-                    <p>{item.heightMin}–{item.heightMax} cm</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <article className="size-guide-note-card">
-              <p className="guide-story-kicker">Versi pendek untuk poster</p>
-              <div className="size-guide-poster-lines">
-                {activeShortNotes.map((line) => (
-                  <span key={`${activeSizeGuideTab}-${line}`}>{line}</span>
-                ))}
-              </div>
-              <p>{activeGuideNote}</p>
-            </article>
-          </section>
-
           {activeSizeGuideTab === 'kemeja' ? (
             <section className="size-guide-calculator-shell scroll-reveal-block">
               <article className="size-guide-calculator-copy">
@@ -3290,6 +3256,40 @@ const PublicSiteView: React.FC = () => {
               </article>
             </section>
           ) : null}
+
+          <section className="size-guide-recommendation-shell scroll-reveal-block">
+            <article className="size-guide-recommendation-copy">
+              <p className="guide-story-kicker">{activeSizeGuideTab === 'kemeja' ? 'Rekomendasi Size Kemeja' : 'Rekomendasi Size Celana'}</p>
+              <h2>Rekomendasi size berdasarkan berat badan dan tinggi badan</h2>
+              <p>
+                {activeSizeGuideTab === 'kemeja'
+                  ? 'Gunakan tabel berikut untuk mendapatkan ukuran kemeja awal sebelum mengukur lebar dada, bahu, dan panjang badan.'
+                  : 'Gunakan tabel berikut untuk mendapatkan ukuran celana awal sebelum mengukur lingkar pinggang dan panjang celana.'}
+              </p>
+            </article>
+
+            <div className="size-guide-range-grid">
+              {activeSizeGuideRecommendations.map((item) => (
+                <article key={`${activeSizeGuideTab}-${item.size}`} className="size-guide-range-card">
+                  <span className="size-guide-range-size">{item.size}</span>
+                  <div className="size-guide-range-meta">
+                    <p>{item.weightMin}–{item.weightMax} kg</p>
+                    <p>{item.heightMin}–{item.heightMax} cm</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <article className="size-guide-note-card">
+              <p className="guide-story-kicker">Versi pendek untuk poster</p>
+              <div className="size-guide-poster-lines">
+                {activeShortNotes.map((line) => (
+                  <span key={`${activeSizeGuideTab}-${line}`}>{line}</span>
+                ))}
+              </div>
+              <p>{activeGuideNote}</p>
+            </article>
+          </section>
 
           <section className="guide-story-info-grid scroll-reveal-block size-guide-support-grid">
             <article className="guide-story-info-card">
