@@ -3136,9 +3136,6 @@ const PublicSiteView: React.FC = () => {
             <article className="guide-story-copy">
               <p className="guide-story-kicker">Panduan Ukuran</p>
               <h1>Pilih panduan ukuran kemeja atau celana, lalu cek rekomendasi size berdasarkan tinggi dan berat badan.</h1>
-              <p className="guide-story-intro">
-                Halaman ini dibuat agar tim lebih cepat menentukan size awal sebelum masuk ke proses desain atau konsultasi. Untuk mobile, tampilannya dibuat lebih compact supaya tabel, foto size chart, dan hasil rekomendasi tetap mudah dibaca.
-              </p>
               <div className="size-guide-tab-row" role="tablist" aria-label="Pilihan panduan ukuran">
                 <button
                   type="button"
@@ -3159,22 +3156,20 @@ const PublicSiteView: React.FC = () => {
                   Celana
                 </button>
               </div>
-              <div className="size-guide-highlight-list">
-                <article className="size-guide-highlight-card">
-                  <h2>2 pilihan size guide</h2>
-                  <p>Pilih mode kemeja atau celana sesuai kebutuhan tim, lalu cocokkan dengan foto size chart yang tampil.</p>
-                </article>
-                <article className="size-guide-highlight-card">
-                  <h2>Rekomendasi awal lebih cepat</h2>
-                  <p>Gunakan berat badan dan tinggi badan sebagai acuan awal sebelum masuk ke pengukuran yang lebih detail.</p>
-                </article>
-              </div>
               <div className="guide-story-actions">
                 <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-primary">
                   Kembali ke Katalog
                 </button>
                 <button type="button" onClick={() => openCustomerServiceDialog({ message: buildCustomerServiceMessage('panduan ukuran seragam custom'), title: 'Pilih customer service untuk panduan ukuran' })} className="guide-story-secondary">
                   Tanya Ukuran
+                </button>
+              </div>
+              <div className="guide-story-guide-nav" aria-label="Navigasi panduan katalog">
+                <button type="button" onClick={() => openCatalogGuide('size')} className="guide-story-guide-link is-active">
+                  Panduan Ukuran
+                </button>
+                <button type="button" onClick={() => openCatalogGuide('material')} className="guide-story-guide-link">
+                  Jenis Bahan
                 </button>
               </div>
             </article>
@@ -3268,16 +3263,25 @@ const PublicSiteView: React.FC = () => {
               </p>
             </article>
 
-            <div className="size-guide-range-grid">
-              {activeSizeGuideRecommendations.map((item) => (
-                <article key={`${activeSizeGuideTab}-${item.size}`} className="size-guide-range-card">
-                  <span className="size-guide-range-size">{item.size}</span>
-                  <div className="size-guide-range-meta">
-                    <p>{item.weightMin}–{item.weightMax} kg</p>
-                    <p>{item.heightMin}–{item.heightMax} cm</p>
-                  </div>
-                </article>
-              ))}
+            <div className="size-guide-table-shell" role="region" aria-label={`Tabel rekomendasi size ${activeSizeGuideTab}`}>
+              <table className="size-guide-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Size</th>
+                    <th scope="col">Berat Badan</th>
+                    <th scope="col">Tinggi Badan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeSizeGuideRecommendations.map((item) => (
+                    <tr key={`${activeSizeGuideTab}-${item.size}`}>
+                      <th scope="row">{item.size}</th>
+                      <td>{item.weightMin}–{item.weightMax} kg</td>
+                      <td>{item.heightMin}–{item.heightMax} cm</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             <article className="size-guide-note-card">
@@ -3292,15 +3296,7 @@ const PublicSiteView: React.FC = () => {
           </section>
 
           <section className="guide-story-info-grid scroll-reveal-block size-guide-support-grid">
-            <article className="guide-story-info-card">
-              <h2>Gunakan foto size chart sebagai acuan utama</h2>
-              <p>Foto size guide tetap ditampilkan penuh agar user bisa membandingkan hasil rekomendasi dengan ukuran visual yang lebih detail.</p>
-            </article>
-            <article className="guide-story-info-card">
-              <h2>Cocok untuk briefing tim</h2>
-              <p>Tabel rekomendasi ini membantu pengumpulan size awal secara cepat sebelum detail final dikirim ke admin Bradwear.</p>
-            </article>
-            <article className="guide-story-info-card">
+            <article className="guide-story-info-card size-guide-warning-card">
               <h2>Tetap ada toleransi produksi</h2>
               <p>Perbedaan ukuran ±1–2 cm tetap bisa terjadi, jadi untuk order penting atau jumlah besar disarankan melakukan pengukuran manual tambahan.</p>
             </article>
@@ -3332,6 +3328,14 @@ const PublicSiteView: React.FC = () => {
                 </button>
                 <button type="button" onClick={() => openCustomerServiceDialog({ message: buildCustomerServiceMessage('panduan jenis bahan seragam custom'), title: 'Pilih customer service untuk konsultasi bahan' })} className="guide-story-secondary">
                   Tanya Bahan
+                </button>
+              </div>
+              <div className="guide-story-guide-nav" aria-label="Navigasi panduan katalog">
+                <button type="button" onClick={() => openCatalogGuide('size')} className="guide-story-guide-link">
+                  Panduan Ukuran
+                </button>
+                <button type="button" onClick={() => openCatalogGuide('material')} className="guide-story-guide-link is-active">
+                  Jenis Bahan
                 </button>
               </div>
             </article>
