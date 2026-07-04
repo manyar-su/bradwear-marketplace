@@ -1600,7 +1600,7 @@ const PublicSiteView: React.FC = () => {
     currentRoute === RouteKey.PANTS ? 'Celana' : 'Semua',
   );
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
-  const [openKemejaShowcaseId, setOpenKemejaShowcaseId] = useState<string | null>(null);
+  const [openCatalogShowcaseId, setOpenCatalogShowcaseId] = useState<string | null>(null);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
   const [activeHomeCustomSlide, setActiveHomeCustomSlide] = useState(0);
@@ -1840,6 +1840,10 @@ const PublicSiteView: React.FC = () => {
   );
   const kemejaProducts = useMemo(
     () => visibleProducts.filter((product) => product.category === 'Kemeja'),
+    [visibleProducts],
+  );
+  const poloProduct = useMemo(
+    () => visibleProducts.find((product) => product.category === 'Polo') ?? null,
     [visibleProducts],
   );
   const spotlightProduct = featured[0] ?? visibleProducts[0] ?? null;
@@ -2153,6 +2157,14 @@ const PublicSiteView: React.FC = () => {
     });
   };
 
+  const openCatalogShowcaseCustomerService = (modelName: string, categoryLabel: string) => {
+    openCustomerServiceDialog({
+      title: `Pilih customer service untuk ${modelName}`,
+      description: 'Pilih admin yang ingin Anda hubungi. Pesan akan otomatis membawa konteks model yang sedang Anda buka.',
+      message: buildCustomerServiceMessage(`pemesanan model ${modelName} kategori ${categoryLabel} dari halaman katalog`),
+    });
+  };
+
   const getProductDetailContent = (product: Product): ProductDetailContent => {
     const categoryDefaults = PRODUCT_CATEGORY_DETAIL_DEFAULTS[product.category];
     const overrides = PRODUCT_DETAIL_OVERRIDES[product.id] ?? {};
@@ -2178,10 +2190,10 @@ const PublicSiteView: React.FC = () => {
     return Array.from(new Set(visuals)).slice(0, 5);
   };
 
-  const catalogKemejaShowcases = useMemo(() => {
+  const catalogModelShowcases = useMemo(() => {
     if (currentRoute !== RouteKey.KATALOG) return [];
 
-    return kemejaProducts.map((product) => {
+    const shirtShowcases = kemejaProducts.map((product) => {
       const aliases = getKemejaShowcaseAliases(product.name);
       const detail = getProductDetailContent(product);
       const mainShowcaseAsset = KEMEJA_SHOWCASE_MAIN_IMAGES.find(({ normalizedName }) => aliases.some((alias) => normalizedName === alias)) ?? null;
@@ -2194,18 +2206,80 @@ const PublicSiteView: React.FC = () => {
           .map(({ fileName, image }) => ({
             label: formatKemejaColorLabel(fileName, product.name, matchingColorFolder.folderName),
             image,
-          })) ?? [];
+          }))
+          .slice(0, 6) ?? [];
 
       return {
+        id: product.id,
         product,
+        title: product.name,
+        kicker: 'Model Kemeja',
         mainImage: mainShowcaseAsset?.image ?? product.image,
         intro: detail.intro,
         functionCopy: detail.bestFor,
         advantageCopy: detail.material,
         colorOptions,
+        ctaMode: 'design-and-cs' as const,
+        openDetail: () => openCatalogProductDetail(product),
+        openCustomerService: () => openCatalogProductCustomerService(product),
       };
     });
-  }, [currentRoute, kemejaProducts]);
+
+    const extraShowcases: Array<{
+      id: string;
+      product: Product | null;
+      title: string;
+      kicker: string;
+      mainImage: string;
+      intro: string;
+      functionCopy: string;
+      advantageCopy: string;
+      colorOptions: Array<{ label: string; image: string }>;
+      ctaMode: 'design-and-cs' | 'cs-only';
+      openDetail: () => void;
+      openCustomerService: () => void;
+    }> = [];
+
+    if (poloProduct) {
+      const detail = getProductDetailContent(poloProduct);
+      extraShowcases.push({
+        id: poloProduct.id,
+        product: poloProduct,
+        title: 'Polo Shirt',
+        kicker: 'Model Polo',
+        mainImage: poloProduct.image,
+        intro: detail.intro,
+        functionCopy: detail.bestFor,
+        advantageCopy: detail.material,
+        colorOptions: [],
+        ctaMode: 'cs-only',
+        openDetail: () => openCatalogShowcaseCustomerService('Polo Shirt', 'Polo'),
+        openCustomerService: () => openCatalogShowcaseCustomerService('Polo Shirt', 'Polo'),
+      });
+    }
+
+    const wearpackImage =
+      KEMEJA_SHOWCASE_MAIN_IMAGES.find(({ normalizedName }) => normalizedName === 'wearpack')?.image ?? null;
+
+    if (wearpackImage) {
+      extraShowcases.push({
+        id: 'wearpack-showcase',
+        product: null,
+        title: 'Wearpack',
+        kicker: 'Model Wearpack',
+        mainImage: wearpackImage,
+        intro: 'Wearpack Bradwear disiapkan untuk kebutuhan kerja lapangan yang menuntut tampilan rapi, identitas tim jelas, dan mobilitas tetap nyaman sepanjang aktivitas.',
+        functionCopy: 'Cocok untuk teknisi, workshop, proyek lapangan, manufaktur, dan kebutuhan operasional yang memerlukan perlindungan sekaligus identitas visual tim.',
+        advantageCopy: 'Bisa diarahkan ke material American Drill atau bahan kerja lain yang lebih sesuai dengan ritme lapangan, area saku, dan kebutuhan branding instansi.',
+        colorOptions: [],
+        ctaMode: 'cs-only',
+        openDetail: () => openCatalogShowcaseCustomerService('Wearpack', 'Wearpack'),
+        openCustomerService: () => openCatalogShowcaseCustomerService('Wearpack', 'Wearpack'),
+      });
+    }
+
+    return [...shirtShowcases, ...extraShowcases];
+  }, [currentRoute, kemejaProducts, poloProduct]);
 
   const showProfileProcessStep = (nextIndex: number, stepCount: number) => {
     if (!activeProcessVisualPage || stepCount < 1) return;
@@ -3139,26 +3213,26 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
-        {catalogKemejaShowcases.map(({ product, mainImage, intro, functionCopy, advantageCopy, colorOptions }) => {
+        {catalogModelShowcases.map(({ id, product, title, kicker, mainImage, intro, functionCopy, advantageCopy, colorOptions, ctaMode, openDetail, openCustomerService }) => {
           const hasColorOptions = colorOptions.length > 0;
-          const isDropdownOpen = openKemejaShowcaseId === product.id;
+          const isDropdownOpen = openCatalogShowcaseId === id;
           const mobileDropdownHeight = `${Math.ceil(colorOptions.length / 2) * 212 + 112}px`;
 
           return (
-            <section key={`catalog-kemeja-showcase-${product.id}`} className="catalog-ventura-showcase scroll-reveal-block" aria-label={`Pilihan model ${product.name}`}>
+            <section key={`catalog-kemeja-showcase-${id}`} className="catalog-ventura-showcase scroll-reveal-block" aria-label={`Pilihan model ${title}`}>
               <button
                 type="button"
-                onClick={() => openCatalogProductDetail(product)}
+                onClick={openDetail}
                 className="catalog-ventura-main-card"
-                aria-label={`Buka detail model ${product.name}`}
+                aria-label={`Buka detail model ${title}`}
               >
-                <img src={mainImage} alt={`Model kemeja ${product.name} Bradwear`} className="catalog-ventura-main-image" />
+                <img src={mainImage} alt={`${title} Bradwear`} className="catalog-ventura-main-image" />
               </button>
 
               <article className={`catalog-ventura-options-panel ${isDropdownOpen ? 'is-open' : ''}`}>
                 <div className="catalog-ventura-options-heading">
-                  <p className="guide-story-kicker">Model Kemeja</p>
-                  <h2>{product.name}</h2>
+                  <p className="guide-story-kicker">{kicker}</p>
+                  <h2>{title}</h2>
                   <p>{intro}</p>
                 </div>
 
@@ -3177,48 +3251,56 @@ const PublicSiteView: React.FC = () => {
                   <>
                     <button
                       type="button"
-                      onClick={() => setOpenKemejaShowcaseId((openId) => (openId === product.id ? null : product.id))}
+                      onClick={() => setOpenCatalogShowcaseId((openId) => (openId === id ? null : id))}
                       className="catalog-ventura-dropdown-trigger"
                       aria-expanded={isDropdownOpen}
-                      aria-controls={`kemeja-showcase-options-${product.id}`}
+                      aria-controls={`kemeja-showcase-options-${id}`}
                     >
                       <span>Pilihan warna</span>
                       <span aria-hidden="true">{isDropdownOpen ? '-' : '+'}</span>
                     </button>
 
                     <div
-                      id={`kemeja-showcase-options-${product.id}`}
+                      id={`kemeja-showcase-options-${id}`}
                       className="catalog-ventura-dropdown-body"
                       style={{ ['--catalog-dropdown-open-height' as const]: mobileDropdownHeight }}
                     >
                       <div className="catalog-ventura-color-grid">
                         {colorOptions.map((item) => (
                           <button
-                            key={`${product.id}-${item.label}`}
+                            key={`${id}-${item.label}`}
                             type="button"
-                            onClick={() => openCatalogProductDetail(product)}
+                            onClick={openDetail}
                             className="catalog-ventura-color-card"
-                            aria-label={`Buka detail ${product.name} warna ${item.label}`}
+                            aria-label={`Buka detail ${title} warna ${item.label}`}
                           >
-                            <img src={item.image} alt={`${product.name} warna ${item.label}`} className="catalog-ventura-color-image" />
+                            <img src={item.image} alt={`${title} warna ${item.label}`} className="catalog-ventura-color-image" />
                             <span>{item.label}</span>
                           </button>
                         ))}
                       </div>
 
                       <div className="catalog-ventura-actions">
-                        <button type="button" onClick={() => openCatalogProductDesign(product)} className="guide-story-primary">
-                          Desain {product.name}
-                        </button>
-                        <button type="button" onClick={() => openCatalogProductCustomerService(product)} className="guide-story-secondary">
-                          Pilih CS
-                        </button>
+                        {ctaMode === 'design-and-cs' && product ? (
+                          <>
+                            <button type="button" onClick={() => openCatalogProductDesign(product)} className="guide-story-primary">
+                              Desain {title}
+                            </button>
+                            <button type="button" onClick={openCustomerService} className="guide-story-secondary">
+                              Pilih CS
+                            </button>
+                          </>
+                        ) : (
+                          <button type="button" onClick={openCustomerService} className="guide-story-primary">
+                            Pesan Sekarang
+                          </button>
+                        )}
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="catalog-ventura-actions catalog-ventura-actions-direct">
-                    <button type="button" onClick={() => openCatalogProductCustomerService(product)} className="guide-story-primary">
+                    <button type="button" onClick={openCustomerService} className="guide-story-primary">
                       Pesan Sekarang
                     </button>
                   </div>
