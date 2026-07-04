@@ -6,6 +6,7 @@ import homeCustomVestbupatiImage from '../assets/main hero/model/vestbupati.png'
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
+import homeClientPertaminaImage from '../assets/galery client/client pertamina.jpeg';
 import clientSlide1 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.21 (1).jpeg';
 import clientSlide2 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22 (1).jpeg';
 import clientSlide3 from '../assets/SlideShow Client/WhatsApp Image 2026-06-17 at 18.08.22.jpeg';
@@ -47,16 +48,98 @@ const MAIN_HERO_SLIDES = Object.entries(
 )
   .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
   .map(([, source]) => source as string);
+const normalizeModelAssetKey = (value: string) => value.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/g, '');
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const toTitleCase = (value: string) =>
+  value.replace(/\b\w/g, (char) => char.toUpperCase()).replace(/\s+/g, ' ').trim();
+const KEMEJA_SHOWCASE_MAIN_IMAGES = Object.entries(
+  import.meta.glob('../assets/Model Kemeja/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
+)
+  .map(([path, source]) => {
+    const fileName = path.split('/').pop() ?? '';
+    return {
+      path,
+      fileName,
+      image: source as string,
+      normalizedName: normalizeModelAssetKey(fileName),
+    };
+  })
+  .sort((left, right) => left.path.localeCompare(right.path, undefined, { numeric: true, sensitivity: 'base' }));
+const KEMEJA_SHOWCASE_COLOR_GROUPS = Object.entries(
+  import.meta.glob('../assets/Model Kemeja/*/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
+).reduce(
+  (groups, [path, source]) => {
+    const segments = path.split('/');
+    const folderName = segments.at(-2) ?? '';
+    const fileName = segments.at(-1) ?? '';
+    const normalizedFolderName = normalizeModelAssetKey(folderName);
+
+    groups[folderName] ??= {
+      folderName,
+      normalizedFolderName,
+      items: [],
+    };
+    groups[folderName].items.push({
+      path,
+      fileName,
+      image: source as string,
+      normalizedName: normalizeModelAssetKey(fileName),
+    });
+
+    return groups;
+  },
+  {} as Record<
+    string,
+    {
+      folderName: string;
+      normalizedFolderName: string;
+      items: Array<{ path: string; fileName: string; image: string; normalizedName: string }>;
+    }
+  >,
+);
+const getKemejaShowcaseAliases = (modelName: string) => {
+  const aliases = new Set<string>();
+  const rawName = modelName.toLowerCase();
+  const compactName = normalizeModelAssetKey(modelName);
+  const versionMatch = rawName.match(/v\s*-?\s*(\d+)/);
+
+  aliases.add(compactName);
+  aliases.add(normalizeModelAssetKey(rawName.replace(/\b(series|seri|bradwear)\b/g, ' ')));
+  rawName
+    .split(/[^a-z0-9]+/i)
+    .map((token) => normalizeModelAssetKey(token))
+    .filter(Boolean)
+    .forEach((token) => aliases.add(token));
+
+  if (versionMatch) {
+    aliases.add(`v${versionMatch[1]}`);
+    aliases.add(`bradv${versionMatch[1]}`);
+    aliases.add(`bradwearv${versionMatch[1]}`);
+  }
+
+  if (compactName.startsWith('executive')) aliases.add('executive');
+
+  return Array.from(aliases).filter(Boolean);
+};
+const formatKemejaColorLabel = (fileName: string, productName: string, folderName: string) => {
+  const cleaned = fileName
+    .replace(/\.[^.]+$/, '')
+    .replace(new RegExp(escapeRegExp(productName), 'ig'), ' ')
+    .replace(new RegExp(escapeRegExp(folderName), 'ig'), ' ')
+    .replace(/\b(depan|belakang|front|back|warna)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned ? toTitleCase(cleaned) : 'Lihat Warna';
+};
 const HOME_CUSTOM_SLIDES = [homeCustomVestbupatiImage];
 
 const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
 type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
 const ALL_MODELS = 'Semua Model';
-const CLIENT_GALLERY_SLIDES = [clientSlide1, clientSlide2, clientSlide3].filter(Boolean);
 const HOW_TO_ORDER_VISUALS = [howToOrderDetailImageA, howToOrderDetailImageB, howToOrderHeroImage, howToOrderDetailImageA, howToOrderDetailImageB];
 const heroTopImage = findAssetBySimilarName(['atas hero', 'hero atas', 'atas'], ['hero']) || ASSETS.BRAND.HERO;
 const portfolioHeroImage = findAssetBySimilarName(['portfolio hero', 'portfolio'], ['hero']) || heroTopImage;
-const SLIDESHOW_INTERVAL_MS = 5000;
 const PORTRAIT_SLIDESHOW_INTERVAL_MS = 10000;
 const PROCESS_SLIDE_TRANSITION_MS = 420;
 const INSTAGRAM_URL = 'https://www.instagram.com/bradwear_indonesia/';
@@ -1218,13 +1301,13 @@ const CLIENT_GALLERY_META: Record<string, { title: string; subtitle: string; log
 // Sumber copy panduan bahan pada halaman katalog.
 const MATERIAL_GUIDE_ITEMS = [
   {
-    name: 'Japan Drill',
+    name: 'American Drill',
     note: 'Best seller kemeja dinas',
     image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.JAPAN_DRILL,
     specification: 'Tekstur drill rapat, handfeel padat, jatuh rapi, dan stabil untuk kemeja dinas maupun lapangan ringan.',
     usage: 'Kemeja, celana, jaket, parka, dan seragam operasional.',
     description:
-      'Japan Drill terasa kuat dan cenderung lebih tebal dibanding bahan kemeja ringan. Karakternya stabil, jatuhnya rapi, dan nyaman dipakai untuk kebutuhan dinas harian maupun aktivitas lapangan ringan.',
+      'American Drill terasa kuat dan cenderung lebih tebal dibanding bahan kemeja ringan. Karakternya stabil, jatuhnya rapi, dan nyaman dipakai untuk kebutuhan dinas harian maupun aktivitas lapangan ringan.',
     advantages: ['Tampilan rapi dan profesional', 'Lebih kokoh untuk pemakaian rutin', 'Nyaman untuk seragam dinas harian'],
     disadvantages: ['Terasa lebih padat dibanding bahan ringan', 'Kurang ideal bila targetnya seragam super ringan'],
   },
@@ -1325,7 +1408,7 @@ const SIZE_GUIDE_DETAIL_POINTS = [
 
 const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetailContent> = {
   Kemeja: {
-    material: 'Japan Drill, Tropical, atau Oxford premium sesuai kebutuhan visual dan ritme kerja.',
+    material: 'American Drill, Tropical, atau Oxford premium sesuai kebutuhan visual dan ritme kerja.',
     pocketLayout: 'Dua area saku depan yang bisa disesuaikan menjadi flap formal, utility pocket, atau kompartemen alat tulis.',
     silhouette: 'Potongan semi formal tactical yang tetap rapi untuk dinas, operasional, dan aktivitas presentasi tim.',
     embroidery: 'Bordir timbul 3D dan identitas personel ditempatkan agar tetap terbaca jelas saat dipakai harian.',
@@ -1344,7 +1427,7 @@ const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetai
     ],
   },
   Celana: {
-    material: 'Drill, Ripstop, atau Japan Drill untuk struktur celana kerja dan tactical yang tetap nyaman dipakai seharian.',
+    material: 'Drill, Ripstop, atau American Drill untuk struktur celana kerja dan tactical yang tetap nyaman dipakai seharian.',
     pocketLayout: 'Kompartemen samping dan belakang bisa diatur untuk fungsi cargo ringan, tactical, atau kerja lapangan yang lebih formal.',
     silhouette: 'Cutting lurus-tegas dengan ruang gerak yang aman untuk aktivitas mobile, inspeksi, dan operasional teknis.',
     embroidery: 'Identitas 3D dapat ditempatkan pada flap, panel belakang, atau detail aksen yang tetap proporsional.',
@@ -1423,7 +1506,7 @@ const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetai
 
 const PRODUCT_DETAIL_OVERRIDES: Record<string, Partial<ProductDetailContent>> = {
   k2: {
-    material: 'Japan Drill premium dengan struktur rapi untuk kebutuhan semi formal tactical.',
+    material: 'American Drill premium dengan struktur rapi untuk kebutuhan semi formal tactical.',
     pocketLayout: 'Dua saku flap depan dengan kompartemen alat tulis dan panel dada yang tetap seimbang secara visual.',
     silhouette: 'Semi formal tactical dengan badan lebih bersih dan garis jahit tegas.',
     embroidery: 'Bordir timbul 3D menonjol di area dada tanpa mengganggu keseimbangan layout kemeja.',
@@ -1439,7 +1522,7 @@ const PRODUCT_DETAIL_OVERRIDES: Record<string, Partial<ProductDetailContent>> = 
     embroidery: 'Logo 3D dan panel nama tetap aman saat digabung dengan detail ventilasi.',
   },
   k11: {
-    material: 'Japan Drill atau Ripstop dengan karakter tactical yang lebih tangguh.',
+    material: 'American Drill atau Ripstop dengan karakter tactical yang lebih tangguh.',
     pocketLayout: 'Beberapa saku utilitas depan cocok untuk tim lapangan dan kebutuhan akses cepat.',
     silhouette: 'Tactical penuh dengan bidang dada yang tegas dan panel kerja yang kuat.',
   },
@@ -1482,7 +1565,7 @@ const PRODUCT_DETAIL_OVERRIDES: Record<string, Partial<ProductDetailContent>> = 
     pocketLayout: 'Cargo pocket samping dan belakang membantu tim membawa alat kerja lapangan secara lebih praktis.',
   },
   c2: {
-    material: 'Drill atau Japan Drill dengan durabilitas tinggi untuk aktivitas teknis.',
+    material: 'Drill atau American Drill dengan durabilitas tinggi untuk aktivitas teknis.',
     silhouette: 'Cutting lebih kokoh dan terasa aman untuk pemakaian kerja intens.',
   },
   c3: {
@@ -1517,10 +1600,10 @@ const PublicSiteView: React.FC = () => {
     currentRoute === RouteKey.PANTS ? 'Celana' : 'Semua',
   );
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
+  const [openKemejaShowcaseId, setOpenKemejaShowcaseId] = useState<string | null>(null);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
   const [activeHomeCustomSlide, setActiveHomeCustomSlide] = useState(0);
-  const [activeClientSlide, setActiveClientSlide] = useState(0);
   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
   const [trackingReceipt, setTrackingReceipt] = useState('');
@@ -1574,14 +1657,6 @@ const PublicSiteView: React.FC = () => {
     }, PORTRAIT_SLIDESHOW_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
-
-  useEffect(() => {
-    if (CLIENT_GALLERY_SLIDES.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     setActiveCatalogHeroSlide(0);
@@ -2103,6 +2178,35 @@ const PublicSiteView: React.FC = () => {
     return Array.from(new Set(visuals)).slice(0, 5);
   };
 
+  const catalogKemejaShowcases = useMemo(() => {
+    if (currentRoute !== RouteKey.KATALOG) return [];
+
+    return kemejaProducts.map((product) => {
+      const aliases = getKemejaShowcaseAliases(product.name);
+      const detail = getProductDetailContent(product);
+      const mainShowcaseAsset = KEMEJA_SHOWCASE_MAIN_IMAGES.find(({ normalizedName }) => aliases.some((alias) => normalizedName === alias)) ?? null;
+      const matchingColorFolder =
+        Object.values(KEMEJA_SHOWCASE_COLOR_GROUPS).find(({ normalizedFolderName }) => aliases.some((alias) => normalizedFolderName === alias)) ?? null;
+      const colorOptions =
+        matchingColorFolder?.items
+          .filter(({ normalizedName }) => !normalizedName.includes('belakang') && !normalizedName.includes('back'))
+          .sort((left, right) => left.path.localeCompare(right.path, undefined, { numeric: true, sensitivity: 'base' }))
+          .map(({ fileName, image }) => ({
+            label: formatKemejaColorLabel(fileName, product.name, matchingColorFolder.folderName),
+            image,
+          })) ?? [];
+
+      return {
+        product,
+        mainImage: mainShowcaseAsset?.image ?? product.image,
+        intro: detail.intro,
+        functionCopy: detail.bestFor,
+        advantageCopy: detail.material,
+        colorOptions,
+      };
+    });
+  }, [currentRoute, kemejaProducts]);
+
   const showProfileProcessStep = (nextIndex: number, stepCount: number) => {
     if (!activeProcessVisualPage || stepCount < 1) return;
 
@@ -2464,10 +2568,10 @@ const PublicSiteView: React.FC = () => {
         <section className="home-hero editorial-home-hero" data-home-section="hero">
           <article className="hero-panel hero-panel-editorial hero-panel-clean">
             <p className="hero-kicker">Bradwear Indonesia</p>
-            <h1>Seragam Dinas Berkualitas untuk Citra Profesional Perusahaan Anda.</h1>
+            <h1>Seragam yang Membantu Tim Tampil Lebih Profesional</h1>
             <p className="hero-lead">
-              Diproduksi dengan standar jahitan rapi, bahan premium, dan desain yang dapat disesuaikan dengan identitas
-              instansi maupun perusahaan.
+              Bradwear hadir untuk memenuhi kebutuhan seragam perusahaan Anda dengan desain elegan, bahan nyaman, dan
+              kualitas yang rapi untuk menunjang penampilan tim yang lebih profesional.
             </p>
             <div className="hero-actions">
               <button
@@ -2519,79 +2623,17 @@ const PublicSiteView: React.FC = () => {
 
         {/* Preview portofolio klien di home. */}
         <section className="home-section" data-home-section="client-gallery">
-          <div className="home-section-shell home-section-shell-bleed home-section-grid">
+          <div className="home-section-shell home-section-shell-bleed home-section-grid home-client-proof-section">
             <div className="home-section-heading">
-              <p className="home-section-kicker">Portofolio</p>
-              <h2 className="home-section-title">Dipilih oleh Berbagai Instansi &amp; Perusahaan</h2>
-              <p className="home-section-copy">
-                Bukti nyata kualitas produksi dan kepercayaan yang telah kami bangun bersama klien.
-              </p>
+              <h2 className="home-section-title">Dipercaya untuk Kebutuhan Seragam Profesional</h2>
             </div>
 
-            <div className="client-gallery-grid">
-              <article className="elegant-parallax-block middle-showcase-shell client-proof-shell client-proof-shell-open">
-                <article className="hero-banner middle-showcase-banner">
-                  <div className="hero-banner-stage middle-showcase-stage client-gallery-stage client-fullscreen-stage">
-                    {CLIENT_GALLERY_SLIDES.map((slide, index) => (
-                      <img
-                        key={`${slide}-${index}`}
-                        src={slide}
-                        alt={`Galeri klien Bradwear ${index + 1}`}
-                        className={`hero-banner-image ${index === activeClientSlide ? 'is-active' : ''}`}
-                      />
-                    ))}
-                    <div className="hero-banner-overlay middle-showcase-overlay" />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setLightboxSlide({
-                          src: CLIENT_GALLERY_SLIDES[activeClientSlide],
-                          alt: `Galeri klien Bradwear ${activeClientSlide + 1}`,
-                          title: `Galeri klien Bradwear ${activeClientSlide + 1}`,
-                        })
-                      }
-                      className="slideshow-lightbox-trigger"
-                      aria-label="Buka gambar klien penuh"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveClientSlide((prev) => (prev - 1 + CLIENT_GALLERY_SLIDES.length) % CLIENT_GALLERY_SLIDES.length)}
-                    className="hero-arrow hero-arrow-left"
-                    aria-label="Slide klien sebelumnya"
-                  >
-                    &lt;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length)}
-                    className="hero-arrow hero-arrow-right"
-                    aria-label="Slide klien berikutnya"
-                  >
-                    &gt;
-                  </button>
-                </article>
-              </article>
-            </div>
-
-            <div className="section-action-stack">
-              <button
-                type="button"
-                onClick={() => setCurrentRoute(RouteKey.CLIENT)}
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--surface-base)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-primary)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent-strong)]"
-              >
-                Menuju Portofolio
-              </button>
-              <a
-                href={buildWhatsAppUrl(buildConsultationMessage('minta referensi hasil jadi seragam custom Bradwear'))}
-                target="_blank"
-                rel="noreferrer"
-                className="hero-secondary"
-              >
-                Minta referensi via WhatsApp
-              </a>
-            </div>
+            <img
+              src={homeClientPertaminaImage}
+              alt="Klien Pertamina menggunakan seragam profesional Bradwear"
+              className="home-client-proof-image"
+              loading="lazy"
+            />
           </div>
         </section>
 
@@ -2599,10 +2641,10 @@ const PublicSiteView: React.FC = () => {
         <section className="home-section" data-home-section="order-flow">
           <div className="home-section-shell home-section-shell-bleed order-flow-preview">
             <div className="home-section-heading">
-              <p className="home-section-kicker">Cara Order</p>
-              <h2 className="home-section-title">Proses Pemesanan yang Mudah dan Terstruktur</h2>
+              <h2 className="home-section-title">CARA ORDER</h2>
               <p className="home-section-copy">
-                Mulai dari konsultasi, pemilihan model, hingga produksi dan pengiriman dalam satu alur yang jelas.
+                Pemesanan sangat mudah, Anda hanya memilih model, warna, dan bahan yang diinginkan. Setelah itu
+                lanjut proses produksi.
               </p>
             </div>
             <button
@@ -2613,25 +2655,6 @@ const PublicSiteView: React.FC = () => {
               Lihat Alur Pemesanan
             </button>
           </div>
-        </section>
-
-        {/* Slideshow runway home diposisikan tepat sebelum slider kategori. */}
-        <section className="hero-image-runway" data-home-section="hero-slider">
-          <article className="hero-banner hero-banner-editorial hero-banner-edge">
-            <div className="hero-banner-stage hero-banner-stage-editorial hero-banner-stage-landscape">
-              {safeHeroSlides.map((slide, index) => (
-                <img
-                  key={`${slide}-${index}`}
-                  src={slide}
-                  alt={`Hero Bradwear ${index + 1}`}
-                  className={`hero-banner-runway-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-                  aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  fetchPriority={index === 0 ? 'high' : 'auto'}
-                />
-              ))}
-            </div>
-          </article>
         </section>
 
         {/* Slider kategori/model pada home. */}
@@ -2739,23 +2762,6 @@ const PublicSiteView: React.FC = () => {
         {/* FAQ ringkas home. */}
         <section className="home-section home-section-tight" data-home-section="faq">
           <div className="home-section-shell faq-panel">
-            <div className="faq-heading-shell">
-              <div className="home-section-heading">
-                <p className="home-section-kicker">FAQ Ringkas</p>
-                <h2 className="home-section-title">Jawaban yang paling sering dicari sebelum order berjalan</h2>
-                <p className="home-section-copy">
-                  Ringkasan ini dibuat agar user langsung menemukan jawaban utama tentang minimum order, kustom logo,
-                  estimasi produksi, dan pelacakan pesanan tanpa membuka terlalu banyak halaman.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCurrentRoute(RouteKey.LAYANAN_PELANGGAN)}
-                className="faq-heading-cta"
-              >
-                Hubungi layanan pelanggan
-              </button>
-            </div>
             {renderFaqAccordion()}
           </div>
         </section>
@@ -3092,6 +3098,26 @@ const PublicSiteView: React.FC = () => {
 
     return (
       <div className="catalog-page-shell">
+        <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
+          <div className="catalog-filter-pill-row">
+            {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
+              const isActive = activeCatalogSection === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => handleCatalogCategorySelect(category)}
+                  className={`catalog-filter-pill ${isActive ? 'is-active' : ''}`}
+                >
+                  {catalogFilterIcons[category]}
+                  <span>{category}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="catalog-top-hero scroll-reveal-block" aria-label="Slideshow katalog Bradwear">
           <div className="catalog-top-hero-stage">
             {catalogHeroSlides.map((slide, index) => (
@@ -3113,25 +3139,94 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
 
-        <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
-          <div className="catalog-filter-pill-row">
-            {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
-              const isActive = activeCatalogSection === category;
+        {catalogKemejaShowcases.map(({ product, mainImage, intro, functionCopy, advantageCopy, colorOptions }) => {
+          const hasColorOptions = colorOptions.length > 0;
+          const isDropdownOpen = openKemejaShowcaseId === product.id;
+          const mobileDropdownHeight = `${Math.ceil(colorOptions.length / 2) * 212 + 112}px`;
 
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => handleCatalogCategorySelect(category)}
-                  className={`catalog-filter-pill ${isActive ? 'is-active' : ''}`}
-                >
-                  {catalogFilterIcons[category]}
-                  <span>{category}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
+          return (
+            <section key={`catalog-kemeja-showcase-${product.id}`} className="catalog-ventura-showcase scroll-reveal-block" aria-label={`Pilihan model ${product.name}`}>
+              <button
+                type="button"
+                onClick={() => openCatalogProductDetail(product)}
+                className="catalog-ventura-main-card"
+                aria-label={`Buka detail model ${product.name}`}
+              >
+                <img src={mainImage} alt={`Model kemeja ${product.name} Bradwear`} className="catalog-ventura-main-image" />
+              </button>
+
+              <article className={`catalog-ventura-options-panel ${isDropdownOpen ? 'is-open' : ''}`}>
+                <div className="catalog-ventura-options-heading">
+                  <p className="guide-story-kicker">Model Kemeja</p>
+                  <h2>{product.name}</h2>
+                  <p>{intro}</p>
+                </div>
+
+                <div className="catalog-ventura-detail-grid">
+                  <article className="catalog-ventura-detail-card">
+                    <h3>Fungsi</h3>
+                    <p>{functionCopy}</p>
+                  </article>
+                  <article className="catalog-ventura-detail-card">
+                    <h3>Keunggulan</h3>
+                    <p>{advantageCopy}</p>
+                  </article>
+                </div>
+
+                {hasColorOptions ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setOpenKemejaShowcaseId((openId) => (openId === product.id ? null : product.id))}
+                      className="catalog-ventura-dropdown-trigger"
+                      aria-expanded={isDropdownOpen}
+                      aria-controls={`kemeja-showcase-options-${product.id}`}
+                    >
+                      <span>Pilihan warna</span>
+                      <span aria-hidden="true">{isDropdownOpen ? '-' : '+'}</span>
+                    </button>
+
+                    <div
+                      id={`kemeja-showcase-options-${product.id}`}
+                      className="catalog-ventura-dropdown-body"
+                      style={{ ['--catalog-dropdown-open-height' as const]: mobileDropdownHeight }}
+                    >
+                      <div className="catalog-ventura-color-grid">
+                        {colorOptions.map((item) => (
+                          <button
+                            key={`${product.id}-${item.label}`}
+                            type="button"
+                            onClick={() => openCatalogProductDetail(product)}
+                            className="catalog-ventura-color-card"
+                            aria-label={`Buka detail ${product.name} warna ${item.label}`}
+                          >
+                            <img src={item.image} alt={`${product.name} warna ${item.label}`} className="catalog-ventura-color-image" />
+                            <span>{item.label}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="catalog-ventura-actions">
+                        <button type="button" onClick={() => openCatalogProductDesign(product)} className="guide-story-primary">
+                          Desain {product.name}
+                        </button>
+                        <button type="button" onClick={() => openCatalogProductCustomerService(product)} className="guide-story-secondary">
+                          Pilih CS
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="catalog-ventura-actions catalog-ventura-actions-direct">
+                    <button type="button" onClick={() => openCatalogProductCustomerService(product)} className="guide-story-primary">
+                      Pesan Sekarang
+                    </button>
+                  </div>
+                )}
+              </article>
+            </section>
+          );
+        })}
 
         <section className="catalog-section-stack">
           {visibleCatalogSections.map((section) => (

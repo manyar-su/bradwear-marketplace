@@ -133,7 +133,7 @@ const buildCatalogSubpageMeta = (pathname: string, products: Product[]): SeoMeta
   if (guide === 'material') {
     return {
       title: 'Panduan Jenis Bahan Seragam Bradwear Indonesia',
-      description: 'Pelajari karakter Japan Drill, Ripstop, Tropical, Twill, Drill, Nagata Drill, dan Stanford untuk kebutuhan seragam custom Bradwear.',
+      description: 'Pelajari karakter American Drill, Ripstop, Tropical, Twill, Drill, Nagata Drill, dan Stanford untuk kebutuhan seragam custom Bradwear.',
       path: CATALOG_GUIDE_PATHS.material,
       keywords: dedupeKeywords([
         ...SEO_META[RouteKey.KATALOG].keywords,
