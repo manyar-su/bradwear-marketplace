@@ -2310,12 +2310,14 @@ const PublicSiteView: React.FC = () => {
 
     if (poloProduct) {
       const detail = getProductDetailContent(poloProduct);
+      const poloShowcaseImage =
+        KEMEJA_SHOWCASE_MAIN_IMAGES.find(({ normalizedName }) => normalizedName === 'poloshirt')?.image ?? poloProduct.image;
       extraShowcases.push({
         id: poloProduct.id,
         product: poloProduct,
         title: 'Polo Shirt',
         kicker: 'Model Polo',
-        mainImage: poloProduct.image,
+        mainImage: poloShowcaseImage,
         intro: detail.intro,
         functionCopy: detail.bestFor,
         advantageCopy: detail.material,
