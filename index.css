@@ -8675,6 +8675,235 @@ a {
   gap: 12px;
 }
 
+.size-guide-tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.size-guide-tab-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 180ms var(--ease-smooth),
+    box-shadow 180ms var(--ease-smooth),
+    background 180ms var(--ease-smooth);
+}
+
+.size-guide-tab-pill.is-active {
+  background: linear-gradient(135deg, #2e8f15, #57c019);
+  color: #ffffff;
+  border-color: rgba(46, 143, 21, 0.22);
+  box-shadow: 0 14px 30px rgba(46, 143, 21, 0.2);
+}
+
+.size-guide-highlight-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.size-guide-highlight-card,
+.size-guide-note-card,
+.size-guide-calculator-panel,
+.size-guide-calculator-copy {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.05);
+}
+
+.size-guide-highlight-card h2,
+.size-guide-recommendation-copy h2,
+.size-guide-calculator-copy h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+  line-height: 1.08;
+}
+
+.size-guide-highlight-card p,
+.size-guide-recommendation-copy p,
+.size-guide-note-card p,
+.size-guide-calculator-copy p,
+.size-guide-calculator-result p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.size-guide-recommendation-shell,
+.size-guide-calculator-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.size-guide-recommendation-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.size-guide-range-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.size-guide-range-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #ffffff, #f7fbf1);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
+}
+
+.size-guide-range-size {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 38px;
+  padding: 0 14px;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(117, 242, 26, 0.14);
+  color: var(--brand-accent-strong);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.size-guide-range-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.size-guide-range-meta p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.size-guide-poster-lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.size-guide-poster-lines span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f4f8ef;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.size-guide-calculator-shell {
+  grid-template-columns: minmax(0, 0.82fr) minmax(320px, 1.18fr);
+}
+
+.size-guide-calculator-copy {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  background: linear-gradient(135deg, #f4faee, #ffffff);
+}
+
+.size-guide-calculator-panel {
+  display: grid;
+  gap: 18px;
+  background: linear-gradient(180deg, #ffffff, #f8fbf3);
+}
+
+.size-guide-calculator-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.size-guide-field {
+  display: grid;
+  gap: 8px;
+}
+
+.size-guide-field span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.size-guide-field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.size-guide-field input:focus {
+  outline: none;
+  border-color: rgba(46, 143, 21, 0.34);
+  box-shadow: 0 0 0 4px rgba(117, 242, 26, 0.12);
+}
+
+.size-guide-calculator-result {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #14350f, #215917);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.size-guide-calculator-label {
+  color: rgba(239, 247, 232, 0.8) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.size-guide-calculator-result h3 {
+  margin: 0;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  line-height: 0.95;
+  color: #ffffff;
+}
+
+.size-guide-calculator-result p:last-child {
+  color: #eff7e8;
+}
+
+.size-guide-support-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .guide-story-primary,
 .guide-story-secondary {
   display: inline-flex;
@@ -8858,6 +9087,49 @@ a {
   gap: 14px;
 }
 
+.guide-material-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guide-material-dropdown-trigger span:last-child {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.guide-material-dropdown-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: max-height 380ms ease, opacity 220ms ease, transform 260ms ease;
+}
+
+.guide-material-section.is-open .guide-material-dropdown-body {
+  max-height: 1200px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .guide-material-meta-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -8927,12 +9199,16 @@ a {
   .catalog-detail-content-grid,
   .guide-story-info-grid,
   .catalog-detail-meta-grid,
-  .guide-material-meta-grid {
+  .guide-material-meta-grid,
+  .size-guide-highlight-list,
+  .size-guide-range-grid,
+  .size-guide-support-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .guide-story-hero,
-  .guide-material-section {
+  .guide-material-section,
+  .size-guide-calculator-shell {
     grid-template-columns: 1fr;
   }
 
@@ -9169,13 +9445,105 @@ a {
     min-height: 240px;
   }
 
+  .guide-material-copy {
+    gap: 12px;
+  }
+
+  .guide-material-dropdown-trigger {
+    padding: 13px 14px;
+    font-size: 12px;
+  }
+
+  .guide-material-dropdown-trigger span:last-child {
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
+  }
+
+  .guide-material-meta-card {
+    padding: 16px;
+  }
+
   .catalog-guide-link-grid,
   .guide-story-info-grid,
   .catalog-detail-meta-grid,
   .catalog-detail-content-grid,
   .guide-material-meta-grid,
-  .catalog-detail-gallery-grid {
+  .catalog-detail-gallery-grid,
+  .size-guide-highlight-list,
+  .size-guide-range-grid,
+  .size-guide-support-grid,
+  .size-guide-calculator-grid {
     grid-template-columns: 1fr;
+  }
+
+  .size-guide-tab-row {
+    gap: 10px;
+  }
+
+  .size-guide-tab-pill {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 46px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .size-guide-highlight-card,
+  .size-guide-note-card,
+  .size-guide-calculator-panel,
+  .size-guide-calculator-copy {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .size-guide-range-card {
+    gap: 10px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .size-guide-range-size {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .size-guide-range-meta p,
+  .size-guide-highlight-card p,
+  .size-guide-recommendation-copy p,
+  .size-guide-note-card p,
+  .size-guide-calculator-copy p,
+  .size-guide-calculator-result p {
+    font-size: 13px;
+    line-height: 1.62;
+  }
+
+  .size-guide-poster-lines {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .size-guide-poster-lines span {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .size-guide-field input {
+    min-height: 48px;
+    padding: 0 14px;
+    border-radius: 14px;
+    font-size: 14px;
+  }
+
+  .size-guide-calculator-result {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .size-guide-calculator-result h3 {
+    font-size: 2rem;
   }
 
   .catalog-guide-link-card {

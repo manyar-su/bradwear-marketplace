@@ -1,7 +1,10 @@
 ﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS, findAssetBySimilarName } from '../assets';
 import bottomFastRespondImage from '../assets/Fast Respond.png';
+import americanDrillImage from '../assets/jenis bahan/AMERICAN DRILL.webp';
 import homeIntroTopImage from '../assets/Hero/atas.webp';
+import celanaSizeChartImage from '../assets/Size Chart/celana.png';
+import kemejaSizeChartImage from '../assets/Size Chart/kemeja.png';
 import homeCustomVestbupatiImage from '../assets/main hero/model/vestbupati.png';
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
@@ -1303,7 +1306,7 @@ const MATERIAL_GUIDE_ITEMS = [
   {
     name: 'American Drill',
     note: 'Best seller kemeja dinas',
-    image: ASSETS.CONTENT.MATERIAL_GUIDE_IMAGES.JAPAN_DRILL,
+    image: americanDrillImage,
     specification: 'Tekstur drill rapat, handfeel padat, jatuh rapi, dan stabil untuk kemeja dinas maupun lapangan ringan.',
     usage: 'Kemeja, celana, jaket, parka, dan seragam operasional.',
     description:
@@ -1391,20 +1394,71 @@ type ProductDetailContent = {
   craftsmanship: string[];
 };
 
-const SIZE_GUIDE_DETAIL_POINTS = [
-  {
-    title: 'Baca ukuran dasar lebih cepat',
-    copy: 'Gunakan tabel ini untuk menyiapkan panjang badan, lebar dada, bahu, dan panjang lengan sebelum diskusi order masuk ke tahap final.',
-  },
-  {
-    title: 'Validasi per divisi atau gender',
-    copy: 'Jika tim Anda memiliki kombinasi ukuran pria, wanita, atau kebutuhan custom, panduan ini membantu menyamakan acuan awal sebelum detail dibahas lebih lanjut.',
-  },
-  {
-    title: 'Tetap bisa lanjut ukuran khusus',
-    copy: 'Untuk kebutuhan yang lebih presisi, CTA desain dan konsultasi tetap membuka jalur custom size agar tim Bradwear bisa menyesuaikan pola dengan kebutuhan lapangan.',
-  },
-] as const;
+type SizeGuideRecommendation = {
+  size: string;
+  weightMin: number;
+  weightMax: number;
+  heightMin: number;
+  heightMax: number;
+};
+
+const SHIRT_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = [
+  { size: 'S', weightMin: 45, weightMax: 55, heightMin: 150, heightMax: 165 },
+  { size: 'M', weightMin: 55, weightMax: 63, heightMin: 155, heightMax: 170 },
+  { size: 'L', weightMin: 63, weightMax: 72, heightMin: 160, heightMax: 175 },
+  { size: 'XL', weightMin: 72, weightMax: 82, heightMin: 165, heightMax: 180 },
+  { size: 'XXL', weightMin: 82, weightMax: 92, heightMin: 168, heightMax: 183 },
+  { size: 'XXXL', weightMin: 92, weightMax: 105, heightMin: 170, heightMax: 185 },
+  { size: 'XXXXL', weightMin: 105, weightMax: 118, heightMin: 172, heightMax: 188 },
+  { size: 'XXXXXL', weightMin: 118, weightMax: 130, heightMin: 175, heightMax: 190 },
+];
+
+const PANTS_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = [
+  { size: '28', weightMin: 45, weightMax: 55, heightMin: 150, heightMax: 165 },
+  { size: '30', weightMin: 55, weightMax: 63, heightMin: 155, heightMax: 170 },
+  { size: '32', weightMin: 63, weightMax: 70, heightMin: 160, heightMax: 175 },
+  { size: '34', weightMin: 70, weightMax: 78, heightMin: 165, heightMax: 178 },
+  { size: '36', weightMin: 78, weightMax: 86, heightMin: 168, heightMax: 182 },
+  { size: '38', weightMin: 86, weightMax: 95, heightMin: 170, heightMax: 185 },
+  { size: '40', weightMin: 95, weightMax: 105, heightMin: 172, heightMax: 188 },
+];
+
+const clampRangeDistance = (value: number, min: number, max: number) => {
+  if (value < min) return min - value;
+  if (value > max) return value - max;
+  return 0;
+};
+
+const getRecommendedSize = (
+  weight: number,
+  height: number,
+  ranges: SizeGuideRecommendation[],
+) => {
+  const exactMatch = ranges.find(
+    (item) =>
+      weight >= item.weightMin &&
+      weight <= item.weightMax &&
+      height >= item.heightMin &&
+      height <= item.heightMax,
+  );
+
+  if (exactMatch) {
+    return { recommendation: exactMatch, matchType: 'exact' as const };
+  }
+
+  const nearestMatch = [...ranges].sort((left, right) => {
+    const leftScore =
+      clampRangeDistance(weight, left.weightMin, left.weightMax) +
+      clampRangeDistance(height, left.heightMin, left.heightMax);
+    const rightScore =
+      clampRangeDistance(weight, right.weightMin, right.weightMax) +
+      clampRangeDistance(height, right.heightMin, right.heightMax);
+
+    return leftScore - rightScore;
+  })[0];
+
+  return nearestMatch ? { recommendation: nearestMatch, matchType: 'nearest' as const } : null;
+};
 
 const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetailContent> = {
   Kemeja: {
@@ -1601,6 +1655,9 @@ const PublicSiteView: React.FC = () => {
   );
   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
   const [openCatalogShowcaseId, setOpenCatalogShowcaseId] = useState<string | null>(null);
+  const [activeSizeGuideTab, setActiveSizeGuideTab] = useState<'kemeja' | 'celana'>('kemeja');
+  const [sizeGuideWeightInput, setSizeGuideWeightInput] = useState('');
+  const [sizeGuideHeightInput, setSizeGuideHeightInput] = useState('');
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
   const [activeHomeCustomSlide, setActiveHomeCustomSlide] = useState(0);
@@ -1612,6 +1669,7 @@ const PublicSiteView: React.FC = () => {
   const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>([]);
   const [openFaqSlug, setOpenFaqSlug] = useState<string | null>(SITE_FAQS[0]?.slug ?? null);
   const [openSupportSectionSlug, setOpenSupportSectionSlug] = useState<string | null>(SUPPORT_DIRECTORY_SECTIONS[0]?.slug ?? null);
+  const [openMaterialGuideName, setOpenMaterialGuideName] = useState<string | null>(MATERIAL_GUIDE_ITEMS[0]?.name ?? null);
   const [activeHowToOrderStepIndex, setActiveHowToOrderStepIndex] = useState(0);
   const [activeProfileProcessStepIndex, setActiveProfileProcessStepIndex] = useState(0);
   const [leavingProfileProcessStepIndex, setLeavingProfileProcessStepIndex] = useState<number | null>(null);
@@ -1874,6 +1932,16 @@ const PublicSiteView: React.FC = () => {
     () => BRAND_PROFILE_VISUAL_ITEMS.find((item) => item.route === currentRoute) ?? null,
     [currentRoute],
   );
+  const shirtSizeCalculatorResult = useMemo(() => {
+    const weight = Number(sizeGuideWeightInput);
+    const height = Number(sizeGuideHeightInput);
+
+    if (!Number.isFinite(weight) || !Number.isFinite(height) || weight <= 0 || height <= 0) {
+      return null;
+    }
+
+    return getRecommendedSize(weight, height, SHIRT_SIZE_RECOMMENDATIONS);
+  }, [sizeGuideHeightInput, sizeGuideWeightInput]);
   const articleFeed = useMemo(
     () =>
       [...ARTICLES].sort(
@@ -3025,6 +3093,36 @@ const PublicSiteView: React.FC = () => {
     }
 
     if (activeCatalogGuide === 'size') {
+      const activeSizeGuideImage = activeSizeGuideTab === 'kemeja' ? kemejaSizeChartImage : celanaSizeChartImage;
+      const activeSizeGuideTitle = activeSizeGuideTab === 'kemeja' ? 'Panduan ukuran kemeja Bradwear' : 'Panduan ukuran celana Bradwear';
+      const activeSizeGuideRecommendations =
+        activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_RECOMMENDATIONS : PANTS_SIZE_RECOMMENDATIONS;
+      const activeShortNotes =
+        activeSizeGuideTab === 'kemeja'
+          ? [
+              'S: 45–55 kg / 150–165 cm',
+              'M: 55–63 kg / 155–170 cm',
+              'L: 63–72 kg / 160–175 cm',
+              'XL: 72–82 kg / 165–180 cm',
+              'XXL: 82–92 kg / 168–183 cm',
+              'XXXL: 92–105 kg / 170–185 cm',
+              'XXXXL: 105–118 kg / 172–188 cm',
+              'XXXXXL: 118–130 kg / 175–190 cm',
+            ]
+          : [
+              '28: 45–55 kg / 150–165 cm',
+              '30: 55–63 kg / 155–170 cm',
+              '32: 63–70 kg / 160–175 cm',
+              '34: 70–78 kg / 165–178 cm',
+              '36: 78–86 kg / 168–182 cm',
+              '38: 86–95 kg / 170–185 cm',
+              '40: 95–105 kg / 172–188 cm',
+            ];
+      const activeGuideNote =
+        activeSizeGuideTab === 'kemeja'
+          ? 'Catatan: Rekomendasi size hanya perkiraan. Untuk hasil paling akurat, ukur lebar dada, lebar bahu, dan panjang kemeja. Toleransi ukuran dapat berbeda ±1–2 cm karena proses produksi.'
+          : 'Catatan: Rekomendasi size berdasarkan tinggi dan berat badan hanya perkiraan. Untuk hasil paling akurat, ukur lingkar pinggang terlebih dahulu. Toleransi ukuran dapat berbeda ±1–2 cm karena proses produksi.';
+
       return (
         <div className="guide-story-page-shell">
           <section className="guide-story-topbar scroll-reveal-block">
@@ -3037,10 +3135,40 @@ const PublicSiteView: React.FC = () => {
           <section className="guide-story-hero scroll-reveal-block">
             <article className="guide-story-copy">
               <p className="guide-story-kicker">Panduan Ukuran</p>
-              <h1>Panduan ukuran seragam Bradwear dibuat terpisah agar tim lebih mudah membaca acuan sebelum order.</h1>
+              <h1>Pilih panduan ukuran kemeja atau celana, lalu cek rekomendasi size berdasarkan tinggi dan berat badan.</h1>
               <p className="guide-story-intro">
-                Halaman ini merangkum acuan ukuran dasar sebelum user masuk ke editor. Gunakan panduan ini untuk briefing tim, pengumpulan size, atau validasi awal sebelum ukuran detail dikirim ke customer service.
+                Halaman ini dibuat agar tim lebih cepat menentukan size awal sebelum masuk ke proses desain atau konsultasi. Untuk mobile, tampilannya dibuat lebih compact supaya tabel, foto size chart, dan hasil rekomendasi tetap mudah dibaca.
               </p>
+              <div className="size-guide-tab-row" role="tablist" aria-label="Pilihan panduan ukuran">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeSizeGuideTab === 'kemeja'}
+                  onClick={() => setActiveSizeGuideTab('kemeja')}
+                  className={`size-guide-tab-pill ${activeSizeGuideTab === 'kemeja' ? 'is-active' : ''}`}
+                >
+                  Kemeja
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeSizeGuideTab === 'celana'}
+                  onClick={() => setActiveSizeGuideTab('celana')}
+                  className={`size-guide-tab-pill ${activeSizeGuideTab === 'celana' ? 'is-active' : ''}`}
+                >
+                  Celana
+                </button>
+              </div>
+              <div className="size-guide-highlight-list">
+                <article className="size-guide-highlight-card">
+                  <h2>2 pilihan size guide</h2>
+                  <p>Pilih mode kemeja atau celana sesuai kebutuhan tim, lalu cocokkan dengan foto size chart yang tampil.</p>
+                </article>
+                <article className="size-guide-highlight-card">
+                  <h2>Rekomendasi awal lebih cepat</h2>
+                  <p>Gunakan berat badan dan tinggi badan sebagai acuan awal sebelum masuk ke pengukuran yang lebih detail.</p>
+                </article>
+              </div>
               <div className="guide-story-actions">
                 <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-primary">
                   Kembali ke Katalog
@@ -3055,30 +3183,127 @@ const PublicSiteView: React.FC = () => {
               <button
                 type="button"
                 onClick={() =>
-                  ASSETS.CONTENT.SIZE_GUIDE
-                    ? setLightboxSlide({
-                        src: ASSETS.CONTENT.SIZE_GUIDE,
-                        alt: 'Panduan ukuran Bradwear',
-                        title: 'Panduan ukuran Bradwear',
-                        description: 'Tampilan size guide penuh untuk membaca detail ukuran dengan lebih jelas.',
-                        variant: 'size-guide',
-                      })
-                    : undefined
+                  setLightboxSlide({
+                    src: activeSizeGuideImage,
+                    alt: activeSizeGuideTitle,
+                    title: activeSizeGuideTitle,
+                    description: 'Tampilan size guide penuh untuk membaca detail ukuran dengan lebih jelas.',
+                    variant: 'size-guide',
+                  })
                 }
                 className="guide-story-media-button"
               >
-                <img src={ASSETS.CONTENT.SIZE_GUIDE || heroTopImage} alt="Panduan ukuran Bradwear" className="guide-story-image" />
+                <img src={activeSizeGuideImage} alt={activeSizeGuideTitle} className="guide-story-image" />
               </button>
             </article>
           </section>
 
-          <section className="guide-story-info-grid scroll-reveal-block">
-            {SIZE_GUIDE_DETAIL_POINTS.map((item) => (
-              <article key={item.title} className="guide-story-info-card">
-                <h2>{item.title}</h2>
-                <p>{item.copy}</p>
+          <section className="size-guide-recommendation-shell scroll-reveal-block">
+            <article className="size-guide-recommendation-copy">
+              <p className="guide-story-kicker">{activeSizeGuideTab === 'kemeja' ? 'Rekomendasi Size Kemeja' : 'Rekomendasi Size Celana'}</p>
+              <h2>Rekomendasi size berdasarkan berat badan dan tinggi badan</h2>
+              <p>
+                {activeSizeGuideTab === 'kemeja'
+                  ? 'Gunakan tabel berikut untuk mendapatkan ukuran kemeja awal sebelum mengukur lebar dada, bahu, dan panjang badan.'
+                  : 'Gunakan tabel berikut untuk mendapatkan ukuran celana awal sebelum mengukur lingkar pinggang dan panjang celana.'}
+              </p>
+            </article>
+
+            <div className="size-guide-range-grid">
+              {activeSizeGuideRecommendations.map((item) => (
+                <article key={`${activeSizeGuideTab}-${item.size}`} className="size-guide-range-card">
+                  <span className="size-guide-range-size">{item.size}</span>
+                  <div className="size-guide-range-meta">
+                    <p>{item.weightMin}–{item.weightMax} kg</p>
+                    <p>{item.heightMin}–{item.heightMax} cm</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <article className="size-guide-note-card">
+              <p className="guide-story-kicker">Versi pendek untuk poster</p>
+              <div className="size-guide-poster-lines">
+                {activeShortNotes.map((line) => (
+                  <span key={`${activeSizeGuideTab}-${line}`}>{line}</span>
+                ))}
+              </div>
+              <p>{activeGuideNote}</p>
+            </article>
+          </section>
+
+          {activeSizeGuideTab === 'kemeja' ? (
+            <section className="size-guide-calculator-shell scroll-reveal-block">
+              <article className="size-guide-calculator-copy">
+                <p className="guide-story-kicker">Kalkulator Size Kemeja</p>
+                <h2>Input tinggi badan dan berat badan untuk mendapatkan size rekomendasi.</h2>
+                <p>Hasil kalkulator ini adalah rekomendasi awal. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.</p>
               </article>
-            ))}
+
+              <article className="size-guide-calculator-panel">
+                <div className="size-guide-calculator-grid">
+                  <label className="size-guide-field">
+                    <span>Berat Badan (kg)</span>
+                    <input
+                      type="number"
+                      min="1"
+                      inputMode="numeric"
+                      placeholder="Contoh 68"
+                      value={sizeGuideWeightInput}
+                      onChange={(event) => setSizeGuideWeightInput(event.target.value)}
+                    />
+                  </label>
+                  <label className="size-guide-field">
+                    <span>Tinggi Badan (cm)</span>
+                    <input
+                      type="number"
+                      min="1"
+                      inputMode="numeric"
+                      placeholder="Contoh 172"
+                      value={sizeGuideHeightInput}
+                      onChange={(event) => setSizeGuideHeightInput(event.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div className="size-guide-calculator-result">
+                  {shirtSizeCalculatorResult ? (
+                    <>
+                      <p className="size-guide-calculator-label">
+                        {shirtSizeCalculatorResult.matchType === 'exact' ? 'Rekomendasi Size' : 'Rekomendasi Size Terdekat'}
+                      </p>
+                      <h3>{shirtSizeCalculatorResult.recommendation.size}</h3>
+                      <p>
+                        Acuan {shirtSizeCalculatorResult.recommendation.weightMin}–{shirtSizeCalculatorResult.recommendation.weightMax} kg
+                        {' / '}
+                        {shirtSizeCalculatorResult.recommendation.heightMin}–{shirtSizeCalculatorResult.recommendation.heightMax} cm
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="size-guide-calculator-label">Rekomendasi Size</p>
+                      <h3>Isi data dulu</h3>
+                      <p>Masukkan berat badan dan tinggi badan untuk melihat size kemeja yang direkomendasikan.</p>
+                    </>
+                  )}
+                </div>
+              </article>
+            </section>
+          ) : null}
+
+          <section className="guide-story-info-grid scroll-reveal-block size-guide-support-grid">
+            <article className="guide-story-info-card">
+              <h2>Gunakan foto size chart sebagai acuan utama</h2>
+              <p>Foto size guide tetap ditampilkan penuh agar user bisa membandingkan hasil rekomendasi dengan ukuran visual yang lebih detail.</p>
+            </article>
+            <article className="guide-story-info-card">
+              <h2>Cocok untuk briefing tim</h2>
+              <p>Tabel rekomendasi ini membantu pengumpulan size awal secara cepat sebelum detail final dikirim ke admin Bradwear.</p>
+            </article>
+            <article className="guide-story-info-card">
+              <h2>Tetap ada toleransi produksi</h2>
+              <p>Perbedaan ukuran ±1–2 cm tetap bisa terjadi, jadi untuk order penting atau jumlah besar disarankan melakukan pengukuran manual tambahan.</p>
+            </article>
           </section>
         </div>
       );
@@ -3097,9 +3322,9 @@ const PublicSiteView: React.FC = () => {
           <section className="guide-story-hero scroll-reveal-block">
             <article className="guide-story-copy">
               <p className="guide-story-kicker">Panduan Jenis Bahan</p>
-              <h1>Panduan bahan dibuat terpisah agar user bisa membaca karakter kain dengan lebih fokus.</h1>
+              <h1>Pilih bahan yang paling sesuai dengan fungsi, kenyamanan, dan karakter seragam tim Anda.</h1>
               <p className="guide-story-intro">
-                Setiap material di bawah punya fungsi yang berbeda. Halaman ini menampilkan foto kain secara lebih luas, lalu diikuti keterangan pemakaian, kelebihan, dan konteks seragam yang paling cocok.
+                Setiap bahan punya karakter berbeda. Gunakan ringkasan singkat ini untuk melihat fungsi utama, kelebihan, dan catatan penting sebelum lanjut konsultasi.
               </p>
               <div className="guide-story-actions">
                 <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="guide-story-primary">
@@ -3117,8 +3342,11 @@ const PublicSiteView: React.FC = () => {
           </section>
 
           <section className="guide-material-stack">
-            {MATERIAL_GUIDE_ITEMS.map((material) => (
-              <article key={material.name} className="guide-material-section scroll-reveal-block">
+            {MATERIAL_GUIDE_ITEMS.map((material) => {
+              const isOpen = openMaterialGuideName === material.name;
+
+              return (
+              <article key={material.name} className={`guide-material-section scroll-reveal-block ${isOpen ? 'is-open' : ''}`}>
                 <div className="guide-material-image-shell elegant-parallax-block">
                   {material.image ? (
                     <button
@@ -3136,6 +3364,20 @@ const PublicSiteView: React.FC = () => {
                   <p className="guide-story-kicker">{material.note}</p>
                   <h2>{material.name}</h2>
                   <p className="guide-story-intro">{material.description}</p>
+                  <button
+                    type="button"
+                    onClick={() => setOpenMaterialGuideName((current) => (current === material.name ? null : material.name))}
+                    className="guide-material-dropdown-trigger"
+                    aria-expanded={isOpen}
+                    aria-controls={`material-guide-${material.name}`}
+                  >
+                    <span>Detail bahan</span>
+                    <span aria-hidden="true">{isOpen ? '-' : '+'}</span>
+                  </button>
+                  <div
+                    id={`material-guide-${material.name}`}
+                    className="guide-material-dropdown-body"
+                  >
                   <div className="guide-material-meta-grid">
                     <article className="guide-material-meta-card">
                       <h3>Spesifikasi</h3>
@@ -3162,9 +3404,11 @@ const PublicSiteView: React.FC = () => {
                       </ul>
                     </article>
                   </div>
+                  </div>
                 </div>
               </article>
-            ))}
+            );
+            })}
           </section>
         </div>
       );
