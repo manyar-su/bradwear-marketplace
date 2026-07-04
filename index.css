@@ -8670,14 +8670,14 @@ a {
 }
 
 .guide-story-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
 .guide-story-guide-nav {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -8709,8 +8709,8 @@ a {
 }
 
 .size-guide-tab-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -8748,7 +8748,6 @@ a {
 }
 
 .size-guide-highlight-card,
-.size-guide-note-card,
 .size-guide-calculator-panel,
 .size-guide-calculator-copy {
   padding: 22px;
@@ -8768,7 +8767,6 @@ a {
 
 .size-guide-highlight-card p,
 .size-guide-recommendation-copy p,
-.size-guide-note-card p,
 .size-guide-calculator-copy p,
 .size-guide-calculator-result p {
   margin: 0;
@@ -8892,25 +8890,6 @@ a {
   font-weight: 700;
   line-height: 1.55;
   color: var(--text-primary);
-}
-
-.size-guide-poster-lines {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 14px;
-}
-
-.size-guide-poster-lines span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: #f4f8ef;
-  color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 800;
 }
 
 .size-guide-calculator-shell {
@@ -9603,10 +9582,8 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .size-guide-tab-row {
-    gap: 10px;
-  }
-
+  .size-guide-tab-row,
+  .guide-story-actions,
   .guide-story-guide-nav {
     gap: 10px;
   }
@@ -9620,15 +9597,12 @@ a {
   }
 
   .size-guide-tab-pill {
-    flex: 1 1 0;
-    min-width: 0;
     min-height: 46px;
     padding: 0 14px;
     font-size: 12px;
   }
 
   .size-guide-highlight-card,
-  .size-guide-note-card,
   .size-guide-calculator-panel,
   .size-guide-calculator-copy {
     padding: 18px;
@@ -9650,7 +9624,6 @@ a {
   .size-guide-range-meta p,
   .size-guide-highlight-card p,
   .size-guide-recommendation-copy p,
-  .size-guide-note-card p,
   .size-guide-calculator-copy p,
   .size-guide-calculator-result p {
     font-size: 13px;
@@ -9666,17 +9639,6 @@ a {
   .size-guide-table tbody td {
     padding: 13px 14px;
     font-size: 13px;
-  }
-
-  .size-guide-poster-lines {
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  .size-guide-poster-lines span {
-    min-height: 32px;
-    padding: 0 10px;
-    font-size: 11px;
   }
 
   .size-guide-field input {

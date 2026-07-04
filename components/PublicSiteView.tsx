@@ -1932,7 +1932,7 @@ const PublicSiteView: React.FC = () => {
     () => BRAND_PROFILE_VISUAL_ITEMS.find((item) => item.route === currentRoute) ?? null,
     [currentRoute],
   );
-  const shirtSizeCalculatorResult = useMemo(() => {
+  const sizeGuideCalculatorResult = useMemo(() => {
     const weight = Number(sizeGuideWeightInput);
     const height = Number(sizeGuideHeightInput);
 
@@ -1940,8 +1940,12 @@ const PublicSiteView: React.FC = () => {
       return null;
     }
 
-    return getRecommendedSize(weight, height, SHIRT_SIZE_RECOMMENDATIONS);
-  }, [sizeGuideHeightInput, sizeGuideWeightInput]);
+    return getRecommendedSize(
+      weight,
+      height,
+      activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_RECOMMENDATIONS : PANTS_SIZE_RECOMMENDATIONS,
+    );
+  }, [activeSizeGuideTab, sizeGuideHeightInput, sizeGuideWeightInput]);
   const articleFeed = useMemo(
     () =>
       [...ARTICLES].sort(
@@ -3099,31 +3103,6 @@ const PublicSiteView: React.FC = () => {
       const activeSizeGuideTitle = activeSizeGuideTab === 'kemeja' ? 'Panduan ukuran kemeja Bradwear' : 'Panduan ukuran celana Bradwear';
       const activeSizeGuideRecommendations =
         activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_RECOMMENDATIONS : PANTS_SIZE_RECOMMENDATIONS;
-      const activeShortNotes =
-        activeSizeGuideTab === 'kemeja'
-          ? [
-              'S: 45–55 kg / 150–165 cm',
-              'M: 55–63 kg / 155–170 cm',
-              'L: 63–72 kg / 160–175 cm',
-              'XL: 72–82 kg / 165–180 cm',
-              'XXL: 82–92 kg / 168–183 cm',
-              'XXXL: 92–105 kg / 170–185 cm',
-              'XXXXL: 105–118 kg / 172–188 cm',
-              'XXXXXL: 118–130 kg / 175–190 cm',
-            ]
-          : [
-              '28: 45–55 kg / 150–165 cm',
-              '30: 55–63 kg / 155–170 cm',
-              '32: 63–70 kg / 160–175 cm',
-              '34: 70–78 kg / 165–178 cm',
-              '36: 78–86 kg / 168–182 cm',
-              '38: 86–95 kg / 170–185 cm',
-              '40: 95–105 kg / 172–188 cm',
-            ];
-      const activeGuideNote =
-        activeSizeGuideTab === 'kemeja'
-          ? 'Catatan: Rekomendasi size hanya perkiraan. Untuk hasil paling akurat, ukur lebar dada, lebar bahu, dan panjang kemeja. Toleransi ukuran dapat berbeda ±1–2 cm karena proses produksi.'
-          : 'Catatan: Rekomendasi size berdasarkan tinggi dan berat badan hanya perkiraan. Untuk hasil paling akurat, ukur lingkar pinggang terlebih dahulu. Toleransi ukuran dapat berbeda ±1–2 cm karena proses produksi.';
 
       return (
         <div className="guide-story-page-shell">
@@ -3195,64 +3174,72 @@ const PublicSiteView: React.FC = () => {
             </article>
           </section>
 
-          {activeSizeGuideTab === 'kemeja' ? (
-            <section className="size-guide-calculator-shell scroll-reveal-block">
-              <article className="size-guide-calculator-copy">
-                <p className="guide-story-kicker">Kalkulator Size Kemeja</p>
-                <h2>Input tinggi badan dan berat badan untuk mendapatkan size rekomendasi.</h2>
-                <p>Hasil kalkulator ini adalah rekomendasi awal. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.</p>
-              </article>
+          <section className="size-guide-calculator-shell scroll-reveal-block">
+            <article className="size-guide-calculator-copy">
+              <p className="guide-story-kicker">
+                {activeSizeGuideTab === 'kemeja' ? 'Kalkulator Size Kemeja' : 'Kalkulator Size Celana'}
+              </p>
+              <h2>Input tinggi badan dan berat badan untuk mendapatkan size rekomendasi.</h2>
+              <p>
+                {activeSizeGuideTab === 'kemeja'
+                  ? 'Hasil kalkulator ini adalah rekomendasi awal kemeja. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.'
+                  : 'Hasil kalkulator ini adalah rekomendasi awal celana. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.'}
+              </p>
+            </article>
 
-              <article className="size-guide-calculator-panel">
-                <div className="size-guide-calculator-grid">
-                  <label className="size-guide-field">
-                    <span>Berat Badan (kg)</span>
-                    <input
-                      type="number"
-                      min="1"
-                      inputMode="numeric"
-                      placeholder="Contoh 68"
-                      value={sizeGuideWeightInput}
-                      onChange={(event) => setSizeGuideWeightInput(event.target.value)}
-                    />
-                  </label>
-                  <label className="size-guide-field">
-                    <span>Tinggi Badan (cm)</span>
-                    <input
-                      type="number"
-                      min="1"
-                      inputMode="numeric"
-                      placeholder="Contoh 172"
-                      value={sizeGuideHeightInput}
-                      onChange={(event) => setSizeGuideHeightInput(event.target.value)}
-                    />
-                  </label>
-                </div>
+            <article className="size-guide-calculator-panel">
+              <div className="size-guide-calculator-grid">
+                <label className="size-guide-field">
+                  <span>Berat Badan (kg)</span>
+                  <input
+                    type="number"
+                    min="1"
+                    inputMode="numeric"
+                    placeholder="Contoh 68"
+                    value={sizeGuideWeightInput}
+                    onChange={(event) => setSizeGuideWeightInput(event.target.value)}
+                  />
+                </label>
+                <label className="size-guide-field">
+                  <span>Tinggi Badan (cm)</span>
+                  <input
+                    type="number"
+                    min="1"
+                    inputMode="numeric"
+                    placeholder="Contoh 172"
+                    value={sizeGuideHeightInput}
+                    onChange={(event) => setSizeGuideHeightInput(event.target.value)}
+                  />
+                </label>
+              </div>
 
-                <div className="size-guide-calculator-result">
-                  {shirtSizeCalculatorResult ? (
-                    <>
-                      <p className="size-guide-calculator-label">
-                        {shirtSizeCalculatorResult.matchType === 'exact' ? 'Rekomendasi Size' : 'Rekomendasi Size Terdekat'}
-                      </p>
-                      <h3>{shirtSizeCalculatorResult.recommendation.size}</h3>
-                      <p>
-                        Acuan {shirtSizeCalculatorResult.recommendation.weightMin}–{shirtSizeCalculatorResult.recommendation.weightMax} kg
-                        {' / '}
-                        {shirtSizeCalculatorResult.recommendation.heightMin}–{shirtSizeCalculatorResult.recommendation.heightMax} cm
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="size-guide-calculator-label">Rekomendasi Size</p>
-                      <h3>Isi data dulu</h3>
-                      <p>Masukkan berat badan dan tinggi badan untuk melihat size kemeja yang direkomendasikan.</p>
-                    </>
-                  )}
-                </div>
-              </article>
-            </section>
-          ) : null}
+              <div className="size-guide-calculator-result">
+                {sizeGuideCalculatorResult ? (
+                  <>
+                    <p className="size-guide-calculator-label">
+                      {sizeGuideCalculatorResult.matchType === 'exact' ? 'Rekomendasi Size' : 'Rekomendasi Size Terdekat'}
+                    </p>
+                    <h3>{sizeGuideCalculatorResult.recommendation.size}</h3>
+                    <p>
+                      Acuan {sizeGuideCalculatorResult.recommendation.weightMin}–{sizeGuideCalculatorResult.recommendation.weightMax} kg
+                      {' / '}
+                      {sizeGuideCalculatorResult.recommendation.heightMin}–{sizeGuideCalculatorResult.recommendation.heightMax} cm
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="size-guide-calculator-label">Rekomendasi Size</p>
+                    <h3>Isi data dulu</h3>
+                    <p>
+                      {activeSizeGuideTab === 'kemeja'
+                        ? 'Masukkan berat badan dan tinggi badan untuk melihat size kemeja yang direkomendasikan.'
+                        : 'Masukkan berat badan dan tinggi badan untuk melihat size celana yang direkomendasikan.'}
+                    </p>
+                  </>
+                )}
+              </div>
+            </article>
+          </section>
 
           <section className="size-guide-recommendation-shell scroll-reveal-block">
             <article className="size-guide-recommendation-copy">
@@ -3285,16 +3272,6 @@ const PublicSiteView: React.FC = () => {
                 </tbody>
               </table>
             </div>
-
-            <article className="size-guide-note-card">
-              <p className="guide-story-kicker">Versi pendek untuk poster</p>
-              <div className="size-guide-poster-lines">
-                {activeShortNotes.map((line) => (
-                  <span key={`${activeSizeGuideTab}-${line}`}>{line}</span>
-                ))}
-              </div>
-              <p>{activeGuideNote}</p>
-            </article>
           </section>
 
           <section className="guide-story-info-grid scroll-reveal-block size-guide-support-grid">
