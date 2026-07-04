@@ -6599,6 +6599,23 @@ a {
   max-width: 760px;
 }
 
+.testimonial-page-hero-image-shell {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 32px;
+  background: #edf5e6;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+}
+
+.testimonial-page-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 640px;
+  object-fit: cover;
+  object-position: center center;
+}
+
 .testimonial-page-kicker {
   margin: 0;
   color: var(--brand-accent-strong);
@@ -7139,6 +7156,14 @@ a {
   .testimonial-page-hero,
   .testimonial-page-copy {
     gap: 0.72rem;
+  }
+
+  .testimonial-page-hero-image-shell {
+    border-radius: 24px;
+  }
+
+  .testimonial-page-hero-image {
+    max-height: none;
   }
 
   .testimonial-page-kicker {

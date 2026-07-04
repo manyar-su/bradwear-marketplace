@@ -5,7 +5,7 @@ const DesignEditorView = React.lazy(() => import('./components/DesignEditorView'
 const SummaryView = React.lazy(() => import('./components/SummaryView'));
 import { preloadCriticalAssets } from './assets';
 import { useStore } from './context/StoreContext';
-import { SITE_FAQS, buildCustomerServiceMessage, getConsultationTopicForPath } from './lib/siteConfig';
+import { CATALOG_GUIDE_PATHS, SITE_FAQS, buildCustomerServiceMessage, getConsultationTopicForPath } from './lib/siteConfig';
 import { applySeoMeta } from './lib/seo';
 import { CUSTOMER_SERVICE_DIALOG_EVENT, CustomerServiceDialogDetail } from './lib/customerServiceDialog';
 import SiteHeader from './components/SiteHeader';
@@ -136,6 +136,9 @@ const App: React.FC = () => {
             onSelectCatalogCategory={(category) => {
               setPreferredCatalogCategory(category);
               setCurrentRoute(category === 'Celana' ? RouteKey.PANTS : RouteKey.KATALOG);
+            }}
+            onOpenCatalogGuide={(guide) => {
+              setCurrentRoute(RouteKey.KATALOG, { path: CATALOG_GUIDE_PATHS[guide] });
             }}
             onNavigate={(route) => {
               if ((route === RouteKey.EDITOR || route === RouteKey.SUMMARY) && !selectedProduct) {

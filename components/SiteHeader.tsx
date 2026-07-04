@@ -7,12 +7,14 @@ interface SiteHeaderProps {
   selectedProductName?: string | null;
   onNavigate: (route: RouteKey) => void;
   onSelectCatalogCategory: (category: Category) => void;
+  onOpenCatalogGuide?: (guide: 'size' | 'material') => void;
 }
 
 type HeaderNavItem = {
   label: string;
   route: RouteKey;
   homeSection?: string;
+  catalogGuide?: 'size' | 'material';
 };
 
 type HeaderMenuSection = {
@@ -24,6 +26,8 @@ const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
   { label: '3D', route: RouteKey.THREE_D },
   { label: 'Katalog', route: RouteKey.KATALOG },
+  { label: 'Panduan Ukuran', route: RouteKey.KATALOG, catalogGuide: 'size' },
+  { label: 'Jenis Bahan', route: RouteKey.KATALOG, catalogGuide: 'material' },
   { label: 'Download', route: RouteKey.DOWNLOAD },
   { label: 'Artikel', route: RouteKey.ARTIKEL },
   { label: 'Portofolio', route: RouteKey.CLIENT },
@@ -39,6 +43,8 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
       { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
       { label: 'Studio 3D', route: RouteKey.THREE_D },
       { label: 'Katalog', route: RouteKey.KATALOG },
+      { label: 'Panduan Ukuran', route: RouteKey.KATALOG, catalogGuide: 'size' },
+      { label: 'Jenis Bahan', route: RouteKey.KATALOG, catalogGuide: 'material' },
       { label: 'Download', route: RouteKey.DOWNLOAD },
       { label: 'Artikel', route: RouteKey.ARTIKEL },
       { label: 'Portofolio', route: RouteKey.CLIENT },
@@ -73,6 +79,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
   selectedProductName,
   onNavigate,
   onSelectCatalogCategory: _onSelectCatalogCategory,
+  onOpenCatalogGuide,
 }) => {
   const mobileMenuRef = React.useRef<HTMLDetailsElement | null>(null);
   const isCatalogRoute = currentRoute === RouteKey.KATALOG || currentRoute === RouteKey.PANTS;
@@ -111,8 +118,12 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
     window.setTimeout(scrollToSection, 180);
   };
 
-  const handleHeaderNavigation = (route: RouteKey, homeSection?: string) => {
+  const handleHeaderNavigation = (route: RouteKey, homeSection?: string, catalogGuide?: 'size' | 'material') => {
     mobileMenuRef.current?.removeAttribute('open');
+    if (catalogGuide && onOpenCatalogGuide) {
+      onOpenCatalogGuide(catalogGuide);
+      return;
+    }
     navigateToHomeSection(route, homeSection);
   };
 
@@ -131,7 +142,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
               <li key={item.route}>
                 <button
                   type="button"
-                  onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
+                  onClick={() => handleHeaderNavigation(item.route, item.homeSection, item.catalogGuide)}
                   className={`market-link header-nav-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
                 >
                   {item.label}
@@ -153,7 +164,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                       <li key={`${item.label}-${item.route}-${item.homeSection ?? 'route'}`}>
                         <button
                           type="button"
-                          onClick={() => handleHeaderNavigation(item.route, item.homeSection)}
+                          onClick={() => handleHeaderNavigation(item.route, item.homeSection, item.catalogGuide)}
                           className={`mobile-main-menu-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
                         >
                           {item.label}

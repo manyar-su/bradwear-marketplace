@@ -3637,6 +3637,10 @@ const PublicSiteView: React.FC = () => {
           </p>
         </div>
 
+        <div className="testimonial-page-hero-image-shell elegant-parallax-block">
+          <img src={homeClientPertaminaImage} alt="Klien Pertamina bersama seragam Bradwear" className="testimonial-page-hero-image" />
+        </div>
+
         <div className="testimonial-stats-grid">
           {TESTIMONIAL_STATS.map((item) => (
             <article key={item.label} className="testimonial-stat-card">
