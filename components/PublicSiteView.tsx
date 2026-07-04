@@ -3632,9 +3632,6 @@ const PublicSiteView: React.FC = () => {
         <div className="testimonial-page-copy">
           <p className="testimonial-page-kicker">Testimoni Klien Kami</p>
           <h1 className="testimonial-page-title">Kepercayaan klien menjadi alasan kami menjaga kualitas produk dan layanan tetap rapi.</h1>
-          <p className="testimonial-page-intro">
-            Ringkasan ini menampilkan kesan dari instansi, perusahaan, pendidikan, dan layanan operasional yang sudah mempercayakan produksi seragam custom kepada Bradwear Indonesia.
-          </p>
         </div>
 
         <div className="testimonial-page-hero-image-shell elegant-parallax-block">
