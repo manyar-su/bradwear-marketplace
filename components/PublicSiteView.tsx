@@ -1394,34 +1394,69 @@ type ProductDetailContent = {
   craftsmanship: string[];
 };
 
+type SizeGuideBand = {
+  label: string;
+  min: number;
+  max: number;
+};
+
+type SizeGuideMatrixRow = {
+  heightLabel: string;
+  heightMin: number;
+  heightMax: number;
+  sizes: string[];
+};
+
 type SizeGuideRecommendation = {
   size: string;
+  weightLabel: string;
   weightMin: number;
   weightMax: number;
+  heightLabel: string;
   heightMin: number;
   heightMax: number;
 };
 
-const SHIRT_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = [
-  { size: 'S', weightMin: 45, weightMax: 55, heightMin: 150, heightMax: 165 },
-  { size: 'M', weightMin: 55, weightMax: 63, heightMin: 155, heightMax: 170 },
-  { size: 'L', weightMin: 63, weightMax: 72, heightMin: 160, heightMax: 175 },
-  { size: 'XL', weightMin: 72, weightMax: 82, heightMin: 165, heightMax: 180 },
-  { size: 'XXL', weightMin: 82, weightMax: 92, heightMin: 168, heightMax: 183 },
-  { size: 'XXXL', weightMin: 92, weightMax: 105, heightMin: 170, heightMax: 185 },
-  { size: 'XXXXL', weightMin: 105, weightMax: 118, heightMin: 172, heightMax: 188 },
-  { size: 'XXXXXL', weightMin: 118, weightMax: 130, heightMin: 175, heightMax: 190 },
+const SIZE_GUIDE_WEIGHT_BANDS: SizeGuideBand[] = [
+  { label: '45–50 kg', min: 45, max: 50 },
+  { label: '51–56 kg', min: 51, max: 56 },
+  { label: '57–63 kg', min: 57, max: 63 },
+  { label: '64–70 kg', min: 64, max: 70 },
+  { label: '71–78 kg', min: 71, max: 78 },
+  { label: '79–86 kg', min: 79, max: 86 },
 ];
 
-const PANTS_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = [
-  { size: '28', weightMin: 45, weightMax: 55, heightMin: 150, heightMax: 165 },
-  { size: '30', weightMin: 55, weightMax: 63, heightMin: 155, heightMax: 170 },
-  { size: '32', weightMin: 63, weightMax: 70, heightMin: 160, heightMax: 175 },
-  { size: '34', weightMin: 70, weightMax: 78, heightMin: 165, heightMax: 178 },
-  { size: '36', weightMin: 78, weightMax: 86, heightMin: 168, heightMax: 182 },
-  { size: '38', weightMin: 86, weightMax: 95, heightMin: 170, heightMax: 185 },
-  { size: '40', weightMin: 95, weightMax: 105, heightMin: 172, heightMax: 188 },
+const SHIRT_SIZE_MATRIX: SizeGuideMatrixRow[] = [
+  { heightLabel: '155–160 cm', heightMin: 155, heightMax: 160, sizes: ['M', 'M/L', 'L', 'XL', 'XXL', '3XL'] },
+  { heightLabel: '161–166 cm', heightMin: 161, heightMax: 166, sizes: ['M', 'L', 'L', 'XL', 'XXL', '3XL'] },
+  { heightLabel: '167–172 cm', heightMin: 167, heightMax: 172, sizes: ['L', 'L', 'XL', 'XL', 'XXL', '3XL'] },
+  { heightLabel: '173–178 cm', heightMin: 173, heightMax: 178, sizes: ['L', 'XL', 'XL', 'XXL', 'XXL', '3XL'] },
+  { heightLabel: '179–185 cm', heightMin: 179, heightMax: 185, sizes: ['XL', 'XL', 'XXL', 'XXL', '3XL', '4XL'] },
 ];
+
+const PANTS_SIZE_MATRIX: SizeGuideMatrixRow[] = [
+  { heightLabel: '155–160 cm', heightMin: 155, heightMax: 160, sizes: ['27', '28', '29', '30', '32', '34'] },
+  { heightLabel: '161–166 cm', heightMin: 161, heightMax: 166, sizes: ['27/28', '28', '29', '30', '32', '34'] },
+  { heightLabel: '167–172 cm', heightMin: 167, heightMax: 172, sizes: ['28', '29', '30', '31/32', '33', '34'] },
+  { heightLabel: '173–178 cm', heightMin: 173, heightMax: 178, sizes: ['29', '30', '31/32', '32', '34', '36'] },
+  { heightLabel: '179–185 cm', heightMin: 179, heightMax: 185, sizes: ['30', '31/32', '32/33', '34', '36', '38'] },
+];
+
+const flattenSizeGuideMatrix = (rows: SizeGuideMatrixRow[]): SizeGuideRecommendation[] =>
+  rows.flatMap((row) =>
+    SIZE_GUIDE_WEIGHT_BANDS.map((band, index) => ({
+      size: row.sizes[index] ?? '-',
+      weightLabel: band.label,
+      weightMin: band.min,
+      weightMax: band.max,
+      heightLabel: row.heightLabel,
+      heightMin: row.heightMin,
+      heightMax: row.heightMax,
+    })),
+  );
+
+const SHIRT_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = flattenSizeGuideMatrix(SHIRT_SIZE_MATRIX);
+const PANTS_SIZE_RECOMMENDATIONS: SizeGuideRecommendation[] = flattenSizeGuideMatrix(PANTS_SIZE_MATRIX);
 
 const clampRangeDistance = (value: number, min: number, max: number) => {
   if (value < min) return min - value;
@@ -1459,6 +1494,12 @@ const getRecommendedSize = (
 
   return nearestMatch ? { recommendation: nearestMatch, matchType: 'nearest' as const } : null;
 };
+
+const SHIRT_SIZE_GUIDE_NOTE =
+  'Rekomendasi size dibuat berdasarkan perkiraan tinggi dan berat badan. Sebagai patokan, tinggi 165 cm dengan berat 55 kg direkomendasikan menggunakan kemeja size L. Jika ingin tampilan lebih slim fit, bisa pilih satu size lebih kecil. Jika ingin lebih longgar dan nyaman untuk aktivitas kerja, pilih sesuai rekomendasi atau satu size lebih besar.';
+
+const PANTS_SIZE_GUIDE_NOTE =
+  'Rekomendasi size dibuat berdasarkan perkiraan tinggi dan berat badan. Sebagai patokan, tinggi 165 cm dengan berat 55 kg direkomendasikan menggunakan celana size 28. Jika ingin tampilan lebih slim fit, bisa pilih satu size lebih kecil. Jika ingin lebih longgar dan nyaman untuk aktivitas kerja, pilih sesuai rekomendasi atau satu size lebih besar.';
 
 const PRODUCT_CATEGORY_DETAIL_DEFAULTS: Record<Product['category'], ProductDetailContent> = {
   Kemeja: {
@@ -3101,8 +3142,8 @@ const PublicSiteView: React.FC = () => {
     if (activeCatalogGuide === 'size') {
       const activeSizeGuideImage = activeSizeGuideTab === 'kemeja' ? kemejaSizeChartImage : celanaSizeChartImage;
       const activeSizeGuideTitle = activeSizeGuideTab === 'kemeja' ? 'Panduan ukuran kemeja Bradwear' : 'Panduan ukuran celana Bradwear';
-      const activeSizeGuideRecommendations =
-        activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_RECOMMENDATIONS : PANTS_SIZE_RECOMMENDATIONS;
+      const activeSizeGuideMatrix = activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_MATRIX : PANTS_SIZE_MATRIX;
+      const activeSizeGuideNote = activeSizeGuideTab === 'kemeja' ? SHIRT_SIZE_GUIDE_NOTE : PANTS_SIZE_GUIDE_NOTE;
 
       return (
         <div className="guide-story-page-shell">
@@ -3180,11 +3221,7 @@ const PublicSiteView: React.FC = () => {
                 {activeSizeGuideTab === 'kemeja' ? 'Kalkulator Size Kemeja' : 'Kalkulator Size Celana'}
               </p>
               <h2>Input tinggi badan dan berat badan untuk mendapatkan size rekomendasi.</h2>
-              <p>
-                {activeSizeGuideTab === 'kemeja'
-                  ? 'Hasil kalkulator ini adalah rekomendasi awal kemeja. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.'
-                  : 'Hasil kalkulator ini adalah rekomendasi awal celana. Jika ukuran tim berada di batas antar size, lanjutkan pengecekan ke size chart atau konsultasi CS.'}
-              </p>
+              <p>{activeSizeGuideNote}</p>
             </article>
 
             <article className="size-guide-calculator-panel">
@@ -3221,9 +3258,9 @@ const PublicSiteView: React.FC = () => {
                     </p>
                     <h3>{sizeGuideCalculatorResult.recommendation.size}</h3>
                     <p>
-                      Acuan {sizeGuideCalculatorResult.recommendation.weightMin}–{sizeGuideCalculatorResult.recommendation.weightMax} kg
+                      Acuan tinggi {sizeGuideCalculatorResult.recommendation.heightLabel}
                       {' / '}
-                      {sizeGuideCalculatorResult.recommendation.heightMin}–{sizeGuideCalculatorResult.recommendation.heightMax} cm
+                      berat {sizeGuideCalculatorResult.recommendation.weightLabel}
                     </p>
                   </>
                 ) : (
@@ -3245,28 +3282,26 @@ const PublicSiteView: React.FC = () => {
             <article className="size-guide-recommendation-copy">
               <p className="guide-story-kicker">{activeSizeGuideTab === 'kemeja' ? 'Rekomendasi Size Kemeja' : 'Rekomendasi Size Celana'}</p>
               <h2>Rekomendasi size berdasarkan berat badan dan tinggi badan</h2>
-              <p>
-                {activeSizeGuideTab === 'kemeja'
-                  ? 'Gunakan tabel berikut untuk mendapatkan ukuran kemeja awal sebelum mengukur lebar dada, bahu, dan panjang badan.'
-                  : 'Gunakan tabel berikut untuk mendapatkan ukuran celana awal sebelum mengukur lingkar pinggang dan panjang celana.'}
-              </p>
+              <p>{activeSizeGuideNote}</p>
             </article>
 
             <div className="size-guide-table-shell" role="region" aria-label={`Tabel rekomendasi size ${activeSizeGuideTab}`}>
               <table className="size-guide-table">
                 <thead>
                   <tr>
-                    <th scope="col">Size</th>
-                    <th scope="col">Berat Badan</th>
-                    <th scope="col">Tinggi Badan</th>
+                    <th scope="col">Tinggi / Berat</th>
+                    {SIZE_GUIDE_WEIGHT_BANDS.map((band) => (
+                      <th key={`${activeSizeGuideTab}-${band.label}`} scope="col">{band.label}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {activeSizeGuideRecommendations.map((item) => (
-                    <tr key={`${activeSizeGuideTab}-${item.size}`}>
-                      <th scope="row">{item.size}</th>
-                      <td>{item.weightMin}–{item.weightMax} kg</td>
-                      <td>{item.heightMin}–{item.heightMax} cm</td>
+                  {activeSizeGuideMatrix.map((row) => (
+                    <tr key={`${activeSizeGuideTab}-${row.heightLabel}`}>
+                      <th scope="row">{row.heightLabel}</th>
+                      {row.sizes.map((size, index) => (
+                        <td key={`${activeSizeGuideTab}-${row.heightLabel}-${SIZE_GUIDE_WEIGHT_BANDS[index]?.label}`}>{size}</td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
