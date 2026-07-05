@@ -23,9 +23,9 @@ import {
 } from './siteConfig';
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
-const SEO_ICON_URL = `${SITE_URL}/logo.png`;
-const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/seo-kemeja.webp`;
-const SEO_PREVIEW_IMAGE_ALT = 'Produk kemeja custom Bradwear Indonesia';
+const SEO_ICON_URL = `${SITE_URL}/favicon-bradwear.png`;
+const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/thumbnail-bradwear.jpeg`;
+const SEO_PREVIEW_IMAGE_ALT = 'Preview seragam custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
 const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
 const ARTICLE_BLOG_URL = `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`;
@@ -33,6 +33,13 @@ const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const LOCAL_BUSINESS_ID = `${SITE_URL}/#local-business`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 const SERVICE_ID = `${SITE_URL}/#custom-uniform-service`;
+const BUSINESS_LATITUDE = '-7.3506';
+const BUSINESS_LONGITUDE = '108.2172';
+const BUSINESS_SERVICE_AREAS = ['Tasikmalaya', 'Jawa Barat', 'Indonesia'];
+const BUSINESS_OPENING_HOURS = [
+  { dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '17:00' },
+  { dayOfWeek: ['Saturday'], opens: '08:00', closes: '14:00' },
+];
 const SOCIAL_PROFILE_URLS = [
   'https://www.instagram.com/bradwear_indonesia/',
   'https://www.tiktok.com/@bradwearindonesia',
@@ -323,6 +330,7 @@ const buildBaseSchemas = (
       '@type': 'Organization',
       '@id': ORGANIZATION_ID,
       name: SITE_NAME,
+      alternateName: ['Bradwear', 'Bradwear Indonesia Tasikmalaya'],
       url: SITE_URL,
       description: SITE_TAGLINE,
       keywords: keywords.join(', '),
@@ -351,8 +359,9 @@ const buildBaseSchemas = (
         '@type': 'ContactPoint',
         contactType: 'customer support',
         telephone: `+${WHATSAPP_NUMBER}`,
-        areaServed: 'ID',
-        availableLanguage: ['id'],
+        areaServed: BUSINESS_SERVICE_AREAS,
+        availableLanguage: ['id-ID', 'id'],
+        url: `${SITE_URL}${ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN]}`,
       },
     },
     {
@@ -368,13 +377,25 @@ const buildBaseSchemas = (
         addressRegion: 'Jawa Barat',
         addressCountry: 'ID',
       },
-      url: canonical,
+      url: SITE_URL,
       hasMap: STORE_MAP_URL,
-      areaServed: 'Indonesia',
+      areaServed: BUSINESS_SERVICE_AREAS,
       description: meta.description,
       image: SEO_PREVIEW_IMAGE_URL,
       keywords: keywords.join(', '),
       priceRange: '$$',
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: BUSINESS_LATITUDE,
+        longitude: BUSINESS_LONGITUDE,
+      },
+      openingHoursSpecification: BUSINESS_OPENING_HOURS.map((item) => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: item.dayOfWeek,
+        opens: item.opens,
+        closes: item.closes,
+      })),
+      knowsLanguage: ['id-ID', 'id'],
       parentOrganization: {
         '@id': ORGANIZATION_ID,
       },
@@ -387,6 +408,7 @@ const buildBaseSchemas = (
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_TAGLINE,
+      keywords: keywords.join(', '),
       inLanguage: 'id-ID',
       maintainer: {
         '@type': 'Person',
@@ -407,6 +429,10 @@ const buildBaseSchemas = (
       publisher: {
         '@id': ORGANIZATION_ID,
       },
+      about: CORE_SERVICE_TERMS.map((term) => ({
+        '@type': 'Thing',
+        name: term,
+      })),
     },
     {
       '@context': 'https://schema.org',
@@ -417,13 +443,17 @@ const buildBaseSchemas = (
       provider: {
         '@id': ORGANIZATION_ID,
       },
-      areaServed: 'Indonesia',
+      areaServed: BUSINESS_SERVICE_AREAS,
       availableChannel: {
         '@type': 'ServiceChannel',
         serviceUrl: `${SITE_URL}/layanan-pelanggan`,
       },
       description: meta.description,
       keywords: keywords.join(', '),
+      audience: {
+        '@type': 'Audience',
+        audienceType: 'Instansi, perusahaan, komunitas, dan tim operasional',
+      },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
         name: 'Katalog seragam custom Bradwear',
@@ -443,6 +473,15 @@ const buildBaseSchemas = (
       isPartOf: {
         '@id': WEBSITE_ID,
       },
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: article?.coverImage || SEO_PREVIEW_IMAGE_URL,
+        caption: article?.coverAlt || SEO_PREVIEW_IMAGE_ALT,
+      },
+      about: keywords.slice(0, 10).map((keyword) => ({
+        '@type': 'Thing',
+        name: keyword,
+      })),
       publisher: {
         '@id': ORGANIZATION_ID,
       },
@@ -480,6 +519,42 @@ export const buildPageSchema = (route: RouteKey, pathname: string, products: Pro
       })),
     });
     return base;
+  }
+
+  if (route === RouteKey.TESTIMONI) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: meta.title,
+      url: canonical,
+      description: meta.description,
+      about: [
+        { '@type': 'Thing', name: 'testimoni klien seragam custom' },
+        { '@type': 'Thing', name: 'review vendor seragam kerja' },
+      ],
+    });
+  }
+
+  if (route === RouteKey.ABOUT) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: meta.title,
+      url: canonical,
+      description: meta.description,
+      about: { '@id': ORGANIZATION_ID },
+    });
+  }
+
+  if (route === RouteKey.LAYANAN_PELANGGAN || route === RouteKey.TEMUKAN_TOKO) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: meta.title,
+      url: canonical,
+      description: meta.description,
+      mainEntity: { '@id': LOCAL_BUSINESS_ID },
+    });
   }
 
   if (route === RouteKey.KATALOG && catalogProduct) {
@@ -732,13 +807,18 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertMetaTag('meta[name="color-scheme"]', { name: 'color-scheme', content: 'light dark' });
   upsertMetaTag('meta[name="geo.region"]', { name: 'geo.region', content: 'ID-JB' });
   upsertMetaTag('meta[name="geo.placename"]', { name: 'geo.placename', content: 'Tasikmalaya' });
-  upsertMetaTag('meta[name="ICBM"]', { name: 'ICBM', content: '-7.3506, 108.2172' });
+  upsertMetaTag('meta[name="geo.position"]', { name: 'geo.position', content: `${BUSINESS_LATITUDE};${BUSINESS_LONGITUDE}` });
+  upsertMetaTag('meta[name="ICBM"]', { name: 'ICBM', content: `${BUSINESS_LATITUDE}, ${BUSINESS_LONGITUDE}` });
+  upsertMetaTag('meta[name="googlebot"]', { name: 'googlebot', content: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' });
+  upsertMetaTag('meta[name="referrer"]', { name: 'referrer', content: 'strict-origin-when-cross-origin' });
+  upsertMetaTag('meta[name="mobile-web-app-capable"]', { name: 'mobile-web-app-capable', content: 'yes' });
   upsertMetaTag('meta[property="og:title"]', { property: 'og:title', content: meta.title });
   upsertMetaTag('meta[property="og:description"]', { property: 'og:description', content: meta.description });
   upsertMetaTag('meta[property="og:type"]', { property: 'og:type', content: article ? 'article' : 'website' });
   upsertMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonical });
   upsertMetaTag('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
   upsertMetaTag('meta[property="og:locale"]', { property: 'og:locale', content: 'id_ID' });
+  upsertMetaTag('meta[property="og:image:type"]', { property: 'og:image:type', content: 'image/jpeg' });
   upsertMetaTag('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
   upsertMetaTag('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
   upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: previewImage });
@@ -765,8 +845,9 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertLinkTag('link[rel="alternate"][hreflang="id-ID"]', { rel: 'alternate', hreflang: 'id-ID', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
   upsertLinkTag('link[rel="sitemap"][type="application/xml"]', { rel: 'sitemap', type: 'application/xml', href: '/sitemap.xml' });
-  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/logo.png' });
-  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/logo.png' });
+  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/favicon-bradwear.png' });
+  upsertLinkTag('link[rel="shortcut icon"]', { rel: 'shortcut icon', href: '/favicon-bradwear.png' });
+  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/favicon-bradwear.png' });
 
   if (article) {
     upsertMetaTag('meta[name="publish_date"]', { name: 'publish_date', content: articlePublishedAt });
