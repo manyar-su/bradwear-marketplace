@@ -1,6 +1,39 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/client",
+      "destination": "/galeri-client",
+      "permanent": true
+    },
+    {
+      "source": "/pants",
+      "destination": "/celana-tactical",
+      "permanent": true
+    },
+    {
+      "source": "/layanan-pelanggan",
+      "destination": "/faq",
+      "permanent": true
+    },
+    {
+      "source": "/temukan-toko",
+      "destination": "/kontak",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.bradwearindonesia.com"
+        }
+      ],
+      "destination": "https://bradwearindonesia.com/$1",
+      "permanent": true
+    }
+  ],
   "routes": [
     {
       "src": "/(wp-admin|wp-login\\.php|xmlrpc\\.php|phpmyadmin|\\.git(?:/.*)?|\\.svn(?:/.*)?|\\.hg(?:/.*)?|\\.env(?:\\..*)?|server-status|cgi-bin(?:/.*)?|boaform/admin(?:/.*)?)",

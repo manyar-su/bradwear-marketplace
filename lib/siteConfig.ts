@@ -23,7 +23,7 @@ const nadhifaAvatar = new URL('../assets/CSavatar/nadhifa.png', import.meta.url)
 const rismaAvatar = new URL('../assets/CSavatar/risma.jpeg', import.meta.url).href;
 const ucuAvatar = new URL('../assets/CSavatar/ucu.png', import.meta.url).href;
 
-export const SITE_URL = 'https://www.bradwearindonesia.com';
+export const SITE_URL = 'https://bradwearindonesia.com';
 export const SITE_NAME = 'Bradwear Indonesia';
 export const SITE_TAGLINE = 'Konveksi kemeja custom, kemeja dinas, dan seragam kerja untuk instansi, perusahaan, dan komunitas di seluruh Indonesia.';
 export const WHATSAPP_NUMBER = '6287736834454';
@@ -31,12 +31,27 @@ export const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=co
 export const STORE_ADDRESS = 'Karisma Residence, Blok C.46, RT.008/RW.003, Margajaya, Kec. Mangunreja, Kabupaten Tasikmalaya, Jawa Barat 46462';
 export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STORE_ADDRESS)}`;
 
+export const CATEGORY_ROUTE_PATHS = {
+  KEMEJA_DINAS: '/kemeja-dinas',
+  PDH_PDL: '/pdh-pdl',
+  WEARPACK: '/wearpack',
+  POLO_JAKET: '/polo-jaket',
+} as const;
+
+export const INFO_ROUTE_PATHS = {
+  GALERI_CLIENT: '/galeri-client',
+  FAQ: '/faq',
+  KONTAK: '/kontak',
+  KEBIJAKAN_PRIVASI: '/kebijakan-privasi',
+  SYARAT_KETENTUAN: '/syarat-ketentuan',
+} as const;
+
 export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.HOME]: '/',
   [RouteKey.THREE_D]: '/3d',
   [RouteKey.KATALOG]: '/katalog',
   [RouteKey.DOWNLOAD]: '/download',
-  [RouteKey.CLIENT]: '/client',
+  [RouteKey.CLIENT]: INFO_ROUTE_PATHS.GALERI_CLIENT,
   [RouteKey.TESTIMONI]: '/testimoni',
   [RouteKey.ABOUT]: '/tentang-kami',
   [RouteKey.VISION_MISSION]: '/visi-misi',
@@ -44,15 +59,31 @@ export const ROUTE_PATHS: Record<RouteKey, string> = {
   [RouteKey.COMPETITIVE_ADVANTAGE]: '/keunggulan',
   [RouteKey.CLIENT_REACH]: '/klien-dan-jangkauan',
   [RouteKey.LEGAL_LICENSE]: '/legal-dan-lisensi',
-  [RouteKey.PANTS]: '/pants',
+  [RouteKey.PANTS]: '/celana-tactical',
   [RouteKey.ARTIKEL]: '/artikel',
   [RouteKey.CARA_ORDER]: '/cara-order',
-  [RouteKey.LAYANAN_PELANGGAN]: '/layanan-pelanggan',
+  [RouteKey.LAYANAN_PELANGGAN]: INFO_ROUTE_PATHS.FAQ,
   [RouteKey.LACAK_PESANAN]: '/lacak-pesanan',
-  [RouteKey.TEMUKAN_TOKO]: '/temukan-toko',
+  [RouteKey.TEMUKAN_TOKO]: INFO_ROUTE_PATHS.KONTAK,
   [RouteKey.BRAD_AI]: '/brad-ai',
   [RouteKey.EDITOR]: '/editor',
   [RouteKey.SUMMARY]: '/summary',
+};
+
+export const LEGACY_PATH_REDIRECTS: Record<string, string> = {
+  '/client': INFO_ROUTE_PATHS.GALERI_CLIENT,
+  '/pants': ROUTE_PATHS[RouteKey.PANTS],
+  '/layanan-pelanggan': ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN],
+  '/temukan-toko': ROUTE_PATHS[RouteKey.TEMUKAN_TOKO],
+};
+
+export const PATH_ROUTE_ALIASES: Record<string, RouteKey> = {
+  [CATEGORY_ROUTE_PATHS.KEMEJA_DINAS]: RouteKey.KATALOG,
+  [CATEGORY_ROUTE_PATHS.PDH_PDL]: RouteKey.KATALOG,
+  [CATEGORY_ROUTE_PATHS.WEARPACK]: RouteKey.KATALOG,
+  [CATEGORY_ROUTE_PATHS.POLO_JAKET]: RouteKey.KATALOG,
+  [INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI]: RouteKey.LAYANAN_PELANGGAN,
+  [INFO_ROUTE_PATHS.SYARAT_KETENTUAN]: RouteKey.LAYANAN_PELANGGAN,
 };
 
 export const PUBLIC_ROUTES = new Set<RouteKey>([
@@ -920,16 +951,16 @@ export const ARTICLES: Article[] = [
 ];
 
 export const CUSTOMER_SERVICE_CONTACTS: CustomerServiceContact[] = [
-  { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: gilangAvatar, statusLabel: 'Online' },
-  { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: elshaAvatar, statusLabel: 'Online' },
   { id: 'bayu', name: 'Bayu', phone: '6287736834454', avatar: bayuAvatar, statusLabel: 'Online' },
   { id: 'nadhifa', name: 'Nadhifa', phone: '6282316067692', avatar: nadhifaAvatar, statusLabel: 'Online' },
-  { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: rismaAvatar, statusLabel: 'Online' },
   { id: 'ede', name: 'Ede', phone: '6285317159575', avatar: edeAvatar, statusLabel: 'Online' },
-  { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: fikriAvatar, statusLabel: 'Online' },
   { id: 'aris', name: 'Aris', phone: '6281295395823', avatar: arisAvatar, statusLabel: 'Online' },
-  { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: ayangAvatar, statusLabel: 'Online' },
+  { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: fikriAvatar, statusLabel: 'Online' },
+  { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: rismaAvatar, statusLabel: 'Online' },
   { id: 'ucu', name: 'Ucu', phone: '6281462327318', avatar: ucuAvatar, statusLabel: 'Online' },
+  { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: ayangAvatar, statusLabel: 'Online' },
+  { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: gilangAvatar, statusLabel: 'Online' },
+  { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: elshaAvatar, statusLabel: 'Online' },
 ];
 
 // Sumber teks tahapan halaman Cara Order.
@@ -1314,10 +1345,8 @@ export const buildTrackingUrl = (provider: CourierProvider, receiptNumber: strin
 
 export const normalizePathname = (pathname: string) => {
   if (!pathname) return '/';
-  if (pathname.length > 1 && pathname.endsWith('/')) {
-    return pathname.slice(0, -1);
-  }
-  return pathname;
+  const cleanPathname = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  return LEGACY_PATH_REDIRECTS[cleanPathname] ?? cleanPathname;
 };
 
 const slugifyPathToken = (value: string) =>
@@ -1370,6 +1399,10 @@ export const getArticleBySlug = (slug?: string | null) =>
 
 export const pathToRoute = (pathname: string): RouteKey => {
   const normalized = normalizePathname(pathname.toLowerCase());
+  const directAliasRoute = PATH_ROUTE_ALIASES[normalized];
+  if (directAliasRoute) {
+    return directAliasRoute;
+  }
   if (normalized.startsWith(`${ROUTE_PATHS[RouteKey.ARTIKEL]}/`)) {
     return RouteKey.ARTIKEL;
   }

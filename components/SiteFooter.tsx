@@ -1,27 +1,37 @@
-﻿import React from 'react';
+import React from 'react';
 import { ASSETS } from '../assets';
 import { CLIENT_LOGOS } from '../constants';
 import {
-  PRIMARY_NAV_ITEMS,
+  CATEGORY_ROUTE_PATHS,
+  INFO_ROUTE_PATHS,
+  ROUTE_PATHS,
   SITE_NAME,
   STORE_ADDRESS,
 } from '../lib/siteConfig';
 import { RouteKey } from '../types';
 
 interface SiteFooterProps {
-  onNavigate: (route: RouteKey) => void;
+  onNavigate: (route: RouteKey, options?: { path?: string }) => void;
 }
 
-const footerRoutes = PRIMARY_NAV_ITEMS.filter((item) =>
-  [RouteKey.HOME, RouteKey.THREE_D, RouteKey.KATALOG, RouteKey.DOWNLOAD, RouteKey.ARTIKEL, RouteKey.CLIENT, RouteKey.TESTIMONI, RouteKey.CARA_ORDER, RouteKey.LAYANAN_PELANGGAN].includes(item.route),
-);
+const footerProductLinks = [
+  { label: 'Kemeja Dinas', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS },
+  { label: 'PDH & PDL', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.PDH_PDL },
+  { label: 'Wearpack', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.WEARPACK },
+  { label: 'Polo & Jaket', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.POLO_JAKET },
+  { label: 'Celana Tactical', route: RouteKey.PANTS, path: ROUTE_PATHS[RouteKey.PANTS] },
+];
 
-const footerProfileLinks = [
-  { label: 'Tentang Kami', route: RouteKey.ABOUT },
-  { label: 'Visi & Misi', route: RouteKey.VISION_MISSION },
-  { label: 'Produk & Jasa', route: RouteKey.PRODUCTS_SERVICES },
-  { label: 'Keunggulan', route: RouteKey.COMPETITIVE_ADVANTAGE },
-  { label: 'Klien & Jangkauan', route: RouteKey.CLIENT_REACH },
+const footerInfoLinks = [
+  { label: 'Tentang Kami', route: RouteKey.ABOUT, path: ROUTE_PATHS[RouteKey.ABOUT] },
+  { label: 'Galeri Client', route: RouteKey.CLIENT, path: ROUTE_PATHS[RouteKey.CLIENT] },
+  { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN, path: ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN] },
+  { label: 'Kontak', route: RouteKey.TEMUKAN_TOKO, path: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO] },
+];
+
+const footerLegalLinks = [
+  { label: 'Kebijakan Privasi', route: RouteKey.LAYANAN_PELANGGAN, path: INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI },
+  { label: 'Syarat dan Ketentuan', route: RouteKey.LAYANAN_PELANGGAN, path: INFO_ROUTE_PATHS.SYARAT_KETENTUAN },
 ];
 
 const footerSocialLinks = [
@@ -48,6 +58,15 @@ const footerSocialLinks = [
 ];
 
 const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
+  const handleAnchorNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    route: RouteKey,
+    path: string,
+  ) => {
+    event.preventDefault();
+    onNavigate(route, { path });
+  };
+
   return (
     <footer className="site-footer">
       <div className="site-footer-partners">
@@ -95,41 +114,51 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
         </div>
 
         <div className="site-footer-main-column">
-          <p className="site-footer-heading">Navigasi</p>
+          <p className="site-footer-heading">Produk</p>
           <div className="site-footer-links site-footer-nav-links">
-            {footerRoutes.map((item) => (
-              <button key={item.route} type="button" onClick={() => onNavigate(item.route)} className="site-footer-link">
+            {footerProductLinks.map((item) => (
+              <a
+                key={item.path}
+                href={item.path}
+                onClick={(event) => handleAnchorNavigation(event, item.route, item.path)}
+                className="site-footer-link"
+              >
                 {item.label}
-              </button>
+              </a>
             ))}
-            <a
-              href="https://www.bradwear.web.id/"
-              target="_blank"
-              rel="noreferrer"
-              className="site-footer-link"
-            >
-              Dashboard
-            </a>
           </div>
         </div>
 
         <div className="site-footer-main-column">
-          <p className="site-footer-heading">Link Profil</p>
+          <p className="site-footer-heading">Informasi</p>
           <div className="site-footer-faq-list">
-            {footerProfileLinks.map((item) => (
-              <button
-                key={item.route}
-                type="button"
-                onClick={() => onNavigate(item.route)}
+            {footerInfoLinks.map((item) => (
+              <a
+                key={item.path}
+                href={item.path}
+                onClick={(event) => handleAnchorNavigation(event, item.route, item.path)}
                 className="site-footer-faq-item"
               >
                 <span>{item.label}</span>
-              </button>
+              </a>
             ))}
           </div>
-          <button type="button" onClick={() => onNavigate(RouteKey.ABOUT)} className="site-footer-faq-link">
-            Buka halaman profil
-          </button>
+        </div>
+
+        <div className="site-footer-main-column">
+          <p className="site-footer-heading">Legal</p>
+          <div className="site-footer-faq-list">
+            {footerLegalLinks.map((item) => (
+              <a
+                key={item.path}
+                href={item.path}
+                onClick={(event) => handleAnchorNavigation(event, item.route, item.path)}
+                className="site-footer-faq-item"
+              >
+                <span>{item.label}</span>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -141,4 +170,3 @@ const SiteFooter: React.FC<SiteFooterProps> = ({ onNavigate }) => {
 };
 
 export default SiteFooter;
-

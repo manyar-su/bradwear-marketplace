@@ -1,11 +1,12 @@
 import React from 'react';
 import { Category, RouteKey } from '../types';
 import { ASSETS } from '../assets';
+import { CATEGORY_ROUTE_PATHS, INFO_ROUTE_PATHS, ROUTE_PATHS } from '../lib/siteConfig';
 
 interface SiteHeaderProps {
   currentRoute: RouteKey;
   selectedProductName?: string | null;
-  onNavigate: (route: RouteKey) => void;
+  onNavigate: (route: RouteKey, options?: { path?: string }) => void;
   onSelectCatalogCategory: (category: Category) => void;
   onOpenCatalogGuide?: (guide: 'size' | 'material') => void;
 }
@@ -13,6 +14,7 @@ interface SiteHeaderProps {
 type HeaderNavItem = {
   label: string;
   route: RouteKey;
+  path?: string;
   homeSection?: string;
   catalogGuide?: 'size' | 'material';
 };
@@ -23,17 +25,16 @@ type HeaderMenuSection = {
 };
 
 const HEADER_NAV_ITEMS: HeaderNavItem[] = [
-  { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
-  { label: '3D', route: RouteKey.THREE_D },
-  { label: 'Katalog', route: RouteKey.KATALOG },
-  { label: 'Panduan Ukuran', route: RouteKey.KATALOG, catalogGuide: 'size' },
-  { label: 'Jenis Bahan', route: RouteKey.KATALOG, catalogGuide: 'material' },
-  { label: 'Download', route: RouteKey.DOWNLOAD },
-  { label: 'Artikel', route: RouteKey.ARTIKEL },
-  { label: 'Portofolio', route: RouteKey.CLIENT },
-  { label: 'Testimoni', route: RouteKey.TESTIMONI },
-  { label: 'Cara Order', route: RouteKey.CARA_ORDER },
-  { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
+  { label: 'Beranda', route: RouteKey.HOME, path: ROUTE_PATHS[RouteKey.HOME], homeSection: 'hero' },
+  { label: 'Kemeja Dinas', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS },
+  { label: 'PDH & PDL', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.PDH_PDL },
+  { label: 'Wearpack', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.WEARPACK },
+  { label: 'Polo & Jaket', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.POLO_JAKET },
+  { label: 'Celana Tactical', route: RouteKey.PANTS, path: ROUTE_PATHS[RouteKey.PANTS] },
+  { label: 'Katalog', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG] },
+  { label: 'Galeri Client', route: RouteKey.CLIENT, path: ROUTE_PATHS[RouteKey.CLIENT] },
+  { label: 'Tentang Kami', route: RouteKey.ABOUT, path: ROUTE_PATHS[RouteKey.ABOUT] },
+  { label: 'Kontak', route: RouteKey.TEMUKAN_TOKO, path: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO] },
 ];
 
 const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
@@ -41,35 +42,34 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
     title: 'Navigasi Utama',
     items: [
       { label: 'Beranda', route: RouteKey.HOME, homeSection: 'hero' },
-      { label: 'Studio 3D', route: RouteKey.THREE_D },
-      { label: 'Katalog', route: RouteKey.KATALOG },
-      { label: 'Panduan Ukuran', route: RouteKey.KATALOG, catalogGuide: 'size' },
-      { label: 'Jenis Bahan', route: RouteKey.KATALOG, catalogGuide: 'material' },
-      { label: 'Download', route: RouteKey.DOWNLOAD },
-      { label: 'Artikel', route: RouteKey.ARTIKEL },
-      { label: 'Portofolio', route: RouteKey.CLIENT },
-      { label: 'Testimoni', route: RouteKey.TESTIMONI },
-      { label: 'Cara Order', route: RouteKey.CARA_ORDER },
-      { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN },
+      { label: 'Kemeja Dinas', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS },
+      { label: 'PDH & PDL', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.PDH_PDL },
+      { label: 'Wearpack', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.WEARPACK },
+      { label: 'Polo & Jaket', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.POLO_JAKET },
+      { label: 'Celana Tactical', route: RouteKey.PANTS, path: ROUTE_PATHS[RouteKey.PANTS] },
+      { label: 'Katalog', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG] },
+      { label: 'Galeri Client', route: RouteKey.CLIENT, path: ROUTE_PATHS[RouteKey.CLIENT] },
+      { label: 'Tentang Kami', route: RouteKey.ABOUT, path: ROUTE_PATHS[RouteKey.ABOUT] },
+      { label: 'Kontak', route: RouteKey.TEMUKAN_TOKO, path: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO] },
     ],
   },
   {
-    title: 'Profil Bradwear',
+    title: 'Panduan',
     items: [
-      { label: 'Tentang Kami', route: RouteKey.ABOUT },
-      { label: 'Visi & Misi', route: RouteKey.VISION_MISSION },
-      { label: 'Produk & Jasa', route: RouteKey.PRODUCTS_SERVICES },
-      { label: 'Keunggulan', route: RouteKey.COMPETITIVE_ADVANTAGE },
-      { label: 'Klien & Jangkauan', route: RouteKey.CLIENT_REACH },
+      { label: 'Panduan Ukuran', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG], catalogGuide: 'size' },
+      { label: 'Jenis Bahan', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG], catalogGuide: 'material' },
+      { label: 'Artikel', route: RouteKey.ARTIKEL, path: ROUTE_PATHS[RouteKey.ARTIKEL] },
+      { label: 'Cara Order', route: RouteKey.CARA_ORDER, path: ROUTE_PATHS[RouteKey.CARA_ORDER] },
+      { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN, path: ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN] },
     ],
   },
   {
     title: 'Bantuan & Legal',
     items: [
-      { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN },
-      { label: 'Temukan Toko', route: RouteKey.TEMUKAN_TOKO },
-      { label: 'Layanan Pelanggan', route: RouteKey.LAYANAN_PELANGGAN },
-      { label: 'Legal & Lisensi', route: RouteKey.LEGAL_LICENSE },
+      { label: 'Lacak Pesanan', route: RouteKey.LACAK_PESANAN, path: ROUTE_PATHS[RouteKey.LACAK_PESANAN] },
+      { label: 'Kebijakan Privasi', route: RouteKey.LAYANAN_PELANGGAN, path: INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI },
+      { label: 'Syarat & Ketentuan', route: RouteKey.LAYANAN_PELANGGAN, path: INFO_ROUTE_PATHS.SYARAT_KETENTUAN },
+      { label: 'Studio 3D', route: RouteKey.THREE_D, path: ROUTE_PATHS[RouteKey.THREE_D] },
     ],
   },
 ];
@@ -118,35 +118,55 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
     window.setTimeout(scrollToSection, 180);
   };
 
-  const handleHeaderNavigation = (route: RouteKey, homeSection?: string, catalogGuide?: 'size' | 'material') => {
+  const handleHeaderNavigation = (route: RouteKey, path?: string, homeSection?: string, catalogGuide?: 'size' | 'material') => {
     mobileMenuRef.current?.removeAttribute('open');
     if (catalogGuide && onOpenCatalogGuide) {
       onOpenCatalogGuide(catalogGuide);
       return;
     }
+    if (path) {
+      onNavigate(route, { path });
+      return;
+    }
     navigateToHomeSection(route, homeSection);
+  };
+
+  const handleAnchorNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    route: RouteKey,
+    path?: string,
+    homeSection?: string,
+    catalogGuide?: 'size' | 'material',
+  ) => {
+    event.preventDefault();
+    handleHeaderNavigation(route, path, homeSection, catalogGuide);
   };
 
   return (
     <header className="site-header site-header-dark">
       <div className="site-nav site-nav-single">
-        <button type="button" className="brand-mark brand-mark-single" onClick={() => handleHeaderNavigation(RouteKey.HOME, 'hero')} aria-label="Bradwear home">
+        <a
+          href={ROUTE_PATHS[RouteKey.HOME]}
+          className="brand-mark brand-mark-single"
+          onClick={(event) => handleAnchorNavigation(event, RouteKey.HOME, ROUTE_PATHS[RouteKey.HOME], 'hero')}
+          aria-label="Bradwear home"
+        >
           <span className="brand-mark-shell">
             <img src={ASSETS.BRAND.LOGO} alt="Bradwear" className="h-10 w-auto object-contain" />
           </span>
-        </button>
+        </a>
 
-        <nav aria-label="Menu marketplace" className="market-nav market-nav-desktop">
+        <nav aria-label="Navigasi utama" className="market-nav market-nav-desktop">
           <ul className="no-scrollbar header-nav-list">
             {HEADER_NAV_ITEMS.map((item) => (
-              <li key={item.route}>
-                <button
-                  type="button"
-                  onClick={() => handleHeaderNavigation(item.route, item.homeSection, item.catalogGuide)}
+              <li key={`${item.route}-${item.path ?? item.label}`}>
+                <a
+                  href={item.path ?? ROUTE_PATHS[item.route]}
+                  onClick={(event) => handleAnchorNavigation(event, item.route, item.path, item.homeSection, item.catalogGuide)}
                   className={`market-link header-nav-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
                 >
                   {item.label}
-                </button>
+                </a>
               </li>
             ))}
           </ul>
@@ -162,13 +182,13 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                   <ul className="mobile-main-menu-list">
                     {section.items.map((item) => (
                       <li key={`${item.label}-${item.route}-${item.homeSection ?? 'route'}`}>
-                        <button
-                          type="button"
-                          onClick={() => handleHeaderNavigation(item.route, item.homeSection, item.catalogGuide)}
+                        <a
+                          href={item.path ?? ROUTE_PATHS[item.route]}
+                          onClick={(event) => handleAnchorNavigation(event, item.route, item.path, item.homeSection, item.catalogGuide)}
                           className={`mobile-main-menu-link ${isActiveNavItem(item.route, item.homeSection) ? 'is-active' : ''}`}
                         >
                           {item.label}
-                        </button>
+                        </a>
                       </li>
                     ))}
                   </ul>

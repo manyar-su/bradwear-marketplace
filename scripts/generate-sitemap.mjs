@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const siteUrl = 'https://www.bradwearindonesia.com';
+const siteUrl = 'https://bradwearindonesia.com';
 const today = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 const escapeXml = (value) =>
@@ -32,12 +32,21 @@ const urls = new Map();
 
 [
   ['/', '1.00', 'weekly'],
-  ['/3d', '0.80', 'weekly'],
+  ['/kemeja-dinas', '0.92', 'weekly'],
+  ['/pdh-pdl', '0.92', 'weekly'],
+  ['/wearpack', '0.92', 'weekly'],
+  ['/polo-jaket', '0.92', 'weekly'],
+  ['/celana-tactical', '0.92', 'weekly'],
   ['/katalog', '0.95', 'weekly'],
-  ['/pants', '0.82', 'weekly'],
-  ['/client', '0.84', 'weekly'],
+  ['/galeri-client', '0.88', 'weekly'],
+  ['/tentang-kami', '0.82', 'monthly'],
+  ['/faq', '0.78', 'weekly'],
+  ['/kontak', '0.80', 'weekly'],
+  ['/kebijakan-privasi', '0.60', 'monthly'],
+  ['/syarat-ketentuan', '0.60', 'monthly'],
+  ['/3d', '0.80', 'weekly'],
+  ['/galeri-client', '0.84', 'weekly'],
   ['/testimoni', '0.84', 'weekly'],
-  ['/tentang-kami', '0.78', 'monthly'],
   ['/visi-misi', '0.72', 'monthly'],
   ['/produk-dan-jasa', '0.80', 'weekly'],
   ['/keunggulan', '0.74', 'monthly'],
@@ -46,9 +55,7 @@ const urls = new Map();
   ['/download', '0.72', 'weekly'],
   ['/artikel', '0.88', 'weekly'],
   ['/cara-order', '0.85', 'weekly'],
-  ['/layanan-pelanggan', '0.76', 'weekly'],
   ['/lacak-pesanan', '0.72', 'weekly'],
-  ['/temukan-toko', '0.68', 'monthly'],
   ['/brad-ai', '0.52', 'weekly'],
   ['/katalog/panduan-ukuran', '0.82', 'monthly'],
   ['/katalog/panduan-jenis-bahan', '0.82', 'monthly'],

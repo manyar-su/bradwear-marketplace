@@ -1,7 +1,9 @@
 import {
   ARTICLES,
   BRAD_AI_CONTEXT,
+  CATEGORY_ROUTE_PATHS,
   CATALOG_GUIDE_PATHS,
+  INFO_ROUTE_PATHS,
   HOW_TO_ORDER_STEPS,
   ROUTE_LABELS,
   ROUTE_PATHS,
@@ -174,7 +176,108 @@ const buildCatalogSubpageMeta = (pathname: string, products: Product[]): SeoMeta
   };
 };
 
+const buildStaticLandingMeta = (pathname: string): SeoMeta | null => {
+  const normalized = normalizePathname(pathname.toLowerCase());
+
+  const pageMap: Record<string, SeoMeta> = {
+    [CATEGORY_ROUTE_PATHS.KEMEJA_DINAS]: {
+      title: 'Kemeja Dinas Custom Profesional | Bradwear Indonesia',
+      description: 'Pesan kemeja dinas custom dengan pilihan bahan, warna, bordir, dan desain sesuai kebutuhan perusahaan atau instansi bersama Bradwear Indonesia.',
+      path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS,
+      keywords: dedupeKeywords(['kemeja dinas custom', 'kemeja dinas profesional', 'bordir logo kemeja dinas', 'seragam kerja kantor', SITE_NAME]),
+      schema: [],
+    },
+    [CATEGORY_ROUTE_PATHS.PDH_PDL]: {
+      title: 'Jasa Pembuatan PDH dan PDL Custom | Bradwear Indonesia',
+      description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH dan PDL custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi.',
+      path: CATEGORY_ROUTE_PATHS.PDH_PDL,
+      keywords: dedupeKeywords(['pdh custom', 'pdl custom', 'seragam lapangan', 'pdh pdl instansi', SITE_NAME]),
+      schema: [],
+    },
+    [CATEGORY_ROUTE_PATHS.WEARPACK]: {
+      title: 'Wearpack Custom Perusahaan dan Industri | Bradwear Indonesia',
+      description: 'Pesan wearpack custom untuk kebutuhan perusahaan, industri, mekanik, teknisi, dan lapangan dengan desain profesional dari Bradwear Indonesia.',
+      path: CATEGORY_ROUTE_PATHS.WEARPACK,
+      keywords: dedupeKeywords(['wearpack custom', 'wearpack perusahaan', 'seragam teknisi', 'wearpack industri', SITE_NAME]),
+      schema: [],
+    },
+    [CATEGORY_ROUTE_PATHS.POLO_JAKET]: {
+      title: 'Polo dan Jaket Custom Bordir | Bradwear Indonesia',
+      description: 'Pembuatan polo shirt dan jaket custom dengan pilihan bordir, sablon, warna, dan bahan untuk perusahaan, komunitas, dan organisasi.',
+      path: CATEGORY_ROUTE_PATHS.POLO_JAKET,
+      keywords: dedupeKeywords(['polo custom', 'jaket custom', 'polo bordir', 'jaket bordir komunitas', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.PANTS]]: {
+      title: 'Celana Tactical Custom Profesional | Bradwear Indonesia',
+      description: 'Temukan celana tactical custom untuk kebutuhan kerja, lapangan, komunitas, dan instansi dengan material berkualitas dari Bradwear Indonesia.',
+      path: ROUTE_PATHS[RouteKey.PANTS],
+      keywords: dedupeKeywords(['celana tactical custom', 'celana kerja lapangan', 'celana operasional instansi', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.HOME]]: {
+      title: 'Bradwear Indonesia | Jasa Pembuatan Seragam Custom',
+      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, PDL, wearpack, polo, jaket, dan celana tactical custom untuk perusahaan, instansi, komunitas, dan UMKM.',
+      path: ROUTE_PATHS[RouteKey.HOME],
+      keywords: dedupeKeywords(['seragam custom', 'kemeja dinas', 'pdh pdl', 'wearpack', 'polo custom', 'jaket custom', 'celana tactical', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.CLIENT]]: {
+      title: 'Galeri Client Bradwear Indonesia | Dokumentasi Seragam Custom',
+      description: 'Lihat dokumentasi hasil produksi dan galeri client Bradwear Indonesia untuk kebutuhan instansi, perusahaan, komunitas, dan operasional lapangan.',
+      path: ROUTE_PATHS[RouteKey.CLIENT],
+      keywords: dedupeKeywords(['galeri client bradwear', 'portofolio seragam custom', 'dokumentasi produksi seragam', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.ABOUT]]: {
+      title: 'Tentang Kami | Bradwear Indonesia',
+      description: 'Pelajari profil Bradwear Indonesia sebagai brand konveksi seragam custom untuk perusahaan, instansi, komunitas, dan UMKM.',
+      path: ROUTE_PATHS[RouteKey.ABOUT],
+      keywords: dedupeKeywords(['tentang bradwear indonesia', 'profil bradwear', 'konveksi seragam tasikmalaya', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN]]: {
+      title: 'FAQ Bradwear Indonesia | Pertanyaan Umum Seragam Custom',
+      description: 'Temukan pertanyaan umum seputar desain custom, bordir logo, proses produksi, jumlah pemesanan, dan pengiriman Bradwear Indonesia.',
+      path: ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN],
+      keywords: dedupeKeywords(['faq bradwear', 'pertanyaan umum seragam custom', 'faq kemeja dinas', SITE_NAME]),
+      schema: [],
+    },
+    [ROUTE_PATHS[RouteKey.TEMUKAN_TOKO]]: {
+      title: 'Kontak dan Konsultasi | Bradwear Indonesia',
+      description: 'Hubungi Bradwear Indonesia untuk konsultasi model, bahan, bordir, estimasi produksi, dan pengiriman seragam custom.',
+      path: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO],
+      keywords: dedupeKeywords(['kontak bradwear indonesia', 'konsultasi seragam custom', 'whatsapp bradwear', SITE_NAME]),
+      schema: [],
+    },
+    [INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI]: {
+      title: 'Kebijakan Privasi | Bradwear Indonesia',
+      description: 'Pelajari kebijakan privasi Bradwear Indonesia terkait penggunaan data konsultasi, file desain, dan informasi pemesanan.',
+      path: INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI,
+      keywords: dedupeKeywords(['kebijakan privasi bradwear', 'privacy policy bradwear indonesia', SITE_NAME]),
+      schema: [],
+    },
+    [INFO_ROUTE_PATHS.SYARAT_KETENTUAN]: {
+      title: 'Syarat dan Ketentuan | Bradwear Indonesia',
+      description: 'Baca syarat dan ketentuan Bradwear Indonesia terkait approval order, hasil produksi, pembatalan, dan penyesuaian visual produk custom.',
+      path: INFO_ROUTE_PATHS.SYARAT_KETENTUAN,
+      keywords: dedupeKeywords(['syarat ketentuan bradwear', 'terms and conditions bradwear indonesia', SITE_NAME]),
+      schema: [],
+    },
+  };
+
+  return pageMap[normalized] ?? null;
+};
+
 const resolveSeoMeta = (route: RouteKey, pathname: string, products: Product[]) => {
+  const staticLandingMeta = buildStaticLandingMeta(pathname);
+  if (staticLandingMeta) {
+    return {
+      article: null,
+      meta: staticLandingMeta,
+    };
+  }
+
   const article = getArticleBySlug(getArticleSlugFromPathname(pathname));
   if (route === RouteKey.ARTIKEL && article) {
     return {
@@ -265,12 +368,70 @@ const buildRouteKeywords = (
 };
 
 const buildBreadcrumbItems = (route: RouteKey, canonical: string, article: Article | null) => {
+  const normalized = normalizePathname(canonical.replace(SITE_URL, '').toLowerCase());
+
+  const staticBreadcrumbMap: Record<string, Array<{ '@type': 'ListItem'; position: number; name: string; item: string }>> = {
+    [CATEGORY_ROUTE_PATHS.KEMEJA_DINAS]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produk', item: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}` },
+      { '@type': 'ListItem', position: 3, name: 'Kemeja Dinas', item: canonical },
+    ],
+    [CATEGORY_ROUTE_PATHS.PDH_PDL]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produk', item: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}` },
+      { '@type': 'ListItem', position: 3, name: 'PDH & PDL', item: canonical },
+    ],
+    [CATEGORY_ROUTE_PATHS.WEARPACK]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produk', item: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}` },
+      { '@type': 'ListItem', position: 3, name: 'Wearpack', item: canonical },
+    ],
+    [CATEGORY_ROUTE_PATHS.POLO_JAKET]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produk', item: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}` },
+      { '@type': 'ListItem', position: 3, name: 'Polo & Jaket', item: canonical },
+    ],
+    [ROUTE_PATHS[RouteKey.PANTS]]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produk', item: `${SITE_URL}${ROUTE_PATHS[RouteKey.KATALOG]}` },
+      { '@type': 'ListItem', position: 3, name: 'Celana Tactical', item: canonical },
+    ],
+    [ROUTE_PATHS[RouteKey.CLIENT]]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Galeri Client', item: canonical },
+    ],
+    [ROUTE_PATHS[RouteKey.ABOUT]]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Tentang Kami', item: canonical },
+    ],
+    [ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN]]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'FAQ', item: canonical },
+    ],
+    [ROUTE_PATHS[RouteKey.TEMUKAN_TOKO]]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Kontak', item: canonical },
+    ],
+    [INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Kebijakan Privasi', item: canonical },
+    ],
+    [INFO_ROUTE_PATHS.SYARAT_KETENTUAN]: [
+      { '@type': 'ListItem', position: 1, name: 'Beranda', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Syarat dan Ketentuan', item: canonical },
+    ],
+  };
+
+  if (staticBreadcrumbMap[normalized]) {
+    return staticBreadcrumbMap[normalized];
+  }
+
   if (route === RouteKey.HOME) {
     return [
       {
         '@type': 'ListItem',
         position: 1,
-        name: 'Home',
+        name: 'Beranda',
         item: SITE_URL,
       },
     ];
@@ -281,13 +442,13 @@ const buildBreadcrumbItems = (route: RouteKey, canonical: string, article: Artic
       {
         '@type': 'ListItem',
         position: 1,
-        name: 'Home',
+        name: 'Beranda',
         item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Beranda / Artikel',
+        name: 'Artikel',
         item: `${SITE_URL}${ROUTE_PATHS[RouteKey.ARTIKEL]}`,
       },
       {
@@ -303,13 +464,13 @@ const buildBreadcrumbItems = (route: RouteKey, canonical: string, article: Artic
     {
       '@type': 'ListItem',
       position: 1,
-      name: 'Home',
+      name: 'Beranda',
       item: SITE_URL,
     },
     {
       '@type': 'ListItem',
       position: 2,
-      name: ROUTE_LABELS[route],
+      name: ROUTE_LABELS[route].replace('Beranda / ', ''),
       item: canonical,
     },
   ];
@@ -845,9 +1006,10 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
   upsertLinkTag('link[rel="alternate"][hreflang="id-ID"]', { rel: 'alternate', hreflang: 'id-ID', href: canonical });
   upsertLinkTag('link[rel="alternate"][hreflang="x-default"]', { rel: 'alternate', hreflang: 'x-default', href: canonical });
   upsertLinkTag('link[rel="sitemap"][type="application/xml"]', { rel: 'sitemap', type: 'application/xml', href: '/sitemap.xml' });
-  upsertLinkTag('link[rel="icon"]', { rel: 'icon', type: 'image/png', href: '/favicon-bradwear.png' });
-  upsertLinkTag('link[rel="shortcut icon"]', { rel: 'shortcut icon', href: '/favicon-bradwear.png' });
-  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/favicon-bradwear.png' });
+  upsertLinkTag('link[rel="icon"][sizes="any"]', { rel: 'icon', href: '/favicon.ico', sizes: 'any' });
+  upsertLinkTag('link[rel="icon"][sizes="48x48"]', { rel: 'icon', type: 'image/png', href: '/favicon-48x48.png', sizes: '48x48' });
+  upsertLinkTag('link[rel="shortcut icon"]', { rel: 'shortcut icon', href: '/favicon-48x48.png' });
+  upsertLinkTag('link[rel="apple-touch-icon"]', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' });
 
   if (article) {
     upsertMetaTag('meta[name="publish_date"]', { name: 'publish_date', content: articlePublishedAt });

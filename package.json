@@ -1,14 +1,15 @@
 {
   "name": "bradermock-ui-ux-design",
   "private": false,
-  "version": "1.18.0",
+  "version": "1.18.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "npm run sitemap && npm run bump && npx vite build",
     "preview": "vite preview",
     "bump": "node scripts/bump-version.js",
-    "sitemap": "node scripts/generate-sitemap.mjs"
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

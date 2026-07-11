@@ -141,6 +141,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, [products, productionOrders, currentRoute, currentPathname, preferredCatalogCategory, designData, orderItems, selectedProduct, orderCode]);
 
   useEffect(() => {
+    const canonicalPath = normalizePathname(window.location.pathname);
+    if (window.location.pathname !== canonicalPath) {
+      window.history.replaceState(null, '', canonicalPath);
+    }
+
     const handlePopState = () => {
       const nextPath = normalizePathname(window.location.pathname);
       const nextRoute = pathToRoute(nextPath);

@@ -18,11 +18,13 @@ import { CLIENT_LOGOS } from '../constants';
 import {
   ARTICLES,
   buildCatalogProductSlug,
+  CATEGORY_ROUTE_PATHS,
   CONTACT_CHANNELS,
   COURIER_PROVIDERS,
   CATALOG_GUIDE_PATHS,
   CUSTOMER_SERVICE_HOURS,
   HOW_TO_ORDER_STEPS,
+  INFO_ROUTE_PATHS,
   ROUTE_PATHS,
   SITE_FAQS,
   GOOGLE_PLAY_URL,
@@ -41,7 +43,7 @@ import {
   buildWhatsAppUrl,
   getTrackingProviderById,
 } from '../lib/siteConfig';
-import { CompletedOrder, CourierProvider, Product, RouteKey } from '../types';
+import { Category, CompletedOrder, CourierProvider, Product, RouteKey } from '../types';
 import BradAiChat from './BradAiChat';
 import SiteFooter from './SiteFooter';
 import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
@@ -288,6 +290,22 @@ type SupportDirectorySection = {
   items: SupportDirectoryItem[];
 };
 
+type CategoryLandingConfig = {
+  path: string;
+  title: string;
+  breadcrumbLabel: string;
+  description: string;
+  consultationTopic: string;
+  heroImage: string;
+  heroImageAlt: string;
+  categoryFilter: Category[];
+  materials: string[];
+  colors: string[];
+  decoration: string[];
+  relatedLinks: Array<{ href: string; label: string }>;
+  faq: Array<{ question: string; answer: string }>;
+};
+
 type BrandProfileVisualItem = {
   route: RouteKey;
   kicker: string;
@@ -419,6 +437,124 @@ const SUPPORT_DIRECTORY_SECTIONS: SupportDirectorySection[] = [
         question: 'Apakah Bradwear melayani luar kota?',
         answer: `${CONTACT_CHANNELS[1]?.value ?? 'Seluruh Indonesia'}. Titik workshop utama berada di ${CONTACT_CHANNELS[2]?.value ?? 'Tasikmalaya, Jawa Barat'} untuk pengembangan sampel dan kontrol kualitas.`,
       },
+    ],
+  },
+];
+
+const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
+  {
+    path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS,
+    title: 'Kemeja Dinas Custom Profesional',
+    breadcrumbLabel: 'Kemeja Dinas',
+    description: 'Bradwear Indonesia melayani pembuatan kemeja dinas custom untuk perusahaan, instansi, komunitas, organisasi, sekolah, dan UMKM. Konsumen dapat memilih bahan, warna, desain, bordir, serta detail produk sesuai kebutuhan.',
+    consultationTopic: 'kemeja dinas custom',
+    heroImage: heroTopImage,
+    heroImageAlt: 'Kemeja dinas custom Bradwear Indonesia',
+    categoryFilter: ['Kemeja'],
+    materials: ['American Drill untuk struktur rapi dan kuat', 'Tropical untuk pemakaian harian yang ringan', 'Ripstop untuk kebutuhan lapangan yang lebih tangguh'],
+    colors: ['Pilihan warna formal seperti navy, hitam, khaki, putih, dan abu', 'Penyesuaian kombinasi warna utama dan aksen sesuai identitas instansi'],
+    decoration: ['Bordir logo instansi di dada atau lengan', 'Sablon atau identitas nama personel sesuai kebutuhan tim'],
+    relatedLinks: [
+      { href: CATEGORY_ROUTE_PATHS.PDH_PDL, label: 'Lihat kategori PDH & PDL custom' },
+      { href: CATEGORY_ROUTE_PATHS.WEARPACK, label: 'Lihat koleksi wearpack custom' },
+      { href: ROUTE_PATHS[RouteKey.CLIENT], label: 'Lihat galeri client Bradwear' },
+    ],
+    faq: [
+      { question: 'Apakah desain kemeja dinas bisa dibuat custom?', answer: 'Bisa. Model, kombinasi warna, penempatan saku, bordir, dan identitas personel dapat disesuaikan mengikuti brief tim Anda.' },
+      { question: 'Apakah tersedia layanan bordir logo?', answer: 'Ya. Bradwear melayani bordir logo instansi, nama divisi, dan identitas personel sesuai kebutuhan produksi.' },
+      { question: 'Berapa lama proses produksi kemeja dinas?', answer: 'Estimasi normal berada di kisaran 14 sampai 21 hari kerja, mengikuti jumlah order, bahan, dan kompleksitas detail yang disetujui.' },
+    ],
+  },
+  {
+    path: CATEGORY_ROUTE_PATHS.PDH_PDL,
+    title: 'PDH dan PDL Custom untuk Kebutuhan Kantor dan Lapangan',
+    breadcrumbLabel: 'PDH & PDL',
+    description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH dan PDL custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi. Fokus utamanya adalah tampilan rapi untuk briefing, operasional, dan aktivitas lapangan.',
+    consultationTopic: 'pdh dan pdl custom',
+    heroImage: portfolioHeroImage,
+    heroImageAlt: 'PDH dan PDL custom Bradwear Indonesia',
+    categoryFilter: ['Kemeja'],
+    materials: ['American Drill dan Nagata Drill untuk karakter tegas', 'Ripstop untuk mobilitas lapangan', 'Twill untuk opsi yang tetap rapi saat dipakai harian'],
+    colors: ['Warna solid untuk kebutuhan dinas dan operasional', 'Kombinasi dua warna agar identitas unit lebih mudah dibedakan'],
+    decoration: ['Bordir logo instansi dan nama personel', 'Velcro, patch, atau identitas tambahan mengikuti brief lapangan'],
+    relatedLinks: [
+      { href: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS, label: 'Lihat kemeja dinas custom profesional' },
+      { href: ROUTE_PATHS[RouteKey.PANTS], label: 'Lihat celana tactical custom' },
+      { href: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO], label: 'Hubungi Bradwear untuk konsultasi PDH & PDL' },
+    ],
+    faq: [
+      { question: 'Apakah Bradwear bisa menangani PDH dan PDL dalam satu brief?', answer: 'Bisa. Tim dapat membantu merapikan arah model indoor dan lapangan agar identitas visual tetap konsisten.' },
+      { question: 'Apakah detail saku dan flap bisa diatur?', answer: 'Bisa. Penyesuaian saku, flap, patch, dan elemen lapangan dibahas saat approval model.' },
+      { question: 'Apakah bisa kirim ke seluruh Indonesia?', answer: 'Ya. Bradwear melayani pengiriman order ke berbagai kota di Indonesia setelah produksi selesai.' },
+    ],
+  },
+  {
+    path: CATEGORY_ROUTE_PATHS.WEARPACK,
+    title: 'Wearpack Custom untuk Industri, Lapangan, dan Tim Teknis',
+    breadcrumbLabel: 'Wearpack',
+    description: 'Pesan wearpack custom untuk kebutuhan perusahaan, industri, mekanik, teknisi, dan lapangan dengan desain profesional dari Bradwear Indonesia. Halaman ini difokuskan untuk kebutuhan seragam kerja yang menuntut ketahanan dan identitas visual yang jelas.',
+    consultationTopic: 'wearpack custom',
+    heroImage: homeCustomVestbupatiImage,
+    heroImageAlt: 'Wearpack custom Bradwear Indonesia',
+    categoryFilter: ['Rompi', 'Kemeja'],
+    materials: ['Ripstop untuk aktivitas lapangan yang intens', 'American Drill untuk struktur yang lebih kokoh', 'Drill tactical untuk kebutuhan kerja semi outdoor'],
+    colors: ['Warna gelap untuk penggunaan operasional', 'Aksen kontras agar identitas tim lebih mudah terlihat'],
+    decoration: ['Bordir logo perusahaan dan nama teknisi', 'Penempatan reflektif atau aksen keselamatan mengikuti kebutuhan brief'],
+    relatedLinks: [
+      { href: CATEGORY_ROUTE_PATHS.PDH_PDL, label: 'Lihat opsi PDH & PDL custom' },
+      { href: ROUTE_PATHS[RouteKey.PANTS], label: 'Lihat celana tactical untuk tim lapangan' },
+      { href: ROUTE_PATHS[RouteKey.CLIENT], label: 'Lihat galeri hasil produksi client' },
+    ],
+    faq: [
+      { question: 'Apakah wearpack bisa dibuat sesuai kebutuhan divisi teknis?', answer: 'Bisa. Penyesuaian model, saku, aksen, dan identitas tim dibahas sesuai konteks kerja lapangan atau industri.' },
+      { question: 'Apakah Bradwear membantu arah bahan?', answer: 'Ya. Tim dapat membantu memberi arahan bahan berdasarkan kebutuhan kenyamanan, kekuatan, dan tampilan akhir.' },
+      { question: 'Apakah logo perusahaan bisa dibordir?', answer: 'Bisa. Logo, nama tim, dan identitas unit dapat diterapkan melalui bordir atau metode visual lain yang relevan.' },
+    ],
+  },
+  {
+    path: CATEGORY_ROUTE_PATHS.POLO_JAKET,
+    title: 'Polo dan Jaket Custom Bordir untuk Brand, Komunitas, dan Tim',
+    breadcrumbLabel: 'Polo & Jaket',
+    description: 'Pembuatan polo shirt dan jaket custom dengan pilihan bordir, sablon, warna, dan bahan untuk perusahaan, komunitas, dan organisasi. Halaman ini menggabungkan dua kebutuhan yang paling sering dipakai untuk aktivitas semi formal dan casual branding.',
+    consultationTopic: 'polo dan jaket custom',
+    heroImage: homeClientPertaminaImage,
+    heroImageAlt: 'Polo dan jaket custom Bradwear Indonesia',
+    categoryFilter: ['Polo', 'Jaket'],
+    materials: ['Lacoste premium untuk polo shirt', 'Bahan jaket yang menjaga bentuk dan kenyamanan pemakaian', 'Pilihan bahan mengikuti fungsi indoor, event, atau operasional luar ruang'],
+    colors: ['Kombinasi warna sesuai brand atau komunitas', 'Warna dasar clean untuk bordir logo yang lebih menonjol'],
+    decoration: ['Bordir dada, lengan, atau punggung', 'Sablon identitas event atau komunitas bila dibutuhkan'],
+    relatedLinks: [
+      { href: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS, label: 'Lihat kategori kemeja dinas custom' },
+      { href: CATEGORY_ROUTE_PATHS.WEARPACK, label: 'Lihat opsi wearpack custom' },
+      { href: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO], label: 'Konsultasi polo dan jaket dengan Bradwear' },
+    ],
+    faq: [
+      { question: 'Apakah polo dan jaket bisa dikerjakan dalam satu konsep visual?', answer: 'Bisa. Bradwear dapat membantu menyamakan arah warna, identitas logo, dan detail branding agar tampilan tim tetap konsisten.' },
+      { question: 'Apakah tersedia bordir logo?', answer: 'Ya. Bordir logo menjadi salah satu opsi utama untuk polo dan jaket custom.' },
+      { question: 'Apakah bisa menyesuaikan warna brand?', answer: 'Bisa. Penyesuaian warna dilakukan berdasarkan brief dan referensi yang Anda kirimkan.' },
+    ],
+  },
+  {
+    path: ROUTE_PATHS[RouteKey.PANTS],
+    title: 'Celana Tactical Custom Profesional',
+    breadcrumbLabel: 'Celana Tactical',
+    description: 'Temukan celana tactical custom untuk kebutuhan kerja, lapangan, komunitas, dan instansi dengan material berkualitas dari Bradwear Indonesia. Halaman ini dirancang untuk tim yang membutuhkan siluet kerja lebih tangguh dan rapi.',
+    consultationTopic: 'celana tactical custom',
+    heroImage: portfolioHeroImage,
+    heroImageAlt: 'Celana tactical custom Bradwear Indonesia',
+    categoryFilter: ['Celana'],
+    materials: ['Drill tactical untuk aktivitas kerja dan operasional', 'Ripstop untuk mobilitas dan ketahanan tambahan', 'Pilihan material disesuaikan dengan ritme lapangan atau kerja harian'],
+    colors: ['Pilihan hitam, navy, abu, khaki, dan army', 'Warna dapat disejajarkan dengan kemeja atau atasan tim'],
+    decoration: ['Fokus pada detail fungsi, bukan ornamen berlebih', 'Identitas tim dapat disesuaikan dengan kebutuhan seragam lengkap'],
+    relatedLinks: [
+      { href: CATEGORY_ROUTE_PATHS.PDH_PDL, label: 'Lihat PDH & PDL yang cocok dipasangkan' },
+      { href: CATEGORY_ROUTE_PATHS.WEARPACK, label: 'Lihat wearpack custom untuk aktivitas lapangan' },
+      { href: ROUTE_PATHS[RouteKey.KATALOG], label: 'Buka katalog lengkap Bradwear' },
+    ],
+    faq: [
+      { question: 'Apakah celana tactical bisa disesuaikan untuk aktivitas lapangan?', answer: 'Bisa. Bradwear menyediakan opsi model dan detail yang lebih sesuai untuk kebutuhan operasional dan aktivitas luar ruang.' },
+      { question: 'Apakah ukuran bisa disesuaikan?', answer: 'Ya. Detail ukuran dibahas sebelum produksi dan tersedia panduan ukuran untuk membantu briefing tim.' },
+      { question: 'Apakah bisa dipasangkan dengan atasan custom?', answer: 'Bisa. Halaman ini dapat dipakai bersama kategori PDH, PDL, atau wearpack agar set seragam lebih konsisten.' },
     ],
   },
 ];
@@ -1728,6 +1864,12 @@ const PublicSiteView: React.FC = () => {
   const activeArticleSlug = getArticleSlugFromPathname(currentPathname);
   const activeArticle = getArticleBySlug(activeArticleSlug);
   const activeCatalogGuide = getCatalogGuideFromPathname(currentPathname);
+  const activeCategoryLanding = CATEGORY_LANDING_CONFIGS.find((item) => item.path === currentPathname) ?? null;
+  const activeSupportDirectorySection = currentPathname === INFO_ROUTE_PATHS.KEBIJAKAN_PRIVASI
+    ? SUPPORT_DIRECTORY_SECTIONS.find((section) => section.slug === 'privacy') ?? null
+    : currentPathname === INFO_ROUTE_PATHS.SYARAT_KETENTUAN
+      ? SUPPORT_DIRECTORY_SECTIONS.find((section) => section.slug === 'terms') ?? null
+      : null;
   const visibleTestimonials = useMemo(
     () =>
       activeTestimonialFilter === 'Semua Testimoni'
@@ -3005,6 +3147,193 @@ const PublicSiteView: React.FC = () => {
     );
   };
 
+  const renderCategoryLandingPage = (config: CategoryLandingConfig) => {
+    const landingProducts = visibleProducts.filter((product) => config.categoryFilter.includes(product.category)).slice(0, 6);
+
+    return (
+      <div className="guide-story-page-shell">
+        <section className="guide-story-topbar scroll-reveal-block">
+          <nav aria-label="Breadcrumb" className="guide-story-guide-nav">
+            <a href={ROUTE_PATHS[RouteKey.HOME]} className="guide-story-guide-link">Beranda</a>
+            <a href={ROUTE_PATHS[RouteKey.KATALOG]} className="guide-story-guide-link">Produk</a>
+            <span className="guide-story-guide-link is-active">{config.breadcrumbLabel}</span>
+          </nav>
+        </section>
+
+        <section className="guide-story-hero scroll-reveal-block">
+          <article className="guide-story-copy">
+            <p className="guide-story-kicker">{config.breadcrumbLabel}</p>
+            <h1>{config.title}</h1>
+            <p className="guide-story-intro">{config.description}</p>
+            <div className="guide-story-actions">
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage(config.consultationTopic))}
+                target="_blank"
+                rel="noreferrer"
+                className="guide-story-primary"
+              >
+                Konsultasi Sekarang
+              </a>
+              <a href={ROUTE_PATHS[RouteKey.KATALOG]} className="guide-story-secondary">
+                Lihat Katalog Lengkap
+              </a>
+            </div>
+          </article>
+
+          <article className="guide-story-media elegant-parallax-block">
+            <img src={config.heroImage} alt={config.heroImageAlt} className="guide-story-image" />
+          </article>
+        </section>
+
+        <section className="guide-story-info-grid scroll-reveal-block">
+          <article className="guide-story-info-card">
+            <h2>Keunggulan Produk</h2>
+            <ul className="catalog-detail-craft-list">
+              <li>Desain custom disesuaikan dengan kebutuhan instansi, perusahaan, atau komunitas.</li>
+              <li>Pilihan bahan dan warna dibahas sejak awal agar approval lebih rapi.</li>
+              <li>Fokus pada hasil jadi yang konsisten untuk produksi tim.</li>
+            </ul>
+          </article>
+          <article className="guide-story-info-card">
+            <h2>Pilihan Bahan</h2>
+            <ul className="catalog-detail-craft-list">
+              {config.materials.map((item) => (
+                <li key={`${config.path}-material-${item}`}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="guide-story-info-card">
+            <h2>Pilihan Warna</h2>
+            <ul className="catalog-detail-craft-list">
+              {config.colors.map((item) => (
+                <li key={`${config.path}-color-${item}`}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="guide-story-info-card">
+            <h2>Opsi Bordir atau Sablon</h2>
+            <ul className="catalog-detail-craft-list">
+              {config.decoration.map((item) => (
+                <li key={`${config.path}-decoration-${item}`}>{item}</li>
+              ))}
+            </ul>
+          </article>
+        </section>
+
+        <section className="catalog-detail-content-grid scroll-reveal-block">
+          <article className="catalog-detail-copy-card">
+            <p className="catalog-detail-copy-kicker">Proses Pemesanan</p>
+            <h2>Alur kerja dirapikan sejak briefing sampai approval produksi</h2>
+            <div className="catalog-detail-feature-list">
+              {HOW_TO_ORDER_STEPS.slice(0, 4).map((step) => (
+                <article key={`${config.path}-${step.id}`} className="catalog-detail-feature-card">
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </article>
+              ))}
+            </div>
+          </article>
+
+          <article className="catalog-detail-copy-card catalog-detail-copy-card-dark">
+            <p className="catalog-detail-copy-kicker">Internal Linking</p>
+            <h2>Produk terkait</h2>
+            <div className="catalog-detail-feature-list">
+              {config.relatedLinks.map((item) => (
+                <article key={`${config.path}-${item.href}`} className="catalog-detail-feature-card">
+                  <h3>{item.label}</h3>
+                  <p>
+                    <a href={item.href} className="guide-story-guide-link is-active">
+                      {item.label}
+                    </a>
+                  </p>
+                </article>
+              ))}
+            </div>
+          </article>
+        </section>
+
+        <section className="catalog-detail-gallery-grid scroll-reveal-block">
+          {landingProducts.map((product) => (
+            <button
+              key={`${config.path}-${product.id}`}
+              type="button"
+              onClick={() => openCatalogProductDetail(product)}
+              className="catalog-detail-gallery-card elegant-parallax-block"
+            >
+              <img src={product.image} alt={`${product.name} Bradwear Indonesia`} className="catalog-detail-gallery-image" />
+            </button>
+          ))}
+        </section>
+
+        <section className="guide-story-info-grid scroll-reveal-block">
+          {config.faq.map((item) => (
+            <article key={`${config.path}-${item.question}`} className="guide-story-info-card">
+              <h2>{item.question}</h2>
+              <p>{item.answer}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="catalog-detail-bottom-cta scroll-reveal-block">
+          <div>
+            <p className="guide-story-kicker">CTA Konsultasi</p>
+            <h2>Butuh arahan bahan, warna, atau detail model sebelum order?</h2>
+            <p>Bradwear dapat membantu merapikan brief agar jalur approval dan produksi lebih jelas sejak awal.</p>
+          </div>
+          <div className="guide-story-actions">
+            <a
+              href={buildWhatsAppUrl(buildConsultationMessage(config.consultationTopic))}
+              target="_blank"
+              rel="noreferrer"
+              className="guide-story-primary"
+            >
+              Konsultasi via WhatsApp
+            </a>
+            <a href={ROUTE_PATHS[RouteKey.TEMUKAN_TOKO]} className="guide-story-secondary">
+              Buka Halaman Kontak
+            </a>
+          </div>
+        </section>
+      </div>
+    );
+  };
+
+  const renderSupportLegalPage = (section: SupportDirectorySection) => (
+    <div className="guide-story-page-shell">
+      <section className="guide-story-topbar scroll-reveal-block">
+        <nav aria-label="Breadcrumb" className="guide-story-guide-nav">
+          <a href={ROUTE_PATHS[RouteKey.HOME]} className="guide-story-guide-link">Beranda</a>
+          <span className="guide-story-guide-link is-active">{section.title}</span>
+        </nav>
+      </section>
+
+      <section className="guide-story-hero scroll-reveal-block">
+        <article className="guide-story-copy">
+          <p className="guide-story-kicker">Legal</p>
+          <h1>{section.title}</h1>
+          <p className="guide-story-intro">{section.subtitle}</p>
+          <div className="guide-story-actions">
+            <a href={ROUTE_PATHS[RouteKey.TEMUKAN_TOKO]} className="guide-story-primary">Hubungi Bradwear</a>
+            <a href={ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN]} className="guide-story-secondary">Buka FAQ</a>
+          </div>
+        </article>
+
+        <article className="guide-story-media elegant-parallax-block">
+          <img src={heroTopImage} alt={section.title} className="guide-story-image" />
+        </article>
+      </section>
+
+      <section className="guide-story-info-grid scroll-reveal-block">
+        {section.items.map((item) => (
+          <article key={`${section.slug}-${item.question}`} className="guide-story-info-card">
+            <h2>{item.question}</h2>
+            <p>{item.answer}</p>
+          </article>
+        ))}
+      </section>
+    </div>
+  );
+
   const renderCatalog = (_catalogProducts: Product[]) => {
     if (activeCatalogProduct) {
       const detail = getProductDetailContent(activeCatalogProduct);
@@ -3525,7 +3854,7 @@ const PublicSiteView: React.FC = () => {
                     <div
                       id={`kemeja-showcase-options-${id}`}
                       className="catalog-ventura-dropdown-body"
-                      style={{ ['--catalog-dropdown-open-height' as const]: mobileDropdownHeight }}
+                      style={{ ['--catalog-dropdown-open-height' as '--catalog-dropdown-open-height']: mobileDropdownHeight } as React.CSSProperties}
                     >
                       <div className="catalog-ventura-color-grid">
                         {colorOptions.map((item) => (
@@ -5155,6 +5484,9 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.THREE_D:
         return renderThreeDPage();
       case RouteKey.KATALOG:
+        if (activeCategoryLanding) {
+          return renderCategoryLandingPage(activeCategoryLanding);
+        }
         return renderCatalog(featured);
       case RouteKey.DOWNLOAD:
         return renderDownloadPage();
@@ -5171,12 +5503,18 @@ const PublicSiteView: React.FC = () => {
       case RouteKey.LEGAL_LICENSE:
         return renderLegacyBrandProfilePage();
       case RouteKey.PANTS:
+        if (activeCategoryLanding) {
+          return renderCategoryLandingPage(activeCategoryLanding);
+        }
         return renderCatalog(pantsProducts);
       case RouteKey.ARTIKEL:
         return renderArticles();
       case RouteKey.CARA_ORDER:
         return renderHowToOrder();
       case RouteKey.LAYANAN_PELANGGAN:
+        if (activeSupportDirectorySection) {
+          return renderSupportLegalPage(activeSupportDirectorySection);
+        }
         return renderCustomerService();
       case RouteKey.LACAK_PESANAN:
         return renderTracking();

@@ -1,9 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /login/
+Disallow: /checkout/
 Disallow: /api/
-Disallow: /editor
-Disallow: /summary
-Disallow: /*?*
-
-Host: bradwearindonesia.com
 Sitemap: https://bradwearindonesia.com/sitemap.xml
