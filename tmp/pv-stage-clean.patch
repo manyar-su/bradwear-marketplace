@@ -1,0 +1,141 @@
+diff --git a/components/PublicSiteView.tsx b/components/PublicSiteView.tsx
+index a56b3c1..4cd8c5d 100644
+--- a/components/PublicSiteView.tsx
++++ b/components/PublicSiteView.tsx
+@@ -41,6 +41,12 @@ import BradAiChat from './BradAiChat';
+ import SiteFooter from './SiteFooter';
+ import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
+ 
++const MAIN_HERO_SLIDES = Object.entries(
++  import.meta.glob('../assets/main hero/model/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
++)
++  .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
++  .map(([, source]) => source as string);
++
+ const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
+ type CatalogSectionFilter = 'Semua' | (typeof CATEGORIES)[number];
+ const ALL_MODELS = 'Semua Model';
+@@ -1507,6 +1513,7 @@ const PublicSiteView: React.FC = () => {
+   );
+   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
+   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
++  const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
+   const [activeClientSlide, setActiveClientSlide] = useState(0);
+   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
+   const [selectedCourier, setSelectedCourier] = useState<CourierProvider>(COURIER_PROVIDERS[0]);
+@@ -1564,6 +1571,19 @@ const PublicSiteView: React.FC = () => {
+     return () => window.clearInterval(timer);
+   }, []);
+ 
++  useEffect(() => {
++    setActiveCatalogHeroSlide(0);
++  }, [safeHeroSlides]);
++
++  useEffect(() => {
++    const slides = MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides;
++    if (currentRoute !== RouteKey.KATALOG || slides.length < 2) return;
++    const timer = window.setInterval(() => {
++      setActiveCatalogHeroSlide((prev) => (prev + 1) % slides.length);
++    }, SLIDESHOW_INTERVAL_MS);
++    return () => window.clearInterval(timer);
++  }, [currentRoute, safeHeroSlides]);
++
+ 
+   useEffect(() => {
+     if (!lightboxSlide) return;
+@@ -2947,6 +2967,27 @@ const PublicSiteView: React.FC = () => {
+ 
+     return (
+       <div className="catalog-page-shell">
++        <section className="catalog-top-hero scroll-reveal-block" aria-label="Slideshow katalog Bradwear">
++          <div className="catalog-top-hero-stage">
++            {(MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides).map((slide, index) => (
++              <div
++                key={`${slide}-${index}`}
++                className={`catalog-top-hero-slide ${index === activeCatalogHeroSlide ? 'is-active' : ''}`}
++                aria-hidden={index === activeCatalogHeroSlide ? 'false' : 'true'}
++              >
++                <img src={slide} alt="" className="catalog-top-hero-backdrop" />
++                <img
++                  src={slide}
++                  alt={`Katalog Bradwear ${index + 1}`}
++                  className="catalog-top-hero-image"
++                  loading={index === 0 ? 'eager' : 'lazy'}
++                  fetchPriority={index === 0 ? 'high' : 'auto'}
++                />
++              </div>
++            ))}
++          </div>
++        </section>
++
+         <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
+           <div className="catalog-filter-pill-row">
+             {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
+@@ -2967,6 +3008,33 @@ const PublicSiteView: React.FC = () => {
+           </div>
+         </section>
+ 
++        <section className="catalog-section-stack">
++          {visibleCatalogSections.map((section) => (
++            <article key={section.category} className="catalog-category-section scroll-reveal-block">
++              <div className="catalog-category-section-header">
++                <div>
++                  <h2 className="catalog-category-section-title">{section.category}</h2>
++                  <p className="catalog-category-section-caption">{section.products.length} model siap dikustom untuk kebutuhan tim Anda.</p>
++                </div>
++                {activeCatalogSection === 'Semua' ? (
++                  <button
++                    type="button"
++                    onClick={() => handleCatalogCategorySelect(section.category)}
++                    className="catalog-section-link"
++                  >
++                    <span>Fokus kategori</span>
++                    <ArrowRightTinyIcon />
++                  </button>
++                ) : null}
++              </div>
++
++              <div className="catalog-product-grid">
++                {section.products.map((product) => renderCatalogProductCard(product))}
++              </div>
++            </article>
++          ))}
++        </section>
++
+         <section className="catalog-guide-link-grid scroll-reveal-block">
+           <button type="button" onClick={() => openCatalogGuide('size')} className="catalog-guide-link-card">
+             <div className="catalog-guide-link-thumb">
+@@ -2997,33 +3065,6 @@ const PublicSiteView: React.FC = () => {
+           </button>
+         </section>
+ 
+-        <section className="catalog-section-stack">
+-          {visibleCatalogSections.map((section) => (
+-            <article key={section.category} className="catalog-category-section scroll-reveal-block">
+-              <div className="catalog-category-section-header">
+-                <div>
+-                  <h2 className="catalog-category-section-title">{section.category}</h2>
+-                  <p className="catalog-category-section-caption">{section.products.length} model siap dikustom untuk kebutuhan tim Anda.</p>
+-                </div>
+-                {activeCatalogSection === 'Semua' ? (
+-                  <button
+-                    type="button"
+-                    onClick={() => handleCatalogCategorySelect(section.category)}
+-                    className="catalog-section-link"
+-                  >
+-                    <span>Fokus kategori</span>
+-                    <ArrowRightTinyIcon />
+-                  </button>
+-                ) : null}
+-              </div>
+-
+-              <div className="catalog-product-grid">
+-                {section.products.map((product) => renderCatalogProductCard(product))}
+-              </div>
+-            </article>
+-          ))}
+-        </section>
+-
+         <section className="catalog-bottom-cta scroll-reveal-block">
+           <div className="catalog-bottom-cta-copy">
+             <h2>Butuh Model Custom Sesuai Kebutuhan Anda?</h2>

@@ -1,0 +1,229 @@
+diff --git a/components/PublicSiteView.tsx b/components/PublicSiteView.tsx
+--- a/components/PublicSiteView.tsx
++++ b/components/PublicSiteView.tsx
+@@
+ import BradAiChat from './BradAiChat';
+ import SiteFooter from './SiteFooter';
+ import { openCustomerServiceDialog } from '../lib/customerServiceDialog';
+ 
++const MAIN_HERO_SLIDES = Object.entries(
++  import.meta.glob('../assets/main hero/model/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' }),
++)
++  .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
++  .map(([, source]) => source as string);
++
+ const CATEGORIES = ['Kemeja', 'Celana', 'Jaket', 'Rompi', 'Polo'] as const;
+@@
+   const [activeModelFilter, setActiveModelFilter] = useState<string>(ALL_MODELS);
+   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
++  const [activeCatalogHeroSlide, setActiveCatalogHeroSlide] = useState(0);
+   const [activeClientSlide, setActiveClientSlide] = useState(0);
+   const [lightboxSlide, setLightboxSlide] = useState<LightboxSlide | null>(null);
+@@
+   useEffect(() => {
+     if (CLIENT_GALLERY_SLIDES.length < 2) return;
+     const timer = window.setInterval(() => {
+       setActiveClientSlide((prev) => (prev + 1) % CLIENT_GALLERY_SLIDES.length);
+     }, SLIDESHOW_INTERVAL_MS);
+     return () => window.clearInterval(timer);
+   }, []);
++
++  useEffect(() => {
++    setActiveCatalogHeroSlide(0);
++  }, [safeHeroSlides]);
++
++  useEffect(() => {
++    const slides = MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides;
++    if (currentRoute !== RouteKey.KATALOG || slides.length < 2) return;
++    const timer = window.setInterval(() => {
++      setActiveCatalogHeroSlide((prev) => (prev + 1) % slides.length);
++    }, SLIDESHOW_INTERVAL_MS);
++    return () => window.clearInterval(timer);
++  }, [currentRoute, safeHeroSlides]);
+ 
+ 
+   useEffect(() => {
+     if (!lightboxSlide) return;
+@@
+     return (
+       <div className="catalog-page-shell">
++        <section className="catalog-top-hero scroll-reveal-block" aria-label="Slideshow katalog Bradwear">
++          <div className="catalog-top-hero-stage">
++            {(MAIN_HERO_SLIDES.length > 0 ? MAIN_HERO_SLIDES : safeHeroSlides).map((slide, index) => (
++              <div
++                key={`${slide}-${index}`}
++                className={`catalog-top-hero-slide ${index === activeCatalogHeroSlide ? 'is-active' : ''}`}
++                aria-hidden={index === activeCatalogHeroSlide ? 'false' : 'true'}
++              >
++                <img src={slide} alt="" className="catalog-top-hero-backdrop" />
++                <img
++                  src={slide}
++                  alt={`Katalog Bradwear ${index + 1}`}
++                  className="catalog-top-hero-image"
++                  loading={index === 0 ? 'eager' : 'lazy'}
++                  fetchPriority={index === 0 ? 'high' : 'auto'}
++                />
++              </div>
++            ))}
++          </div>
++        </section>
++
+         <section ref={catalogRef} data-catalog-filter-band="true" className="catalog-filter-band scroll-reveal-block">
+           <div className="catalog-filter-pill-row">
+             {(['Semua', ...CATEGORIES] as CatalogSectionFilter[]).map((category) => {
+               const isActive = activeCatalogSection === category;
+@@
+             })}
+           </div>
+         </section>
+ 
+-        <section className="catalog-guide-link-grid scroll-reveal-block">
+-          <button type="button" onClick={() => openCatalogGuide('size')} className="catalog-guide-link-card">
+-            <div className="catalog-guide-link-thumb">
+-              <img src={ASSETS.CONTENT.SIZE_GUIDE || heroTopImage} alt="Panduan ukuran Bradwear" className="catalog-guide-link-image" />
+-            </div>
+-            <div className="catalog-guide-link-copy">
+-              <p>Panduan ukuran</p>
+-              <h2>Buka halaman size guide terpisah</h2>
+-              <span>
+-                Lihat panduan
+-                <ArrowRightTinyIcon />
+-              </span>
+-            </div>
+-          </button>
+-
+-          <button type="button" onClick={() => openCatalogGuide('material')} className="catalog-guide-link-card">
+-            <div className="catalog-guide-link-thumb">
+-              <img src={MATERIAL_GUIDE_ITEMS[0]?.image || heroTopImage} alt="Panduan bahan Bradwear" className="catalog-guide-link-image" />
+-            </div>
+-            <div className="catalog-guide-link-copy">
+-              <p>Panduan jenis bahan</p>
+-              <h2>Buka halaman bahan secara terpisah</h2>
+-              <span>
+-                Lihat panduan
+-                <ArrowRightTinyIcon />
+-              </span>
+-            </div>
+-          </button>
+-        </section>
+-
+         <section className="catalog-section-stack">
+           {visibleCatalogSections.map((section) => (
+             <article key={section.category} className="catalog-category-section scroll-reveal-block">
+               <div className="catalog-category-section-header">
+@@
+             </article>
+           ))}
+         </section>
++
++        <section className="catalog-guide-link-grid scroll-reveal-block">
++          <button type="button" onClick={() => openCatalogGuide('size')} className="catalog-guide-link-card">
++            <div className="catalog-guide-link-thumb">
++              <img src={ASSETS.CONTENT.SIZE_GUIDE || heroTopImage} alt="Panduan ukuran Bradwear" className="catalog-guide-link-image" />
++            </div>
++            <div className="catalog-guide-link-copy">
++              <p>Panduan ukuran</p>
++              <h2>Buka halaman size guide terpisah</h2>
++              <span>
++                Lihat panduan
++                <ArrowRightTinyIcon />
++              </span>
++            </div>
++          </button>
++
++          <button type="button" onClick={() => openCatalogGuide('material')} className="catalog-guide-link-card">
++            <div className="catalog-guide-link-thumb">
++              <img src={MATERIAL_GUIDE_ITEMS[0]?.image || heroTopImage} alt="Panduan bahan Bradwear" className="catalog-guide-link-image" />
++            </div>
++            <div className="catalog-guide-link-copy">
++              <p>Panduan jenis bahan</p>
++              <h2>Buka halaman bahan secara terpisah</h2>
++              <span>
++                Lihat panduan
++                <ArrowRightTinyIcon />
++              </span>
++            </div>
++          </button>
++        </section>
+ 
+         <section className="catalog-bottom-cta scroll-reveal-block">
+           <div className="catalog-bottom-cta-copy">
+             <h2>Butuh Model Custom Sesuai Kebutuhan Anda?</h2>
+diff --git a/index.css b/index.css
+--- a/index.css
++++ b/index.css
+@@
+ .catalog-page-shell {
+   display: grid;
+   gap: 2rem;
+ }
++
++.catalog-top-hero {
++  position: relative;
++  width: 100vw;
++  margin-top: calc(var(--site-header-offset) * -1);
++  margin-left: calc(50% - 50vw);
++  overflow: hidden;
++  background:
++    radial-gradient(circle at top center, rgba(117, 242, 26, 0.12), transparent 42%),
++    linear-gradient(180deg, #08111e 0%, #0c1622 100%);
++}
++
++.catalog-top-hero-stage {
++  position: relative;
++  min-height: clamp(420px, 76vw, 880px);
++}
++
++.catalog-top-hero-stage::after {
++  content: '';
++  position: absolute;
++  inset: 0;
++  background: linear-gradient(180deg, rgba(6, 12, 18, 0.2), rgba(6, 12, 18, 0.34));
++  pointer-events: none;
++}
++
++.catalog-top-hero-slide {
++  position: absolute;
++  inset: 0;
++  opacity: 0;
++  transform: scale(1.015);
++  transition:
++    opacity 1400ms var(--ease-smooth),
++    transform 1600ms var(--ease-smooth);
++}
++
++.catalog-top-hero-slide.is-active {
++  opacity: 1;
++  transform: scale(1);
++}
++
++.catalog-top-hero-backdrop,
++.catalog-top-hero-image {
++  position: absolute;
++  inset: 0;
++  width: 100%;
++  height: 100%;
++}
++
++.catalog-top-hero-backdrop {
++  inset: -24px;
++  width: calc(100% + 48px);
++  height: calc(100% + 48px);
++  object-fit: cover;
++  filter: blur(24px) brightness(0.42) saturate(0.82);
++  opacity: 0.78;
++  transform: scale(1.08);
++}
++
++.catalog-top-hero-image {
++  object-fit: contain;
++  object-position: center center;
++  padding:
++    calc(var(--site-header-offset) + 10px)
++    clamp(12px, 1.8vw, 28px)
++    clamp(12px, 1.8vw, 28px);
++}
+ 
+ .catalog-page-hero,
+ .catalog-filter-band,
+ .catalog-product-grid,

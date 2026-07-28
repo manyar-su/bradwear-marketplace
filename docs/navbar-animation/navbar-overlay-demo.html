@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navbar Overlay Motion Demo</title>
+    <link rel="stylesheet" href="./navbar-overlay-demo.css" />
+  </head>
+  <body>
+    <header class="navbar-motion" data-navbar>
+      <div class="navbar-shell">
+        <a class="navbar-brand" href="#hero" aria-label="Bradwear Motion">
+          Bradwear Motion
+        </a>
+
+        <nav class="navbar-links" aria-label="Primary navigation">
+          <a href="#koleksi">Koleksi</a>
+          <a href="#layanan">Layanan</a>
+          <a href="#material">Material</a>
+          <a href="#kontak">Kontak</a>
+        </nav>
+
+        <div class="navbar-actions">
+          <a class="navbar-cta" href="#kontak">Konsultasi</a>
+          <button
+            class="navbar-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            data-menu-toggle
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+        <a href="#koleksi">Koleksi</a>
+        <a href="#layanan">Layanan</a>
+        <a href="#material">Material</a>
+        <a href="#kontak">Kontak</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-stage" id="hero">
+        <div class="hero-backdrop"></div>
+        <div class="hero-scrim"></div>
+
+        <div class="hero-copy">
+          <p class="hero-kicker">
+            <span class="cropper"><span class="rise-up delay-1">Bahan seragam premium</span></span>
+          </p>
+          <h1 class="hero-title">
+            <span class="cropper"><span class="rise-up delay-2">Navbar overlay</span></span>
+            <span class="cropper"><span class="rise-up delay-3">dengan motion halus</span></span>
+          </h1>
+          <p class="hero-subtitle">
+            <span class="cropper"><span class="rise-up delay-4">Karakter visual mengikuti pola hero-fashion: overlay, zoom image, text reveal, dan scroll state yang bersih.</span></span>
+          </p>
+          <div class="hero-buttons fade-in delay-5">
+            <a class="button-primary" href="#koleksi">Lihat Demo</a>
+            <a class="button-secondary" href="#kontak">Minta Adaptasi</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-block" id="koleksi">
+        <div class="section-head">
+          <p class="eyebrow">Section 01</p>
+          <h2>Koleksi seragam dengan header yang tetap ringan</h2>
+        </div>
+        <div class="card-grid">
+          <article class="info-card">
+            <h3>Overlay default</h3>
+            <p>Navbar menyatu dengan hero tanpa memakan ruang visual di bagian atas.</p>
+          </article>
+          <article class="info-card">
+            <h3>Scroll solid</h3>
+            <p>Saat user turun, navbar berubah menjadi panel solid agar keterbacaan meningkat.</p>
+          </article>
+          <article class="info-card">
+            <h3>Hide and reveal</h3>
+            <p>Navbar menghilang saat scroll turun dan kembali muncul saat scroll naik.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-block alt" id="layanan">
+        <div class="section-head">
+          <p class="eyebrow">Section 02</p>
+          <h2>Interaksi yang lebih siap dipakai di produksi</h2>
+        </div>
+        <div class="copy-grid">
+          <p>
+            Link navbar memakai underline motion, tombol CTA memakai transisi kontras, dan mobile menu turun
+            dari atas tanpa terasa berat.
+          </p>
+          <p>
+            Behavior ini lebih stabil untuk website modern dibanding sekadar header transparan permanen.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-block" id="material">
+        <div class="section-head">
+          <p class="eyebrow">Section 03</p>
+          <h2>Motion yang disarankan</h2>
+        </div>
+        <div class="card-grid">
+          <article class="info-card">
+            <h3>Image zoom-fade</h3>
+            <p>Dipakai untuk membangun kesan premium sejak first paint.</p>
+          </article>
+          <article class="info-card">
+            <h3>Rise-up text</h3>
+            <p>Judul dan subjudul muncul bertahap agar tempo hero lebih hidup.</p>
+          </article>
+          <article class="info-card">
+            <h3>Reduced motion</h3>
+            <p>Semua animasi utama bisa dipadamkan otomatis untuk user yang membutuhkannya.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-block alt" id="kontak">
+        <div class="section-head">
+          <p class="eyebrow">Section 04</p>
+          <h2>Siap dipecah ke komponen React</h2>
+        </div>
+        <p class="closing-copy">
+          File ini sengaja dibuat mandiri supaya mudah diuji cepat di browser, lalu dipindahkan ke React, Next.js,
+          atau Vite tanpa mengubah konsep motion-nya.
+        </p>
+      </section>
+    </main>
+
+    <script src="./navbar-overlay-demo.js"></script>
+  </body>
+</html>

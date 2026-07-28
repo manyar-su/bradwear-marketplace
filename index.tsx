@@ -1,7 +1,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { inject } from '@vercel/analytics';
 import App from './App';
 import { StoreProvider } from './context/StoreContext';
 
@@ -10,7 +9,17 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-inject();
+const loadAnalytics = () => {
+  import('@vercel/analytics')
+    .then(({ inject }) => inject())
+    .catch(() => {});
+};
+
+if ('requestIdleCallback' in window) {
+  window.requestIdleCallback(loadAnalytics, { timeout: 3000 });
+} else {
+  window.setTimeout(loadAnalytics, 2000);
+}
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(

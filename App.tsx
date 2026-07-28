@@ -3,7 +3,6 @@ import { RouteKey } from './types';
 const PublicSiteView = React.lazy(() => import('./components/PublicSiteView'));
 const DesignEditorView = React.lazy(() => import('./components/DesignEditorView'));
 const SummaryView = React.lazy(() => import('./components/SummaryView'));
-import { preloadCriticalAssets } from './assets';
 import { useStore } from './context/StoreContext';
 import { CATALOG_GUIDE_PATHS, SITE_FAQS, buildCustomerServiceMessage, getConsultationTopicForPath } from './lib/siteConfig';
 import { applySeoMeta } from './lib/seo';
@@ -21,10 +20,6 @@ const App: React.FC = () => {
   const { currentRoute, currentPathname, setCurrentRoute, selectedProduct, products, setPreferredCatalogCategory } = useStore();
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [customerServiceRequest, setCustomerServiceRequest] = React.useState<CustomerServiceDialogDetail | null>(null);
-
-  useEffect(() => {
-    preloadCriticalAssets();
-  }, []);
 
   useEffect(() => {
     if ((currentRoute === RouteKey.EDITOR || currentRoute === RouteKey.SUMMARY) && !selectedProduct) {

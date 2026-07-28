@@ -2939,13 +2939,21 @@ const PublicSiteView: React.FC = () => {
                 className={`home-main-hero-slide ${index === activeHeroSlide ? 'is-active' : ''}`}
                 aria-hidden={index === activeHeroSlide ? 'false' : 'true'}
               >
-                <img src={slide} alt="" className="home-main-hero-backdrop" />
+                <img
+                  src={slide}
+                  alt=""
+                  className="home-main-hero-backdrop"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                  decoding="async"
+                />
                 <img
                   src={slide}
                   alt={`Hero utama Bradwear ${index + 1}`}
                   className="home-main-hero-image"
                   loading={index === 0 ? 'eager' : 'lazy'}
                   fetchPriority={index === 0 ? 'high' : 'auto'}
+                  decoding="async"
                 />
               </div>
             ))}
@@ -3791,13 +3799,21 @@ const PublicSiteView: React.FC = () => {
                 className={`catalog-top-hero-slide ${index === activeCatalogHeroSlide ? 'is-active' : ''}`}
                 aria-hidden={index === activeCatalogHeroSlide ? 'false' : 'true'}
               >
-                <img src={slide} alt="" className="catalog-top-hero-backdrop" />
+                <img
+                  src={slide}
+                  alt=""
+                  className="catalog-top-hero-backdrop"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                  decoding="async"
+                />
                 <img
                   src={slide}
                   alt={`Katalog Bradwear ${index + 1}`}
                   className="catalog-top-hero-image"
                   loading={index === 0 ? 'eager' : 'lazy'}
                   fetchPriority={index === 0 ? 'high' : 'auto'}
+                  decoding="async"
                 />
               </div>
             ))}
@@ -5400,6 +5416,9 @@ const PublicSiteView: React.FC = () => {
                           src={image}
                           alt={`${meta.title} gallery ${index + 1}`}
                           className={`hero-banner-image hero-banner-image-ambient ${index === 0 ? 'is-active' : ''}`}
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          fetchPriority={index === 0 ? 'auto' : 'low'}
+                          decoding="async"
                           style={{
                             animationDelay: `${index * 5}s`,
                             animationDuration: `${Math.max(gallerySlides.length, 1) * 5}s`,

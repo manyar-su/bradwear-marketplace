@@ -818,23 +818,3 @@ export const getAssetByName = (name: string): string => {
   return typeof result === 'string' ? result : '';
 };
 
-/**
- * Preload critical assets to improve speed
- */
-export const preloadCriticalAssets = () => {
-  const critical = [
-    LOGO_BRADWEAR,
-    HERO_BG,
-    SIZE_GUIDE,
-    // Add first few products or frequent images
-    ...Object.values(ASSETS.KEMEJA.BRAD_V3).flatMap(v => Array.isArray(v) ? v : [v as string]),
-    ...COLOR_CATALOGS['Tropical (Best Seller)'].slice(0, 5),
-    ...MIDDLE_CONTENT_SLIDES.slice(0, 2),
-  ];
-
-  critical.forEach(url => {
-    if (!url) return;
-    const img = new Image();
-    img.src = url;
-  });
-};
