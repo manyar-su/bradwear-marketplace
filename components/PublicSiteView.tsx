@@ -4109,9 +4109,36 @@ const PublicSiteView: React.FC = () => {
   const renderArticles = () => {
     if (activeArticle) {
       const relatedArticles = articleFeed.filter((article) => article.slug !== activeArticle.slug).slice(0, 3);
+      const articleJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: activeArticle.seoTitle || activeArticle.title,
+        description: activeArticle.seoDescription,
+        image: activeArticle.coverImage,
+        datePublished: activeArticle.publishedAt,
+        dateModified: activeArticle.updatedAt || activeArticle.publishedAt,
+        author: { '@type': 'Person', name: activeArticle.author },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Bradwear Indonesia',
+          logo: { '@type': 'ImageObject', url: 'https://bradwearindonesia.com/favicon-bradwear.png' },
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': `https://bradwearindonesia.com/artikel/${activeArticle.slug}`,
+        },
+        keywords: activeArticle.keywords.join(', '),
+        articleSection: activeArticle.category,
+        inLanguage: 'id-ID',
+      };
 
       return (
         <div className="article-page-shell px-6 py-8 md:px-10">
+          {/* Article structured data for Google & AI */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+          />
           <section className="article-detail-hero article-detail-hero-grid scroll-reveal-block rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm md:p-8">
             <div className="grid content-start gap-5">
               <button
@@ -4290,13 +4317,40 @@ const PublicSiteView: React.FC = () => {
 
     return (
       <div className="article-page-shell px-6 py-8 md:px-10">
+        {/* SEO hidden content block for AI and search crawlers */}
+        <div className="seo-content-block" aria-hidden="true">
+          <h1>Artikel Bradwear Indonesia — Panduan Seragam Custom, Kemeja Dinas, dan Pengadaan</h1>
+          <p>Bradwear Indonesia menerbitkan artikel panduan tentang kemeja dinas custom, PDH PDL, wearpack, seragam komunitas, dan proses pengadaan seragam instansi di Indonesia. Setiap artikel dioptimalkan untuk pencarian Google dan mesin AI generatif.</p>
+        </div>
+
         <section className="article-masthead-grid scroll-reveal-block">
-          <div className="article-masthead-copy rounded-[32px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#fff7ed,#ffffff)] p-6 shadow-sm">
+          <div className="article-masthead-copy">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
-            <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight text-[var(--text-primary)]">Halaman artikel bergaya news untuk keyword seragam, kemeja custom, dan pengadaan</h1>
+            <h1 className="article-masthead-h1 mt-3">Panduan seragam custom, kemeja dinas &amp; pengadaan untuk instansi</h1>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              Setiap artikel dibuat sebagai landing page yang bisa dibaca user, diindeks Google, dan dipahami mesin AI untuk konteks kemeja custom, seragam dinas, komunitas, serta proses order Bradwear Indonesia.
+              Setiap artikel dibuat sebagai halaman yang bisa dibaca user, diindeks Google, dan dipahami mesin AI — mencakup kemeja custom, seragam dinas, komunitas, serta proses order Bradwear Indonesia.
             </p>
+
+            {/* Category filter chips */}
+            <div className="article-filter-row mt-5">
+              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-muted)] mr-1">Topik:</span>
+              {['Semua', 'Panduan Bahan', 'Kemeja Dinas', 'Proses Order', 'Event & Komunitas', 'Pengadaan'].map((cat) => (
+                <button key={cat} type="button" className={`article-filter-chip ${cat === 'Semua' ? 'is-active' : ''}`}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Breaking ticker */}
+            <div className="article-ticker-bar mt-5">
+              <span className="article-ticker-label">Terbaru</span>
+              <div className="article-ticker-track">
+                <span className="article-ticker-text">
+                  {articleFeed.slice(0, 5).map((a) => a.title).join('  ·  ')}
+                </span>
+              </div>
+            </div>
+
             {activeArticleHeadline ? (
               <div className="article-title-highlight mt-6">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Headline bergerak</p>
@@ -4483,18 +4537,16 @@ const PublicSiteView: React.FC = () => {
           {articleMagazineFeed.map((article) => (
             <article key={article.slug} className="article-story-card article-story-card-two-column scroll-reveal-block">
               <div className="article-story-visual">
-                <img src={article.coverImage} alt={article.coverAlt} className="article-cover-image" />
+                <img src={article.coverImage} alt={article.coverAlt} className="article-cover-image" loading="lazy" decoding="async" />
               </div>
               <div className="article-story-body">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--brand-accent-strong)]">
-                    {article.category}
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{formatArticleDate(article.publishedAt)}</span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{article.readTime}</span>
+                <div className="article-meta-row">
+                  <span className="article-category-badge">{article.category}</span>
+                  <span className="article-meta-chip">{formatArticleDate(article.publishedAt)}</span>
+                  <span className="article-meta-chip">{article.readTime} baca</span>
                 </div>
                 <div className="article-title-highlight mt-4">
-                  <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
+                  <h2 className="text-xl font-black tracking-tight text-[var(--text-primary)]">{article.title}</h2>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.excerpt}</p>
                 <div className="article-story-keywords mt-4">
