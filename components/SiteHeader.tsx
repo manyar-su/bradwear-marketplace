@@ -118,7 +118,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
 }) => {
   const mobileMenuRef = React.useRef<HTMLDetailsElement | null>(null);
   const [megaMenuOpen, setMegaMenuOpen] = React.useState(false);
-  const megaMenuRef = React.useRef<HTMLDivElement | null>(null);
+  const megaMenuRef = React.useRef<HTMLLIElement | null>(null);
   const megaMenuTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCatalogRoute = currentRoute === RouteKey.KATALOG || currentRoute === RouteKey.PANTS;
 

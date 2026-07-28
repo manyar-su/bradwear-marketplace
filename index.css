@@ -252,6 +252,8 @@ a {
 /* ─── Desktop Mega Menu ───────────────────────────────────────────── */
 .header-mega-trigger-li {
   position: relative;
+  /* No overflow clipping — panel must escape */
+  overflow: visible;
 }
 
 .header-nav-mega-trigger {
@@ -516,7 +518,14 @@ a {
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-x: auto;
+  /* No overflow on desktop — mega panel must not be clipped */
+}
+
+/* Only scroll on small screens where nav wraps */
+@media (max-width: 1023px) {
+  .header-nav-list {
+    overflow-x: auto;
+  }
 }
 
 .header-nav-link {
@@ -576,10 +585,13 @@ a {
 
 .market-nav {
   min-width: 0;
+  /* overflow: visible ensures mega panel is not clipped by nav container */
+  overflow: visible;
 }
 
 .market-nav-desktop {
   min-width: 0;
+  overflow: visible;
 }
 
 .mobile-main-menu {
@@ -5349,10 +5361,14 @@ a {
   min-height: 100%;
 }
 
+.article-story-visual {
+  min-height: 200px;
+}
+
 .article-cover-image {
   width: 100%;
   height: 100%;
-  min-height: 260px;
+  min-height: 200px;
   object-fit: cover;
 }
 
@@ -5648,17 +5664,20 @@ a {
 }
 
 /* Top masthead: headline copy | featured card | headline list */
+.article-masthead-copy {
+  border-radius: 32px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(135deg, #fff8ed, #ffffff);
+  padding: clamp(20px, 3vw, 36px);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  display: grid;
+  align-content: start;
+}
+
 @media (min-width: 1024px) {
   .article-masthead-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) 300px;
     gap: 20px;
-  }
-  .article-masthead-copy {
-    border-radius: 32px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background: linear-gradient(135deg, #fff8ed, #ffffff);
-    padding: 32px 36px;
-    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
   }
 }
 
@@ -5761,13 +5780,27 @@ a {
   .article-card-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .article-story-card-two-column {
-    grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+  /* In 3-col grid, cards must be portrait (stacked), not side-by-side */
+  .article-card-grid .article-story-card-two-column {
+    grid-template-columns: minmax(0, 1fr);
   }
-  /* Feature card spans full row */
+  .article-card-grid .article-story-visual {
+    min-height: 220px;
+  }
+  /* Feature card spans full row with side-by-side layout */
   .article-story-card-feature-full {
     grid-column: 1 / -1;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
+  }
+}
+
+/* 2-col medium screens — keep side-by-side */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .article-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .article-card-grid .article-story-card-two-column {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
