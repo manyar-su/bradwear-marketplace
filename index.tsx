@@ -18,7 +18,7 @@ const loadAnalytics = () => {
 if ('requestIdleCallback' in window) {
   window.requestIdleCallback(loadAnalytics, { timeout: 3000 });
 } else {
-  window.setTimeout(loadAnalytics, 2000);
+  globalThis.setTimeout(loadAnalytics, 2000);
 }
 
 const root = ReactDOM.createRoot(rootElement);

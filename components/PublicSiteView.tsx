@@ -2022,6 +2022,22 @@ const PublicSiteView: React.FC = () => {
     setActiveModelFilter(ALL_MODELS);
   }, [currentRoute, preferredCatalogCategory]);
 
+  // Scroll to wearpack section when navigating to /wearpack path
+  useEffect(() => {
+    if (currentRoute !== RouteKey.KATALOG || currentPathname !== CATEGORY_ROUTE_PATHS.WEARPACK) return;
+    // Ensure all sections visible before scrolling
+    setActiveCatalogSection('Semua');
+    const scrollToWearpack = () => {
+      const target = document.getElementById('wearpack-showcase');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+    // Delay to allow render after section filter change
+    const timer = window.setTimeout(scrollToWearpack, 320);
+    return () => window.clearTimeout(timer);
+  }, [currentRoute, currentPathname]);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('bradwear_order_history');
@@ -3826,7 +3842,7 @@ const PublicSiteView: React.FC = () => {
           const mobileDropdownHeight = `${Math.ceil(colorOptions.length / 2) * 212 + 112}px`;
 
           return (
-            <section key={`catalog-kemeja-showcase-${id}`} className="catalog-ventura-showcase scroll-reveal-block" aria-label={`Pilihan model ${title}`}>
+            <section key={`catalog-kemeja-showcase-${id}`} id={id} className="catalog-ventura-showcase scroll-reveal-block" aria-label={`Pilihan model ${title}`}>
               <button
                 type="button"
                 onClick={openDetail}
@@ -3919,7 +3935,7 @@ const PublicSiteView: React.FC = () => {
 
         <section className="catalog-section-stack">
           {visibleCatalogSections.map((section) => (
-            <article key={section.category} className="catalog-category-section scroll-reveal-block">
+            <article key={section.category} id={`catalog-section-${section.category.toLowerCase()}`} className="catalog-category-section scroll-reveal-block">
               <div className="catalog-category-section-header">
                 <div>
                   <h2 className="catalog-category-section-title">{section.category}</h2>
@@ -4160,7 +4176,7 @@ const PublicSiteView: React.FC = () => {
               <p className="max-w-3xl text-sm leading-relaxed text-[var(--text-secondary)]">{activeArticle.seoDescription}</p>
               <div className="article-title-highlight">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Sorotan artikel</p>
-                <p className="mt-3 text-base font-semibold leading-7 text-[var(--text-primary)]">{activeArticle.highlight}</p>
+                <p className="article-detail-summary mt-3 text-base font-semibold leading-7 text-[var(--text-primary)]">{activeArticle.highlight}</p>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
                 <span className="rounded-full bg-white px-3 py-2 font-semibold">Oleh {activeArticle.author}</span>

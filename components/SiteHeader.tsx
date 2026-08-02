@@ -43,11 +43,11 @@ const MEGA_MENU_COLUMNS: MegaMenuColumn[] = [
     ],
   },
   {
-    title: 'Outerwear',
-    icon: '🧥',
+    title: 'Celana',
+    icon: '👖',
     items: [
-      { label: 'Polo & Jaket', desc: 'Polo shirt & jaket promosi event', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.POLO_JAKET },
       { label: 'Celana Tactical', desc: 'Celana operasional & lapangan', route: RouteKey.PANTS, path: ROUTE_PATHS[RouteKey.PANTS] },
+      { label: 'Polo & Jaket', desc: 'Polo shirt & jaket promosi event', route: RouteKey.KATALOG, path: CATEGORY_ROUTE_PATHS.POLO_JAKET },
     ],
   },
   {
@@ -262,7 +262,6 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
                           ))}
                           <div className="header-mega-cta-col">
                             <p className="header-mega-col-title">
-                              <span className="header-mega-col-icon">✨</span>
                               Mulai Custom
                             </p>
                             <div className="header-mega-cta-box">
