@@ -5,7 +5,7 @@ import americanDrillImage from '../assets/jenis bahan/AMERICAN DRILL.webp';
 import homeIntroTopImage from '../assets/Hero/atas.webp';
 import celanaSizeChartImage from '../assets/Size Chart/celana.png';
 import kemejaSizeChartImage from '../assets/Size Chart/kemeja.png';
-import homeCustomVestbupatiImage from '../assets/main hero/model/vestbupati.png';
+import homeCustomVestbupatiImage from '../assets/main hero/model/vestbupati.webp';
 import howToOrderDetailImageA from '../assets/cara order/1.webp.png';
 import howToOrderDetailImageB from '../assets/cara order/22.webp';
 import howToOrderHeroImage from '../assets/cara order/hero cara orderr.webp';
@@ -2988,6 +2988,7 @@ const PublicSiteView: React.FC = () => {
               alt="Klien Pertamina menggunakan seragam profesional Bradwear"
               className="home-client-proof-image"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </section>
@@ -4016,6 +4017,8 @@ const PublicSiteView: React.FC = () => {
             src={bottomFastRespondImage}
             alt="Fast respon customer service Bradwear"
             className="catalog-full-bleed-image"
+            loading="lazy"
+            decoding="async"
           />
         </section>
       </div>
@@ -4031,7 +4034,13 @@ const PublicSiteView: React.FC = () => {
         </div>
 
         <div className="testimonial-page-hero-image-shell elegant-parallax-block">
-          <img src={homeClientPertaminaImage} alt="Klien Pertamina bersama seragam Bradwear" className="testimonial-page-hero-image" />
+          <img
+            src={homeClientPertaminaImage}
+            alt="Klien Pertamina bersama seragam Bradwear"
+            className="testimonial-page-hero-image"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
         <div className="testimonial-stats-grid">

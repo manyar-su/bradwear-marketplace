@@ -21,12 +21,16 @@ const ProductCardImage: React.FC<{ product: { image: string; name: string; image
         src={product.image}
         alt={product.name}
         className={`product-card-image product-card-image-primary ${hasHoverImage ? 'has-hover' : ''}`}
+        loading="lazy"
+        decoding="async"
       />
       {hasHoverImage ? (
         <img
           src={hoverImage}
           alt={`${product.name} alternate view`}
           className="product-card-image product-card-image-hover"
+          loading="lazy"
+          decoding="async"
         />
       ) : null}
     </div>
@@ -52,6 +56,7 @@ const HomeView: React.FC = () => {
     }, 4200);
     return () => window.clearInterval(timer);
   }, [safeHeroSlides]);
+  const activeHeroImage = safeHeroSlides[activeHeroSlide] ?? safeHeroSlides[0];
 
   const featured = useMemo(
     () => products.filter((p) => p.category === activeCategory && !p.isHidden),
@@ -68,19 +73,20 @@ const HomeView: React.FC = () => {
       <section className="home-hero">
         <article className="hero-banner">
           <div className="hero-banner-stage">
-            {safeHeroSlides.map((slide, index) => (
-              <img
-                key={`${slide}-${index}`}
-                src={slide}
-                alt={`Bradwear banner ${index + 1}`}
-                className={`hero-banner-image ${index === activeHeroSlide ? 'is-active' : ''}`}
-              />
-            ))}
+            <img
+              key={activeHeroImage}
+              src={activeHeroImage}
+              alt={`Bradwear banner ${activeHeroSlide + 1}`}
+              className="hero-banner-image is-active"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+            />
             <div className="hero-banner-overlay" />
             <div className="hero-copy">
-              <p className="hero-kicker">Bradwear Official Studio</p>
-              <h2>Marketplace Seragam Instansi Premium</h2>
-              <p>Pilih model terbaik, kustom desain, lalu lanjutkan ringkasan order dalam satu alur web yang cepat dan responsif.</p>
+              <p className="hero-kicker">Bradwear Indonesia Official</p>
+              <h2>Pembuatan Seragam dinas tactical dan formal</h2>
+              <p>Pilih model terbaik, kustom desain, lalu lanjutkan ringkasan order.</p>
               <div className="hero-actions">
                 <button
                   type="button"
@@ -166,7 +172,7 @@ const HomeView: React.FC = () => {
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Katalog Produk</p>
-            <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">Pilih Model yang Ingin Dikustom</h3>
+            <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">Pilih Model yang Ingin Dipesan</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((category) => (
@@ -219,7 +225,7 @@ const HomeView: React.FC = () => {
               {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((client, index) => (
                 <div key={`${client.name}-${index}`} className="marquee-item">
                   <div className="partner-logo-frame">
-                    <img src={client.logo} alt={client.name} />
+                    <img src={client.logo} alt={client.name} loading="lazy" decoding="async" />
                   </div>
                   <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">{client.name}</span>
                 </div>
@@ -293,7 +299,7 @@ const HomeView: React.FC = () => {
         <div className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-soft)] p-8 text-center">
           <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-4xl">Siap Masuk Tahap Kustomisasi?</h3>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)] md:text-base">
-            Pilih model dari katalog, atur spesifikasi seragam, lalu lanjutkan proses ringkasan order langsung dari browser.
+            Pilih model dari katalog, sesuaikan desain seragam, lalu lanjutkan proses ringkasan order langsung dari browser.
           </p>
           {featured[0] && (
             <button
@@ -312,7 +318,13 @@ const HomeView: React.FC = () => {
           {TESTIMONIALS.slice(0, 5).map((testimonial) => (
             <article key={testimonial.name} className="rounded-3xl border border-[var(--border-soft)] bg-white p-5 shadow-sm">
               <div className="mb-3 flex items-center gap-3">
-                <img src={testimonial.avatar} alt={testimonial.name} className="h-10 w-10 rounded-full object-cover" />
+                <img
+                  src={testimonial.avatar}
+                  alt={testimonial.name}
+                  className="h-10 w-10 rounded-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div>
                   <p className="text-sm font-semibold text-[var(--text-primary)]">{testimonial.name}</p>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">{testimonial.agency}</p>
