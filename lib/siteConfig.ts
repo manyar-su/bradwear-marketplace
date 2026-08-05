@@ -1167,7 +1167,7 @@ export const CUSTOMER_SERVICE_CONTACTS: CustomerServiceContact[] = [
   { id: 'aris', name: 'Aris', phone: '6281295395823', avatar: arisAvatar, statusLabel: 'Online' },
   { id: 'fikri', name: 'Fikri', phone: '6287788780188', avatar: fikriAvatar, statusLabel: 'Online' },
   { id: 'risma', name: 'Risma', phone: '6282232133926', avatar: rismaAvatar, statusLabel: 'Online' },
-  { id: 'ucu', name: 'Ucu', phone: '6281462327318', avatar: ucuAvatar, statusLabel: 'Online' },
+  { id: 'ucu', name: 'Ucu', phone: '6287753516782', avatar: ucuAvatar, statusLabel: 'Online' },
   { id: 'ayang', name: 'Ayang', phone: '6285900067691', avatar: ayangAvatar, statusLabel: 'Online' },
   { id: 'gilang', name: 'Gilang', phone: '6282319226530', avatar: gilangAvatar, statusLabel: 'Online' },
   { id: 'elsha', name: 'Elsha', phone: '6285716486007', avatar: elshaAvatar, statusLabel: 'Online' },
@@ -1404,7 +1404,7 @@ export const SEO_META: Record<RouteKey, SeoMeta> = {
   [RouteKey.HOME]: makeMeta(
     RouteKey.HOME,
     'Bradwear Indonesia | Kemeja Custom, Kemeja Dinas, dan Seragam Kerja Tasikmalaya',
-    'Bradwear Indonesia melayani pembuatan kemeja custom, kemeja dinas, seragam kerja, PDH, PDL, rompi, jaket, dan bordir logo untuk instansi, perusahaan, serta komunitas. Berbasis di Tasikmalaya dengan pengiriman ke seluruh Indonesia.',
+    'Bradwear Indonesia melayani pembuatan kemeja custom, kemeja dinas, seragam kerja, PDH, rompi, jaket, dan bordir logo dengan banyak pilihan model tactical untuk instansi, perusahaan, serta komunitas. Berbasis di Tasikmalaya dengan pengiriman ke seluruh Indonesia.',
     ['seragam instansi', 'konveksi seragam tasikmalaya', 'custom seragam perusahaan', 'vendor seragam indonesia', 'seragam kerja kantor', 'kemeja custom tasikmalaya', 'kemeja dinas custom', 'seragam kerja custom', 'vendor pdh pdl']
   ),
   [RouteKey.THREE_D]: makeMeta(
