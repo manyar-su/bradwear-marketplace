@@ -195,16 +195,23 @@ export const SITE_FAQS: SiteFaqItem[] = [
   },
 ];
 
-// Folder `assets/artikel` disiapkan untuk penggantian asset lokal.
-// Selama folder itu belum diisi gambar final, artikel memakai fallback foto online gratis yang relevan.
+const articleFabricImage = new URL('../assets/jenis bahan/AMERICAN DRILL.webp', import.meta.url).href;
+const articleGarmentRackImage = new URL('../assets/galery client/pemkab/client-pemkab-hss-1.webp', import.meta.url).href;
+const articleProcurementImage = new URL('../assets/cara order/22.webp', import.meta.url).href;
+const articleProductionImage = new URL('../assets/prouksi.png', import.meta.url).href;
+const articleCustomShirtImage = new URL('../assets/main hero/custom/4.webp', import.meta.url).href;
+const articleFormalUniformImage = new URL('../assets/Model Kemeja/Executive Series/executive-depan-navi.webp', import.meta.url).href;
+const articleCommunityEventImage = new URL('../assets/galery client/medis/client-medis-1.webp', import.meta.url).href;
+
+// Cover artikel memakai asset lokal supaya LCP lebih stabil dan tidak tergantung jaringan pihak ketiga.
 const ARTICLE_IMAGE_FALLBACKS = {
-  fabric: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80',
-  garmentRack: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1600&q=80',
-  procurementDesk: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=80',
-  productionFloor: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1600&q=80',
-  customShirt: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80',
-  formalUniform: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80',
-  communityEvent: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80',
+  fabric: articleFabricImage,
+  garmentRack: articleGarmentRackImage,
+  procurementDesk: articleProcurementImage,
+  productionFloor: articleProductionImage,
+  customShirt: articleCustomShirtImage,
+  formalUniform: articleFormalUniformImage,
+  communityEvent: articleCommunityEventImage,
 } as const;
 
 // Sumber teks halaman artikel publik.

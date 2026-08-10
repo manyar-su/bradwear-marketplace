@@ -1,4 +1,4 @@
-﻿import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ASSETS, findAssetBySimilarName } from '../assets';
 import bottomFastRespondImage from '../assets/Fast Respond.png';
 import americanDrillImage from '../assets/jenis bahan/AMERICAN DRILL.webp';
@@ -53,6 +53,9 @@ const MAIN_HERO_SLIDES = Object.entries(
 )
   .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { numeric: true, sensitivity: 'base' }))
   .map(([, source]) => source as string);
+const ARTICLE_FILTER_ALL = 'Semua';
+const ARTICLE_LIST_LIMIT = 3;
+const ARTICLE_FILTER_LABELS = ['Bahan', 'Model', 'Pemesanan', 'Checklist', 'Kemeja Custom', 'Pengadaan', 'Vendor Nasional'];
 const normalizeModelAssetKey = (value: string) => value.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/g, '');
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const toTitleCase = (value: string) =>
@@ -446,7 +449,7 @@ const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
     path: CATEGORY_ROUTE_PATHS.KEMEJA_DINAS,
     title: 'Kemeja Dinas Custom Profesional',
     breadcrumbLabel: 'Kemeja Dinas',
-    description: 'Bradwear Indonesia melayani pembuatan kemeja dinas custom untuk perusahaan, instansi, komunitas, organisasi, sekolah, dan UMKM. Konsumen dapat memilih bahan, warna, desain, bordir, serta detail produk sesuai kebutuhan.',
+    description: 'Bradwear Indonesia melayani pembuatan kemeja dinas custom dengan banyak pilihan model tactical untuk perusahaan, instansi, komunitas, organisasi, sekolah, dan UMKM. Konsumen dapat memilih bahan, warna, desain, bordir, serta detail produk sesuai kebutuhan.',
     consultationTopic: 'kemeja dinas custom',
     heroImage: heroTopImage,
     heroImageAlt: 'Kemeja dinas custom Bradwear Indonesia',
@@ -1853,6 +1856,7 @@ const PublicSiteView: React.FC = () => {
   const [profileProcessMotionDirection, setProfileProcessMotionDirection] = useState<'forward' | 'backward'>('forward');
   const [activeHomeCarouselSlide, setActiveHomeCarouselSlide] = useState(0);
   const [articleHighlightIndex, setArticleHighlightIndex] = useState(0);
+  const [activeArticleCategory, setActiveArticleCategory] = useState(ARTICLE_FILTER_ALL);
   const [articleCommentName, setArticleCommentName] = useState('');
   const [articleCommentBody, setArticleCommentBody] = useState('');
   const [articleCommentStatus, setArticleCommentStatus] = useState('');
@@ -1956,6 +1960,23 @@ const PublicSiteView: React.FC = () => {
     parallaxNodes.forEach((node) => node.classList.add('scroll-parallax'));
     revealNodes.forEach((node) => node.classList.remove('is-visible'));
 
+    let revealObserver: IntersectionObserver | null = null;
+    if ('IntersectionObserver' in window) {
+      revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            revealObserver?.unobserve(entry.target);
+          });
+        },
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+      );
+      revealNodes.forEach((node) => revealObserver?.observe(node));
+    } else {
+      revealNodes.forEach((node) => node.classList.add('is-visible'));
+    }
+
     let frame = 0;
     const updateParallax = () => {
       frame = 0;
@@ -1972,13 +1993,6 @@ const PublicSiteView: React.FC = () => {
           node.classList.add('is-visible');
         }
       });
-
-      revealNodes.forEach((node) => {
-        const rect = node.getBoundingClientRect();
-        if (rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.08) {
-          node.classList.add('is-visible');
-        }
-      });
     };
 
     const requestUpdate = () => {
@@ -1986,18 +2000,23 @@ const PublicSiteView: React.FC = () => {
       frame = window.requestAnimationFrame(updateParallax);
     };
 
-    updateParallax();
-    window.addEventListener('scroll', requestUpdate, { passive: true });
-    window.addEventListener('resize', requestUpdate);
-    main.addEventListener('scroll', requestUpdate, { passive: true });
+    if (parallaxNodes.length > 0) {
+      updateParallax();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+      main.addEventListener('scroll', requestUpdate, { passive: true });
+    }
 
     return () => {
       if (frame) {
         window.cancelAnimationFrame(frame);
       }
-      window.removeEventListener('scroll', requestUpdate);
-      window.removeEventListener('resize', requestUpdate);
-      main.removeEventListener('scroll', requestUpdate);
+      revealObserver?.disconnect();
+      if (parallaxNodes.length > 0) {
+        window.removeEventListener('scroll', requestUpdate);
+        window.removeEventListener('resize', requestUpdate);
+        main.removeEventListener('scroll', requestUpdate);
+      }
       parallaxNodes.forEach((node) => {
         node.classList.remove('scroll-parallax', 'is-visible');
         node.style.removeProperty('--parallax-offset');
@@ -2152,6 +2171,21 @@ const PublicSiteView: React.FC = () => {
       ),
     [],
   );
+  const articleFilterOptions = useMemo(
+    () => {
+      const availableCategories = new Set(articleFeed.map((article) => article.category));
+      return [ARTICLE_FILTER_ALL, ...ARTICLE_FILTER_LABELS.filter((category) => availableCategories.has(category))];
+    },
+    [articleFeed],
+  );
+  const filteredArticleFeed = useMemo(
+    () =>
+      activeArticleCategory === ARTICLE_FILTER_ALL
+        ? articleFeed
+        : articleFeed.filter((article) => article.category === activeArticleCategory),
+    [activeArticleCategory, articleFeed],
+  );
+  const visibleArticleFeed = useMemo(() => filteredArticleFeed.slice(0, ARTICLE_LIST_LIMIT), [filteredArticleFeed]);
   const articleSpotlight = articleFeed[0] ?? null;
   const articleLatest = articleFeed.slice(1, 4);
   const articleHeadlineItems = articleFeed.slice(0, 5);
@@ -2403,6 +2437,24 @@ const PublicSiteView: React.FC = () => {
   const navigateToArticle = (slug: string) => {
     setCurrentRoute(RouteKey.ARTIKEL, { path: getArticlePath(slug) });
   };
+
+  const renderArticleImage = (
+    article: typeof articleFeed[number],
+    className: string,
+    loading: 'eager' | 'lazy' = 'lazy',
+    width = 1200,
+    height = 800,
+  ) => (
+    <img
+      src={article.coverImage}
+      alt={article.coverAlt}
+      className={className}
+      loading={loading}
+      decoding="async"
+      width={width}
+      height={height}
+    />
+  );
 
   const openCatalogGuide = (guide: keyof typeof CATALOG_GUIDE_PATHS) => {
     setCurrentRoute(RouteKey.KATALOG, { path: CATALOG_GUIDE_PATHS[guide] });
@@ -4194,7 +4246,7 @@ const PublicSiteView: React.FC = () => {
             </div>
 
             <div className="article-cover-stage">
-              <img src={activeArticle.coverImage} alt={activeArticle.coverAlt} className="article-cover-image" />
+              {renderArticleImage(activeArticle, 'article-cover-image', 'eager')}
             </div>
           </section>
 
@@ -4269,7 +4321,7 @@ const PublicSiteView: React.FC = () => {
                       onClick={() => navigateToArticle(article.slug)}
                       className="article-related-card"
                     >
-                      <img src={article.coverImage} alt={article.coverAlt} className="article-related-thumb" />
+                      {renderArticleImage(article, 'article-related-thumb', 'lazy', 320, 220)}
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
                         <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)] underline decoration-[rgba(117,242,26,0.4)] underline-offset-4">{article.title}</p>
@@ -4338,7 +4390,7 @@ const PublicSiteView: React.FC = () => {
       );
     }
 
-    const articleMagazineFeed = articleFeed;
+    const articleMagazineFeed = visibleArticleFeed;
 
     return (
       <div className="article-page-shell px-6 py-8 md:px-10">
@@ -4348,7 +4400,7 @@ const PublicSiteView: React.FC = () => {
           <p>Bradwear Indonesia menerbitkan artikel panduan tentang kemeja dinas custom, PDH PDL, wearpack, seragam komunitas, dan proses pengadaan seragam instansi di Indonesia. Setiap artikel dioptimalkan untuk pencarian Google dan mesin AI generatif.</p>
         </div>
 
-        <section className="article-masthead-grid scroll-reveal-block">
+        <section className="article-directory-hero scroll-reveal-block">
           <div className="article-masthead-copy">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--brand-accent-strong)]">Artikel Bradwear</p>
             <h1 className="article-masthead-h1 mt-3">Panduan seragam custom, kemeja dinas &amp; pengadaan untuk instansi</h1>
@@ -4359,24 +4411,33 @@ const PublicSiteView: React.FC = () => {
             {/* Category filter chips */}
             <div className="article-filter-row mt-5">
               <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-muted)] mr-1">Topik:</span>
-              {['Semua', 'Panduan Bahan', 'Kemeja Dinas', 'Proses Order', 'Event & Komunitas', 'Pengadaan'].map((cat) => (
-                <button key={cat} type="button" className={`article-filter-chip ${cat === 'Semua' ? 'is-active' : ''}`}>
+              {articleFilterOptions.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setActiveArticleCategory(cat)}
+                  className={`article-filter-chip ${activeArticleCategory === cat ? 'is-active' : ''}`}
+                >
                   {cat}
                 </button>
               ))}
             </div>
 
+            <div className="article-count-row mt-6">
+              Menampilkan {articleMagazineFeed.length} dari {filteredArticleFeed.length} artikel
+            </div>
+
             {/* Breaking ticker */}
-            <div className="article-ticker-bar mt-5">
+            {false ? <div className="article-ticker-bar mt-5">
               <span className="article-ticker-label">Terbaru</span>
               <div className="article-ticker-track">
                 <span className="article-ticker-text">
                   {articleFeed.slice(0, 5).map((a) => a.title).join('  ·  ')}
                 </span>
               </div>
-            </div>
+            </div> : null}
 
-            {activeArticleHeadline ? (
+            {false && activeArticleHeadline ? (
               <div className="article-title-highlight mt-6">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Headline bergerak</p>
                 <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">{activeArticleHeadline.title}</h2>
@@ -4390,10 +4451,10 @@ const PublicSiteView: React.FC = () => {
             ) : null}
           </div>
 
-          {activeArticleHeadline ? (
+          {false && activeArticleHeadline ? (
             <article className="article-spotlight-stage rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] p-4 text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
               <div className="article-spotlight-stage-image-shell">
-                <img src={activeArticleHeadline.coverImage} alt={activeArticleHeadline.coverAlt} className="article-cover-image" />
+                {renderArticleImage(activeArticleHeadline, 'article-cover-image', 'eager')}
               </div>
               <div className="p-2 sm:p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Visual utama</p>
@@ -4418,7 +4479,7 @@ const PublicSiteView: React.FC = () => {
             </article>
           ) : null}
 
-          <aside className="article-headline-rail rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
+          {false ? <aside className="article-headline-rail rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Headline</p>
               <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Auto update</span>
@@ -4441,14 +4502,14 @@ const PublicSiteView: React.FC = () => {
                 </button>
               ))}
             </div>
-          </aside>
+          </aside> : null}
         </section>
 
-        {articleSpotlight ? (
+        {false && articleSpotlight ? (
           <section className="article-editorial-grid mt-8 scroll-reveal-block">
             <article className="article-feature-band rounded-[34px] border border-[var(--border-soft)] bg-[linear-gradient(180deg,#0f172a,#1f4d17)] text-white shadow-[0_22px_48px_rgba(15,23,42,0.24)]">
               <div className="article-feature-band-visual">
-                <img src={articleSpotlight.coverImage} alt={articleSpotlight.coverAlt} className="article-cover-image" />
+                {renderArticleImage(articleSpotlight, 'article-cover-image', 'eager')}
               </div>
               <div className="article-feature-band-copy">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d4f9af]">Sorotan utama</p>
@@ -4497,7 +4558,7 @@ const PublicSiteView: React.FC = () => {
                     onClick={() => navigateToArticle(article.slug)}
                     className="article-related-card"
                   >
-                    <img src={article.coverImage} alt={article.coverAlt} className="article-related-thumb" />
+                    {renderArticleImage(article, 'article-related-thumb', 'lazy', 320, 220)}
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-accent-strong)]">{article.category}</p>
                       <p className="mt-2 text-sm font-black tracking-tight text-[var(--text-primary)]">{article.title}</p>
@@ -4510,7 +4571,7 @@ const PublicSiteView: React.FC = () => {
           </section>
         ) : null}
 
-        <section className="article-social-shell mt-8 scroll-reveal-block">
+        {false ? <section className="article-social-shell mt-8 scroll-reveal-block">
           <div className="article-social-band">
             <div className="max-w-2xl">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Video TikTok Bradwear</p>
@@ -4556,13 +4617,13 @@ const PublicSiteView: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> : null}
 
-        <section className="mt-8 article-card-grid">
+        <section className="mt-8 article-card-grid" aria-live="polite">
           {articleMagazineFeed.map((article) => (
             <article key={article.slug} className="article-story-card article-story-card-two-column scroll-reveal-block">
               <div className="article-story-visual">
-                <img src={article.coverImage} alt={article.coverAlt} className="article-cover-image" loading="lazy" decoding="async" />
+                {renderArticleImage(article, 'article-cover-image', 'lazy')}
               </div>
               <div className="article-story-body">
                 <div className="article-meta-row">
@@ -4579,21 +4640,6 @@ const PublicSiteView: React.FC = () => {
                     <span key={`${article.slug}-keyword-${keyword}`} className="article-story-keyword-chip">
                       {keyword}
                     </span>
-                  ))}
-                </div>
-                <div className="mt-4 grid gap-3">
-                  {article.highlights.slice(0, 2).map((point) => (
-                    <div key={`${article.slug}-highlight-${point}`} className="article-inline-point">
-                      <span />
-                      <p>{point}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="article-story-snippet-grid mt-5">
-                  {article.body.slice(0, 2).map((paragraph, index) => (
-                    <p key={`${article.slug}-snippet-${index}`} className="article-story-snippet">
-                      {paragraph}
-                    </p>
                   ))}
                 </div>
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
