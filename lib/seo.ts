@@ -26,7 +26,7 @@ import {
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
 const SEO_ICON_URL = `${SITE_URL}/favicon-bradwear.png`;
-const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/thumbnail-bradwear.jpeg`;
+const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/thumbnail-bradwear.webp`;
 const SEO_PREVIEW_IMAGE_ALT = 'Preview seragam custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
 const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
@@ -254,7 +254,7 @@ const buildStaticLandingMeta = (pathname: string): SeoMeta | null => {
     },
     [ROUTE_PATHS[RouteKey.HOME]]: {
       title: 'Bradwear Indonesia | Jasa Pembuatan Seragam Custom',
-      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, wearpack, polo, jaket, dan celana tactical custom dengan banyak pilihan model untuk perusahaan, instansi, komunitas, dan UMKM.',
+      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, PDL, wearpack, polo, jaket, dan celana tactical custom dengan banyak pilihan model untuk perusahaan, instansi, komunitas, dan UMKM.',
       path: ROUTE_PATHS[RouteKey.HOME],
       keywords: dedupeKeywords(['seragam custom', 'kemeja dinas', 'pdh', 'wearpack', 'polo custom', 'jaket custom', 'celana tactical', 'model tactical custom', SITE_NAME]),
       schema: [],
