@@ -1,7 +1,7 @@
 import React from 'react';
 import { Category, RouteKey } from '../types';
 import { ASSETS } from '../assets';
-import { CATEGORY_ROUTE_PATHS, INFO_ROUTE_PATHS, ROUTE_PATHS } from '../lib/siteConfig';
+import { CATALOG_GUIDE_PATHS, CATEGORY_ROUTE_PATHS, INFO_ROUTE_PATHS, ROUTE_PATHS } from '../lib/siteConfig';
 
 interface SiteHeaderProps {
   currentRoute: RouteKey;
@@ -55,8 +55,8 @@ const MEGA_MENU_COLUMNS: MegaMenuColumn[] = [
     icon: '📋',
     items: [
       { label: 'Katalog Lengkap', desc: 'Semua model & kategori produk', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG] },
-      { label: 'Panduan Ukuran', desc: 'Tabel ukuran & cara mengukur', route: RouteKey.KATALOG, path: '/katalog/panduan-ukuran' },
-      { label: 'Jenis Bahan', desc: 'Perbandingan material produksi', route: RouteKey.KATALOG, path: '/katalog/panduan-jenis-bahan' },
+      { label: 'Panduan Ukuran', desc: 'Tabel ukuran & cara mengukur', route: RouteKey.KATALOG, path: CATALOG_GUIDE_PATHS.size },
+      { label: 'Jenis Bahan', desc: 'Perbandingan bahan produksi', route: RouteKey.KATALOG, path: CATALOG_GUIDE_PATHS.material },
     ],
   },
 ];
@@ -91,8 +91,8 @@ const MOBILE_MENU_SECTIONS: HeaderMenuSection[] = [
   {
     title: 'Panduan',
     items: [
-      { label: 'Panduan Ukuran', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG], catalogGuide: 'size' },
-      { label: 'Jenis Bahan', route: RouteKey.KATALOG, path: ROUTE_PATHS[RouteKey.KATALOG], catalogGuide: 'material' },
+      { label: 'Panduan Ukuran', route: RouteKey.KATALOG, path: CATALOG_GUIDE_PATHS.size },
+      { label: 'Jenis Bahan', route: RouteKey.KATALOG, path: CATALOG_GUIDE_PATHS.material },
       { label: 'Artikel', route: RouteKey.ARTIKEL, path: ROUTE_PATHS[RouteKey.ARTIKEL] },
       { label: 'Cara Order', route: RouteKey.CARA_ORDER, path: ROUTE_PATHS[RouteKey.CARA_ORDER] },
       { label: 'FAQ', route: RouteKey.LAYANAN_PELANGGAN, path: ROUTE_PATHS[RouteKey.LAYANAN_PELANGGAN] },

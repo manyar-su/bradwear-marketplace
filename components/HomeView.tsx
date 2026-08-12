@@ -86,7 +86,7 @@ const HomeView: React.FC = () => {
             <div className="hero-copy">
               <p className="hero-kicker">Bradwear Indonesia Official</p>
               <h2>Pembuatan Seragam dinas tactical dan formal</h2>
-              <p>Pilih model terbaik, kustom desain, lalu lanjutkan ringkasan order.</p>
+              <p>Pilih model terbaik, tersedia banyak pilihan model tactical, lalu lanjutkan ringkasan order.</p>
               <div className="hero-actions">
                 <button
                   type="button"
@@ -134,16 +134,16 @@ const HomeView: React.FC = () => {
 
         <div className="hero-benefits">
           <div>
-            <strong>Tidak ada pesanan minimum khusus sampel.</strong>
-            <span>Konsultasi desain kemeja sesuai kebutuhan anda.</span>
+            <strong>Tidak ada minimum order.</strong>
+            <span>Langsung konsultasi model dan desain seragam sesuai kebutuhan Anda.</span>
           </div>
           <div>
-            <strong>Desain sekarang, produksi bisa lebih cepat.</strong>
-            <span>Semua fitur tersedia untuk memudahkan anda dalam pemesanan.</span>
+            <strong>Desain sekarang, produksi lebih cepat.</strong>
+            <span>Semua langkah pemesanan tersedia dalam satu halaman, mudah diikuti.</span>
           </div>
           <div>
-            <strong>Pengiriman seluruh Indonesia.</strong>
-            <span>Cocok untuk keperluan pembuatan seragam dinas, instansi dan team anda.</span>
+            <strong>Kirim ke seluruh Indonesia.</strong>
+            <span>Cocok untuk seragam dinas, instansi, perusahaan, dan tim Anda.</span>
           </div>
         </div>
       </section>
@@ -238,9 +238,9 @@ const HomeView: React.FC = () => {
       <section className="px-6 pb-8 md:px-10">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { title: 'Lead Time Transparan', desc: 'Estimasi produksi 14-21 hari kerja dengan update tahap berkala.' },
-            { title: 'MOQ Fleksibel', desc: 'Tanpa minimal produksi bisa satuan untuk kebutuhan Sample.' },
-            { title: 'QC Berlapis', desc: 'Cutting, sewing, dan finishing melewati quality control berstandar industri.' },
+            { title: 'Estimasi Waktu Produksi Jelas', desc: 'Waktu produksi 14–21 hari kerja dengan update di tiap tahap.' },
+            { title: 'Tidak Ada Minimum Order', desc: 'Bisa pesan satuan untuk kebutuhan contoh produk terlebih dahulu.' },
+            { title: 'Pengecekan Kualitas Berlapis', desc: 'Setiap proses — pemotongan, jahit, hingga penyelesaian akhir — dicek dengan standar yang ketat.' },
           ].map((item) => (
             <article key={item.title} className="rounded-3xl border border-[var(--border-soft)] bg-white p-6 shadow-sm">
               <h4 className="text-lg font-bold text-[var(--text-primary)]">{item.title}</h4>
@@ -282,7 +282,7 @@ const HomeView: React.FC = () => {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border-soft)] bg-white px-5 py-4">
-            <p className="text-sm text-[var(--text-secondary)]">Masih ada pertanyaan lain soal kain, revisi desain, atau proses produksi?</p>
+            <p className="text-sm text-[var(--text-secondary)]">Masih ada pertanyaan soal bahan, ukuran, atau proses produksi?</p>
             <a
               href="https://wa.me/"
               target="_blank"
@@ -297,9 +297,9 @@ const HomeView: React.FC = () => {
 
       <section className="px-6 pb-10 md:px-10">
         <div className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--surface-soft)] p-8 text-center">
-          <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-4xl">Siap Masuk Tahap Kustomisasi?</h3>
+          <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">Siap Mulai Pesan Seragam?</h3>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)] md:text-base">
-            Pilih model dari katalog, sesuaikan desain seragam, lalu lanjutkan proses ringkasan order langsung dari browser.
+            Pilih model dari katalog, sesuaikan desain seragam, lalu kirim ringkasan pesanan langsung dari browser.
           </p>
           {featured[0] && (
             <button
@@ -333,6 +333,28 @@ const HomeView: React.FC = () => {
               <p className="text-sm leading-relaxed text-[var(--text-secondary)]">"{testimonial.text}"</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="px-6 pb-14 md:px-10">
+        <div className="rounded-[28px] border border-[var(--border-soft)] bg-white p-6 shadow-sm md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-strong)]">Butuh Bantuan Memilih?</p>
+              <h3 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">Konsultasi gratis lewat WhatsApp — tanpa biaya, tanpa komitmen</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">Tim kami siap bantu pilih model, bahan, dan estimasi biaya sesuai kebutuhan Anda.</p>
+            </div>
+            <div className="flex flex-shrink-0 flex-wrap gap-3">
+              <a
+                href="https://wa.me/"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+              >
+                Chat Sekarang
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </div>

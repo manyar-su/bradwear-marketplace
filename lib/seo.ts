@@ -225,10 +225,10 @@ const buildStaticLandingMeta = (pathname: string): SeoMeta | null => {
       schema: [],
     },
     [CATEGORY_ROUTE_PATHS.PDH_PDL]: {
-      title: 'Jasa Pembuatan PDH dan PDL Custom | Bradwear Indonesia',
-      description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH dan PDL custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi.',
+      title: 'Jasa Pembuatan PDH Custom | Bradwear Indonesia',
+      description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi.',
       path: CATEGORY_ROUTE_PATHS.PDH_PDL,
-      keywords: dedupeKeywords(['pdh custom', 'pdl custom', 'seragam lapangan', 'pdh pdl instansi', SITE_NAME]),
+      keywords: dedupeKeywords(['pdh custom', 'seragam dinas harian', 'pdh instansi', SITE_NAME]),
       schema: [],
     },
     [CATEGORY_ROUTE_PATHS.WEARPACK]: {
@@ -254,7 +254,7 @@ const buildStaticLandingMeta = (pathname: string): SeoMeta | null => {
     },
     [ROUTE_PATHS[RouteKey.HOME]]: {
       title: 'Bradwear Indonesia | Jasa Pembuatan Seragam Custom',
-      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, wearpack, polo, jaket, dan celana tactical custom dengan banyak pilihan model tactical untuk perusahaan, instansi, komunitas, dan UMKM.',
+      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, wearpack, polo, jaket, dan celana tactical custom dengan banyak pilihan model untuk perusahaan, instansi, komunitas, dan UMKM.',
       path: ROUTE_PATHS[RouteKey.HOME],
       keywords: dedupeKeywords(['seragam custom', 'kemeja dinas', 'pdh', 'wearpack', 'polo custom', 'jaket custom', 'celana tactical', 'model tactical custom', SITE_NAME]),
       schema: [],

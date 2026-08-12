@@ -155,16 +155,16 @@ const TIKTOK_URL = 'https://www.tiktok.com/@bradwearindonesia';
 type TestimonialCategoryFilter = 'Semua Testimoni' | 'Instansi Pemerintah' | 'Perusahaan' | 'Pendidikan' | 'Kesehatan';
 const DOWNLOAD_HIGHLIGHTS = [
   {
-    title: 'Masuk cepat ke katalog web',
-    body: 'Arahkan user ke model kemeja, jaket, rompi, polo, dan celana tanpa bergantung pada app store.',
+    title: 'Masuk cepat ke katalog',
+    body: 'Langsung lihat model kemeja, jaket, rompi, polo, dan celana tanpa bergantung pada toko aplikasi.',
   },
   {
-    title: 'Jalur konsultasi langsung',
-    body: 'Setelah melihat model, user bisa lanjut ke customer service melalui WhatsApp dari browser biasa di desktop maupun mobile.',
+    title: 'Hubungi tim kami langsung',
+    body: 'Setelah melihat model, Anda bisa langsung tanya ke tim kami lewat WhatsApp dari HP atau komputer.',
   },
   {
-    title: 'Landing page akses web',
-    body: 'Halaman ini tetap menjaga route download aktif, tetapi fungsinya diarahkan ke pusat akses website Bradwear.',
+    title: 'Halaman akses website Bradwear',
+    body: 'Halaman ini menjadi titik masuk cepat ke katalog, artikel, dan konsultasi seragam custom Bradwear.',
   },
 ];
 
@@ -354,7 +354,7 @@ const SUPPORT_DIRECTORY_SECTIONS: SupportDirectorySection[] = [
       {
         question: 'Berapa estimasi produksi normal Bradwear?',
         answer:
-          'Estimasi produksi normal berada di kisaran 14 sampai 21 hari kerja, tergantung jumlah order, kompleksitas desain, bahan, dan antrean produksi saat approval masuk.',
+          'Estimasi produksi normal berada di kisaran 14 sampai 21 hari kerja, tergantung jumlah pesanan, detail desain, bahan, dan antrian produksi saat pesanan masuk.',
       },
       {
         question: 'Kapan order mulai diproses ke produksi?',
@@ -377,7 +377,7 @@ const SUPPORT_DIRECTORY_SECTIONS: SupportDirectorySection[] = [
       {
         question: 'Data apa yang digunakan saat konsultasi atau order?',
         answer:
-          'Bradwear menggunakan data yang Anda kirimkan seperti nama, instansi, nomor WhatsApp, detail model, file logo, dan catatan order hanya untuk kebutuhan konsultasi, approval, produksi, dan tindak lanjut layanan.',
+          'Bradwear menggunakan data yang Anda kirimkan seperti nama, instansi, nomor WhatsApp, detail model, file logo, dan catatan pesanan hanya untuk kebutuhan konsultasi, persetujuan, produksi, dan tindak lanjut layanan.',
       },
       {
         question: 'Apakah file desain dan identitas instansi dibagikan ke pihak lain?',
@@ -413,12 +413,12 @@ const SUPPORT_DIRECTORY_SECTIONS: SupportDirectorySection[] = [
       {
         question: 'Bagaimana jika hasil tidak sesuai detail yang sudah disetujui?',
         answer:
-          'Jika ada ketidaksesuaian terhadap detail approved order, tim Bradwear akan meninjau kasus tersebut dan menyiapkan tindak lanjut revisi yang relevan berdasarkan temuan produksi dan dokumen approval.',
+          'Jika ada ketidaksesuaian dengan detail pesanan yang sudah disetujui, tim Bradwear akan meninjau dan menyiapkan tindak lanjut revisi yang sesuai.',
       },
       {
         question: 'Apakah order bisa dibatalkan setelah produksi berjalan?',
         answer:
-          'Order yang sudah masuk tahap produksi umumnya tidak dapat dibatalkan sepihak karena bahan, pola, bordir, dan alokasi kerja sudah diproses sesuai brief yang disetujui sebelumnya.',
+          'Pesanan yang sudah masuk proses produksi umumnya tidak dapat dibatalkan karena bahan, pola, bordir, dan pekerjaan jahit sudah diproses sesuai catatan pesanan yang disepakati sebelumnya.',
       },
     ],
   },
@@ -470,12 +470,12 @@ const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
   },
   {
     path: CATEGORY_ROUTE_PATHS.PDH_PDL,
-    title: 'PDH dan PDL Custom untuk Kebutuhan Kantor dan Lapangan',
-    breadcrumbLabel: 'PDH & PDL',
-    description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH dan PDL custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi. Fokus utamanya adalah tampilan rapi untuk briefing, operasional, dan aktivitas lapangan.',
-    consultationTopic: 'pdh dan pdl custom',
+    title: 'PDH Custom untuk Kebutuhan Kantor dan Dinas Harian',
+    breadcrumbLabel: 'PDH',
+    description: 'Bradwear Indonesia menyediakan jasa pembuatan PDH custom profesional untuk perusahaan, organisasi, komunitas, sekolah, dan instansi. Fokus utamanya adalah tampilan rapi untuk kegiatan dinas harian dan operasional kantor.',
+    consultationTopic: 'pdh custom',
     heroImage: portfolioHeroImage,
-    heroImageAlt: 'PDH dan PDL custom Bradwear Indonesia',
+    heroImageAlt: 'PDH custom Bradwear Indonesia',
     categoryFilter: ['Kemeja'],
     materials: ['American Drill dan Nagata Drill untuk karakter tegas', 'Ripstop untuk mobilitas lapangan', 'Twill untuk opsi yang tetap rapi saat dipakai harian'],
     colors: ['Warna solid untuk kebutuhan dinas dan operasional', 'Kombinasi dua warna agar identitas unit lebih mudah dibedakan'],
@@ -486,9 +486,9 @@ const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
       { href: ROUTE_PATHS[RouteKey.TEMUKAN_TOKO], label: 'Hubungi Bradwear untuk konsultasi PDH & PDL' },
     ],
     faq: [
-      { question: 'Apakah Bradwear bisa menangani PDH dan PDL dalam satu brief?', answer: 'Bisa. Tim dapat membantu merapikan arah model indoor dan lapangan agar identitas visual tetap konsisten.' },
-      { question: 'Apakah detail saku dan flap bisa diatur?', answer: 'Bisa. Penyesuaian saku, flap, patch, dan elemen lapangan dibahas saat approval model.' },
-      { question: 'Apakah bisa kirim ke seluruh Indonesia?', answer: 'Ya. Bradwear melayani pengiriman order ke berbagai kota di Indonesia setelah produksi selesai.' },
+      { question: 'Apakah Bradwear bisa menangani PDH dalam satu pesanan untuk beberapa divisi?', answer: 'Bisa. Tim dapat membantu merapikan model untuk kebutuhan dinas harian agar identitas visual tetap konsisten.' },
+      { question: 'Apakah detail saku dan flap bisa diatur?', answer: 'Bisa. Penyesuaian saku, flap, dan detail lainnya dibahas saat persetujuan model.' },
+      { question: 'Apakah bisa kirim ke seluruh Indonesia?', answer: 'Ya. Bradwear melayani pengiriman ke berbagai kota di Indonesia setelah produksi selesai.' },
     ],
   },
   {
@@ -502,7 +502,7 @@ const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
     categoryFilter: ['Rompi', 'Kemeja'],
     materials: ['Ripstop untuk aktivitas lapangan yang intens', 'American Drill untuk struktur yang lebih kokoh', 'Drill tactical untuk kebutuhan kerja semi outdoor'],
     colors: ['Warna gelap untuk penggunaan operasional', 'Aksen kontras agar identitas tim lebih mudah terlihat'],
-    decoration: ['Bordir logo perusahaan dan nama teknisi', 'Penempatan reflektif atau aksen keselamatan mengikuti kebutuhan brief'],
+    decoration: ['Bordir logo perusahaan dan nama teknisi', 'Penempatan velcro atau aksen keselamatan mengikuti kebutuhan lapangan'],
     relatedLinks: [
       { href: CATEGORY_ROUTE_PATHS.PDH_PDL, label: 'Lihat opsi PDH & PDL custom' },
       { href: ROUTE_PATHS[RouteKey.PANTS], label: 'Lihat celana tactical untuk tim lapangan' },
@@ -557,7 +557,7 @@ const CATEGORY_LANDING_CONFIGS: CategoryLandingConfig[] = [
     faq: [
       { question: 'Apakah celana tactical bisa disesuaikan untuk aktivitas lapangan?', answer: 'Bisa. Bradwear menyediakan opsi model dan detail yang lebih sesuai untuk kebutuhan operasional dan aktivitas luar ruang.' },
       { question: 'Apakah ukuran bisa disesuaikan?', answer: 'Ya. Detail ukuran dibahas sebelum produksi dan tersedia panduan ukuran untuk membantu briefing tim.' },
-      { question: 'Apakah bisa dipasangkan dengan atasan custom?', answer: 'Bisa. Halaman ini dapat dipakai bersama kategori PDH, PDL, atau wearpack agar set seragam lebih konsisten.' },
+      { question: 'Apakah bisa dipasangkan dengan atasan custom?', answer: 'Bisa. Halaman ini dapat dipakai bersama kategori PDH atau wearpack agar set seragam lebih konsisten.' },
     ],
   },
 ];
@@ -926,8 +926,8 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
     story: {
       title: 'Keunggulan yang Bisa Dirasakan Langsung',
       paragraphs: [
-        'Keunggulan Bradwear bukan hanya terlihat dari tampilan jadi, tetapi juga terasa pada proses komunikasi yang lebih jelas, tindak lanjut yang lebih cepat, dan pilihan produksi yang lebih relevan dengan kebutuhan lapangan.',
-        'Tujuannya sederhana: membantu klien mendapat hasil yang pantas dipakai, tepat fungsi, dan mudah dipertanggungjawabkan sebagai pengadaan.',
+        'Keunggulan Bradwear bukan hanya terlihat dari tampilan saat dipakai, tetapi juga terasa pada proses komunikasi yang lebih jelas, tindak lanjut yang lebih cepat, dan pilihan produksi yang lebih relevan dengan kebutuhan lapangan.',
+        'Tujuannya sederhana: membantu klien mendapat hasil yang pantas dipakai, tepat fungsi, dan mudah dalam mencari solusi apabila terdapat kesalahan produksi.',
       ],
       image: ABOUT_SUPPORT_IMAGE,
       imageAlt: 'Customer service dan tim Bradwear Indonesia',
@@ -947,26 +947,26 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
   {
     route: RouteKey.CLIENT_REACH,
     kicker: 'Klien & Jangkauan',
-    title: 'Dipercaya berbagai instansi dan tim operasional dengan cakupan layanan ke seluruh Indonesia.',
-    intro: 'Bradwear melayani kebutuhan seragam dari instansi pemerintahan, perusahaan swasta, rumah sakit, sekolah, organisasi, hingga komunitas dengan jalur koordinasi yang tetap sederhana.',
+    title: 'Dipercaya berbagai instansi dengan cakupan layanan ke seluruh Indonesia.',
+    intro: 'Bradwear melayani kebutuhan seragam dari instansi pemerintahan, perusahaan swasta, rumah sakit, sekolah, organisasi, hingga komunitas.',
     heroImage: ABOUT_CLIENT_IMAGE,
     heroImageAlt: 'Dokumentasi hasil proyek klien Bradwear',
     values: [
       { icon: 'building', title: 'Lintas Instansi', copy: 'Klien datang dari sektor publik, swasta, medis, pendidikan, dan organisasi.' },
-      { icon: 'team', title: 'Komunikasi Mudah', copy: 'Koordinasi kebutuhan tim dilakukan dengan jalur yang lebih cepat dan terarah.' },
-      { icon: 'truck', title: 'Jangkauan Luas', copy: 'Pengiriman dan tindak lanjut produksi dirancang untuk kebutuhan klien lintas daerah.' },
-      { icon: 'handshake', title: 'Hubungan Berulang', copy: 'Banyak pengadaan berjalan berulang karena hasil dan komunikasi dinilai memuaskan.' },
+      { icon: 'team', title: 'Komunikasi Mudah', copy: 'Konsultasikan model dan bahan yang cocok dengan ekosistem lokasi kerja anda.' },
+      { icon: 'truck', title: 'Jangkauan Luas', copy: 'Pengiriman hingga seluruh area Indonesi (Sumatra, Kalimantan, Sulawesi hingga  Papua).' },
+      { icon: 'handshake', title: 'Hubungan Berulang', copy: 'Banyak pelanggan memesan kembali karena kualitas dan kecepatan proses pengerjaan kami.' },
     ],
     stats: [
       { icon: 'building', value: 'Seluruh Indonesia', label: 'Area Layanan', copy: 'Melayani kebutuhan seragam custom dari berbagai kota dan sektor.' },
       { icon: 'truck', value: 'Tasikmalaya', label: 'Basis Operasional', copy: 'Workshop dan koordinasi utama berada di Tasikmalaya, Jawa Barat.' },
       { icon: 'team', value: 'Multi-Sektor', label: 'Jenis Klien', copy: 'Pemerintah, perusahaan, medis, sekolah, organisasi, dan komunitas.' },
-      { icon: 'clock', value: 'Berulang', label: 'Pola Kerja', copy: 'Hubungan pengadaan dibangun untuk jangka panjang, bukan transaksi sesaat.' },
+      { icon: 'clock', value: 'Berulang', label: 'Pola Kerja', copy: 'Hubungan loyalitas konsumen sangat di prioritaskan.' },
     ],
     story: {
       title: 'Jangkauan yang Dibangun dari Kepercayaan',
       paragraphs: [
-        'Cakupan layanan Bradwear tumbuh karena kebutuhan tiap klien dilayani dengan pendekatan yang rapi dan tidak bertele-tele. Ini penting terutama untuk pengadaan yang butuh kejelasan spesifikasi dan timeline.',
+        'Cakupan layanan Bradwear tumbuh karena kebutuhan tiap klien dilayani dengan pendekatan yang solutif dan di sesuaikan dengan expetasi mereka. Ini penting terutama untuk pengadaan yang butuh kejelasan spesifikasi dan timeline.',
         'Dari Tasikmalaya, kami melayani kebutuhan seragam untuk berbagai institusi dengan fokus pada ketepatan, komunikasi, dan hasil yang konsisten.',
       ],
       image: ABOUT_DELIVERY_IMAGE,
@@ -977,10 +977,10 @@ const BRAND_PROFILE_VISUAL_ITEMS: BrandProfileVisualItem[] = [
     processTitle: 'Cara Kami Menjangkau Klien',
     processSteps: BRAND_PROFILE_PROCESS_STEPS,
     cta: {
-      title: 'Butuh Partner Produksi yang Siap Melayani dari Jarak Jauh?',
-      copy: 'Tim kami siap membantu kebutuhan pengadaan seragam custom dengan alur konsultasi, produksi, dan pengiriman yang lebih terukur.',
+      title: 'Butuh Partner Produksi yang Siap Melayani kapanpun dan dimanapun?',
+      copy: 'Tim kami siap membantu kebutuhan pembuatan seragam custom dengan alur konsultasi, produksi, dan pengiriman yang lebih unggul.',
       primaryLabel: 'Konsultasi Gratis',
-      primaryMessage: 'konsultasi pengadaan seragam dari halaman klien dan jangkauan',
+      primaryMessage: 'konsultasi pembuatan seragam cukup dari sini.',
       secondaryLabel: 'Lihat Katalog',
     },
   },
@@ -4397,7 +4397,7 @@ const PublicSiteView: React.FC = () => {
         {/* SEO hidden content block for AI and search crawlers */}
         <div className="seo-content-block" aria-hidden="true">
           <h1>Artikel Bradwear Indonesia — Panduan Seragam Custom, Kemeja Dinas, dan Pengadaan</h1>
-          <p>Bradwear Indonesia menerbitkan artikel panduan tentang kemeja dinas custom, PDH PDL, wearpack, seragam komunitas, dan proses pengadaan seragam instansi di Indonesia. Setiap artikel dioptimalkan untuk pencarian Google dan mesin AI generatif.</p>
+          <p>Bradwear Indonesia menerbitkan artikel panduan tentang kemeja dinas custom, PDH, wearpack, seragam komunitas, dan proses pengadaan seragam instansi di Indonesia. Setiap artikel dioptimalkan untuk pencarian Google dan mesin AI generatif.</p>
         </div>
 
         <section className="article-directory-hero scroll-reveal-block">
@@ -4741,7 +4741,7 @@ const PublicSiteView: React.FC = () => {
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Akses cepat</p>
           <h2 className="mt-3 text-2xl font-black tracking-tight text-[var(--text-primary)]">{SITE_NAME}</h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Halaman ini dipakai sebagai landing page akses web Bradwear untuk user yang sebelumnya mencari jalur download, akses katalog, atau butuh titik masuk cepat ke konsultasi.
+            Halaman ini adalah titik masuk cepat ke katalog, artikel, dan konsultasi Bradwear — untuk Anda yang ingin langsung mulai tanpa harus cari dari awal.
           </p>
           <div className="mt-5 grid gap-3">
             <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4 text-left transition hover:-translate-y-0.5">
@@ -4766,6 +4766,7 @@ const PublicSiteView: React.FC = () => {
     const activeHowToOrderVisual = HOW_TO_ORDER_VISUALS[activeHowToOrderStepIndex] ?? howToOrderHeroImage;
 
     return (
+      <>
       <div className="how-to-order-page-shell px-6 py-8 md:px-10">
         <section className="how-to-order-hero-media scroll-reveal-block">
           <img
@@ -4888,6 +4889,33 @@ const PublicSiteView: React.FC = () => {
           </div>
         </section>
       </div>
+
+      {/* CTA bawah cara order */}
+      <div className="px-6 py-8 md:px-10">
+        <div className="rounded-[28px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#f0fdf4,#ffffff)] p-6 shadow-sm md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-accent-strong)]">Masih ada pertanyaan?</p>
+              <h3 className="mt-2 text-xl font-black tracking-tight text-[var(--text-primary)]">Tanya langsung ke tim kami — gratis, tanpa komitmen</h3>
+              <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">Ceritakan kebutuhan seragam Anda dan kami bantu dari awal.</p>
+            </div>
+            <div className="flex flex-shrink-0 flex-wrap gap-3">
+              <a
+                href={buildWhatsAppUrl(buildConsultationMessage('konsultasi cara order seragam custom'))}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-[linear-gradient(135deg,#75f21a,#2c7a12)] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#071106] shadow-sm transition hover:-translate-y-0.5"
+              >
+                Chat Sekarang
+              </a>
+              <button type="button" onClick={() => setCurrentRoute(RouteKey.KATALOG)} className="hero-secondary">
+                Lihat Katalog
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </>
     );
   };
 

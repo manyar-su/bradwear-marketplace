@@ -1012,7 +1012,7 @@ export const ARTICLES: Article[] = [
     title: 'Bahan seragam lapangan: kapan memilih Ripstop, Drill, atau Tropical?',
     excerpt: 'Bahan seragam lapangan perlu disesuaikan dengan mobilitas kerja, cuaca, risiko gesek, dan target tampilan agar hasil tetap nyaman serta tahan dipakai harian.',
     seoTitle: 'Bahan Seragam Lapangan Ripstop, Drill, dan Tropical | Bradwear Indonesia',
-    seoDescription: 'Bandingkan bahan seragam lapangan seperti Ripstop, Drill, dan Tropical untuk seragam operasional, PDL, kemeja dinas, dan kebutuhan kerja luar ruangan.',
+    seoDescription: 'Bandingkan bahan seragam lapangan seperti Ripstop, Drill, dan Tropical untuk seragam operasional, kemeja dinas, dan kebutuhan kerja luar ruangan.',
     keywords: ['bahan seragam lapangan', 'ripstop untuk seragam', 'drill seragam kerja', 'tropical kemeja dinas', 'bahan pdl custom', 'perbandingan ripstop drill tropical', 'bahan seragam operasional luar ruang', 'kain kemeja lapangan tahan lama', 'drill vs tropical seragam', 'bahan seragam tahan gesekan', 'material pdl lapangan', 'memilih bahan seragam kerja outdoor'],
     body: [
       'Bahan seragam lapangan yang tepat harus menjawab dua kebutuhan sekaligus: kuat menghadapi aktivitas dan tetap nyaman dipakai dalam durasi panjang. Karena itu, pemilihan bahan sebaiknya dimulai dari konteks kerja, bukan dari nama kain yang paling populer.',
@@ -1054,7 +1054,7 @@ export const ARTICLES: Article[] = [
     title: 'Lead time produksi seragam custom: faktor yang membuat order cepat atau lambat',
     excerpt: 'Lead time produksi seragam custom dipengaruhi oleh kelengkapan brief, jumlah item, approval desain, ketersediaan bahan, bordir, dan antrean kerja saat order masuk.',
     seoTitle: 'Lead Time Produksi Seragam Custom | Bradwear Indonesia',
-    seoDescription: 'Pahami faktor lead time produksi seragam custom, kemeja dinas, PDH, PDL, rompi, jaket, dan celana tactical agar jadwal order lebih realistis.',
+    seoDescription: 'Pahami faktor lead time produksi seragam custom, kemeja dinas, PDH, rompi, jaket, dan celana tactical agar jadwal pesanan lebih realistis.',
     keywords: ['lead time produksi seragam custom', 'estimasi produksi kemeja dinas', 'timeline order seragam', 'waktu produksi seragam kerja', 'produksi pdh pdl custom', 'faktor lead time seragam', 'berapa lama produksi seragam custom', 'estimasi waktu order seragam instansi', 'jadwal produksi kemeja custom', 'proses produksi seragam dari brief ke jadi', 'antrean produksi seragam', 'cara mempercepat lead time seragam'],
     body: [
       'Lead time produksi seragam custom tidak hanya ditentukan oleh proses jahit. Sebelum masuk produksi, vendor perlu membaca brief, menyesuaikan desain, mengecek bahan, memvalidasi ukuran, dan mengunci detail identitas seperti logo, nama, atau jabatan.',
@@ -1096,7 +1096,7 @@ export const ARTICLES: Article[] = [
     title: 'Bordir nama personel dan jabatan pada seragam kerja: standar yang perlu dicek',
     excerpt: 'Bordir nama personel, jabatan, dan divisi pada seragam kerja perlu disiapkan dengan format yang konsisten agar hasil akhir terlihat profesional.',
     seoTitle: 'Bordir Nama Personel dan Jabatan Seragam Kerja | Bradwear Indonesia',
-    seoDescription: 'Panduan menyiapkan bordir nama personel, jabatan, dan divisi pada kemeja dinas, seragam kerja, PDH, PDL, dan kemeja custom.',
+    seoDescription: 'Panduan menyiapkan bordir nama personel, jabatan, dan divisi pada kemeja dinas, seragam kerja, PDH, dan kemeja custom.',
     keywords: ['bordir nama personel seragam', 'bordir jabatan kemeja dinas', 'bordir nama kemeja kerja', 'logo dan nama seragam', 'bordir divisi seragam custom', 'format data bordir nama personel', 'ejaan nama bordir seragam', 'bordir jabatan instansi', 'bordir nama karyawan seragam kerja', 'standar penulisan bordir seragam', 'ukuran teks bordir kemeja', 'bordir nama dan gelar personel'],
     body: [
       'Bordir nama personel dan jabatan pada seragam kerja membutuhkan standar yang jelas sejak awal. Tanpa standar, satu batch produksi bisa berisi variasi penulisan yang tidak konsisten, misalnya singkatan jabatan berbeda, kapitalisasi tidak sama, atau urutan nama yang berubah.',
