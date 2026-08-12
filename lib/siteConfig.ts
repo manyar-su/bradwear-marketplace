@@ -232,7 +232,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Perbedaan material seperti Tropical, Nagata Drill, Ripstop, dan Oxford perlu disesuaikan dengan ritme kerja, lokasi lapangan, dan tampilan yang diinginkan.',
     seoTitle: 'Panduan Memilih Bahan Seragam Kerja dan Kemeja Dinas | Bradwear Indonesia',
     seoDescription: 'Pelajari cara memilih bahan seragam kerja, kemeja dinas, dan kemeja custom seperti Tropical, Oxford, Ripstop, dan Nagata Drill sesuai fungsi lapangan maupun kantor.',
-    keywords: ['panduan bahan seragam', 'bahan kemeja dinas', 'bahan seragam kerja', 'bahan kemeja custom', 'tropical oxford ripstop nagata drill'],
+    keywords: ['panduan bahan seragam', 'bahan kemeja dinas', 'bahan seragam kerja', 'bahan kemeja custom', 'tropical oxford ripstop nagata drill', 'bahan seragam kantor tasikmalaya', 'pilih bahan seragam instansi', 'kain kemeja custom berkualitas', 'bahan nagata drill seragam', 'bahan tropical kemeja dinas', 'bahan oxford kemeja kerja', 'ripstop vs drill seragam', 'bahan seragam perusahaan', 'material seragam lapangan'],
     body: [
       'Seragam yang baik tidak hanya terlihat formal, tetapi juga mendukung mobilitas pemakainya. Untuk kebutuhan kantor dengan pemakaian harian, bahan yang ringan dan tidak panas seperti Tropical atau Oxford sering menjadi pilihan aman.',
       'Jika kebutuhan lebih berat, misalnya untuk lapangan atau operasional yang aktif, bahan seperti Ripstop dan Nagata Drill memberi struktur yang lebih kokoh serta ketahanan lebih baik terhadap gesekan.',
@@ -280,7 +280,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Jenis seragam yang terlihat mirip sering punya kebutuhan pola, bahan, dan detail finishing yang berbeda.',
     seoTitle: 'Beda PDH, PDL, dan Seragam Lapangan untuk Instansi | Bradwear Indonesia',
     seoDescription: 'Pahami perbedaan model PDH, PDL, dan seragam lapangan agar instansi, perusahaan, dan komunitas lebih tepat memilih potongan, bahan, dan detail custom.',
-    keywords: ['beda pdh pdl', 'seragam lapangan instansi', 'model kemeja dinas', 'seragam dinas lapangan', 'pdh pdl custom'],
+    keywords: ['beda pdh pdl', 'seragam lapangan instansi', 'model kemeja dinas', 'seragam dinas lapangan', 'pdh pdl custom', 'perbedaan pdh dan pdl', 'seragam dinas harian formal', 'pdh instansi pemerintah', 'pdl lapangan operasional', 'model kemeja instansi tasikmalaya', 'seragam dinas jawa barat', 'beda model seragam dinas'],
     body: [
       'PDH biasanya dipakai untuk kebutuhan dinas harian sehingga tampilannya lebih rapi dan formal. PDL dan model lapangan umumnya membutuhkan potongan yang lebih fungsional dengan kantong, penguat jahitan, atau bahan yang lebih tangguh.',
       'Kesalahan memilih tipe model di awal akan memengaruhi bahan, biaya, dan waktu persetujuan desain. Karena itu, Bradwear menyiapkan katalog terstruktur agar pelanggan bisa membedakan fungsi tiap seri dengan lebih cepat.',
@@ -329,7 +329,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Kejelasan data ukuran, identitas instansi, jumlah item, dan target waktu akan sangat mempercepat persetujuan.',
     seoTitle: 'Tips Order Seragam Instansi dan Perusahaan | Bradwear Indonesia',
     seoDescription: 'Simak tips order seragam instansi, perusahaan, dan komunitas agar approval desain, pengumpulan ukuran, bordir logo, dan produksi berjalan lebih cepat.',
-    keywords: ['tips order seragam instansi', 'order kemeja dinas', 'pengadaan seragam perusahaan', 'order seragam komunitas', 'konsultasi seragam custom'],
+    keywords: ['tips order seragam instansi', 'order kemeja dinas', 'pengadaan seragam perusahaan', 'order seragam komunitas', 'konsultasi seragam custom', 'cara order seragam kerja', 'proses pemesanan seragam instansi', 'vendor seragam cepat produksi', 'tips order seragam tasikmalaya', 'brief pengadaan seragam', 'approval desain seragam', 'pengadaan seragam jawa barat'],
     body: [
       'Sebelum order, siapkan daftar ukuran, pembagian gender, kebutuhan lengan, dan target tanggal pemakaian. Langkah sederhana ini membantu tim CS dan produksi menyusun estimasi dengan lebih akurat.',
       'Untuk seragam yang membutuhkan bordir logo, file referensi berkualitas baik akan mempersingkat proses penyesuaian. Jika ada panduan warna resmi instansi, lampirkan sejak awal.',
@@ -378,7 +378,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Approval akhir sebaiknya mencakup model, ukuran, material, warna, logo, nama, dan alamat pengiriman.',
     seoTitle: 'Checklist Sebelum Produksi Seragam Custom Dimulai | Bradwear Indonesia',
     seoDescription: 'Gunakan checklist produksi seragam custom untuk memastikan model, bahan, warna, bordir logo, nama personel, dan alamat pengiriman sudah final sebelum jahit dimulai.',
-    keywords: ['checklist seragam custom', 'produksi kemeja custom', 'approval seragam dinas', 'bordir nama personel', 'persiapan produksi seragam'],
+    keywords: ['checklist seragam custom', 'produksi kemeja custom', 'approval seragam dinas', 'bordir nama personel', 'persiapan produksi seragam', 'final check seragam custom', 'validasi ukuran seragam sebelum jahit', 'checklist pengadaan seragam kerja', 'approval final kemeja dinas', 'pengiriman seragam custom', 'kontrol kualitas produksi seragam'],
     body: [
       'Pastikan kode model, warna kain, serta jenis bahan yang dipilih sudah final. Perubahan setelah proses cutting biasanya memengaruhi waktu produksi.',
       'Cek ulang penulisan nama personel, jabatan, atau divisi yang akan dibordir. Kesalahan data kecil justru sering menyebabkan penundaan produksi di tahap akhir.',
@@ -428,7 +428,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Kemeja custom untuk perusahaan, organisasi, dan komunitas akan lebih cepat diproduksi jika brief desain, fungsi pemakaian, dan identitas visual sudah jelas sejak awal.',
     seoTitle: 'Kemeja Custom untuk Perusahaan dan Komunitas | Bradwear Indonesia',
     seoDescription: 'Panduan menyiapkan kemeja custom untuk perusahaan, komunitas, organisasi, dan event agar desain, bahan, bordir, serta approval produksi lebih rapi.',
-    keywords: ['kemeja custom perusahaan', 'kemeja custom komunitas', 'vendor kemeja custom', 'kemeja kostum custom', 'kemeja event custom'],
+    keywords: ['kemeja custom perusahaan', 'kemeja custom komunitas', 'vendor kemeja custom', 'kemeja kostum custom', 'kemeja event custom', 'kemeja custom branding', 'kemeja custom bordir logo', 'vendor kemeja custom tasikmalaya', 'kemeja seragam organisasi', 'kemeja custom identitas tim', 'kemeja kerja custom jawa barat', 'desain kemeja custom online'],
     body: [
       'Kemeja custom sering dipakai untuk kebutuhan branding internal, event, operasional lapangan, sampai identitas komunitas. Karena itu, poin paling awal yang harus jelas adalah konteks pemakaian: formal, santai, teknis, atau promosi.',
       'Untuk perusahaan dan komunitas, referensi warna utama, posisi logo, jenis identitas personel, dan jumlah item per divisi perlu dikunci lebih cepat. Langkah ini mempercepat diskusi desain dan mencegah revisi berulang di tengah proses approval.',
@@ -477,7 +477,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Pemilihan model seragam dinas dan komunitas perlu disesuaikan dengan ritme kerja, kebutuhan identitas, serta citra yang ingin ditampilkan di lapangan maupun kantor.',
     seoTitle: 'Seragam Dinas dan Seragam Komunitas: Pilih Model yang Tepat | Bradwear Indonesia',
     seoDescription: 'Cari model seragam dinas, seragam komunitas, dan kemeja kerja custom yang sesuai kebutuhan kantor, lapangan, operasional, dan event organisasi.',
-    keywords: ['seragam dinas', 'seragam komunitas', 'kemeja kerja custom', 'vendor seragam dinas', 'seragam kantor custom'],
+    keywords: ['seragam dinas', 'seragam komunitas', 'kemeja kerja custom', 'vendor seragam dinas', 'seragam kantor custom', 'model seragam dinas formal', 'seragam dinas harian', 'kemeja dinas kantor instansi', 'seragam komunitas event', 'vendor seragam dinas tasikmalaya', 'seragam dinas jawa barat', 'pilih model seragam kerja'],
     body: [
       'Seragam dinas yang dipakai harian biasanya membutuhkan tampilan lebih formal dengan potongan rapi dan bahan yang nyaman untuk durasi panjang. Sebaliknya, seragam komunitas atau lapangan cenderung memerlukan fleksibilitas gerak, detail kantong, dan material yang lebih tangguh.',
       'Model yang tepat bukan hanya soal tampilan. Bentuk kerah, komposisi warna, bahan, bordir logo, dan panjang lengan akan memengaruhi kenyamanan pemakai sekaligus kesan profesional saat dipresentasikan ke pimpinan atau anggota tim.',
@@ -526,7 +526,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Vendor seragam dinas lebih mudah memberi estimasi akurat jika instansi menyiapkan data fungsi pemakaian, jumlah item, identitas visual, dan timeline penggunaan.',
     seoTitle: 'Vendor Seragam Dinas untuk Pengadaan Instansi | Bradwear Indonesia',
     seoDescription: 'Panduan memilih vendor seragam dinas, vendor kemeja kerja, dan konveksi seragam instansi agar brief pengadaan lebih jelas, approval lebih cepat, dan produksi lebih terukur.',
-    keywords: ['vendor seragam dinas', 'pengadaan seragam instansi', 'vendor kemeja kerja', 'konveksi seragam pemerintah', 'seragam kerja pengadaan'],
+    keywords: ['vendor seragam dinas', 'pengadaan seragam instansi', 'vendor kemeja kerja', 'konveksi seragam pemerintah', 'seragam kerja pengadaan', 'vendor seragam kerja terpercaya', 'konveksi seragam tasikmalaya', 'pengadaan seragam dinas jawa barat', 'vendor kemeja dinas instansi', 'brief pengadaan seragam instansi', 'vendor seragam custom indonesia', 'memilih vendor seragam kerja'],
     body: [
       'Dalam proses pengadaan, vendor tidak cukup hanya melihat contoh desain. Mereka perlu memahami konteks penggunaan, rentang ukuran, detail bordir, komposisi warna, dan batas waktu pemakaian seragam.',
       'Instansi yang menyiapkan data lebih rapi sejak awal akan lebih mudah membandingkan proposal, estimasi bahan, dan alur revisi. Hal ini penting agar keputusan tidak hanya didasarkan pada harga, tetapi juga kesiapan produksi.',
@@ -575,7 +575,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Seragam komunitas, gathering, dan event akan terlihat lebih kuat jika logo, warna utama, dan model dipilih sesuai situasi pemakaian.',
     seoTitle: 'Seragam Komunitas dan Kemeja Event Custom | Bradwear Indonesia',
     seoDescription: 'Pelajari cara menyiapkan seragam komunitas, kemeja event custom, dan kemeja kostum custom agar branding tim lebih rapi, nyaman dipakai, dan mudah diproduksi.',
-    keywords: ['seragam komunitas', 'kemeja event custom', 'kemeja kostum custom', 'seragam gathering', 'vendor kemeja komunitas'],
+    keywords: ['seragam komunitas', 'kemeja event custom', 'kemeja kostum custom', 'seragam gathering', 'vendor kemeja komunitas', 'seragam event outdoor', 'kemeja komunitas bordir', 'seragam panitia event', 'kemeja gathering custom', 'seragam alumni custom', 'branding seragam komunitas', 'vendor seragam event tasikmalaya'],
     body: [
       'Komunitas dan penyelenggara event sering memerlukan seragam yang terlihat kuat di foto, mudah dikenali, tetapi tetap nyaman dipakai berjam-jam. Karena itu, pemilihan kain dan warna tidak bisa hanya mengikuti tren visual.',
       'Untuk event di ruang luar, model yang lebih ringan dan cepat kering sering menjadi pilihan aman. Sementara untuk komunitas yang ingin tampil lebih formal, potongan kemeja dengan bordir identitas masih menjadi opsi paling fleksibel.',
@@ -625,7 +625,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Bordir logo instansi pada kemeja dinas perlu dipersiapkan dari file, ukuran, warna benang, dan posisi agar identitas visual tetap rapi saat dipakai harian.',
     seoTitle: 'Bordir Logo Instansi pada Kemeja Dinas | Bradwear Indonesia',
     seoDescription: 'Pelajari cara menyiapkan bordir logo instansi pada kemeja dinas, seragam kerja, dan kemeja custom agar hasil tetap presisi, terbaca, dan konsisten saat produksi.',
-    keywords: ['bordir logo instansi', 'bordir kemeja dinas', 'logo bordir seragam kerja', 'bordir nama dan logo', 'ukuran bordir kemeja custom'],
+    keywords: ['bordir logo instansi', 'bordir kemeja dinas', 'logo bordir seragam kerja', 'bordir nama dan logo', 'ukuran bordir kemeja custom', 'digitizing bordir logo', 'bordir logo perusahaan', 'posisi bordir kemeja dinas', 'warna benang bordir seragam', 'bordir identitas instansi', 'bordir logo di dada kemeja', 'vendor bordir kemeja tasikmalaya'],
     body: [
       'Bordir logo instansi pada kemeja dinas tidak cukup hanya mengandalkan file gambar yang terlihat jelas di layar. Tim produksi tetap perlu file yang bersih, kontras yang cukup, dan bentuk detail yang masih masuk akal untuk diterjemahkan ke jalur benang.',
       'Masalah yang paling sering muncul biasanya ada pada ukuran logo yang terlalu kecil atau terlalu padat. Ketika detail terlalu rapat, hasil bordir bisa terlihat penuh, garis tipis hilang, dan identitas visual justru sulit dibaca dari jarak normal.',
@@ -675,7 +675,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Celana tactical untuk tim operasional perlu dibahas dari bahan, pola gerak, kantong, dan kekuatan jahitan agar tetap nyaman dipakai dalam mobilitas tinggi.',
     seoTitle: 'Celana Tactical dan Seragam Lapangan Custom | Bradwear Indonesia',
     seoDescription: 'Panduan memilih celana tactical, celana kerja, dan seragam lapangan custom untuk tim operasional agar bahan, potongan, dan detail fungsional sesuai kebutuhan kerja.',
-    keywords: ['celana tactical custom', 'celana kerja lapangan', 'seragam lapangan custom', 'pants operasional instansi', 'celana tactical tim operasional'],
+    keywords: ['celana tactical custom', 'celana kerja lapangan', 'seragam lapangan custom', 'pants operasional instansi', 'celana tactical tim operasional', 'celana kerja outdoor', 'celana tactical bordir', 'celana operasional perusahaan', 'celana cargo lapangan custom', 'celana dinas operasional', 'vendor celana tactical tasikmalaya', 'seragam lengkap atasan celana tactical'],
     body: [
       'Celana tactical untuk tim operasional tidak bisa dipilih hanya dari tampilan luar. Kebutuhan lapangan biasanya menuntut kombinasi antara bahan yang cukup kuat, pola yang memberi ruang gerak, dan detail kantong yang benar-benar berguna saat bekerja.',
       'Untuk pekerjaan yang sering berpindah titik, naik turun kendaraan, atau bergerak dalam posisi jongkok dan berjalan jauh, struktur potongan celana sangat berpengaruh pada kenyamanan harian. Celana yang terlalu kaku memang terlihat tegas, tetapi cepat melelahkan jika dipakai sepanjang hari.',
@@ -725,7 +725,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Memilih vendor seragam kerja di Tasikmalaya sebaiknya tidak berhenti di harga, tetapi juga melihat alur konsultasi, sample, revisi, dan kontrol produksi.',
     seoTitle: 'Vendor Seragam Kerja Tasikmalaya untuk Perusahaan | Bradwear Indonesia',
     seoDescription: 'Panduan memilih vendor seragam kerja Tasikmalaya, vendor kemeja custom, dan konveksi seragam perusahaan agar proses sample, approval, dan produksi lebih terkontrol.',
-    keywords: ['vendor seragam kerja tasikmalaya', 'konveksi seragam perusahaan tasikmalaya', 'vendor kemeja custom tasikmalaya', 'seragam kerja custom jawa barat', 'pengadaan seragam perusahaan tasikmalaya'],
+    keywords: ['vendor seragam kerja tasikmalaya', 'konveksi seragam perusahaan tasikmalaya', 'vendor kemeja custom tasikmalaya', 'seragam kerja custom jawa barat', 'pengadaan seragam perusahaan tasikmalaya', 'konveksi kemeja dinas tasikmalaya', 'vendor seragam terpercaya jawa barat', 'produksi seragam kerja tasikmalaya', 'jasa seragam custom tasikmalaya', 'vendor seragam lokal tasikmalaya', 'bradwear tasikmalaya seragam', 'konveksi seragam jawa barat terpercaya'],
     body: [
       'Memilih vendor seragam kerja Tasikmalaya untuk perusahaan tidak cukup hanya melihat portofolio foto atau daftar harga. Tim pengadaan juga perlu memahami bagaimana vendor menangani konsultasi, sample, revisi desain, dan koordinasi produksi dari awal sampai pengiriman.',
       'Vendor yang baik biasanya mampu menerjemahkan kebutuhan perusahaan ke format kerja yang lebih rapi. Mereka tidak hanya menjawab pertanyaan bahan dan model, tetapi juga membantu memecah kebutuhan per divisi, target pemakaian, hingga pembagian item yang berbeda antar tim.',
@@ -775,7 +775,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Bradwear Indonesia tumbuh sebagai partner seragam custom yang menyeimbangkan kualitas bahan, desain, kontrol produksi, dan komunikasi yang lebih terarah untuk instansi maupun perusahaan.',
     seoTitle: 'Tentang Bradwear Indonesia dan Standar Produksi Seragam Custom',
     seoDescription: 'Kenali profil Bradwear Indonesia, standar produksi seragam custom, founder Gilang, pengelola website Maris Ibrahim, serta pendekatan kerja yang rapi untuk instansi dan perusahaan.',
-    keywords: ['tentang bradwear indonesia', 'profil bradwear indonesia', 'founder bradwear gilang', 'seragam custom tasikmalaya', 'standar produksi seragam custom', 'vendor kemeja custom indonesia'],
+    keywords: ['tentang bradwear indonesia', 'profil bradwear indonesia', 'founder bradwear gilang', 'seragam custom tasikmalaya', 'standar produksi seragam custom', 'vendor kemeja custom indonesia', 'bradwear indonesia tasikmalaya', 'konveksi seragam custom profesional', 'maris ibrahim bradwear', 'brand seragam custom indonesia', 'vendor seragam terpercaya tasikmalaya', 'produksi kemeja dinas tasikmalaya'],
     body: [
       'Bradwear Indonesia dibangun untuk menjawab kebutuhan seragam custom yang tidak hanya bagus di foto, tetapi juga tertata rapi saat masuk ke proses pengadaan. Banyak instansi, perusahaan, dan komunitas membutuhkan vendor yang mampu menjelaskan bahan, model, bordir logo, dan timeline produksi secara lebih jelas sejak awal. Dari kebutuhan inilah Bradwear tumbuh sebagai partner yang mengutamakan ketelitian, konsistensi, dan komunikasi yang lebih mudah diikuti.',
       'Di balik brand ini, Gilang berperan sebagai owner sekaligus founder yang membangun arah kerja Bradwear dari kebutuhan lapangan yang nyata. Fokus utamanya adalah memastikan setiap seragam yang diproduksi tidak berhenti di visual menarik, melainkan benar-benar relevan dengan konteks pemakaian, ritme kerja tim, dan identitas instansi yang memesan. Sementara itu, pengelolaan website Bradwear ditangani oleh Maris Ibrahim agar katalog, artikel, serta jalur konsultasi digital tetap terstruktur dan mudah diakses user dari desktop maupun mobile.',
@@ -824,7 +824,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Layanan Bradwear tidak berhenti di penjualan produk, tetapi mencakup konsultasi model, pemilihan bahan, penyesuaian identitas, hingga alur produksi dan pengiriman.',
     seoTitle: 'Produk dan Jasa Seragam Custom Bradwear Indonesia',
     seoDescription: 'Lihat produk dan jasa Bradwear Indonesia untuk kemeja custom, seragam dinas, jaket, rompi, polo, celana tactical, desain custom, dan konsultasi pengadaan seragam.',
-    keywords: ['produk seragam custom bradwear', 'jasa kemeja custom', 'seragam dinas custom', 'jasa bordir logo instansi', 'vendor rompi jaket polo custom', 'celana tactical custom'],
+    keywords: ['produk seragam custom bradwear', 'jasa kemeja custom', 'seragam dinas custom', 'jasa bordir logo instansi', 'vendor rompi jaket polo custom', 'celana tactical custom', 'jasa seragam perusahaan bradwear', 'produk kemeja kerja custom', 'layanan pengadaan seragam tasikmalaya', 'vendor seragam lengkap indonesia', 'kemeja polo rompi jaket custom', 'katalog produk seragam bradwear'],
     body: [
       'Produk dan jasa Bradwear disusun untuk memudahkan tim pengadaan memilih jalur kerja yang paling sesuai. Di satu sisi, tersedia model dasar seperti kemeja, celana, jaket, rompi, dan polo yang bisa langsung dijadikan fondasi. Di sisi lain, setiap model tetap terbuka untuk penyesuaian bahan, warna, identitas, dan kebutuhan fungsi yang lebih spesifik.',
       'Untuk kebutuhan formal, banyak user memulai dari kemeja dinas atau kemeja kerja custom yang tampil rapi dan profesional. Untuk kebutuhan lapangan, Bradwear juga menangani jaket kerja, rompi, serta celana tactical yang menuntut struktur bahan dan detail utilitas yang lebih tepat. Pendekatan ini membuat produk tidak dipilih dari tampilan semata, tetapi dari fungsi pemakaiannya sehari-hari.',
@@ -873,7 +873,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Keunggulan Bradwear hadir dari kombinasi kualitas bahan, standar jahit, layanan responsif, dan penyesuaian desain yang tetap terukur saat masuk produksi.',
     seoTitle: 'Keunggulan Bradwear dalam Produksi Seragam Custom',
     seoDescription: 'Pelajari keunggulan Bradwear Indonesia dalam produksi seragam custom: bahan berkualitas, jahitan presisi, harga kompetitif, dan layanan custom yang realistis.',
-    keywords: ['keunggulan bradwear', 'seragam custom berkualitas', 'jahitan presisi seragam kerja', 'vendor seragam instansi terpercaya', 'harga seragam custom kompetitif', 'bordir logo rapi'],
+    keywords: ['keunggulan bradwear', 'seragam custom berkualitas', 'jahitan presisi seragam kerja', 'vendor seragam instansi terpercaya', 'harga seragam custom kompetitif', 'bordir logo rapi', 'kualitas produksi seragam bradwear', 'vendor seragam profesional tasikmalaya', 'konveksi seragam custom terpercaya', 'kelebihan vendor seragam custom', 'seragam kerja jahitan rapi', 'bradwear vs vendor lain seragam'],
     body: [
       'Saat memilih vendor seragam custom, banyak user melihat hasil akhir di foto tanpa sempat menilai apa yang membuat kualitas itu bisa konsisten. Di Bradwear, keunggulan justru dibangun dari beberapa lapisan kerja sekaligus: pemilihan bahan yang sesuai fungsi, standar jahit yang rapi, komunikasi yang cepat, dan kemampuan menerjemahkan custom secara realistis ke proses produksi.',
       'Bahan menjadi titik awal yang sangat menentukan. Untuk kebutuhan formal, Bradwear cenderung mengarahkan pelanggan ke opsi yang tampil rapi dan nyaman dipakai penuh seharian. Untuk kebutuhan lapangan atau operasional, tim akan mempertimbangkan material yang lebih kuat, lebih stabil, dan lebih sesuai dengan aktivitas kerja yang intens. Pendekatan ini membantu user menghindari keputusan bahan yang kelihatan bagus di awal tetapi tidak cocok saat dipakai harian.',
@@ -922,7 +922,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Dari basis operasional di Tasikmalaya, Bradwear melayani instansi, perusahaan, sekolah, medis, dan komunitas dengan pola komunikasi yang dibuat tetap ringkas.',
     seoTitle: 'Klien dan Jangkauan Layanan Seragam Bradwear Indonesia',
     seoDescription: 'Lihat jangkauan layanan seragam Bradwear Indonesia untuk instansi, perusahaan, sekolah, rumah sakit, organisasi, dan komunitas di seluruh Indonesia.',
-    keywords: ['jangkauan layanan bradwear', 'vendor seragam seluruh indonesia', 'seragam custom tasikmalaya', 'klien bradwear indonesia', 'pengadaan seragam instansi nasional', 'vendor kemeja dinas jawa barat'],
+    keywords: ['jangkauan layanan bradwear', 'vendor seragam seluruh indonesia', 'seragam custom tasikmalaya', 'klien bradwear indonesia', 'pengadaan seragam instansi nasional', 'vendor kemeja dinas jawa barat', 'layanan seragam lintas kota', 'klien instansi pemerintah bradwear', 'seragam rumah sakit custom', 'seragam sekolah custom bradwear', 'vendor seragam komunitas seluruh indonesia', 'pengiriman seragam custom ke seluruh indonesia'],
     body: [
       'Jangkauan layanan Bradwear tidak dibangun dari iklan besar semata, tetapi dari proyek yang datang berulang karena hasil dan komunikasinya dinilai memuaskan. Dari Tasikmalaya, Bradwear melayani kebutuhan seragam untuk instansi pemerintahan, perusahaan swasta, sekolah, rumah sakit, organisasi, hingga komunitas yang tersebar di berbagai daerah.',
       'Setiap sektor datang dengan kebutuhannya sendiri. Instansi cenderung membutuhkan struktur identitas yang rapi dan mudah dipertanggungjawabkan. Perusahaan sering fokus pada citra profesional dan pembagian item per divisi. Sementara sekolah, komunitas, dan sektor medis membutuhkan pendekatan yang lebih spesifik pada fungsi pemakaian, kenyamanan, serta kejelasan visual identitas. Karena itu, jangkauan tidak hanya berarti luas secara wilayah, tetapi juga siap menangani banyak konteks kerja yang berbeda.',
@@ -971,7 +971,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Ukuran seragam karyawan perlu dikumpulkan dengan format yang konsisten agar proses produksi lebih cepat, hasil lebih nyaman, dan risiko salah size bisa ditekan sejak awal.',
     seoTitle: 'Cara Menentukan Ukuran Seragam Karyawan | Bradwear Indonesia',
     seoDescription: 'Panduan menentukan ukuran seragam karyawan, kemeja dinas, dan seragam kerja custom agar data size, gender, panjang lengan, dan revisi produksi lebih rapi.',
-    keywords: ['cara menentukan ukuran seragam karyawan', 'ukuran seragam kerja', 'size chart kemeja dinas', 'data ukuran seragam custom', 'panduan ukuran kemeja custom'],
+    keywords: ['cara menentukan ukuran seragam karyawan', 'ukuran seragam kerja', 'size chart kemeja dinas', 'data ukuran seragam custom', 'panduan ukuran kemeja custom', 'pengumpulan ukuran seragam karyawan', 'format data ukuran seragam', 'size guide seragam instansi', 'ukuran kemeja dinas pria wanita', 'validasi ukuran produksi seragam', 'cara ukur badan untuk seragam', 'menghindari salah size seragam'],
     body: [
       'Cara menentukan ukuran seragam karyawan sebaiknya dimulai dari satu format data yang dipakai seluruh tim. Format itu minimal berisi nama, divisi, gender, pilihan size, panjang lengan, jumlah item, dan catatan khusus bila ada kebutuhan ukuran berbeda dari standar.',
       'Kesalahan size paling sering muncul ketika data dikirim bertahap tanpa format yang sama. Ada nama yang dobel, ukuran yang tertukar, atau perubahan lengan yang tidak tercatat. Karena itu, PIC internal perlu mengunci satu file utama sebelum data masuk ke vendor seragam.',
@@ -1013,7 +1013,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Bahan seragam lapangan perlu disesuaikan dengan mobilitas kerja, cuaca, risiko gesek, dan target tampilan agar hasil tetap nyaman serta tahan dipakai harian.',
     seoTitle: 'Bahan Seragam Lapangan Ripstop, Drill, dan Tropical | Bradwear Indonesia',
     seoDescription: 'Bandingkan bahan seragam lapangan seperti Ripstop, Drill, dan Tropical untuk seragam operasional, PDL, kemeja dinas, dan kebutuhan kerja luar ruangan.',
-    keywords: ['bahan seragam lapangan', 'ripstop untuk seragam', 'drill seragam kerja', 'tropical kemeja dinas', 'bahan pdl custom'],
+    keywords: ['bahan seragam lapangan', 'ripstop untuk seragam', 'drill seragam kerja', 'tropical kemeja dinas', 'bahan pdl custom', 'perbandingan ripstop drill tropical', 'bahan seragam operasional luar ruang', 'kain kemeja lapangan tahan lama', 'drill vs tropical seragam', 'bahan seragam tahan gesekan', 'material pdl lapangan', 'memilih bahan seragam kerja outdoor'],
     body: [
       'Bahan seragam lapangan yang tepat harus menjawab dua kebutuhan sekaligus: kuat menghadapi aktivitas dan tetap nyaman dipakai dalam durasi panjang. Karena itu, pemilihan bahan sebaiknya dimulai dari konteks kerja, bukan dari nama kain yang paling populer.',
       'Ripstop biasanya dipertimbangkan untuk kebutuhan yang lebih aktif karena struktur kainnya membantu menahan gesekan dan aktivitas luar ruangan. Bahan ini cocok untuk seragam lapangan, PDL, rompi, atau item operasional yang dipakai pada situasi kerja lebih dinamis.',
@@ -1055,7 +1055,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Lead time produksi seragam custom dipengaruhi oleh kelengkapan brief, jumlah item, approval desain, ketersediaan bahan, bordir, dan antrean kerja saat order masuk.',
     seoTitle: 'Lead Time Produksi Seragam Custom | Bradwear Indonesia',
     seoDescription: 'Pahami faktor lead time produksi seragam custom, kemeja dinas, PDH, PDL, rompi, jaket, dan celana tactical agar jadwal order lebih realistis.',
-    keywords: ['lead time produksi seragam custom', 'estimasi produksi kemeja dinas', 'timeline order seragam', 'waktu produksi seragam kerja', 'produksi pdh pdl custom'],
+    keywords: ['lead time produksi seragam custom', 'estimasi produksi kemeja dinas', 'timeline order seragam', 'waktu produksi seragam kerja', 'produksi pdh pdl custom', 'faktor lead time seragam', 'berapa lama produksi seragam custom', 'estimasi waktu order seragam instansi', 'jadwal produksi kemeja custom', 'proses produksi seragam dari brief ke jadi', 'antrean produksi seragam', 'cara mempercepat lead time seragam'],
     body: [
       'Lead time produksi seragam custom tidak hanya ditentukan oleh proses jahit. Sebelum masuk produksi, vendor perlu membaca brief, menyesuaikan desain, mengecek bahan, memvalidasi ukuran, dan mengunci detail identitas seperti logo, nama, atau jabatan.',
       'Order bisa berjalan lebih cepat jika data awal lengkap sejak konsultasi pertama. Jumlah item, model, warna, bahan, ukuran, deadline pemakaian, dan file logo yang jelas akan membantu tim menyusun estimasi tanpa terlalu banyak klarifikasi ulang.',
@@ -1097,7 +1097,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Bordir nama personel, jabatan, dan divisi pada seragam kerja perlu disiapkan dengan format yang konsisten agar hasil akhir terlihat profesional.',
     seoTitle: 'Bordir Nama Personel dan Jabatan Seragam Kerja | Bradwear Indonesia',
     seoDescription: 'Panduan menyiapkan bordir nama personel, jabatan, dan divisi pada kemeja dinas, seragam kerja, PDH, PDL, dan kemeja custom.',
-    keywords: ['bordir nama personel seragam', 'bordir jabatan kemeja dinas', 'bordir nama kemeja kerja', 'logo dan nama seragam', 'bordir divisi seragam custom'],
+    keywords: ['bordir nama personel seragam', 'bordir jabatan kemeja dinas', 'bordir nama kemeja kerja', 'logo dan nama seragam', 'bordir divisi seragam custom', 'format data bordir nama personel', 'ejaan nama bordir seragam', 'bordir jabatan instansi', 'bordir nama karyawan seragam kerja', 'standar penulisan bordir seragam', 'ukuran teks bordir kemeja', 'bordir nama dan gelar personel'],
     body: [
       'Bordir nama personel dan jabatan pada seragam kerja membutuhkan standar yang jelas sejak awal. Tanpa standar, satu batch produksi bisa berisi variasi penulisan yang tidak konsisten, misalnya singkatan jabatan berbeda, kapitalisasi tidak sama, atau urutan nama yang berubah.',
       'Data bordir sebaiknya dikumpulkan dalam tabel yang memisahkan nama, jabatan, divisi, posisi bordir, dan catatan khusus. Format seperti ini memudahkan vendor membaca kebutuhan sekaligus membantu PIC internal mengecek ulang sebelum approval final.',
@@ -1139,7 +1139,7 @@ export const ARTICLES: Article[] = [
     excerpt: 'Vendor seragam custom untuk klien lintas daerah perlu punya katalog jelas, komunikasi rapi, validasi spesifikasi, dan alur pengiriman yang mudah dipantau.',
     seoTitle: 'Vendor Seragam Custom Seluruh Indonesia | Bradwear Indonesia',
     seoDescription: 'Cari vendor seragam custom seluruh Indonesia untuk kemeja dinas, seragam kerja, rompi, jaket, polo, dan celana tactical dengan alur order online yang jelas.',
-    keywords: ['vendor seragam custom seluruh indonesia', 'vendor kemeja custom indonesia', 'konveksi seragam kerja nasional', 'seragam custom online', 'vendor seragam perusahaan indonesia'],
+    keywords: ['vendor seragam custom seluruh indonesia', 'vendor kemeja custom indonesia', 'konveksi seragam kerja nasional', 'seragam custom online', 'vendor seragam perusahaan indonesia', 'order seragam custom jarak jauh', 'vendor seragam online terpercaya', 'pengiriman seragam ke seluruh indonesia', 'konveksi seragam nasional whatsapp', 'jasa seragam custom kirim ke luar kota', 'bradwear vendor nasional', 'vendor seragam custom daerah indonesia'],
     body: [
       'Vendor seragam custom seluruh Indonesia perlu dinilai dari kemampuan mengelola proyek jarak jauh. Katalog online, konsultasi WhatsApp, ringkasan spesifikasi, dan validasi desain menjadi penting karena tidak semua pelanggan bisa datang langsung ke workshop.',
       'Hal pertama yang perlu dicek adalah kejelasan katalog dan model. User sebaiknya bisa melihat pilihan kemeja dinas, rompi, jaket, polo, atau celana tactical, lalu memahami fungsi tiap model sebelum berdiskusi lebih lanjut dengan admin.',

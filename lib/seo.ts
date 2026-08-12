@@ -146,10 +146,15 @@ const buildArticleMeta = (article: Article): SeoMeta => ({
     ...SEO_META[RouteKey.ARTIKEL].keywords,
     ...article.keywords,
     article.title,
-    article.excerpt,
+    article.seoTitle,
     article.category,
     article.authorRole,
     `artikel ${article.category.toLowerCase()}`,
+    `artikel seragam custom bradwear`,
+    `${article.category.toLowerCase()} tasikmalaya`,
+    `${article.category.toLowerCase()} jawa barat`,
+    `panduan ${article.category.toLowerCase()} custom`,
+    `bradwear indonesia ${article.category.toLowerCase()}`,
   ]),
   schema: [],
 });
@@ -249,9 +254,9 @@ const buildStaticLandingMeta = (pathname: string): SeoMeta | null => {
     },
     [ROUTE_PATHS[RouteKey.HOME]]: {
       title: 'Bradwear Indonesia | Jasa Pembuatan Seragam Custom',
-      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, PDL, wearpack, polo, jaket, dan celana tactical custom untuk perusahaan, instansi, komunitas, dan UMKM.',
+      description: 'Bradwear Indonesia melayani pembuatan kemeja dinas, PDH, wearpack, polo, jaket, dan celana tactical custom dengan banyak pilihan model tactical untuk perusahaan, instansi, komunitas, dan UMKM.',
       path: ROUTE_PATHS[RouteKey.HOME],
-      keywords: dedupeKeywords(['seragam custom', 'kemeja dinas', 'pdh pdl', 'wearpack', 'polo custom', 'jaket custom', 'celana tactical', SITE_NAME]),
+      keywords: dedupeKeywords(['seragam custom', 'kemeja dinas', 'pdh', 'wearpack', 'polo custom', 'jaket custom', 'celana tactical', 'model tactical custom', SITE_NAME]),
       schema: [],
     },
     [ROUTE_PATHS[RouteKey.CLIENT]]: {
@@ -398,8 +403,12 @@ const buildRouteKeywords = (
     ? [
       article.title,
       article.seoTitle,
+      article.seoDescription,
       article.category,
       ...article.keywords,
+      `artikel ${article.category.toLowerCase()} bradwear`,
+      `${article.category.toLowerCase()} tasikmalaya`,
+      `${article.category.toLowerCase()} jawa barat`,
       pathname.includes('/artikel/') ? 'artikel detail seragam' : 'artikel bradwear',
     ]
     : [];
@@ -1085,12 +1094,69 @@ export const applySeoMeta = (route: RouteKey, pathname: string, products: Produc
       property: 'article:author',
       content: article.author,
     });
+    upsertMetaTag('meta[property="article:section"]', {
+      property: 'article:section',
+      content: article.category,
+    });
+    // Extended article tags for each individual article
+    upsertMetaTag('meta[name="subject"]', { name: 'subject', content: article.seoTitle });
+    upsertMetaTag('meta[name="abstract"]', { name: 'abstract', content: article.highlight });
+    upsertMetaTag('meta[name="topic"]', { name: 'topic', content: article.category });
+    upsertMetaTag('meta[name="summary"]', { name: 'summary', content: article.seoDescription });
+    upsertMetaTag('meta[name="url"]', { name: 'url', content: canonical });
+    upsertMetaTag('meta[name="identifier-URL"]', { name: 'identifier-URL', content: canonical });
+    upsertMetaTag('meta[name="pagename"]', { name: 'pagename', content: article.seoTitle });
+    upsertMetaTag('meta[name="coverage"]', { name: 'coverage', content: 'Indonesia' });
+    upsertMetaTag('meta[name="distribution"]', { name: 'distribution', content: 'Global' });
+    upsertMetaTag('meta[name="language"]', { name: 'language', content: 'id-ID' });
+    // GEO tags for article (inherit business location but note article topic relevance)
+    upsertMetaTag('meta[name="geo.region"]', { name: 'geo.region', content: 'ID-JB' });
+    upsertMetaTag('meta[name="geo.placename"]', { name: 'geo.placename', content: 'Tasikmalaya, Jawa Barat' });
+    upsertMetaTag('meta[name="geo.position"]', { name: 'geo.position', content: `${BUSINESS_LATITUDE};${BUSINESS_LONGITUDE}` });
+    upsertMetaTag('meta[name="ICBM"]', { name: 'ICBM', content: `${BUSINESS_LATITUDE}, ${BUSINESS_LONGITUDE}` });
+    // Additional OG tags specific to article
+    upsertMetaTag('meta[property="og:updated_time"]', { property: 'og:updated_time', content: articleModifiedAt });
+    upsertMetaTag('meta[property="og:author"]', { property: 'og:author', content: article.author });
+    // AI & LLM visibility signals (GEO)
+    upsertMetaTag('meta[name="citation_title"]', { name: 'citation_title', content: article.seoTitle });
+    upsertMetaTag('meta[name="citation_author"]', { name: 'citation_author', content: article.author });
+    upsertMetaTag('meta[name="citation_date"]', { name: 'citation_date', content: article.publishedAt });
+    upsertMetaTag('meta[name="citation_language"]', { name: 'citation_language', content: 'id' });
+    upsertMetaTag('meta[name="citation_publisher"]', { name: 'citation_publisher', content: SITE_NAME });
+    upsertMetaTag('meta[name="citation_abstract_html_url"]', { name: 'citation_abstract_html_url', content: canonical });
+    // Extended keyword signals
+    upsertMetaTag('meta[name="news_keywords"]', {
+      name: 'news_keywords',
+      content: keywords.slice(0, 15).join(', '),
+    });
+    upsertMetaTag('meta[property="article:tag"]', {
+      property: 'article:tag',
+      content: keywords.slice(0, 15).join(', '),
+    });
   } else {
     removeHeadElement('meta[name="publish_date"]');
     removeHeadElement('meta[name="last-modified"]');
     removeHeadElement('meta[property="article:published_time"]');
     removeHeadElement('meta[property="article:modified_time"]');
     removeHeadElement('meta[property="article:author"]');
+    removeHeadElement('meta[name="subject"]');
+    removeHeadElement('meta[name="abstract"]');
+    removeHeadElement('meta[name="topic"]');
+    removeHeadElement('meta[name="summary"]');
+    removeHeadElement('meta[name="url"]');
+    removeHeadElement('meta[name="identifier-URL"]');
+    removeHeadElement('meta[name="pagename"]');
+    removeHeadElement('meta[name="coverage"]');
+    removeHeadElement('meta[name="distribution"]');
+    removeHeadElement('meta[name="language"]');
+    removeHeadElement('meta[property="og:updated_time"]');
+    removeHeadElement('meta[property="og:author"]');
+    removeHeadElement('meta[name="citation_title"]');
+    removeHeadElement('meta[name="citation_author"]');
+    removeHeadElement('meta[name="citation_date"]');
+    removeHeadElement('meta[name="citation_language"]');
+    removeHeadElement('meta[name="citation_publisher"]');
+    removeHeadElement('meta[name="citation_abstract_html_url"]');
   }
 
   let script = document.getElementById('bradwear-jsonld');
