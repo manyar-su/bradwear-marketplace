@@ -26,7 +26,7 @@ import {
 import { Article, Category, Product, RouteKey, SeoMeta, SiteFaqItem } from '../types';
 
 const SEO_ICON_URL = `${SITE_URL}/favicon-bradwear.png`;
-const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/thumbnail-bradwear.webp`;
+const SEO_PREVIEW_IMAGE_URL = `${SITE_URL}/thumbnail-bradwear.jpg`;
 const SEO_PREVIEW_IMAGE_ALT = 'Preview seragam custom Bradwear Indonesia';
 const BRADWEAR_FOUNDER_NAME = 'Gilang';
 const BRADWEAR_WEBSITE_MANAGER = 'Maris Ibrahim';
